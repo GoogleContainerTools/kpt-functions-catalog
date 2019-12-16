@@ -1,0 +1,50 @@
+{
+  "name": "kubelinter",
+  "version": "0.0.1",
+  "description": "Linters for commonly found issues in Kubernetes configurations",
+  "author": "kpt Authors",
+  "license": "Apache-2.0",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -Rf node_modules/ dist/",
+    "lint": "tslint -p package.json; ts-node node_modules/prettier/bin-prettier.js \"src/**\" \"*.json\" --check",
+    "lint-license": "jsgl --local .",
+    "format": "ts-node node_modules/prettier/bin-prettier.js \"src/**\" \"*.json\" --write",
+    "pretest": "npm run build",
+    "test": "ts-node node_modules/jasmine/bin/jasmine --config=jasmine.json",
+    "posttest": "npm run lint",
+    "add-function": "npm init kpt-functions add-function",
+    "update-generated-types": "npm init kpt-functions update-generated-types",
+    "local": "npm init kpt-functions run-local",
+    "build-functions": "npm test && npm init kpt-functions build-functions",
+    "push-functions": "npm init kpt-functions push-functions",
+    "publish-functions": "npm init kpt-functions build-functions && npm init kpt-functions push-functions"
+  },
+  "dependencies": {
+    "kpt-functions": "file:/deps/kpt-functions/kpt-functions-0.0.1.tgz"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^3.3.12",
+    "@types/lodash": "^4.14.144",
+    "@types/node": "^12.7.2",
+    "jasmine": "^3.4.0",
+    "js-green-licenses": "^1.1.0",
+    "prettier": "^1.18.2",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.19.0",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-config-prettier": "1.18.0",
+    "typescript": "^3.5.3"
+  },
+  "dev_kpt": {
+    "docker_repo_base": "gcr.io/kpt-functions-demo"
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all"
+  }
+}

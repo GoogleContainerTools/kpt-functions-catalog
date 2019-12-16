@@ -1,0 +1,7 @@
+apiVersion: foo-corp.com/v1
+kind: FulfillmentCenter
+metadata:
+  name: staging
+  namespace: shipping-staging
+spec:
+  address: 100 Main St.

@@ -1,0 +1,38 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint-config-prettier"],
+  "jsRules": {},
+  "rules": {
+    "no-null-keyword": true,
+    "no-console": false,
+    "interface-name": [true, "never-prefix"],
+    "object-literal-sort-keys": false,
+    "object-literal-key-quotes": [true, "as-needed"],
+    "max-classes-per-file": false,
+    "naming-convention": [
+      true,
+      {
+        "type": "default",
+        "format": "camelCase"
+      },
+      {
+        "type": "type",
+        "format": "PascalCase"
+      },
+      {
+        "type": "enumMember",
+        "modifiers": ["global"],
+        "format": "UPPER_CASE"
+      },
+      {
+        "type": "variable",
+        "modifiers": ["global", "const"],
+        "format": "UPPER_CASE"
+      }
+    ]
+  },
+  "rulesDirectory": ["tslint-consistent-codestyle"],
+  "linterOptions": {
+    "exclude": ["**/gen/**", "node_modules/**"]
+  }
+}
