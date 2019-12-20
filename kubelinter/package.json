@@ -15,12 +15,13 @@
     "pretest": "npm run build",
     "test": "ts-node node_modules/jasmine/bin/jasmine --config=jasmine.json",
     "posttest": "npm run lint",
-    "add-function": "npm init kpt-functions add-function",
-    "update-generated-types": "npm init kpt-functions update-generated-types",
-    "local": "npm init kpt-functions run-local",
-    "build-functions": "npm test && npm init kpt-functions build-functions",
-    "push-functions": "npm init kpt-functions push-functions",
-    "publish-functions": "npm init kpt-functions build-functions && npm init kpt-functions push-functions"
+    "kpt:type-create": "npm init kpt-functions type-create",
+    "kpt:function-create": "npm init kpt-functions function-create",
+    "kpt:docker-create": "npm init kpt-functions docker-create",
+    "kpt:docker-build": "npm test && npm init kpt-functions docker-build",
+    "kpt:docker-push": "npm init kpt-functions docker-push",
+    "kpt:docker-publish": "npm init kpt-functions docker-build && npm init kpt-functions docker-push",
+    "kpt:workflow-config-create": "npm init kpt-functions workflow-config-create"
   },
   "dependencies": {
     "kpt-functions": "file:/deps/kpt-functions/kpt-functions-0.0.1.tgz"
