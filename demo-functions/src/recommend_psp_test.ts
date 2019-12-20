@@ -35,7 +35,7 @@ function psp(allowPrivilegeEscalation: boolean): PodSecurityPolicy {
 
 const RUNNER = new TestRunner(recommendPsp);
 
-describe(recommendPsp.name, () => {
+describe('recommendPsp', () => {
   it('passes empty repos', RUNNER.run());
 
   it(

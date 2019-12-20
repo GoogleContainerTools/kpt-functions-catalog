@@ -17,6 +17,7 @@
 import { Configs, newManifestError, TestRunner } from 'kpt-functions';
 import { ClusterRoleBinding, RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';
 import { disallowRoleBindingSubject, SUBJECT_NAME } from './validate_rolebinding';
+import { ConfigMap } from './gen/io.k8s.api.core.v1';
 
 function roleBinding(name: string, ...subjects: Subject[]): RoleBinding {
   return new RoleBinding({
@@ -24,7 +25,7 @@ function roleBinding(name: string, ...subjects: Subject[]): RoleBinding {
     roleRef: {
       apiGroup: 'rbac',
       kind: 'Role',
-      name: 'admin',
+      name: 'alice',
     },
     subjects: subjects,
   });
@@ -33,7 +34,11 @@ function roleBinding(name: string, ...subjects: Subject[]): RoleBinding {
 const RUNNER = new TestRunner(disallowRoleBindingSubject);
 
 describe(disallowRoleBindingSubject.name, () => {
-  it('passes empty input', RUNNER.run());
+  let functionConfig = ConfigMap.named('config');
+  functionConfig.data = {};
+  functionConfig.data![SUBJECT_NAME] = 'alice@example.com';
+
+  it('passes empty input', RUNNER.run(undefined, undefined, true));
 
   it(
     'passes valid RoleBindings',
@@ -45,7 +50,7 @@ describe(disallowRoleBindingSubject.name, () => {
             kind: 'User',
           }),
         ],
-        new Map([[SUBJECT_NAME.name, 'admin@example.com']]),
+        functionConfig,
       ),
     ),
   );
@@ -56,11 +61,11 @@ describe(disallowRoleBindingSubject.name, () => {
       new Configs(
         [
           roleBinding('alice', {
-            name: 'admin@example.com',
+            name: 'alice@example.com',
             kind: 'User',
           }),
         ],
-        new Map([[SUBJECT_NAME.name, 'admin@example.com']]),
+        functionConfig,
       ),
       newManifestError('Found RoleBindings with banned subjects'),
     ),
@@ -76,17 +81,17 @@ describe(disallowRoleBindingSubject.name, () => {
             roleRef: {
               apiGroup: 'rbac',
               kind: 'Role',
-              name: 'admin',
+              name: 'alice',
             },
             subjects: [
               {
-                name: 'admin@example.com',
+                name: 'alice@example.com',
                 kind: 'User',
               },
             ],
           }),
         ],
-        new Map([[SUBJECT_NAME.name, 'admin@example.com']]),
+        functionConfig,
       ),
     ),
   );

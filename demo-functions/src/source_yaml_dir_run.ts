@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-import { RUNNER } from './source_yaml_dir';
+import { readYAMLDir } from './source_yaml_dir';
+import { run } from 'kpt-functions';
 
-RUNNER.run();
+run(readYAMLDir);

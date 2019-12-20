@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-import { RUNNER } from './hydrate_anthos_team';
+import { hydrateAnthosTeam } from './hydrate_anthos_team';
+import { run } from 'kpt-functions';
 
-RUNNER.run();
+run(hydrateAnthosTeam);

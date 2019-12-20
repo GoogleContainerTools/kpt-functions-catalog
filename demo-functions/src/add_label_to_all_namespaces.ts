@@ -14,37 +14,35 @@
  * limitations under the License.
  */
 
-import { Configs, Param, Runner } from 'kpt-functions';
-import { isNamespace, Namespace } from './gen/io.k8s.api.core.v1';
+import { KptFunc, addLabel } from 'kpt-functions';
+import { isNamespace } from './gen/io.k8s.api.core.v1';
 
-export const LABEL_NAME = new Param('lable_name', {
-  required: true,
-  help: 'Label name to annotate namespaces with',
-});
+export const LABEL_NAME = 'label_name';
+export const LABEL_VALUE = 'label_value';
 
-export const LABEL_VALUE = new Param('label_value', {
-  required: true,
-  help: 'Label value to annotate namespaces with',
-});
+export const addLabelToAllNamespaces: KptFunc = (configs) => {
+  const labelName = configs.getFunctionConfigValueOrThrow(LABEL_NAME);
+  const labelValue = configs.getFunctionConfigValueOrThrow(LABEL_VALUE);
+  configs.get(isNamespace).forEach((n) => addLabel(n, labelName, labelValue));
+};
 
-/**
- * Add a label to all namespaces found in configs.
- *
- * @param configs The configs to validate/mutate.
- */
-export function addLabelToAllNamespaces(configs: Configs) {
-  const labelName = configs.getParam(LABEL_NAME)!;
-  const labelValue = configs.getParam(LABEL_VALUE)!;
+addLabelToAllNamespaces.usage = `
+Adds a label to all Namespaces.
 
-  configs.get(isNamespace).forEach((n) => addLabelToNamespace(n, labelName, labelValue));
-}
+Configured using a ConfigMap with the following keys:
 
-function addLabelToNamespace(namespace: Namespace, labelName: string, labelValue: string) {
-  if (namespace.metadata.labels === undefined) {
-    namespace.metadata.labels = {};
-  }
+${LABEL_NAME}: Label name to add to Namespaces.
+${LABEL_VALUE}: Label value to add to Namespaces.
 
-  namespace.metadata.labels[labelName] = labelValue;
-}
+Example:
 
-export const RUNNER = Runner.newFunc(addLabelToAllNamespaces, LABEL_NAME, LABEL_VALUE);
+To add a label 'color: orange' to Namespaces:
+
+apiVersion: v1
+kind: ConfigMap
+data:
+  ${LABEL_NAME}: color
+  ${LABEL_VALUE}: orange
+metadata:
+  name: my-config
+`;

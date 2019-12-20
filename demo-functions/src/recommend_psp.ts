@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import { Configs, Runner } from 'kpt-functions';
+import { KptFunc } from 'kpt-functions';
 import { isPodSecurityPolicy } from './gen/io.k8s.api.policy.v1beta1';
 
-// Ensures allowPrivilegeEscalation is always set to false for PodSecurityPolicies.
-export function recommendPsp(configs: Configs) {
+export const recommendPsp: KptFunc = (configs) => {
   configs
     .get(isPodSecurityPolicy)
     .filter((psp) => psp.spec && psp.spec.allowPrivilegeEscalation !== false)
     .forEach((psp) => (psp!.spec!.allowPrivilegeEscalation = false));
-}
+};
 
-export const RUNNER = Runner.newFunc(recommendPsp);
+recommendPsp.usage = `
+Mutates all PodSecurityPolicy by setting 'spec.allowPrivilegeEscalation' field to 'false'.
+`;
