@@ -18,19 +18,17 @@ import * as fs from 'fs';
 import { existsSync, mkdirSync } from 'fs';
 import * as glob from 'glob';
 import { DumpOptions, safeDump } from 'js-yaml';
-import * as kpt from 'kpt-functions';
+import * as kpt from '@googlecontainertools/kpt-functions';
 import * as path from 'path';
 import { isNamespace, Namespace } from './gen/io.k8s.api.core.v1';
+import {
+  KptFunc,
+  SOURCE_PATH_ANNOTATION,
+  SOURCE_INDEX_ANNOTATION,
+} from '@googlecontainertools/kpt-functions';
 
-export const SINK_DIR = new kpt.Param('sink_dir', {
-  help: 'Path to the config directory to write to.',
-  required: true,
-});
-export const OVERWRITE = new kpt.Param('overwrite', {
-  help: `If "true", overwrite existing YAML files in sink_dir.
-Otherwise, fail if any YAML files exist.`,
-});
-
+export const SINK_DIR = 'sink_dir';
+export const OVERWRITE = 'overwrite';
 const DEFAULT_NAMESPACE = 'default';
 const YAML_STYLE: DumpOptions = {
   /** indentation width to use (in spaces). */
@@ -39,26 +37,13 @@ const YAML_STYLE: DumpOptions = {
   noArrayIndent: true,
 };
 
-/**
- * Write a directory of kubernetes YAML configs.
- *
- * If an object has the SOURCE_PATH_ANNOTATION, the file is created at that path.
- * Otherwise, the file is created at the top level dir using this convention for
- * the file name:
- *
- * |<namespace>/|<kind>_<name>.yaml
- *
- * If two objects have the same SOURCE_PATH_ANNOTATION, a multi-document file is
- * created. Ordering within this file is based on the order of objects in the input.
- */
-export function writeYAMLDir(configs: kpt.Configs) {
-  const sinkDir = configs.getParam(SINK_DIR)!;
-  const overwrite = configs.getParam(OVERWRITE) === 'true';
+export const writeYAMLDir: KptFunc = (configs) => {
+  const sinkDir = configs.getFunctionConfigValueOrThrow(SINK_DIR);
+  const overwrite = configs.getFunctionConfigValue(OVERWRITE) === 'true';
 
-  // Potential filesystem race conditions if another process is manipulating ths directory.
   const yamls = listYamlFiles(sinkDir);
   if (!overwrite && yamls.length > 0) {
-    throw new Error(`--sink_dir contains YAML files and --overwrite is not set to "true".`);
+    throw new Error(`sink dir contains YAML files and overwrite is not set to string 'true'.`);
   }
 
   const filesToDelete = new Set(yamls);
@@ -93,17 +78,46 @@ export function writeYAMLDir(configs: kpt.Configs) {
   filesToDelete.forEach((file) => {
     fs.unlinkSync(file);
   });
-}
+};
+
+writeYAMLDir.usage = `
+Creates a directory of YAML files.
+
+If an object has the '${SOURCE_PATH_ANNOTATION}' annotation, the file is created at that path.
+Otherwise, this convention is used for the file path:
+
+|<namespace>/|<kind>_<name>.yaml
+
+e.g.:
+
+my-namespace/rolebinding_alice.yaml
+clusterrole_sre.yaml
+
+If two objects have the same path annotation, a multi-document file is
+created. Ordering within this file is based on the '${SOURCE_INDEX_ANNOTATION}' annotation.
+
+Configured using a ConfigMap with the following keys:
+
+${SINK_DIR}: Path to the config directory to write to.
+${OVERWRITE}: [Optional] If 'true', overwrite existing YAML files. Otherwise, fail if any YAML files exist.
+
+Example:
+
+apiVersion: v1
+kind: ConfigMap
+data:
+  ${SINK_DIR}: /path/to/sink/dir
+  ${OVERWRITE}: 'true'
+metadata:
+  name: my-config
+`;
 
 function listYamlFiles(dir: string): string[] {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
-  // TODO(b/142947511): Does this work on Windows?
   return glob.sync(dir + '/**/*.+(yaml|yml)');
 }
-
-export const RUNNER = kpt.Runner.newSink(writeYAMLDir, SINK_DIR, OVERWRITE);
 
 function toYaml(o: kpt.KubernetesObject): string {
   try {
@@ -156,7 +170,7 @@ export function buildSourcePath(o: kpt.KubernetesObject): string {
  * If an object is missing index annotation, default to using zero.
  */
 function compareSourceIndex(o1: kpt.KubernetesObject, o2: kpt.KubernetesObject): number {
-  const i1 = Number(kpt.getAnnotation(o1, kpt.SOURCE_INDEX_ANNOTATION)) | 0;
-  const i2 = Number(kpt.getAnnotation(o2, kpt.SOURCE_INDEX_ANNOTATION)) | 0;
+  const i1 = Number(kpt.getAnnotation(o1, kpt.SOURCE_INDEX_ANNOTATION)) || 0;
+  const i2 = Number(kpt.getAnnotation(o2, kpt.SOURCE_INDEX_ANNOTATION)) || 0;
   return i1 - i2;
 }

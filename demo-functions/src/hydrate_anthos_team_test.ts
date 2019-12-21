@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Configs, TestRunner } from 'kpt-functions';
+import { Configs, TestRunner } from '@googlecontainertools/kpt-functions';
 import { Team } from './gen/dev.cft.anthos.v1alpha1';
 import { Namespace } from './gen/io.k8s.api.core.v1';
 import { ClusterRole, RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';

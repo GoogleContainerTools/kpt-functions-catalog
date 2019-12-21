@@ -16,10 +16,10 @@
 
 import { compareSync } from 'dir-compare';
 import * as fs from 'fs-extra';
-import * as kpt from 'kpt-functions';
+import * as kpt from '@googlecontainertools/kpt-functions';
 import * as os from 'os';
 import * as path from 'path';
-import { Namespace, Pod } from './gen/io.k8s.api.core.v1';
+import { Namespace, Pod, ConfigMap } from './gen/io.k8s.api.core.v1';
 import { Role, RoleBinding } from './gen/io.k8s.api.rbac.v1';
 import { buildSourcePath, OVERWRITE, SINK_DIR, writeYAMLDir } from './sink_yaml_dir';
 
@@ -42,12 +42,14 @@ function matchesExpected(dir: string) {
 
 describe('writeYAMLDir', () => {
   let tmpDir: string = '';
+  let functionConfig = ConfigMap.named('config');
 
   beforeEach(() => {
     // Ensures tmpDir is unset before testing. Detects incorrectly running tests in parallel, or
     // tests not cleaning up properly.
     expect(tmpDir).toEqual('');
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yaml-dir-sink-test'));
+    functionConfig.data = {};
   });
 
   afterEach(() => {
@@ -59,8 +61,9 @@ describe('writeYAMLDir', () => {
 
   it('test dir', () => {
     const input = readIntermediate();
+    functionConfig.data![SINK_DIR] = tmpDir;
+    const configs = new kpt.Configs(input.getAll(), functionConfig);
 
-    const configs = new kpt.Configs(input.getAll(), new Map([[SINK_DIR.name, tmpDir]]));
     writeYAMLDir(configs);
 
     matchesExpected(tmpDir);
@@ -69,25 +72,18 @@ describe('writeYAMLDir', () => {
   it("throws if --overwrite isn't passed for non-empty directory", () => {
     fs.copySync(SINK_DIR_EXPECTED, tmpDir);
     const input = readIntermediate();
+    functionConfig.data![SINK_DIR] = tmpDir;
+    const configs = new kpt.Configs(input.getAll(), functionConfig);
 
-    const configs = new kpt.Configs(input.getAll(), new Map([[SINK_DIR.name, tmpDir]]));
-    let caughtErr = false;
-    try {
-      writeYAMLDir(configs);
-    } catch (err) {
-      caughtErr = true;
-    }
-    if (!caughtErr) {
-      console.log(tmpDir);
-      fail('Expected failure on writing to existing files');
-    }
+    expect(() => writeYAMLDir(configs)).toThrow();
   });
 
   it("silently makes output directory if it doesn't exist", () => {
     const sinkDir = path.resolve(tmpDir, 'foo');
-
     const input = readIntermediate();
-    const configs = new kpt.Configs(input.getAll(), new Map([[SINK_DIR.name, sinkDir]]));
+    functionConfig.data![SINK_DIR] = sinkDir;
+    const configs = new kpt.Configs(input.getAll(), functionConfig);
+
     writeYAMLDir(configs);
 
     matchesExpected(sinkDir);
@@ -95,25 +91,22 @@ describe('writeYAMLDir', () => {
 
   it('overwrites if --overwrite is passed for non-empty directory', () => {
     fs.copySync(SINK_DIR_EXPECTED, tmpDir);
-
     // Modify contents of existing file.
     fs.copySync(
       path.resolve(tmpDir, 'foo-corp-1.0.0', 'podsecuritypolicy_psp.yaml'),
       path.resolve(tmpDir, 'foo-corp-1.0.0', 'clusterrole_pod-creator.yaml'),
       { overwrite: true },
     );
-
     // Move file to a different location.
     fs.moveSync(
       path.resolve(tmpDir, 'foo-corp-1.0.0', 'podsecuritypolicy_psp.yaml'),
       path.resolve(tmpDir, 'foo-corp-1.0.0', 'other.yaml'),
     );
     const input = readIntermediate();
+    functionConfig.data![SINK_DIR] = tmpDir;
+    functionConfig.data![OVERWRITE] = 'true';
+    const configs = new kpt.Configs(input.getAll(), functionConfig);
 
-    const configs = new kpt.Configs(
-      input.getAll(),
-      new Map([[SINK_DIR.name, tmpDir], [OVERWRITE.name, 'true']]),
-    );
     writeYAMLDir(configs);
 
     // Ensure the resulting directory is actually overwritten.

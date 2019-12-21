@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import { Configs, Runner } from 'kpt-functions';
+import { KptFunc } from '@googlecontainertools/kpt-functions';
 
-/**
- * A NO OP kpt function used for testing/demo purposes.
- *
- * @param configs The configs to validate/mutate.
- */
-export function noOp(configs: Configs) {}
+export const noOp: KptFunc = (configs) => {};
 
-export const RUNNER = Runner.newFunc(noOp);
+noOp.usage = `
+A NO OP kpt function used for testing and demo purposes.
+`;

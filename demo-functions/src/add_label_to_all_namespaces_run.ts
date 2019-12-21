@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-import { RUNNER } from './add_label_to_all_namespaces';
+import { addLabelToAllNamespaces } from './add_label_to_all_namespaces';
+import { run } from '@googlecontainertools/kpt-functions';
 
-RUNNER.run();
+run(addLabelToAllNamespaces);

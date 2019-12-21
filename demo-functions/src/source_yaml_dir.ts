@@ -17,31 +17,19 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import { safeLoadAll } from 'js-yaml';
-import * as kpt from 'kpt-functions';
+import * as kpt from '@googlecontainertools/kpt-functions';
 import * as path from 'path';
+import { KptFunc } from '@googlecontainertools/kpt-functions';
 
-export const SOURCE_DIR = new kpt.Param('source_dir', {
-  help: 'Path to the source config directory',
-  required: true,
-});
-export const FILTER_IVNALID = new kpt.Param('filter_invalid', {
-  help: `If "true", Ignores objects that are not valid Kubernetes objects`,
-  required: false,
-});
+export const SOURCE_DIR = 'source_dir';
+export const FILTER_IVNALID = 'filter_invalid';
 
-/**
- * Reads a directory of kubernetes YAML configs recursively.
- *
- * An error is thrown if there are any exceptions reading files or parsing YAML.
- * Returns a ConfigError if any YAML file is not a KubernetesObject.
- */
-export function readYAMLDir(configs: kpt.Configs) {
-  const sourceDir = configs.getParam(SOURCE_DIR)!;
-  const ignoreInvalid = configs.getParam(FILTER_IVNALID) === 'true';
+export const readYAMLDir: KptFunc = (configs) => {
+  const sourceDir = configs.getFunctionConfigValueOrThrow(SOURCE_DIR);
+  const ignoreInvalid = configs.getFunctionConfigValue(FILTER_IVNALID) === 'true';
   const files = glob.sync(sourceDir + '/**/*.+(yaml|yml)');
 
-  // TODO(frankf): It's easy for source functions to not do this.
-  // Explore way for framework to take care of this.
+  // Discard any input objects since this is a source function.
   configs.deleteAll();
 
   const errs: kpt.ConfigError[] = [];
@@ -54,7 +42,25 @@ export function readYAMLDir(configs: kpt.Configs) {
 
   // TODO(willbeason): Provide way to return multiple errors since we want one error per file.
   return errs && errs[0];
-}
+};
+
+readYAMLDir.usage = `
+Reads a directory of kubernetes YAML configs recursively.
+
+Configured using a ConfigMap with the following keys:
+
+${SOURCE_DIR}: Path to the config directory to read.
+${FILTER_IVNALID}: [Optional] If 'true', ignores invalid Kubernetes objects instead of failing.
+
+Example:
+
+apiVersion: v1
+kind: ConfigMap
+data:
+  ${SOURCE_DIR}: /path/to/source/dir
+metadata:
+  name: my-config
+`;
 
 function parseFile(
   configs: kpt.Configs,
@@ -73,7 +79,7 @@ function parseFile(
       return new kpt.ConfigError(
         `File contains invalid Kubernetes objects ${file}: ${JSON.stringify(invalidObjects)}
 
-To filter invalid objects using --filter_invalid flag.
+To filter invalid objects set ${FILTER_IVNALID} to 'true'
         `,
       );
     }
@@ -94,5 +100,3 @@ function readFileOrThrow(f: string): string {
     throw new Error(`Failed to read file ${f}: ${err}`);
   }
 }
-
-export const RUNNER = kpt.Runner.newSource(readYAMLDir, SOURCE_DIR, FILTER_IVNALID);

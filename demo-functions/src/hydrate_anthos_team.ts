@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-import { Configs, Runner } from 'kpt-functions';
+import { KptFunc } from '@googlecontainertools/kpt-functions';
 import { isTeam, Team } from './gen/dev.cft.anthos.v1alpha1';
 import { Namespace } from './gen/io.k8s.api.core.v1';
 import { RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';
 
 const ENVIRONMENTS = ['dev', 'prod'];
 
-// Generates native K8S resources from Anthos Toolkit Team custom resources.
-export function hydrateAnthosTeam(configs: Configs) {
+export const hydrateAnthosTeam: KptFunc = (configs) => {
   configs.get(isTeam).forEach((team) => {
     const name = team.metadata.name;
 
@@ -32,7 +31,7 @@ export function hydrateAnthosTeam(configs: Configs) {
       configs.insert(...expandTeam(team, ns));
     });
   });
-}
+};
 
 function roleSubjects(item: Team.Spec.Item): Subject[] {
   const userSubjects: Subject[] = (item.users || []).map(
@@ -69,4 +68,26 @@ function expandTeam(team: Team, namespace: string): RoleBinding[] {
   });
 }
 
-export const RUNNER = Runner.newFunc(hydrateAnthosTeam);
+hydrateAnthosTeam.usage = `
+Generates per-environment Namespaces and RoleBindings from the Anthos Team custom resource.
+
+Configured using a custom resource of kind Team, e.g.:
+
+apiVersion: anthos.cft.dev/v1alpha1
+kind: Team
+metadata:
+  name: payments
+spec:
+  roles:
+  - role: sre
+    users:
+    - jane@clearify.co
+  - groups:
+    - payments-developers@clearify.co
+    role: developer
+    users:
+    - basic@clearify.co
+
+This configuration creates 2 Namespaces (payments-prod, payments-dev)
+and corresponding Rolebinding objects in each of these Namespaces.
+`;

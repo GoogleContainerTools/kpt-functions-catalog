@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-import { RUNNER } from './recommend_psp';
+import { recommendPsp } from './recommend_psp';
+import { run } from '@googlecontainertools/kpt-functions';
 
-RUNNER.run();
+run(recommendPsp);

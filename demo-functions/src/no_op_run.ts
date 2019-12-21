@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-import { RUNNER } from './no_op';
+import { noOp } from './no_op';
+import { run } from '@googlecontainertools/kpt-functions';
 
-RUNNER.run();
+run(noOp);

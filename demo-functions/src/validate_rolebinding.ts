@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-import { Configs, KubernetesObject, newManifestError, Param, Runner } from 'kpt-functions';
+import { KubernetesObject, newManifestError, KptFunc } from '@googlecontainertools/kpt-functions';
 import { isRoleBinding } from './gen/io.k8s.api.rbac.v1';
 
-export const SUBJECT_NAME = new Param('subject_name', {
-  required: true,
-  help: 'Banned RoleBinding subjects.name',
-});
+export const SUBJECT_NAME = 'subject_name';
 
-// Validates there is no RBAC RoleBinding with the given subject name.
-export function disallowRoleBindingSubject(configs: Configs) {
-  const subjectName = configs.getParam(SUBJECT_NAME)!;
+export const disallowRoleBindingSubject: KptFunc = (configs) => {
+  const subjectName = configs.getFunctionConfigValueOrThrow(SUBJECT_NAME);
 
   const rbs: KubernetesObject[] = configs
     .get(isRoleBinding)
@@ -34,6 +30,21 @@ export function disallowRoleBindingSubject(configs: Configs) {
     return newManifestError('Found RoleBindings with banned subjects', ...rbs);
   }
   return;
-}
+};
 
-export const RUNNER = Runner.newFunc(disallowRoleBindingSubject, SUBJECT_NAME);
+disallowRoleBindingSubject.usage = `
+Disallows RBAC RoleBinding objects with the given subject name.
+
+Configured using a ConfigMap with the following key:
+
+${SUBJECT_NAME}: RoleBinding subjects.name to disallow.
+
+Example:
+
+apiVersion: v1
+kind: ConfigMap
+data:
+  ${SUBJECT_NAME}: alice
+metadata:
+  name: my-config
+`;

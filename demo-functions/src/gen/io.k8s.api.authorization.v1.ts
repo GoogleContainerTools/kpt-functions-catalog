@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KubernetesObject } from 'kpt-functions';
+import { KubernetesObject } from '@googlecontainertools/kpt-functions';
 import * as apisMetaV1 from './io.k8s.apimachinery.pkg.apis.meta.v1';
 
 // LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.

@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-import { Configs } from 'kpt-functions';
+import { Configs } from '@googlecontainertools/kpt-functions';
 import { addLabelToAllNamespaces, LABEL_NAME, LABEL_VALUE } from './add_label_to_all_namespaces';
-import { Namespace } from './gen/io.k8s.api.core.v1';
+import { Namespace, ConfigMap } from './gen/io.k8s.api.core.v1';
 
 const TEST_NAMESPACE = 'testNamespace';
 const TEST_LABEL_NAME = 'costCenter';
 const TEST_LABEL_VALUE = 'xyz';
 
 describe('addLabelToAllNamespaces', () => {
-  const params = new Map([
-    [LABEL_NAME.name, TEST_LABEL_NAME],
-    [LABEL_VALUE.name, TEST_LABEL_VALUE],
-  ]);
+  let functionConfig = ConfigMap.named('foo');
+  functionConfig.data = {};
+  functionConfig.data[LABEL_NAME] = TEST_LABEL_NAME;
+  functionConfig.data[LABEL_VALUE] = TEST_LABEL_VALUE;
 
-  it('empty input', () => {
-    expect(addLabelToAllNamespaces(new Configs(undefined, params))).toBeUndefined();
+  it('empty input ok', () => {
+    expect(addLabelToAllNamespaces(new Configs(undefined, functionConfig))).toBeUndefined();
   });
 
-  it('adds label namespace is metadata.labels is undefined', () => {
-    const actual = new Configs(undefined, params);
+  it('adds label namespace when metadata.labels is undefined', () => {
+    const actual = new Configs(undefined, functionConfig);
     actual.insert(Namespace.named(TEST_NAMESPACE));
 
     addLabelToAllNamespaces(actual);
@@ -51,8 +51,8 @@ describe('addLabelToAllNamespaces', () => {
     expect(actual.getAll()).toEqual(expected.getAll());
   });
 
-  it('adds label to namespace if metadata.labels is defined', () => {
-    const actual = new Configs(undefined, params);
+  it('adds label to namespace when metadata.labels is defined', () => {
+    const actual = new Configs(undefined, functionConfig);
     actual.insert(
       new Namespace({
         metadata: {

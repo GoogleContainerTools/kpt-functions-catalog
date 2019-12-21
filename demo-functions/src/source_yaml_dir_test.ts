@@ -16,17 +16,29 @@
 
 import { compareSync } from 'dir-compare';
 import * as fs from 'fs';
-import { Configs, FileFormat, isConfigError, readConfigs, writeConfigs } from 'kpt-functions';
+import {
+  Configs,
+  FileFormat,
+  isConfigError,
+  readConfigs,
+  writeConfigs,
+} from '@googlecontainertools/kpt-functions';
 import * as os from 'os';
 import * as path from 'path';
 import { readYAMLDir, SOURCE_DIR } from './source_yaml_dir';
+import { ConfigMap } from './gen/io.k8s.api.core.v1';
 
 describe('readYAMLDir', () => {
+  let functionConfig = ConfigMap.named('config');
+  functionConfig.data = {};
+
   it('works on empty dir', () => {
     const sourceDir = path.resolve(__dirname, '../test-data/source/empty');
+    functionConfig.data![SOURCE_DIR] = sourceDir;
+    const configs = new Configs(undefined, functionConfig);
 
-    const configs = new Configs(undefined, new Map([[SOURCE_DIR.name, sourceDir]]));
     readYAMLDir(configs);
+
     if (isConfigError(configs)) {
       fail('Unexpected error: ' + configs);
     } else {
@@ -38,12 +50,12 @@ describe('readYAMLDir', () => {
     const sourceDir = path.resolve(__dirname, '../test-data/source/foo-yaml');
     const expectedIntermediateFile = path.resolve(__dirname, '../test-data/intermediate/foo.yaml');
     const expectedConfigs = readConfigs(expectedIntermediateFile, FileFormat.YAML);
+    functionConfig.data![SOURCE_DIR] = sourceDir;
+    const actualConfigs = new Configs(undefined, functionConfig);
 
-    const actualConfigs = new Configs(undefined, new Map([[SOURCE_DIR.name, sourceDir]]));
     readYAMLDir(actualConfigs);
 
     expect(actualConfigs.getAll()).toEqual(expectedConfigs.getAll());
-
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yaml-dir-source-test'));
     const intermediateFile = path.join(tmpDir, 'foo.yaml');
     writeConfigs(intermediateFile, actualConfigs, FileFormat.YAML);
@@ -58,9 +70,11 @@ describe('readYAMLDir', () => {
 
   it('fails for invalid KubernetesObjects', () => {
     const sourceDir = path.resolve(__dirname, '../test-data/source/invalid');
+    functionConfig.data![SOURCE_DIR] = sourceDir;
+    const actualConfigs = new Configs(undefined, functionConfig);
 
-    const actualConfigs = new Configs(undefined, new Map([[SOURCE_DIR.name, sourceDir]]));
     const err = readYAMLDir(actualConfigs);
+
     if (!isConfigError(err)) {
       fail('Expected error, but got configs: ' + JSON.stringify(actualConfigs, undefined, 2));
     }

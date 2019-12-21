@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-import { RUNNER } from './sink_yaml_dir';
+import { writeYAMLDir } from './sink_yaml_dir';
+import { run } from '@googlecontainertools/kpt-functions';
 
-RUNNER.run();
+run(writeYAMLDir);

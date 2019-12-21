@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Configs, TestRunner } from 'kpt-functions';
+import { Configs, TestRunner } from '@googlecontainertools/kpt-functions';
 import { PodSecurityPolicy } from './gen/io.k8s.api.policy.v1beta1';
 import { recommendPsp } from './recommend_psp';
 
@@ -35,7 +35,7 @@ function psp(allowPrivilegeEscalation: boolean): PodSecurityPolicy {
 
 const RUNNER = new TestRunner(recommendPsp);
 
-describe(recommendPsp.name, () => {
+describe('recommendPsp', () => {
   it('passes empty repos', RUNNER.run());
 
   it(
