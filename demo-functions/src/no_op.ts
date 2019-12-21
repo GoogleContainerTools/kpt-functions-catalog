@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KptFunc } from 'kpt-functions';
+import { KptFunc } from '@googlecontainertools/kpt-functions';
 
 export const noOp: KptFunc = (configs) => {};
 

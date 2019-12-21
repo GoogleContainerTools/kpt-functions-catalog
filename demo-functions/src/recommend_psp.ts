@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KptFunc } from 'kpt-functions';
+import { KptFunc } from '@googlecontainertools/kpt-functions';
 import { isPodSecurityPolicy } from './gen/io.k8s.api.policy.v1beta1';
 
 export const recommendPsp: KptFunc = (configs) => {

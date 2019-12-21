@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Configs } from 'kpt-functions';
+import { Configs } from '@googlecontainertools/kpt-functions';
 import { addLabelToAllNamespaces, LABEL_NAME, LABEL_VALUE } from './add_label_to_all_namespaces';
 import { Namespace, ConfigMap } from './gen/io.k8s.api.core.v1';
 
@@ -32,7 +32,7 @@ describe('addLabelToAllNamespaces', () => {
     expect(addLabelToAllNamespaces(new Configs(undefined, functionConfig))).toBeUndefined();
   });
 
-  it('adds label namespace is metadata.labels is undefined', () => {
+  it('adds label namespace when metadata.labels is undefined', () => {
     const actual = new Configs(undefined, functionConfig);
     actual.insert(Namespace.named(TEST_NAMESPACE));
 
@@ -51,7 +51,7 @@ describe('addLabelToAllNamespaces', () => {
     expect(actual.getAll()).toEqual(expected.getAll());
   });
 
-  it('adds label to namespace if metadata.labels is defined', () => {
+  it('adds label to namespace when metadata.labels is defined', () => {
     const actual = new Configs(undefined, functionConfig);
     actual.insert(
       new Namespace({

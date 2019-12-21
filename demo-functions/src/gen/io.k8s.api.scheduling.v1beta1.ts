@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KubernetesObject } from 'kpt-functions';
+import { KubernetesObject } from '@googlecontainertools/kpt-functions';
 import * as apisMetaV1 from './io.k8s.apimachinery.pkg.apis.meta.v1';
 
 // DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.

@@ -15,6 +15,6 @@
  */
 
 import { disallowRoleBindingSubject } from './validate_rolebinding';
-import { run } from 'kpt-functions';
+import { run } from '@googlecontainertools/kpt-functions';
 
 run(disallowRoleBindingSubject);

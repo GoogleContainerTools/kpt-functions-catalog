@@ -18,10 +18,14 @@ import * as fs from 'fs';
 import { existsSync, mkdirSync } from 'fs';
 import * as glob from 'glob';
 import { DumpOptions, safeDump } from 'js-yaml';
-import * as kpt from 'kpt-functions';
+import * as kpt from '@googlecontainertools/kpt-functions';
 import * as path from 'path';
 import { isNamespace, Namespace } from './gen/io.k8s.api.core.v1';
-import { KptFunc, SOURCE_PATH_ANNOTATION, SOURCE_INDEX_ANNOTATION } from 'kpt-functions';
+import {
+  KptFunc,
+  SOURCE_PATH_ANNOTATION,
+  SOURCE_INDEX_ANNOTATION,
+} from '@googlecontainertools/kpt-functions';
 
 export const SINK_DIR = 'sink_dir';
 export const OVERWRITE = 'overwrite';
@@ -95,7 +99,7 @@ created. Ordering within this file is based on the '${SOURCE_INDEX_ANNOTATION}' 
 Configured using a ConfigMap with the following keys:
 
 ${SINK_DIR}: Path to the config directory to write to.
-${OVERWRITE}: If 'true', overwrite existing YAML files. Otherwise, fail if any YAML files exist.
+${OVERWRITE}: [Optional] If 'true', overwrite existing YAML files. Otherwise, fail if any YAML files exist.
 
 Example:
 

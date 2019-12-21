@@ -17,9 +17,9 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import { safeLoadAll } from 'js-yaml';
-import * as kpt from 'kpt-functions';
+import * as kpt from '@googlecontainertools/kpt-functions';
 import * as path from 'path';
-import { KptFunc } from 'kpt-functions';
+import { KptFunc } from '@googlecontainertools/kpt-functions';
 
 export const SOURCE_DIR = 'source_dir';
 export const FILTER_IVNALID = 'filter_invalid';
@@ -50,7 +50,7 @@ Reads a directory of kubernetes YAML configs recursively.
 Configured using a ConfigMap with the following keys:
 
 ${SOURCE_DIR}: Path to the config directory to read.
-${FILTER_IVNALID}: If 'true', ignores invalid Kubernetes objects instead of failing.
+${FILTER_IVNALID}: [Optional] If 'true', ignores invalid Kubernetes objects instead of failing.
 
 Example:
 

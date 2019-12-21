@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KubernetesObject, newManifestError, KptFunc } from 'kpt-functions';
+import { KubernetesObject, newManifestError, KptFunc } from '@googlecontainertools/kpt-functions';
 import { isRoleBinding } from './gen/io.k8s.api.rbac.v1';
 
 export const SUBJECT_NAME = 'subject_name';

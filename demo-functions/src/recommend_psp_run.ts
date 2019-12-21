@@ -15,6 +15,6 @@
  */
 
 import { recommendPsp } from './recommend_psp';
-import { run } from 'kpt-functions';
+import { run } from '@googlecontainertools/kpt-functions';
 
 run(recommendPsp);

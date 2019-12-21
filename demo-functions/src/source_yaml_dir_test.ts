@@ -16,7 +16,13 @@
 
 import { compareSync } from 'dir-compare';
 import * as fs from 'fs';
-import { Configs, FileFormat, isConfigError, readConfigs, writeConfigs } from 'kpt-functions';
+import {
+  Configs,
+  FileFormat,
+  isConfigError,
+  readConfigs,
+  writeConfigs,
+} from '@googlecontainertools/kpt-functions';
 import * as os from 'os';
 import * as path from 'path';
 import { readYAMLDir, SOURCE_DIR } from './source_yaml_dir';

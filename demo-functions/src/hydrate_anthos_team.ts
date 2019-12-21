@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KptFunc } from 'kpt-functions';
+import { KptFunc } from '@googlecontainertools/kpt-functions';
 import { isTeam, Team } from './gen/dev.cft.anthos.v1alpha1';
 import { Namespace } from './gen/io.k8s.api.core.v1';
 import { RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';

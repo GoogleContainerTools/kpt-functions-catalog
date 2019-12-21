@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KubernetesObject } from 'kpt-functions';
+import { KubernetesObject } from '@googlecontainertools/kpt-functions';
 import * as apiCoreV1 from './io.k8s.api.core.v1';
 import * as apisMetaV1 from './io.k8s.apimachinery.pkg.apis.meta.v1';
 

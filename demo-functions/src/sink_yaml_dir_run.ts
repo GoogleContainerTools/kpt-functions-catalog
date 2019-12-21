@@ -15,6 +15,6 @@
  */
 
 import { writeYAMLDir } from './sink_yaml_dir';
-import { run } from 'kpt-functions';
+import { run } from '@googlecontainertools/kpt-functions';
 
 run(writeYAMLDir);

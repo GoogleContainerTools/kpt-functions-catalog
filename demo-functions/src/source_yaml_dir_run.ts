@@ -15,6 +15,6 @@
  */
 
 import { readYAMLDir } from './source_yaml_dir';
-import { run } from 'kpt-functions';
+import { run } from '@googlecontainertools/kpt-functions';
 
 run(readYAMLDir);

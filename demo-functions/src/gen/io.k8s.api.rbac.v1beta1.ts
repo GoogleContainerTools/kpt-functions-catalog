@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KubernetesObject } from 'kpt-functions';
+import { KubernetesObject } from '@googlecontainertools/kpt-functions';
 import * as apisMetaV1 from './io.k8s.apimachinery.pkg.apis.meta.v1';
 
 // AggregationRule describes how to locate ClusterRoles to aggregate into the ClusterRole

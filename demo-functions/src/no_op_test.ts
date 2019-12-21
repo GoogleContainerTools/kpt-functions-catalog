@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Configs } from 'kpt-functions';
+import { Configs } from '@googlecontainertools/kpt-functions';
 import { noOp } from './no_op';
 import { Role } from './gen/io.k8s.api.rbac.v1';
 

@@ -16,7 +16,7 @@
 
 import { compareSync } from 'dir-compare';
 import * as fs from 'fs-extra';
-import * as kpt from 'kpt-functions';
+import * as kpt from '@googlecontainertools/kpt-functions';
 import * as os from 'os';
 import * as path from 'path';
 import { Namespace, Pod, ConfigMap } from './gen/io.k8s.api.core.v1';

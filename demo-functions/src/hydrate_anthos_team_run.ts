@@ -15,6 +15,6 @@
  */
 
 import { hydrateAnthosTeam } from './hydrate_anthos_team';
-import { run } from 'kpt-functions';
+import { run } from '@googlecontainertools/kpt-functions';
 
 run(hydrateAnthosTeam);

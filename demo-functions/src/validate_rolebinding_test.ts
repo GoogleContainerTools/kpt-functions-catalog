@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Configs, newManifestError, TestRunner } from 'kpt-functions';
+import { Configs, newManifestError, TestRunner } from '@googlecontainertools/kpt-functions';
 import { ClusterRoleBinding, RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';
 import { disallowRoleBindingSubject, SUBJECT_NAME } from './validate_rolebinding';
 import { ConfigMap } from './gen/io.k8s.api.core.v1';

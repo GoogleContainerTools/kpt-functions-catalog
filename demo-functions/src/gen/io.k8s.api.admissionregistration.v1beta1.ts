@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { KubernetesObject } from 'kpt-functions';
+import { KubernetesObject } from '@googlecontainertools/kpt-functions';
 import * as apisMetaV1 from './io.k8s.apimachinery.pkg.apis.meta.v1';
 
 // MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
