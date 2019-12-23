@@ -22,7 +22,7 @@
     "kpt:docker-create": "npm run kpt docker-create",
     "kpt:docker-build": "npm test && npm run kpt docker-build",
     "kpt:docker-push": "npm run kpt docker-push",
-    "kpt:docker-publish": "npm run kpt docker-build && npm run kpt docker-push",
+    "kpt:docker-publish": "npm run kpt:docker-build && npm run kpt:docker-push",
     "kpt:workflow-create": "npm run kpt workflow-create"
   },
   "dependencies": {
