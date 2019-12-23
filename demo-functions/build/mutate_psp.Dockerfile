@@ -33,4 +33,4 @@ WORKDIR /home/node/app
 
 COPY --from=builder /home/node/app /home/node/app
 
-ENTRYPOINT ["node", "/home/node/app/dist/hydrate_anthos_team_run.js"]
+ENTRYPOINT ["node", "/home/node/app/dist/mutate_psp_run.js"]

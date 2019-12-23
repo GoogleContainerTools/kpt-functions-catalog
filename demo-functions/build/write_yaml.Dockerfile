@@ -33,4 +33,4 @@ WORKDIR /home/node/app
 
 COPY --from=builder /home/node/app /home/node/app
 
-ENTRYPOINT ["node", "/home/node/app/dist/add_label_to_all_namespaces_run.js"]
+ENTRYPOINT ["node", "/home/node/app/dist/write_yaml_run.js"]

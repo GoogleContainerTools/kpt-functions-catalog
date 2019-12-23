@@ -16,7 +16,7 @@
 # TODO(b/141210134): Add props from func signature as inputs.parameters.
   - name: kpt-function-add-label-to-all-namespaces
     container:
-      image: gcr.io/kpt-functions/add-label-to-all-namespaces:dev
+      image: gcr.io/kpt-functions/label-namespace:dev
       args:
       - "--input"
       - "/tmp/in.json"

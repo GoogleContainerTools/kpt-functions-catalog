@@ -33,7 +33,7 @@ spec:
         type: storage
   steps:
     - name: sink-yaml-dir
-      image: gcr.io/kpt-functions/sink-yaml-dir:dev
+      image: gcr.io/kpt-functions/write-yaml:dev
       args:
       - "--input"
       - "/workspace/intermediate/${inputs.params.INPUT_FILE}.json"

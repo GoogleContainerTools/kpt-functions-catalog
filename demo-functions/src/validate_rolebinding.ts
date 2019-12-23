@@ -19,7 +19,7 @@ import { isRoleBinding } from './gen/io.k8s.api.rbac.v1';
 
 export const SUBJECT_NAME = 'subject_name';
 
-export const disallowRoleBindingSubject: KptFunc = (configs) => {
+export const validateRolebinding: KptFunc = (configs) => {
   const subjectName = configs.getFunctionConfigValueOrThrow(SUBJECT_NAME);
 
   const rbs: KubernetesObject[] = configs
@@ -32,7 +32,7 @@ export const disallowRoleBindingSubject: KptFunc = (configs) => {
   return;
 };
 
-disallowRoleBindingSubject.usage = `
+validateRolebinding.usage = `
 Disallows RBAC RoleBinding objects with the given subject name.
 
 Configured using a ConfigMap with the following key:

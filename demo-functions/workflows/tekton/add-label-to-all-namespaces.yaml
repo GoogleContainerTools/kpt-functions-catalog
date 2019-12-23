@@ -33,7 +33,7 @@ spec:
         type: storage
   steps:
     - name: add-label-to-all-namespaces
-      image: gcr.io/kpt-functions/add-label-to-all-namespaces:dev
+      image: gcr.io/kpt-functions/label-namespace:dev
       args:
       - "--input"
       - "/workspace/intermediate/${inputs.params.INPUT_FILE}.json"

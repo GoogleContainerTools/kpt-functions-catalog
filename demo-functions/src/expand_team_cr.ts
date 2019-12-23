@@ -21,7 +21,7 @@ import { RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';
 
 const ENVIRONMENTS = ['dev', 'prod'];
 
-export const hydrateAnthosTeam: KptFunc = (configs) => {
+export const expandTeamCr: KptFunc = (configs) => {
   configs.get(isTeam).forEach((team) => {
     const name = team.metadata.name;
 
@@ -68,8 +68,8 @@ function expandTeam(team: Team, namespace: string): RoleBinding[] {
   });
 }
 
-hydrateAnthosTeam.usage = `
-Generates per-environment Namespaces and RoleBindings from the Anthos Team custom resource.
+expandTeamCr.usage = `
+Generates per-environment Namespaces and RoleBindings from the 'Team' custom resource.
 
 Configured using a custom resource of kind Team, e.g.:
 

@@ -33,4 +33,4 @@ WORKDIR /home/node/app
 
 COPY --from=builder /home/node/app /home/node/app
 
-ENTRYPOINT ["node", "/home/node/app/dist/source_yaml_dir_run.js"]
+ENTRYPOINT ["node", "/home/node/app/dist/expand_team_cr_run.js"]

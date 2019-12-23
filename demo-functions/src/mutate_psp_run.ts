@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { readYAMLDir } from './source_yaml_dir';
+import { mutatePsp } from './mutate_psp';
 import { run } from '@googlecontainertools/kpt-functions';
 
-run(readYAMLDir);
+run(mutatePsp);

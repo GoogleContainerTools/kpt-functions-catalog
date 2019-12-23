@@ -16,7 +16,7 @@
 # TODO(b/141210134): Add props from func signature as inputs.parameters.
   - name: kpt-function-recommend-psp
     container:
-      image: gcr.io/kpt-functions/recommend-psp:dev
+      image: gcr.io/kpt-functions/mutate-psp:dev
       args:
       - "--input"
       - "/tmp/in.json"

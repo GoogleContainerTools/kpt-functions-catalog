@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { recommendPsp } from './recommend_psp';
+import { readYaml } from './read_yaml';
 import { run } from '@googlecontainertools/kpt-functions';
 
-run(recommendPsp);
+run(readYaml);
