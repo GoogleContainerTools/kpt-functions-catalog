@@ -1,4 +1,3 @@
-
 FROM node:10-alpine as builder
 
 RUN mkdir -p /home/node/app && \
