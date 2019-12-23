@@ -22,7 +22,7 @@ import * as path from 'path';
 import { readYaml, SOURCE_DIR } from './read_yaml';
 import { ConfigMap } from './gen/io.k8s.api.core.v1';
 
-describe('readYAMLDir', () => {
+describe('readYaml', () => {
   let functionConfig = ConfigMap.named('config');
   functionConfig.data = {};
 
