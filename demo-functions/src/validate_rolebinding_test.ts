@@ -16,7 +16,7 @@
 
 import { Configs, newManifestError, TestRunner } from '@googlecontainertools/kpt-functions';
 import { ClusterRoleBinding, RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';
-import { disallowRoleBindingSubject, SUBJECT_NAME } from './validate_rolebinding';
+import { validateRolebinding, SUBJECT_NAME } from './validate_rolebinding';
 import { ConfigMap } from './gen/io.k8s.api.core.v1';
 
 function roleBinding(name: string, ...subjects: Subject[]): RoleBinding {
@@ -31,9 +31,9 @@ function roleBinding(name: string, ...subjects: Subject[]): RoleBinding {
   });
 }
 
-const RUNNER = new TestRunner(disallowRoleBindingSubject);
+const RUNNER = new TestRunner(validateRolebinding);
 
-describe(disallowRoleBindingSubject.name, () => {
+describe(validateRolebinding.name, () => {
   let functionConfig = ConfigMap.named('config');
   functionConfig.data = {};
   functionConfig.data![SUBJECT_NAME] = 'alice@example.com';

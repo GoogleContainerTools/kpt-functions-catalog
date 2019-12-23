@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { disallowRoleBindingSubject } from './validate_rolebinding';
+import { validateRolebinding } from './validate_rolebinding';
 import { run } from '@googlecontainertools/kpt-functions';
 
-run(disallowRoleBindingSubject);
+run(validateRolebinding);

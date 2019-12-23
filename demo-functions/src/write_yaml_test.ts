@@ -21,7 +21,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { Namespace, Pod, ConfigMap } from './gen/io.k8s.api.core.v1';
 import { Role, RoleBinding } from './gen/io.k8s.api.rbac.v1';
-import { buildSourcePath, OVERWRITE, SINK_DIR, writeYAMLDir } from './sink_yaml_dir';
+import { buildSourcePath, OVERWRITE, SINK_DIR, writeYaml } from './write_yaml';
 
 const INTERMEDIATE_FILE = path.resolve(__dirname, '..', 'test-data', 'intermediate', 'foo.yaml');
 const SINK_DIR_EXPECTED = path.resolve(__dirname, '..', 'test-data', 'sink', 'foo-yaml');
@@ -64,7 +64,7 @@ describe('writeYAMLDir', () => {
     functionConfig.data![SINK_DIR] = tmpDir;
     const configs = new kpt.Configs(input.getAll(), functionConfig);
 
-    writeYAMLDir(configs);
+    writeYaml(configs);
 
     matchesExpected(tmpDir);
   });
@@ -75,7 +75,7 @@ describe('writeYAMLDir', () => {
     functionConfig.data![SINK_DIR] = tmpDir;
     const configs = new kpt.Configs(input.getAll(), functionConfig);
 
-    expect(() => writeYAMLDir(configs)).toThrow();
+    expect(() => writeYaml(configs)).toThrow();
   });
 
   it("silently makes output directory if it doesn't exist", () => {
@@ -84,7 +84,7 @@ describe('writeYAMLDir', () => {
     functionConfig.data![SINK_DIR] = sinkDir;
     const configs = new kpt.Configs(input.getAll(), functionConfig);
 
-    writeYAMLDir(configs);
+    writeYaml(configs);
 
     matchesExpected(sinkDir);
   });
@@ -107,7 +107,7 @@ describe('writeYAMLDir', () => {
     functionConfig.data![OVERWRITE] = 'true';
     const configs = new kpt.Configs(input.getAll(), functionConfig);
 
-    writeYAMLDir(configs);
+    writeYaml(configs);
 
     // Ensure the resulting directory is actually overwritten.
     matchesExpected(tmpDir);

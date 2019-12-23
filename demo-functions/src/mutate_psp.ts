@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-import { writeYAMLDir } from './sink_yaml_dir';
-import { run } from '@googlecontainertools/kpt-functions';
+import { KptFunc } from '@googlecontainertools/kpt-functions';
+import { isPodSecurityPolicy } from './gen/io.k8s.api.policy.v1beta1';
 
-run(writeYAMLDir);
+export const mutatePsp: KptFunc = (configs) => {
+  configs
+    .get(isPodSecurityPolicy)
+    .filter((psp) => psp.spec && psp.spec.allowPrivilegeEscalation !== false)
+    .forEach((psp) => (psp!.spec!.allowPrivilegeEscalation = false));
+};
+
+mutatePsp.usage = `
+Mutates all PodSecurityPolicy by setting 'spec.allowPrivilegeEscalation' field to 'false'.
+`;

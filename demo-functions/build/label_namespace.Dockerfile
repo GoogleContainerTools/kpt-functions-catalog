@@ -33,4 +33,4 @@ WORKDIR /home/node/app
 
 COPY --from=builder /home/node/app /home/node/app
 
-ENTRYPOINT ["node", "/home/node/app/dist/sink_yaml_dir_run.js"]
+ENTRYPOINT ["node", "/home/node/app/dist/label_namespace_run.js"]

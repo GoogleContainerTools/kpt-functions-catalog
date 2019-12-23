@@ -15,7 +15,7 @@
  */
 
 import { Configs } from '@googlecontainertools/kpt-functions';
-import { addLabelToAllNamespaces, LABEL_NAME, LABEL_VALUE } from './add_label_to_all_namespaces';
+import { labelNamespace, LABEL_NAME, LABEL_VALUE } from './label_namespace';
 import { Namespace, ConfigMap } from './gen/io.k8s.api.core.v1';
 
 const TEST_NAMESPACE = 'testNamespace';
@@ -29,14 +29,14 @@ describe('addLabelToAllNamespaces', () => {
   functionConfig.data[LABEL_VALUE] = TEST_LABEL_VALUE;
 
   it('empty input ok', () => {
-    expect(addLabelToAllNamespaces(new Configs(undefined, functionConfig))).toBeUndefined();
+    expect(labelNamespace(new Configs(undefined, functionConfig))).toBeUndefined();
   });
 
   it('adds label namespace when metadata.labels is undefined', () => {
     const actual = new Configs(undefined, functionConfig);
     actual.insert(Namespace.named(TEST_NAMESPACE));
 
-    addLabelToAllNamespaces(actual);
+    labelNamespace(actual);
 
     const expected = new Configs();
     expected.insert(
@@ -75,7 +75,7 @@ describe('addLabelToAllNamespaces', () => {
       }),
     );
 
-    addLabelToAllNamespaces(actual);
+    labelNamespace(actual);
 
     expect(actual.getAll()).toEqual(expected.getAll());
   });

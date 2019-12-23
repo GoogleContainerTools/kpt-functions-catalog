@@ -19,12 +19,11 @@ import * as glob from 'glob';
 import { safeLoadAll } from 'js-yaml';
 import * as kpt from '@googlecontainertools/kpt-functions';
 import * as path from 'path';
-import { KptFunc } from '@googlecontainertools/kpt-functions';
 
 export const SOURCE_DIR = 'source_dir';
 export const FILTER_IVNALID = 'filter_invalid';
 
-export const readYAMLDir: KptFunc = (configs) => {
+export const readYaml: kpt.KptFunc = (configs) => {
   const sourceDir = configs.getFunctionConfigValueOrThrow(SOURCE_DIR);
   const ignoreInvalid = configs.getFunctionConfigValue(FILTER_IVNALID) === 'true';
   const files = glob.sync(sourceDir + '/**/*.+(yaml|yml)');
@@ -44,7 +43,7 @@ export const readYAMLDir: KptFunc = (configs) => {
   return errs && errs[0];
 };
 
-readYAMLDir.usage = `
+readYaml.usage = `
 Reads a directory of kubernetes YAML configs recursively.
 
 Configured using a ConfigMap with the following keys:

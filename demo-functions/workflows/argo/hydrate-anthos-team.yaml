@@ -16,7 +16,7 @@
 # TODO(b/141210134): Add props from func signature as inputs.parameters.
   - name: kpt-function-hydrate-anthos-team
     container:
-      image: gcr.io/kpt-functions/hydrate-anthos-team:dev
+      image: gcr.io/kpt-functions/expand-team-cr:dev
       args:
       - "--input"
       - "/tmp/in.json"

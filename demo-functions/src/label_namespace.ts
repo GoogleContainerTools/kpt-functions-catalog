@@ -20,13 +20,13 @@ import { isNamespace } from './gen/io.k8s.api.core.v1';
 export const LABEL_NAME = 'label_name';
 export const LABEL_VALUE = 'label_value';
 
-export const addLabelToAllNamespaces: KptFunc = (configs) => {
+export const labelNamespace: KptFunc = (configs) => {
   const labelName = configs.getFunctionConfigValueOrThrow(LABEL_NAME);
   const labelValue = configs.getFunctionConfigValueOrThrow(LABEL_VALUE);
   configs.get(isNamespace).forEach((n) => addLabel(n, labelName, labelValue));
 };
 
-addLabelToAllNamespaces.usage = `
+labelNamespace.usage = `
 Adds a label to all Namespaces.
 
 Configured using a ConfigMap with the following keys:

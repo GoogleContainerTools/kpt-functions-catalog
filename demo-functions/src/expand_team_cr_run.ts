@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-import { KptFunc } from '@googlecontainertools/kpt-functions';
-import { isPodSecurityPolicy } from './gen/io.k8s.api.policy.v1beta1';
+import { expandTeamCr } from './expand_team_cr';
+import { run } from '@googlecontainertools/kpt-functions';
 
-export const recommendPsp: KptFunc = (configs) => {
-  configs
-    .get(isPodSecurityPolicy)
-    .filter((psp) => psp.spec && psp.spec.allowPrivilegeEscalation !== false)
-    .forEach((psp) => (psp!.spec!.allowPrivilegeEscalation = false));
-};
-
-recommendPsp.usage = `
-Mutates all PodSecurityPolicy by setting 'spec.allowPrivilegeEscalation' field to 'false'.
-`;
+run(expandTeamCr);

@@ -18,7 +18,7 @@ import { Configs, TestRunner } from '@googlecontainertools/kpt-functions';
 import { Team } from './gen/dev.cft.anthos.v1alpha1';
 import { Namespace } from './gen/io.k8s.api.core.v1';
 import { ClusterRole, RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';
-import { hydrateAnthosTeam } from './hydrate_anthos_team';
+import { expandTeamCr } from './expand_team_cr';
 
 function team(name: string, ...roles: Team.Spec.Item[]): Team {
   const team = new Team({
@@ -31,9 +31,9 @@ function team(name: string, ...roles: Team.Spec.Item[]): Team {
   return team;
 }
 
-const RUNNER = new TestRunner(hydrateAnthosTeam);
+const RUNNER = new TestRunner(expandTeamCr);
 
-describe(hydrateAnthosTeam.name, () => {
+describe(expandTeamCr.name, () => {
   it('does nothing to empty repos', RUNNER.run());
 
   it('does nothing to non-Team objects', RUNNER.run(new Configs([Namespace.named('backend')])));

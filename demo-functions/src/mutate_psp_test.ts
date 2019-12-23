@@ -16,7 +16,7 @@
 
 import { Configs, TestRunner } from '@googlecontainertools/kpt-functions';
 import { PodSecurityPolicy } from './gen/io.k8s.api.policy.v1beta1';
-import { recommendPsp } from './recommend_psp';
+import { mutatePsp } from './mutate_psp';
 
 function psp(allowPrivilegeEscalation: boolean): PodSecurityPolicy {
   return new PodSecurityPolicy({
@@ -33,7 +33,7 @@ function psp(allowPrivilegeEscalation: boolean): PodSecurityPolicy {
   });
 }
 
-const RUNNER = new TestRunner(recommendPsp);
+const RUNNER = new TestRunner(mutatePsp);
 
 describe('recommendPsp', () => {
   it('passes empty repos', RUNNER.run());

@@ -21,11 +21,6 @@ import { DumpOptions, safeDump } from 'js-yaml';
 import * as kpt from '@googlecontainertools/kpt-functions';
 import * as path from 'path';
 import { isNamespace, Namespace } from './gen/io.k8s.api.core.v1';
-import {
-  KptFunc,
-  SOURCE_PATH_ANNOTATION,
-  SOURCE_INDEX_ANNOTATION,
-} from '@googlecontainertools/kpt-functions';
 
 export const SINK_DIR = 'sink_dir';
 export const OVERWRITE = 'overwrite';
@@ -37,7 +32,7 @@ const YAML_STYLE: DumpOptions = {
   noArrayIndent: true,
 };
 
-export const writeYAMLDir: KptFunc = (configs) => {
+export const writeYaml: kpt.KptFunc = (configs) => {
   const sinkDir = configs.getFunctionConfigValueOrThrow(SINK_DIR);
   const overwrite = configs.getFunctionConfigValue(OVERWRITE) === 'true';
 
@@ -80,10 +75,10 @@ export const writeYAMLDir: KptFunc = (configs) => {
   });
 };
 
-writeYAMLDir.usage = `
+writeYaml.usage = `
 Creates a directory of YAML files.
 
-If an object has the '${SOURCE_PATH_ANNOTATION}' annotation, the file is created at that path.
+If an object has the '${kpt.SOURCE_PATH_ANNOTATION}' annotation, the file is created at that path.
 Otherwise, this convention is used for the file path:
 
 |<namespace>/|<kind>_<name>.yaml
@@ -94,7 +89,7 @@ my-namespace/rolebinding_alice.yaml
 clusterrole_sre.yaml
 
 If two objects have the same path annotation, a multi-document file is
-created. Ordering within this file is based on the '${SOURCE_INDEX_ANNOTATION}' annotation.
+created. Ordering within this file is based on the '${kpt.SOURCE_INDEX_ANNOTATION}' annotation.
 
 Configured using a ConfigMap with the following keys:
 

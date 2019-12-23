@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { hydrateAnthosTeam } from './hydrate_anthos_team';
+import { writeYaml } from './write_yaml';
 import { run } from '@googlecontainertools/kpt-functions';
 
-run(hydrateAnthosTeam);
+run(writeYaml);
