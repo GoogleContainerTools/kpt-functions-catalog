@@ -22,7 +22,7 @@ const TEST_NAMESPACE = 'testNamespace';
 const TEST_LABEL_NAME = 'costCenter';
 const TEST_LABEL_VALUE = 'xyz';
 
-describe('addLabelToAllNamespaces', () => {
+describe('labelNamespace', () => {
   let functionConfig = ConfigMap.named('foo');
   functionConfig.data = {};
   functionConfig.data[LABEL_NAME] = TEST_LABEL_NAME;
