@@ -40,7 +40,7 @@ function matchesExpected(dir: string) {
   }
 }
 
-describe('writeYAMLDir', () => {
+describe('writeYaml', () => {
   let tmpDir: string = '';
   let functionConfig = ConfigMap.named('config');
 
