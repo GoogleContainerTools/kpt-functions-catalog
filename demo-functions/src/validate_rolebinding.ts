@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { KubernetesObject, newManifestError, KptFunc } from '@googlecontainertools/kpt-functions';
+import {
+  KptFunc,
+  KubernetesObjectError,
+  MultiConfigError,
+} from '@googlecontainertools/kpt-functions';
 import { isRoleBinding } from './gen/io.k8s.api.rbac.v1';
 
 export const SUBJECT_NAME = 'subject_name';
@@ -22,12 +26,13 @@ export const SUBJECT_NAME = 'subject_name';
 export const validateRolebinding: KptFunc = (configs) => {
   const subjectName = configs.getFunctionConfigValueOrThrow(SUBJECT_NAME);
 
-  const rbs: KubernetesObject[] = configs
+  let errors: KubernetesObjectError[] = configs
     .get(isRoleBinding)
-    .filter((rb) => rb && rb.subjects && rb.subjects.find((s) => s.name === subjectName));
+    .filter((rb) => rb && rb.subjects && rb.subjects.find((s) => s.name === subjectName))
+    .map((rb) => new KubernetesObjectError('Object has banned subject', rb));
 
-  if (rbs.length) {
-    return newManifestError('Found RoleBindings with banned subjects', ...rbs);
+  if (errors.length) {
+    return new MultiConfigError('Found RoleBindings with banned subjects', errors);
   }
   return;
 };
