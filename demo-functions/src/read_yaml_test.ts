@@ -31,10 +31,10 @@ describe('readYaml', () => {
     functionConfig.data![SOURCE_DIR] = sourceDir;
     const configs = new kpt.Configs(undefined, functionConfig);
 
-    readYaml(configs);
+    const out = readYaml(configs);
 
-    if (kpt.isConfigError(configs)) {
-      fail('Unexpected error: ' + configs);
+    if (out instanceof kpt.ConfigError) {
+      fail('Unexpected error: ' + out);
     } else {
       expect(configs.getAll().length).toBe(0);
     }
@@ -67,9 +67,9 @@ describe('readYaml', () => {
     functionConfig.data![SOURCE_DIR] = sourceDir;
     const actualConfigs = new kpt.Configs(undefined, functionConfig);
 
-    const err = readYaml(actualConfigs);
+    const out = readYaml(actualConfigs);
 
-    if (!kpt.isConfigError(err)) {
+    if (!(out instanceof kpt.ConfigError)) {
       fail('Expected error, but got configs: ' + JSON.stringify(actualConfigs, undefined, 2));
     }
   });

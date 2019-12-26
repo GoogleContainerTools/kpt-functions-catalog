@@ -26,9 +26,9 @@ export const SINK_DIR = 'sink_dir';
 export const OVERWRITE = 'overwrite';
 const DEFAULT_NAMESPACE = 'default';
 const YAML_STYLE: DumpOptions = {
-  /** indentation width to use (in spaces). */
+  // indentation width to use (in spaces).
   indent: 2,
-  /** when true, will not add an indentation level to array elements */
+  // when true, will not add an indentation level to array elements.
   noArrayIndent: true,
 };
 
