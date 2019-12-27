@@ -11,8 +11,8 @@ WORKDIR /home/node/app
 COPY --chown=node:node .npmrc .
 
 # Install dependencies and cache them.
-COPY --chown=node:node package.json ./
-RUN npm install
+COPY --chown=node:node package*.json ./
+RUN npm ci
 
 # Build the source.
 COPY --chown=node:node tsconfig.json .
