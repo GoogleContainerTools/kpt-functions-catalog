@@ -81,11 +81,14 @@ Creates a directory of YAML files.
 If an object has the '${kpt.SOURCE_PATH_ANNOTATION}' annotation, the file is created at that path.
 Otherwise, this convention is used for the file path:
 
-|<namespace>/|<kind>_<name>.yaml
+[<namespace>]/<kind>_<name>.yaml
+
+default/<kind>_<name>.yaml
 
 e.g.:
 
 my-namespace/rolebinding_alice.yaml
+default/role_pod-creator.yaml
 clusterrole_sre.yaml
 
 If two objects have the same path annotation, a multi-document file is
