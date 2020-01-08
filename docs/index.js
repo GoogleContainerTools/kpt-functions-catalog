@@ -1,5 +1,5 @@
 const data = require('../catalog.json');
-const table = require('markdown-table')
+const table = require('markdown-table');
 
 function tableByType(type) {
     let t = [['Image', 'Description', 'Source']];
