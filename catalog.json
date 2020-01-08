@@ -17,21 +17,25 @@
   {
     "image": "gcr.io/kpt-functions/mutate-psp",
     "description": "[Demo] Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.",
-    "type": "recommendation"
+    "type": "mutation",
+    "demo": true
   },
   {
     "image": "gcr.io/kpt-functions/validate-rolebinding",
-    "description": "[Demo] Enforces a blacklist of subjects in RoleBinding objects.",
-    "type": "compliance"
+    "description": "Enforces a blacklist of subjects in RoleBinding objects.",
+    "type": "compliance",
+    "demo": true
   },
   {
     "image": "gcr.io/kpt-functions/expand-team-cr",
-    "description": "[Demo] Reads custom resources of type Team and generates multiple Namespace and RoleBinding objects.",
-    "type": "generation"
+    "description": "Reads custom resources of type Team and generates multiple Namespace and RoleBinding objects.",
+    "type": "generation",
+    "demo": true
   },
   {
     "image": "gcr.io/kpt-functions/no-op",
     "description": "[Demo] No Op function",
-    "type": "testing"
+    "type": "misc",
+    "demo": true
   }
 ]

@@ -4,7 +4,11 @@ const table = require('markdown-table')
 function tableByType(type) {
     let t = [['Image', 'Description']];
     data.filter(r => r.type === type).forEach(r => {
-        t.push([r.image, r.description]);
+        let d = r.description;
+        if (r.demo === true) {
+            d = '[Demo] ' + d;
+        }
+        t.push([r.image, d]);
     });
     return table(t);
 }
@@ -32,9 +36,17 @@ See [definition of sink functions][sink].
 
 ${tableByType('sink')}
 
-## Policy Enforcement
+## Policy Enforcement Functions
 
 ${tableByType('compliance')}
+
+## Configuration Generation Functions
+
+${tableByType('generation')}
+
+## Miscellaneous Functions
+
+${tableByType('misc')}
 
 [spec]: https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md
 [source]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/README.md#source-function
