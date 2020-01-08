@@ -2,13 +2,14 @@ const data = require('../catalog.json');
 const table = require('markdown-table')
 
 function tableByType(type) {
-    let t = [['Image', 'Description']];
+    let t = [['Image', 'Description', 'Source']];
     data.filter(r => r.type === type).forEach(r => {
         let d = r.description;
         if (r.demo === true) {
             d = '[Demo] ' + d;
         }
-        t.push([r.image, d]);
+        const s = `[Link](${r.source})`;
+        t.push([r.image, d, s]);
     });
     return table(t);
 }

@@ -13,36 +13,36 @@ These functions can be implemented using any toolchain such as the [KPT Function
 
 See [definition of source functions][source].
 
-| Image                          | Description                                                |
-| ------------------------------ | ---------------------------------------------------------- |
-| gcr.io/kpt-functions/read-yaml | Reads a directory of Kubernetes configuration recursively. |
+| Image                          | Description                                                | Source                                                                                           |
+| ------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| gcr.io/kpt-functions/read-yaml | Reads a directory of Kubernetes configuration recursively. | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions) |
 
 ## Sink Functions
 
 See [definition of sink functions][sink].
 
-| Image                           | Description                                                                                                                |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-functions/write-yaml | Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions. |
+| Image                           | Description                                                                                                                | Source                                                                                           |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| gcr.io/kpt-functions/write-yaml | Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions. | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions) |
 
 ## Policy Enforcement Functions
 
-| Image                                     | Description                                                                                                      |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-functions/gatekeeper-validate  | Enforces OPA constraints on input objects. The constraints are also passed as part of the input to the function. |
-| gcr.io/kpt-functions/validate-rolebinding | [Demo] Enforces a blacklist of subjects in RoleBinding objects.                                                  |
+| Image                                     | Description                                                                                                      | Source                                                                                                    |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| gcr.io/kpt-functions/gatekeeper-validate  | Enforces OPA constraints on input objects. The constraints are also passed as part of the input to the function. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/go/pkg/functions/gatekeeper) |
+| gcr.io/kpt-functions/validate-rolebinding | [Demo] Enforces a blacklist of subjects in RoleBinding objects.                                                  | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions)          |
 
 ## Configuration Generation Functions
 
-| Image                               | Description                                                                                          |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-functions/expand-team-cr | [Demo] Reads custom resources of type Team and generates multiple Namespace and RoleBinding objects. |
+| Image                               | Description                                                                                          | Source                                                                                           |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| gcr.io/kpt-functions/expand-team-cr | [Demo] Reads custom resources of type Team and generates multiple Namespace and RoleBinding objects. | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions) |
 
 ## Miscellaneous Functions
 
-| Image                      | Description                  |
-| -------------------------- | ---------------------------- |
-| gcr.io/kpt-functions/no-op | [Demo] [Demo] No Op function |
+| Image                      | Description                  | Source                                                                                           |
+| -------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| gcr.io/kpt-functions/no-op | [Demo] [Demo] No Op function | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions) |
 
 [spec]: https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md
 [source]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/README.md#source-function

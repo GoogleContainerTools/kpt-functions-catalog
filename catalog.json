@@ -1,39 +1,46 @@
 [
   {
     "image": "gcr.io/kpt-functions/read-yaml",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions",
     "description": "Reads a directory of Kubernetes configuration recursively.",
     "type": "source"
   },
   {
     "image": "gcr.io/kpt-functions/write-yaml",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions",
     "description": "Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions.",
     "type": "sink"
   },
   {
     "image": "gcr.io/kpt-functions/gatekeeper-validate",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/go/pkg/functions/gatekeeper",
     "description": "Enforces OPA constraints on input objects. The constraints are also passed as part of the input to the function.",
     "type": "compliance"
   },
   {
     "image": "gcr.io/kpt-functions/mutate-psp",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions",
     "description": "[Demo] Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.",
     "type": "mutation",
     "demo": true
   },
   {
     "image": "gcr.io/kpt-functions/validate-rolebinding",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions",
     "description": "Enforces a blacklist of subjects in RoleBinding objects.",
     "type": "compliance",
     "demo": true
   },
   {
     "image": "gcr.io/kpt-functions/expand-team-cr",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions",
     "description": "Reads custom resources of type Team and generates multiple Namespace and RoleBinding objects.",
     "type": "generation",
     "demo": true
   },
   {
     "image": "gcr.io/kpt-functions/no-op",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions",
     "description": "[Demo] No Op function",
     "type": "misc",
     "demo": true
