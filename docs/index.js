@@ -45,6 +45,10 @@ ${tableByType('compliance')}
 
 ${tableByType('generation')}
 
+## Configuration Mutation Functions
+
+${tableByType('mutation')}
+
 ## Miscellaneous Functions
 
 ${tableByType('misc')}

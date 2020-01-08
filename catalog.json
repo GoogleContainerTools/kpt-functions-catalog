@@ -20,7 +20,7 @@
   {
     "image": "gcr.io/kpt-functions/mutate-psp",
     "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions",
-    "description": "[Demo] Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.",
+    "description": "Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.",
     "type": "mutation",
     "demo": true
   },
@@ -41,7 +41,7 @@
   {
     "image": "gcr.io/kpt-functions/no-op",
     "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions",
-    "description": "[Demo] No Op function",
+    "description": "No Op function",
     "type": "misc",
     "demo": true
   }
