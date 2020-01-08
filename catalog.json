@@ -1,0 +1,37 @@
+[
+  {
+    "image": "gcr.io/kpt-functions/read-yaml",
+    "description": "Reads a directory of Kubernetes configuration recursively.",
+    "type": "source"
+  },
+  {
+    "image": "gcr.io/kpt-functions/write-yaml",
+    "description": "Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions.",
+    "type": "sink"
+  },
+  {
+    "image": "gcr.io/kpt-functions/gatekeeper-validate",
+    "description": "Enforces OPA constraints on input objects. The constraints are also passed as part of the input to the function.",
+    "type": "compliance"
+  },
+  {
+    "image": "gcr.io/kpt-functions/mutate-psp",
+    "description": "[Demo] Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.",
+    "type": "recommendation"
+  },
+  {
+    "image": "gcr.io/kpt-functions/validate-rolebinding",
+    "description": "[Demo] Enforces a blacklist of subjects in RoleBinding objects.",
+    "type": "compliance"
+  },
+  {
+    "image": "gcr.io/kpt-functions/expand-team-cr",
+    "description": "[Demo] Reads custom resources of type Team and generates multiple Namespace and RoleBinding objects.",
+    "type": "generation"
+  },
+  {
+    "image": "gcr.io/kpt-functions/no-op",
+    "description": "[Demo] No Op function",
+    "type": "testing"
+  }
+]
