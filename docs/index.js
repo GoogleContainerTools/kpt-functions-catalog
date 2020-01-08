@@ -37,7 +37,7 @@ See [definition of sink functions][sink].
 
 ${tableByType('sink')}
 
-## Policy Enforcement Functions
+## Configuration Compliance Functions
 
 ${tableByType('compliance')}
 

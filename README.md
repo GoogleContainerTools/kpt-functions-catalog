@@ -25,7 +25,7 @@ See [definition of sink functions][sink].
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | gcr.io/kpt-functions/write-yaml | Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions. | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions) |
 
-## Policy Enforcement Functions
+## Configuration Compliance Functions
 
 | Image                                     | Description                                                                                                      | Source                                                                                                    |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
@@ -46,9 +46,9 @@ See [definition of sink functions][sink].
 
 ## Miscellaneous Functions
 
-| Image                      | Description           | Source                                                                                           |
-| -------------------------- | --------------------- | ------------------------------------------------------------------------------------------------ |
-| gcr.io/kpt-functions/no-op | [Demo] No Op function | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions) |
+| Image                      | Description                                | Source                                                                                           |
+| -------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| gcr.io/kpt-functions/no-op | [Demo] No Op function for testing purposes | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/demo-functions) |
 
 [spec]: https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md
 [source]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/README.md#source-function
