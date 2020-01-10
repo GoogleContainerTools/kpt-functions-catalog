@@ -23,13 +23,15 @@ const TEST_LABEL_NAME = 'costCenter';
 const TEST_LABEL_VALUE = 'xyz';
 
 describe('labelNamespace', () => {
-  let functionConfig = ConfigMap.named('foo');
+  const functionConfig = ConfigMap.named('foo');
   functionConfig.data = {};
   functionConfig.data[LABEL_NAME] = TEST_LABEL_NAME;
   functionConfig.data[LABEL_VALUE] = TEST_LABEL_VALUE;
 
   it('empty input ok', () => {
-    expect(labelNamespace(new Configs(undefined, functionConfig))).toBeUndefined();
+    expect(
+      labelNamespace(new Configs(undefined, functionConfig))
+    ).toBeUndefined();
   });
 
   it('adds label namespace when metadata.labels is undefined', () => {
@@ -45,7 +47,7 @@ describe('labelNamespace', () => {
           name: TEST_NAMESPACE,
           labels: { [TEST_LABEL_NAME]: TEST_LABEL_VALUE },
         },
-      }),
+      })
     );
 
     expect(actual.getAll()).toEqual(expected.getAll());
@@ -59,7 +61,7 @@ describe('labelNamespace', () => {
           name: TEST_NAMESPACE,
           labels: { a: 'b' },
         },
-      }),
+      })
     );
 
     const expected = new Configs();
@@ -72,7 +74,7 @@ describe('labelNamespace', () => {
             [TEST_LABEL_NAME]: TEST_LABEL_VALUE,
           },
         },
-      }),
+      })
     );
 
     labelNamespace(actual);

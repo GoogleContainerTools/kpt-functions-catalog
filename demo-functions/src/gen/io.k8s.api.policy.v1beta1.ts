@@ -160,7 +160,9 @@ export class PodDisruptionBudget implements KubernetesObject {
 
 export function isPodDisruptionBudget(o: any): o is PodDisruptionBudget {
   return (
-    o && o.apiVersion === PodDisruptionBudget.apiVersion && o.kind === PodDisruptionBudget.kind
+    o &&
+    o.apiVersion === PodDisruptionBudget.apiVersion &&
+    o.kind === PodDisruptionBudget.kind
   );
 }
 
@@ -200,13 +202,15 @@ export class PodDisruptionBudgetList {
 
   constructor(desc: PodDisruptionBudgetList) {
     this.apiVersion = PodDisruptionBudgetList.apiVersion;
-    this.items = desc.items.map((i) => new PodDisruptionBudget(i));
+    this.items = desc.items.map(i => new PodDisruptionBudget(i));
     this.kind = PodDisruptionBudgetList.kind;
     this.metadata = desc.metadata;
   }
 }
 
-export function isPodDisruptionBudgetList(o: any): o is PodDisruptionBudgetList {
+export function isPodDisruptionBudgetList(
+  o: any
+): o is PodDisruptionBudgetList {
   return (
     o &&
     o.apiVersion === PodDisruptionBudgetList.apiVersion &&
@@ -293,7 +297,11 @@ export class PodSecurityPolicy implements KubernetesObject {
 }
 
 export function isPodSecurityPolicy(o: any): o is PodSecurityPolicy {
-  return o && o.apiVersion === PodSecurityPolicy.apiVersion && o.kind === PodSecurityPolicy.kind;
+  return (
+    o &&
+    o.apiVersion === PodSecurityPolicy.apiVersion &&
+    o.kind === PodSecurityPolicy.kind
+  );
 }
 
 export namespace PodSecurityPolicy {
@@ -332,7 +340,7 @@ export class PodSecurityPolicyList {
 
   constructor(desc: PodSecurityPolicyList) {
     this.apiVersion = PodSecurityPolicyList.apiVersion;
-    this.items = desc.items.map((i) => new PodSecurityPolicy(i));
+    this.items = desc.items.map(i => new PodSecurityPolicy(i));
     this.kind = PodSecurityPolicyList.kind;
     this.metadata = desc.metadata;
   }
@@ -340,7 +348,9 @@ export class PodSecurityPolicyList {
 
 export function isPodSecurityPolicyList(o: any): o is PodSecurityPolicyList {
   return (
-    o && o.apiVersion === PodSecurityPolicyList.apiVersion && o.kind === PodSecurityPolicyList.kind
+    o &&
+    o.apiVersion === PodSecurityPolicyList.apiVersion &&
+    o.kind === PodSecurityPolicyList.kind
   );
 }
 

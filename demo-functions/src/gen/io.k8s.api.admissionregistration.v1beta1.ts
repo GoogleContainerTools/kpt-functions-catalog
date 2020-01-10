@@ -39,7 +39,9 @@ export class MutatingWebhookConfiguration implements KubernetesObject {
   }
 }
 
-export function isMutatingWebhookConfiguration(o: any): o is MutatingWebhookConfiguration {
+export function isMutatingWebhookConfiguration(
+  o: any
+): o is MutatingWebhookConfiguration {
   return (
     o &&
     o.apiVersion === MutatingWebhookConfiguration.apiVersion &&
@@ -83,13 +85,15 @@ export class MutatingWebhookConfigurationList {
 
   constructor(desc: MutatingWebhookConfigurationList) {
     this.apiVersion = MutatingWebhookConfigurationList.apiVersion;
-    this.items = desc.items.map((i) => new MutatingWebhookConfiguration(i));
+    this.items = desc.items.map(i => new MutatingWebhookConfiguration(i));
     this.kind = MutatingWebhookConfigurationList.kind;
     this.metadata = desc.metadata;
   }
 }
 
-export function isMutatingWebhookConfigurationList(o: any): o is MutatingWebhookConfigurationList {
+export function isMutatingWebhookConfigurationList(
+  o: any
+): o is MutatingWebhookConfigurationList {
   return (
     o &&
     o.apiVersion === MutatingWebhookConfigurationList.apiVersion &&
@@ -177,7 +181,9 @@ export class ValidatingWebhookConfiguration implements KubernetesObject {
   }
 }
 
-export function isValidatingWebhookConfiguration(o: any): o is ValidatingWebhookConfiguration {
+export function isValidatingWebhookConfiguration(
+  o: any
+): o is ValidatingWebhookConfiguration {
   return (
     o &&
     o.apiVersion === ValidatingWebhookConfiguration.apiVersion &&
@@ -221,14 +227,14 @@ export class ValidatingWebhookConfigurationList {
 
   constructor(desc: ValidatingWebhookConfigurationList) {
     this.apiVersion = ValidatingWebhookConfigurationList.apiVersion;
-    this.items = desc.items.map((i) => new ValidatingWebhookConfiguration(i));
+    this.items = desc.items.map(i => new ValidatingWebhookConfiguration(i));
     this.kind = ValidatingWebhookConfigurationList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isValidatingWebhookConfigurationList(
-  o: any,
+  o: any
 ): o is ValidatingWebhookConfigurationList {
   return (
     o &&

@@ -79,14 +79,16 @@ export class LeaseList {
 
   constructor(desc: LeaseList) {
     this.apiVersion = LeaseList.apiVersion;
-    this.items = desc.items.map((i) => new Lease(i));
+    this.items = desc.items.map(i => new Lease(i));
     this.kind = LeaseList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isLeaseList(o: any): o is LeaseList {
-  return o && o.apiVersion === LeaseList.apiVersion && o.kind === LeaseList.kind;
+  return (
+    o && o.apiVersion === LeaseList.apiVersion && o.kind === LeaseList.kind
+  );
 }
 
 export namespace LeaseList {
