@@ -1,7 +1,0 @@
-apiVersion: foo-corp.com/v1
-kind: FulfillmentCenter
-metadata:
-  name: production
-  namespace: shipping-prod
-spec:
-  address: 100 Industry St.
