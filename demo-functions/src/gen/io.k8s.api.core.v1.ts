@@ -409,11 +409,7 @@ export class ComponentStatus implements KubernetesObject {
 }
 
 export function isComponentStatus(o: any): o is ComponentStatus {
-  return (
-    o &&
-    o.apiVersion === ComponentStatus.apiVersion &&
-    o.kind === ComponentStatus.kind
-  );
+  return o && o.apiVersion === ComponentStatus.apiVersion && o.kind === ComponentStatus.kind;
 }
 
 export namespace ComponentStatus {
@@ -452,7 +448,7 @@ export class ComponentStatusList {
 
   constructor(desc: ComponentStatusList) {
     this.apiVersion = ComponentStatusList.apiVersion;
-    this.items = desc.items.map(i => new ComponentStatus(i));
+    this.items = desc.items.map((i) => new ComponentStatus(i));
     this.kind = ComponentStatusList.kind;
     this.metadata = desc.metadata;
   }
@@ -460,9 +456,7 @@ export class ComponentStatusList {
 
 export function isComponentStatusList(o: any): o is ComponentStatusList {
   return (
-    o &&
-    o.apiVersion === ComponentStatusList.apiVersion &&
-    o.kind === ComponentStatusList.kind
+    o && o.apiVersion === ComponentStatusList.apiVersion && o.kind === ComponentStatusList.kind
   );
 }
 
@@ -509,9 +503,7 @@ export class ConfigMap implements KubernetesObject {
 }
 
 export function isConfigMap(o: any): o is ConfigMap {
-  return (
-    o && o.apiVersion === ConfigMap.apiVersion && o.kind === ConfigMap.kind
-  );
+  return o && o.apiVersion === ConfigMap.apiVersion && o.kind === ConfigMap.kind;
 }
 
 export namespace ConfigMap {
@@ -582,18 +574,14 @@ export class ConfigMapList {
 
   constructor(desc: ConfigMapList) {
     this.apiVersion = ConfigMapList.apiVersion;
-    this.items = desc.items.map(i => new ConfigMap(i));
+    this.items = desc.items.map((i) => new ConfigMap(i));
     this.kind = ConfigMapList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isConfigMapList(o: any): o is ConfigMapList {
-  return (
-    o &&
-    o.apiVersion === ConfigMapList.apiVersion &&
-    o.kind === ConfigMapList.kind
-  );
+  return o && o.apiVersion === ConfigMapList.apiVersion && o.kind === ConfigMapList.kind;
 }
 
 export namespace ConfigMapList {
@@ -1047,9 +1035,7 @@ export class Endpoints implements KubernetesObject {
 }
 
 export function isEndpoints(o: any): o is Endpoints {
-  return (
-    o && o.apiVersion === Endpoints.apiVersion && o.kind === Endpoints.kind
-  );
+  return o && o.apiVersion === Endpoints.apiVersion && o.kind === Endpoints.kind;
 }
 
 export namespace Endpoints {
@@ -1099,18 +1085,14 @@ export class EndpointsList {
 
   constructor(desc: EndpointsList) {
     this.apiVersion = EndpointsList.apiVersion;
-    this.items = desc.items.map(i => new Endpoints(i));
+    this.items = desc.items.map((i) => new Endpoints(i));
     this.kind = EndpointsList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isEndpointsList(o: any): o is EndpointsList {
-  return (
-    o &&
-    o.apiVersion === EndpointsList.apiVersion &&
-    o.kind === EndpointsList.kind
-  );
+  return o && o.apiVersion === EndpointsList.apiVersion && o.kind === EndpointsList.kind;
 }
 
 export namespace EndpointsList {
@@ -1323,16 +1305,14 @@ export class EventList {
 
   constructor(desc: EventList) {
     this.apiVersion = EventList.apiVersion;
-    this.items = desc.items.map(i => new Event(i));
+    this.items = desc.items.map((i) => new Event(i));
     this.kind = EventList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isEventList(o: any): o is EventList {
-  return (
-    o && o.apiVersion === EventList.apiVersion && o.kind === EventList.kind
-  );
+  return o && o.apiVersion === EventList.apiVersion && o.kind === EventList.kind;
 }
 
 export namespace EventList {
@@ -1766,9 +1746,7 @@ export class LimitRange implements KubernetesObject {
 }
 
 export function isLimitRange(o: any): o is LimitRange {
-  return (
-    o && o.apiVersion === LimitRange.apiVersion && o.kind === LimitRange.kind
-  );
+  return o && o.apiVersion === LimitRange.apiVersion && o.kind === LimitRange.kind;
 }
 
 export namespace LimitRange {
@@ -1828,18 +1806,14 @@ export class LimitRangeList {
 
   constructor(desc: LimitRangeList) {
     this.apiVersion = LimitRangeList.apiVersion;
-    this.items = desc.items.map(i => new LimitRange(i));
+    this.items = desc.items.map((i) => new LimitRange(i));
     this.kind = LimitRangeList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isLimitRangeList(o: any): o is LimitRangeList {
-  return (
-    o &&
-    o.apiVersion === LimitRangeList.apiVersion &&
-    o.kind === LimitRangeList.kind
-  );
+  return o && o.apiVersion === LimitRangeList.apiVersion && o.kind === LimitRangeList.kind;
 }
 
 export namespace LimitRangeList {
@@ -1948,9 +1922,7 @@ export class Namespace implements KubernetesObject {
 }
 
 export function isNamespace(o: any): o is Namespace {
-  return (
-    o && o.apiVersion === Namespace.apiVersion && o.kind === Namespace.kind
-  );
+  return o && o.apiVersion === Namespace.apiVersion && o.kind === Namespace.kind;
 }
 
 export namespace Namespace {
@@ -1992,18 +1964,14 @@ export class NamespaceList {
 
   constructor(desc: NamespaceList) {
     this.apiVersion = NamespaceList.apiVersion;
-    this.items = desc.items.map(i => new Namespace(i));
+    this.items = desc.items.map((i) => new Namespace(i));
     this.kind = NamespaceList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isNamespaceList(o: any): o is NamespaceList {
-  return (
-    o &&
-    o.apiVersion === NamespaceList.apiVersion &&
-    o.kind === NamespaceList.kind
-  );
+  return o && o.apiVersion === NamespaceList.apiVersion && o.kind === NamespaceList.kind;
 }
 
 export namespace NamespaceList {
@@ -2183,7 +2151,7 @@ export class NodeList {
 
   constructor(desc: NodeList) {
     this.apiVersion = NodeList.apiVersion;
-    this.items = desc.items.map(i => new Node(i));
+    this.items = desc.items.map((i) => new Node(i));
     this.kind = NodeList.kind;
     this.metadata = desc.metadata;
   }
@@ -2414,11 +2382,7 @@ export class PersistentVolume implements KubernetesObject {
 }
 
 export function isPersistentVolume(o: any): o is PersistentVolume {
-  return (
-    o &&
-    o.apiVersion === PersistentVolume.apiVersion &&
-    o.kind === PersistentVolume.kind
-  );
+  return o && o.apiVersion === PersistentVolume.apiVersion && o.kind === PersistentVolume.kind;
 }
 
 export namespace PersistentVolume {
@@ -2472,9 +2436,7 @@ export class PersistentVolumeClaim implements KubernetesObject {
 
 export function isPersistentVolumeClaim(o: any): o is PersistentVolumeClaim {
   return (
-    o &&
-    o.apiVersion === PersistentVolumeClaim.apiVersion &&
-    o.kind === PersistentVolumeClaim.kind
+    o && o.apiVersion === PersistentVolumeClaim.apiVersion && o.kind === PersistentVolumeClaim.kind
   );
 }
 
@@ -2545,15 +2507,13 @@ export class PersistentVolumeClaimList {
 
   constructor(desc: PersistentVolumeClaimList) {
     this.apiVersion = PersistentVolumeClaimList.apiVersion;
-    this.items = desc.items.map(i => new PersistentVolumeClaim(i));
+    this.items = desc.items.map((i) => new PersistentVolumeClaim(i));
     this.kind = PersistentVolumeClaimList.kind;
     this.metadata = desc.metadata;
   }
 }
 
-export function isPersistentVolumeClaimList(
-  o: any
-): o is PersistentVolumeClaimList {
+export function isPersistentVolumeClaimList(o: any): o is PersistentVolumeClaimList {
   return (
     o &&
     o.apiVersion === PersistentVolumeClaimList.apiVersion &&
@@ -2646,7 +2606,7 @@ export class PersistentVolumeList {
 
   constructor(desc: PersistentVolumeList) {
     this.apiVersion = PersistentVolumeList.apiVersion;
-    this.items = desc.items.map(i => new PersistentVolume(i));
+    this.items = desc.items.map((i) => new PersistentVolume(i));
     this.kind = PersistentVolumeList.kind;
     this.metadata = desc.metadata;
   }
@@ -2654,9 +2614,7 @@ export class PersistentVolumeList {
 
 export function isPersistentVolumeList(o: any): o is PersistentVolumeList {
   return (
-    o &&
-    o.apiVersion === PersistentVolumeList.apiVersion &&
-    o.kind === PersistentVolumeList.kind
+    o && o.apiVersion === PersistentVolumeList.apiVersion && o.kind === PersistentVolumeList.kind
   );
 }
 
@@ -2950,7 +2908,7 @@ export class PodList {
 
   constructor(desc: PodList) {
     this.apiVersion = PodList.apiVersion;
-    this.items = desc.items.map(i => new Pod(i));
+    this.items = desc.items.map((i) => new Pod(i));
     this.kind = PodList.kind;
     this.metadata = desc.metadata;
   }
@@ -3203,9 +3161,7 @@ export class PodTemplate implements KubernetesObject {
 }
 
 export function isPodTemplate(o: any): o is PodTemplate {
-  return (
-    o && o.apiVersion === PodTemplate.apiVersion && o.kind === PodTemplate.kind
-  );
+  return o && o.apiVersion === PodTemplate.apiVersion && o.kind === PodTemplate.kind;
 }
 
 export namespace PodTemplate {
@@ -3244,18 +3200,14 @@ export class PodTemplateList {
 
   constructor(desc: PodTemplateList) {
     this.apiVersion = PodTemplateList.apiVersion;
-    this.items = desc.items.map(i => new PodTemplate(i));
+    this.items = desc.items.map((i) => new PodTemplate(i));
     this.kind = PodTemplateList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isPodTemplateList(o: any): o is PodTemplateList {
-  return (
-    o &&
-    o.apiVersion === PodTemplateList.apiVersion &&
-    o.kind === PodTemplateList.kind
-  );
+  return o && o.apiVersion === PodTemplateList.apiVersion && o.kind === PodTemplateList.kind;
 }
 
 export namespace PodTemplateList {
@@ -3490,9 +3442,7 @@ export class ReplicationController implements KubernetesObject {
 
 export function isReplicationController(o: any): o is ReplicationController {
   return (
-    o &&
-    o.apiVersion === ReplicationController.apiVersion &&
-    o.kind === ReplicationController.kind
+    o && o.apiVersion === ReplicationController.apiVersion && o.kind === ReplicationController.kind
   );
 }
 
@@ -3561,15 +3511,13 @@ export class ReplicationControllerList {
 
   constructor(desc: ReplicationControllerList) {
     this.apiVersion = ReplicationControllerList.apiVersion;
-    this.items = desc.items.map(i => new ReplicationController(i));
+    this.items = desc.items.map((i) => new ReplicationController(i));
     this.kind = ReplicationControllerList.kind;
     this.metadata = desc.metadata;
   }
 }
 
-export function isReplicationControllerList(
-  o: any
-): o is ReplicationControllerList {
+export function isReplicationControllerList(o: any): o is ReplicationControllerList {
   return (
     o &&
     o.apiVersion === ReplicationControllerList.apiVersion &&
@@ -3683,11 +3631,7 @@ export class ResourceQuota implements KubernetesObject {
 }
 
 export function isResourceQuota(o: any): o is ResourceQuota {
-  return (
-    o &&
-    o.apiVersion === ResourceQuota.apiVersion &&
-    o.kind === ResourceQuota.kind
-  );
+  return o && o.apiVersion === ResourceQuota.apiVersion && o.kind === ResourceQuota.kind;
 }
 
 export namespace ResourceQuota {
@@ -3729,18 +3673,14 @@ export class ResourceQuotaList {
 
   constructor(desc: ResourceQuotaList) {
     this.apiVersion = ResourceQuotaList.apiVersion;
-    this.items = desc.items.map(i => new ResourceQuota(i));
+    this.items = desc.items.map((i) => new ResourceQuota(i));
     this.kind = ResourceQuotaList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isResourceQuotaList(o: any): o is ResourceQuotaList {
-  return (
-    o &&
-    o.apiVersion === ResourceQuotaList.apiVersion &&
-    o.kind === ResourceQuotaList.kind
-  );
+  return o && o.apiVersion === ResourceQuotaList.apiVersion && o.kind === ResourceQuotaList.kind;
 }
 
 export namespace ResourceQuotaList {
@@ -4025,16 +3965,14 @@ export class SecretList {
 
   constructor(desc: SecretList) {
     this.apiVersion = SecretList.apiVersion;
-    this.items = desc.items.map(i => new Secret(i));
+    this.items = desc.items.map((i) => new Secret(i));
     this.kind = SecretList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isSecretList(o: any): o is SecretList {
-  return (
-    o && o.apiVersion === SecretList.apiVersion && o.kind === SecretList.kind
-  );
+  return o && o.apiVersion === SecretList.apiVersion && o.kind === SecretList.kind;
 }
 
 export namespace SecretList {
@@ -4207,11 +4145,7 @@ export class ServiceAccount implements KubernetesObject {
 }
 
 export function isServiceAccount(o: any): o is ServiceAccount {
-  return (
-    o &&
-    o.apiVersion === ServiceAccount.apiVersion &&
-    o.kind === ServiceAccount.kind
-  );
+  return o && o.apiVersion === ServiceAccount.apiVersion && o.kind === ServiceAccount.kind;
 }
 
 export namespace ServiceAccount {
@@ -4256,18 +4190,14 @@ export class ServiceAccountList {
 
   constructor(desc: ServiceAccountList) {
     this.apiVersion = ServiceAccountList.apiVersion;
-    this.items = desc.items.map(i => new ServiceAccount(i));
+    this.items = desc.items.map((i) => new ServiceAccount(i));
     this.kind = ServiceAccountList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isServiceAccountList(o: any): o is ServiceAccountList {
-  return (
-    o &&
-    o.apiVersion === ServiceAccountList.apiVersion &&
-    o.kind === ServiceAccountList.kind
-  );
+  return o && o.apiVersion === ServiceAccountList.apiVersion && o.kind === ServiceAccountList.kind;
 }
 
 export namespace ServiceAccountList {
@@ -4320,16 +4250,14 @@ export class ServiceList {
 
   constructor(desc: ServiceList) {
     this.apiVersion = ServiceList.apiVersion;
-    this.items = desc.items.map(i => new Service(i));
+    this.items = desc.items.map((i) => new Service(i));
     this.kind = ServiceList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isServiceList(o: any): o is ServiceList {
-  return (
-    o && o.apiVersion === ServiceList.apiVersion && o.kind === ServiceList.kind
-  );
+  return o && o.apiVersion === ServiceList.apiVersion && o.kind === ServiceList.kind;
 }
 
 export namespace ServiceList {

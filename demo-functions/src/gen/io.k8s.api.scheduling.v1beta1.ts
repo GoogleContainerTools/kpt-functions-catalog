@@ -48,11 +48,7 @@ export class PriorityClass implements KubernetesObject {
 }
 
 export function isPriorityClass(o: any): o is PriorityClass {
-  return (
-    o &&
-    o.apiVersion === PriorityClass.apiVersion &&
-    o.kind === PriorityClass.kind
-  );
+  return o && o.apiVersion === PriorityClass.apiVersion && o.kind === PriorityClass.kind;
 }
 
 export namespace PriorityClass {
@@ -93,18 +89,14 @@ export class PriorityClassList {
 
   constructor(desc: PriorityClassList) {
     this.apiVersion = PriorityClassList.apiVersion;
-    this.items = desc.items.map(i => new PriorityClass(i));
+    this.items = desc.items.map((i) => new PriorityClass(i));
     this.kind = PriorityClassList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isPriorityClassList(o: any): o is PriorityClassList {
-  return (
-    o &&
-    o.apiVersion === PriorityClassList.apiVersion &&
-    o.kind === PriorityClassList.kind
-  );
+  return o && o.apiVersion === PriorityClassList.apiVersion && o.kind === PriorityClassList.kind;
 }
 
 export namespace PriorityClassList {

@@ -50,9 +50,7 @@ export class ClusterRole implements KubernetesObject {
 }
 
 export function isClusterRole(o: any): o is ClusterRole {
-  return (
-    o && o.apiVersion === ClusterRole.apiVersion && o.kind === ClusterRole.kind
-  );
+  return o && o.apiVersion === ClusterRole.apiVersion && o.kind === ClusterRole.kind;
 }
 
 export namespace ClusterRole {
@@ -105,11 +103,7 @@ export class ClusterRoleBinding implements KubernetesObject {
 }
 
 export function isClusterRoleBinding(o: any): o is ClusterRoleBinding {
-  return (
-    o &&
-    o.apiVersion === ClusterRoleBinding.apiVersion &&
-    o.kind === ClusterRoleBinding.kind
-  );
+  return o && o.apiVersion === ClusterRoleBinding.apiVersion && o.kind === ClusterRoleBinding.kind;
 }
 
 export namespace ClusterRoleBinding {
@@ -147,7 +141,7 @@ export class ClusterRoleBindingList {
 
   constructor(desc: ClusterRoleBindingList) {
     this.apiVersion = ClusterRoleBindingList.apiVersion;
-    this.items = desc.items.map(i => new ClusterRoleBinding(i));
+    this.items = desc.items.map((i) => new ClusterRoleBinding(i));
     this.kind = ClusterRoleBindingList.kind;
     this.metadata = desc.metadata;
   }
@@ -193,18 +187,14 @@ export class ClusterRoleList {
 
   constructor(desc: ClusterRoleList) {
     this.apiVersion = ClusterRoleList.apiVersion;
-    this.items = desc.items.map(i => new ClusterRole(i));
+    this.items = desc.items.map((i) => new ClusterRole(i));
     this.kind = ClusterRoleList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isClusterRoleList(o: any): o is ClusterRoleList {
-  return (
-    o &&
-    o.apiVersion === ClusterRoleList.apiVersion &&
-    o.kind === ClusterRoleList.kind
-  );
+  return o && o.apiVersion === ClusterRoleList.apiVersion && o.kind === ClusterRoleList.kind;
 }
 
 export namespace ClusterRoleList {
@@ -322,9 +312,7 @@ export class RoleBinding implements KubernetesObject {
 }
 
 export function isRoleBinding(o: any): o is RoleBinding {
-  return (
-    o && o.apiVersion === RoleBinding.apiVersion && o.kind === RoleBinding.kind
-  );
+  return o && o.apiVersion === RoleBinding.apiVersion && o.kind === RoleBinding.kind;
 }
 
 export namespace RoleBinding {
@@ -362,18 +350,14 @@ export class RoleBindingList {
 
   constructor(desc: RoleBindingList) {
     this.apiVersion = RoleBindingList.apiVersion;
-    this.items = desc.items.map(i => new RoleBinding(i));
+    this.items = desc.items.map((i) => new RoleBinding(i));
     this.kind = RoleBindingList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isRoleBindingList(o: any): o is RoleBindingList {
-  return (
-    o &&
-    o.apiVersion === RoleBindingList.apiVersion &&
-    o.kind === RoleBindingList.kind
-  );
+  return o && o.apiVersion === RoleBindingList.apiVersion && o.kind === RoleBindingList.kind;
 }
 
 export namespace RoleBindingList {
@@ -408,7 +392,7 @@ export class RoleList {
 
   constructor(desc: RoleList) {
     this.apiVersion = RoleList.apiVersion;
-    this.items = desc.items.map(i => new Role(i));
+    this.items = desc.items.map((i) => new Role(i));
     this.kind = RoleList.kind;
     this.metadata = desc.metadata;
   }

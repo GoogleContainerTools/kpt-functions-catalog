@@ -17,11 +17,11 @@
 import { KptFunc } from '@googlecontainertools/kpt-functions';
 import { isPodSecurityPolicy } from './gen/io.k8s.api.policy.v1beta1';
 
-export const mutatePsp: KptFunc = configs => {
+export const mutatePsp: KptFunc = (configs) => {
   configs
     .get(isPodSecurityPolicy)
-    .filter(psp => psp.spec && psp.spec.allowPrivilegeEscalation !== false)
-    .forEach(psp => (psp!.spec!.allowPrivilegeEscalation = false));
+    .filter((psp) => psp.spec && psp.spec.allowPrivilegeEscalation !== false)
+    .forEach((psp) => (psp!.spec!.allowPrivilegeEscalation = false));
 };
 
 mutatePsp.usage = `

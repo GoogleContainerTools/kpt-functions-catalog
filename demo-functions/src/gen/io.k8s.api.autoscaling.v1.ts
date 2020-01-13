@@ -61,9 +61,7 @@ export class HorizontalPodAutoscaler implements KubernetesObject {
   }
 }
 
-export function isHorizontalPodAutoscaler(
-  o: any
-): o is HorizontalPodAutoscaler {
+export function isHorizontalPodAutoscaler(o: any): o is HorizontalPodAutoscaler {
   return (
     o &&
     o.apiVersion === HorizontalPodAutoscaler.apiVersion &&
@@ -110,15 +108,13 @@ export class HorizontalPodAutoscalerList {
 
   constructor(desc: HorizontalPodAutoscalerList) {
     this.apiVersion = HorizontalPodAutoscalerList.apiVersion;
-    this.items = desc.items.map(i => new HorizontalPodAutoscaler(i));
+    this.items = desc.items.map((i) => new HorizontalPodAutoscaler(i));
     this.kind = HorizontalPodAutoscalerList.kind;
     this.metadata = desc.metadata;
   }
 }
 
-export function isHorizontalPodAutoscalerList(
-  o: any
-): o is HorizontalPodAutoscalerList {
+export function isHorizontalPodAutoscalerList(o: any): o is HorizontalPodAutoscalerList {
   return (
     o &&
     o.apiVersion === HorizontalPodAutoscalerList.apiVersion &&

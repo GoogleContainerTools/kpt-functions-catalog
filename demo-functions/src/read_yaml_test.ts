@@ -23,11 +23,11 @@ import { readYaml, SOURCE_DIR } from './read_yaml';
 import { ConfigMap } from './gen/io.k8s.api.core.v1';
 
 describe('readYaml', () => {
-  const functionConfig = ConfigMap.named('config');
+  let functionConfig = ConfigMap.named('config');
   functionConfig.data = {};
 
   it('works on empty dir', () => {
-    const sourceDir = path.resolve(__dirname, '../../test-data/source/empty');
+    const sourceDir = path.resolve(__dirname, '../test-data/source/empty');
     functionConfig.data![SOURCE_DIR] = sourceDir;
     const configs = new kpt.Configs(undefined, functionConfig);
 
@@ -41,27 +41,16 @@ describe('readYaml', () => {
   });
 
   it('replicates test dir', () => {
-    const sourceDir = path.resolve(
-      __dirname,
-      '../../test-data/source/foo-yaml'
-    );
-    const expectedIntermediateFile = path.resolve(
-      __dirname,
-      '../../test-data/intermediate/foo.yaml'
-    );
-    const expectedConfigs = kpt.readConfigs(
-      expectedIntermediateFile,
-      kpt.FileFormat.YAML
-    );
+    const sourceDir = path.resolve(__dirname, '../test-data/source/foo-yaml');
+    const expectedIntermediateFile = path.resolve(__dirname, '../test-data/intermediate/foo.yaml');
+    const expectedConfigs = kpt.readConfigs(expectedIntermediateFile, kpt.FileFormat.YAML);
     functionConfig.data![SOURCE_DIR] = sourceDir;
     const actualConfigs = new kpt.Configs(undefined, functionConfig);
 
     readYaml(actualConfigs);
 
     expect(actualConfigs.getAll()).toEqual(expectedConfigs.getAll());
-    const tmpDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'yaml-dir-source-test')
-    );
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'yaml-dir-source-test'));
     const intermediateFile = path.join(tmpDir, 'foo.yaml');
     kpt.writeConfigs(intermediateFile, actualConfigs, kpt.FileFormat.YAML);
     const res = compareSync(expectedIntermediateFile, intermediateFile, {
@@ -69,24 +58,19 @@ describe('readYaml', () => {
     });
     if (res.differences) {
       console.log(res.diffSet);
-      fail(
-        'Found differences between actual and generated intermediate files.'
-      );
+      fail('Found differences between actual and generated intermediate files.');
     }
   });
 
   it('fails for invalid KubernetesObjects', () => {
-    const sourceDir = path.resolve(__dirname, '../../test-data/source/invalid');
+    const sourceDir = path.resolve(__dirname, '../test-data/source/invalid');
     functionConfig.data![SOURCE_DIR] = sourceDir;
     const actualConfigs = new kpt.Configs(undefined, functionConfig);
 
     const out = readYaml(actualConfigs);
 
     if (!(out instanceof kpt.ConfigError)) {
-      fail(
-        'Expected error, but got configs: ' +
-          JSON.stringify(actualConfigs, undefined, 2)
-      );
+      fail('Expected error, but got configs: ' + JSON.stringify(actualConfigs, undefined, 2));
     }
   });
 });

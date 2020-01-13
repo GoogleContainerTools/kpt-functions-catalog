@@ -117,7 +117,7 @@ export class JobList {
 
   constructor(desc: JobList) {
     this.apiVersion = JobList.apiVersion;
-    this.items = desc.items.map(i => new Job(i));
+    this.items = desc.items.map((i) => new Job(i));
     this.kind = JobList.kind;
     this.metadata = desc.metadata;
   }

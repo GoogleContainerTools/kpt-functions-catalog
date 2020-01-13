@@ -36,10 +36,7 @@ const RUNNER = new TestRunner(expandTeamCr);
 describe(expandTeamCr.name, () => {
   it('does nothing to empty repos', RUNNER.run());
 
-  it(
-    'does nothing to non-Team objects',
-    RUNNER.run(new Configs([Namespace.named('backend')]))
-  );
+  it('does nothing to non-Team objects', RUNNER.run(new Configs([Namespace.named('backend')])));
 
   it(
     'expands an empty team to its environments',
@@ -49,8 +46,8 @@ describe(expandTeamCr.name, () => {
         team('backend'),
         Namespace.named('backend-dev'),
         Namespace.named('backend-prod'),
-      ])
-    )
+      ]),
+    ),
   );
 
   it(
@@ -103,8 +100,8 @@ describe(expandTeamCr.name, () => {
             }),
           ],
         }),
-      ])
-    )
+      ]),
+    ),
   );
 
   it(
@@ -157,8 +154,8 @@ describe(expandTeamCr.name, () => {
             }),
           ],
         }),
-      ])
-    )
+      ]),
+    ),
   );
 
   it(
@@ -221,7 +218,7 @@ describe(expandTeamCr.name, () => {
             }),
           ],
         }),
-      ])
-    )
+      ]),
+    ),
   );
 });

@@ -42,9 +42,7 @@ export class CertificateSigningRequest implements KubernetesObject {
   }
 }
 
-export function isCertificateSigningRequest(
-  o: any
-): o is CertificateSigningRequest {
+export function isCertificateSigningRequest(o: any): o is CertificateSigningRequest {
   return (
     o &&
     o.apiVersion === CertificateSigningRequest.apiVersion &&
@@ -108,15 +106,13 @@ export class CertificateSigningRequestList {
 
   constructor(desc: CertificateSigningRequestList) {
     this.apiVersion = CertificateSigningRequestList.apiVersion;
-    this.items = desc.items.map(i => new CertificateSigningRequest(i));
+    this.items = desc.items.map((i) => new CertificateSigningRequest(i));
     this.kind = CertificateSigningRequestList.kind;
     this.metadata = desc.metadata;
   }
 }
 
-export function isCertificateSigningRequestList(
-  o: any
-): o is CertificateSigningRequestList {
+export function isCertificateSigningRequestList(o: any): o is CertificateSigningRequestList {
   return (
     o &&
     o.apiVersion === CertificateSigningRequestList.apiVersion &&
