@@ -23,24 +23,23 @@ import * as path from 'path';
 export const SOURCE_DIR = 'source_dir';
 export const FILTER_IVNALID = 'filter_invalid';
 
-export const readYaml: kpt.KptFunc = configs => {
+export const readYaml: kpt.KptFunc = (configs) => {
   const sourceDir = configs.getFunctionConfigValueOrThrow(SOURCE_DIR);
-  const ignoreInvalid =
-    configs.getFunctionConfigValue(FILTER_IVNALID) === 'true';
+  const ignoreInvalid = configs.getFunctionConfigValue(FILTER_IVNALID) === 'true';
 
   // Discard any input objects since this is a source function.
   configs.deleteAll();
 
   const files = glob.sync(sourceDir + '/**/*.+(yaml|yml)');
   const errors: kpt.ConfigError[] = files
-    .map(f => parseFile(configs, sourceDir, f, ignoreInvalid))
-    .filter(err => err !== undefined)
-    .map(err => err as kpt.ConfigError);
+    .map((f) => parseFile(configs, sourceDir, f, ignoreInvalid))
+    .filter((err) => err !== undefined)
+    .map((err) => err as kpt.ConfigError);
 
   if (errors.length) {
     return new kpt.MultiConfigError(
       `Found files containing invalid objects. To filter invalid objects set ${FILTER_IVNALID} to 'true'.`,
-      errors
+      errors,
     );
   }
   return;
@@ -68,33 +67,25 @@ function parseFile(
   configs: kpt.Configs,
   sourceDir: string,
   file: string,
-  ignoreInvalid: boolean
+  ignoreInvalid: boolean,
 ): kpt.ConfigError | undefined {
   const contents = readFileOrThrow(file);
   let objects = safeLoadAll(contents);
 
-  const invalidObjects: object[] = objects.filter(
-    o => !kpt.isKubernetesObject(o)
-  );
+  const invalidObjects: object[] = objects.filter((o) => !kpt.isKubernetesObject(o));
   if (invalidObjects.length) {
     if (ignoreInvalid) {
-      objects = objects.filter(o => kpt.isKubernetesObject(o));
+      objects = objects.filter((o) => kpt.isKubernetesObject(o));
     } else {
       return new kpt.ConfigFileError(
-        `File contains invalid Kubernetes objects '${JSON.stringify(
-          invalidObjects
-        )}'`,
-        file
+        `File contains invalid Kubernetes objects '${JSON.stringify(invalidObjects)}'`,
+        file,
       );
     }
   }
 
   objects.forEach((o, i) => {
-    kpt.addAnnotation(
-      o,
-      kpt.SOURCE_PATH_ANNOTATION,
-      path.relative(sourceDir, file)
-    );
+    kpt.addAnnotation(o, kpt.SOURCE_PATH_ANNOTATION, path.relative(sourceDir, file));
     kpt.addAnnotation(o, kpt.SOURCE_INDEX_ANNOTATION, i.toString());
   });
   configs.insert(...objects);

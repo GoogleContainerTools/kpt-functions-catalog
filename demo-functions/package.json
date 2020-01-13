@@ -8,10 +8,10 @@
     "prepare": "npm run build",
     "build": "tsc",
     "watch": "tsc --watch",
-    "clean": "rm -Rf node_modules/ build/",
-    "lint": "tslint -p package.json && prettier \"src/**\" \"*.json\" --check",
+    "clean": "rm -Rf node_modules/ dist/",
+    "lint": "tslint -p package.json; prettier \"src/**\" \"*.json\" --check",
     "lint-license": "jsgl --local .",
-    "format": "prettier \"src/**\" \"*.json\" --write && tslint --fix -p package.json",
+    "format": "prettier \"src/**\" \"*.json\" --write",
     "pretest": "npm run build",
     "test": "jasmine --config=jasmine.json",
     "posttest": "npm run lint",
@@ -41,12 +41,18 @@
     "tslint": "^5.19.0",
     "tslint-config-prettier": "1.18.0",
     "tslint-consistent-codestyle": "^1.16.0",
-    "typescript": "~3.7.0"
+    "typescript": "^3.5.3"
   },
   "kpt": {
     "docker_repo_base": "gcr.io/kpt-functions"
   },
   "repository": {
     "type": "git"
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }

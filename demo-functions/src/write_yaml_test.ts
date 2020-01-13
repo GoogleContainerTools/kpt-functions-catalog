@@ -23,22 +23,8 @@ import { Namespace, Pod, ConfigMap } from './gen/io.k8s.api.core.v1';
 import { Role, RoleBinding } from './gen/io.k8s.api.rbac.v1';
 import { buildSourcePath, OVERWRITE, SINK_DIR, writeYaml } from './write_yaml';
 
-const INTERMEDIATE_FILE = path.resolve(
-  __dirname,
-  '..',
-  '..',
-  'test-data',
-  'intermediate',
-  'foo.yaml'
-);
-const SINK_DIR_EXPECTED = path.resolve(
-  __dirname,
-  '..',
-  '..',
-  'test-data',
-  'sink',
-  'foo-yaml'
-);
+const INTERMEDIATE_FILE = path.resolve(__dirname, '..', 'test-data', 'intermediate', 'foo.yaml');
+const SINK_DIR_EXPECTED = path.resolve(__dirname, '..', 'test-data', 'sink', 'foo-yaml');
 
 function readIntermediate(): kpt.Configs {
   return kpt.readConfigs(INTERMEDIATE_FILE, kpt.FileFormat.YAML);
@@ -55,8 +41,8 @@ function matchesExpected(dir: string) {
 }
 
 describe('writeYaml', () => {
-  let tmpDir = '';
-  const functionConfig = ConfigMap.named('config');
+  let tmpDir: string = '';
+  let functionConfig = ConfigMap.named('config');
 
   beforeEach(() => {
     // Ensures tmpDir is unset before testing. Detects incorrectly running tests in parallel, or
@@ -109,12 +95,12 @@ describe('writeYaml', () => {
     fs.copySync(
       path.resolve(tmpDir, 'foo-corp-1.0.0', 'podsecuritypolicy_psp.yaml'),
       path.resolve(tmpDir, 'foo-corp-1.0.0', 'clusterrole_pod-creator.yaml'),
-      { overwrite: true }
+      { overwrite: true },
     );
     // Move file to a different location.
     fs.moveSync(
       path.resolve(tmpDir, 'foo-corp-1.0.0', 'podsecuritypolicy_psp.yaml'),
-      path.resolve(tmpDir, 'foo-corp-1.0.0', 'other.yaml')
+      path.resolve(tmpDir, 'foo-corp-1.0.0', 'other.yaml'),
     );
     const input = readIntermediate();
     functionConfig.data![SINK_DIR] = tmpDir;

@@ -41,9 +41,7 @@ export class CSIDriver implements KubernetesObject {
 }
 
 export function isCSIDriver(o: any): o is CSIDriver {
-  return (
-    o && o.apiVersion === CSIDriver.apiVersion && o.kind === CSIDriver.kind
-  );
+  return o && o.apiVersion === CSIDriver.apiVersion && o.kind === CSIDriver.kind;
 }
 
 export namespace CSIDriver {
@@ -78,18 +76,14 @@ export class CSIDriverList {
 
   constructor(desc: CSIDriverList) {
     this.apiVersion = CSIDriverList.apiVersion;
-    this.items = desc.items.map(i => new CSIDriver(i));
+    this.items = desc.items.map((i) => new CSIDriver(i));
     this.kind = CSIDriverList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isCSIDriverList(o: any): o is CSIDriverList {
-  return (
-    o &&
-    o.apiVersion === CSIDriverList.apiVersion &&
-    o.kind === CSIDriverList.kind
-  );
+  return o && o.apiVersion === CSIDriverList.apiVersion && o.kind === CSIDriverList.kind;
 }
 
 export namespace CSIDriverList {
@@ -193,16 +187,14 @@ export class CSINodeList {
 
   constructor(desc: CSINodeList) {
     this.apiVersion = CSINodeList.apiVersion;
-    this.items = desc.items.map(i => new CSINode(i));
+    this.items = desc.items.map((i) => new CSINode(i));
     this.kind = CSINodeList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isCSINodeList(o: any): o is CSINodeList {
-  return (
-    o && o.apiVersion === CSINodeList.apiVersion && o.kind === CSINodeList.kind
-  );
+  return o && o.apiVersion === CSINodeList.apiVersion && o.kind === CSINodeList.kind;
 }
 
 export namespace CSINodeList {
@@ -280,11 +272,7 @@ export class StorageClass implements KubernetesObject {
 }
 
 export function isStorageClass(o: any): o is StorageClass {
-  return (
-    o &&
-    o.apiVersion === StorageClass.apiVersion &&
-    o.kind === StorageClass.kind
-  );
+  return o && o.apiVersion === StorageClass.apiVersion && o.kind === StorageClass.kind;
 }
 
 export namespace StorageClass {
@@ -339,18 +327,14 @@ export class StorageClassList {
 
   constructor(desc: StorageClassList) {
     this.apiVersion = StorageClassList.apiVersion;
-    this.items = desc.items.map(i => new StorageClass(i));
+    this.items = desc.items.map((i) => new StorageClass(i));
     this.kind = StorageClassList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isStorageClassList(o: any): o is StorageClassList {
-  return (
-    o &&
-    o.apiVersion === StorageClassList.apiVersion &&
-    o.kind === StorageClassList.kind
-  );
+  return o && o.apiVersion === StorageClassList.apiVersion && o.kind === StorageClassList.kind;
 }
 
 export namespace StorageClassList {
@@ -398,11 +382,7 @@ export class VolumeAttachment implements KubernetesObject {
 }
 
 export function isVolumeAttachment(o: any): o is VolumeAttachment {
-  return (
-    o &&
-    o.apiVersion === VolumeAttachment.apiVersion &&
-    o.kind === VolumeAttachment.kind
-  );
+  return o && o.apiVersion === VolumeAttachment.apiVersion && o.kind === VolumeAttachment.kind;
 }
 
 export namespace VolumeAttachment {
@@ -442,7 +422,7 @@ export class VolumeAttachmentList {
 
   constructor(desc: VolumeAttachmentList) {
     this.apiVersion = VolumeAttachmentList.apiVersion;
-    this.items = desc.items.map(i => new VolumeAttachment(i));
+    this.items = desc.items.map((i) => new VolumeAttachment(i));
     this.kind = VolumeAttachmentList.kind;
     this.metadata = desc.metadata;
   }
@@ -450,9 +430,7 @@ export class VolumeAttachmentList {
 
 export function isVolumeAttachmentList(o: any): o is VolumeAttachmentList {
   return (
-    o &&
-    o.apiVersion === VolumeAttachmentList.apiVersion &&
-    o.kind === VolumeAttachmentList.kind
+    o && o.apiVersion === VolumeAttachmentList.apiVersion && o.kind === VolumeAttachmentList.kind
   );
 }
 

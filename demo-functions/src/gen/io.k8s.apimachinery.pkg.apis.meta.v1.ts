@@ -91,11 +91,7 @@ export class APIGroupList {
 }
 
 export function isAPIGroupList(o: any): o is APIGroupList {
-  return (
-    o &&
-    o.apiVersion === APIGroupList.apiVersion &&
-    o.kind === APIGroupList.kind
-  );
+  return o && o.apiVersion === APIGroupList.apiVersion && o.kind === APIGroupList.kind;
 }
 
 export namespace APIGroupList {
@@ -180,11 +176,7 @@ export class APIResourceList {
 }
 
 export function isAPIResourceList(o: any): o is APIResourceList {
-  return (
-    o &&
-    o.apiVersion === APIResourceList.apiVersion &&
-    o.kind === APIResourceList.kind
-  );
+  return o && o.apiVersion === APIResourceList.apiVersion && o.kind === APIResourceList.kind;
 }
 
 export namespace APIResourceList {
@@ -226,9 +218,7 @@ export class APIVersions {
 }
 
 export function isAPIVersions(o: any): o is APIVersions {
-  return (
-    o && o.apiVersion === APIVersions.apiVersion && o.kind === APIVersions.kind
-  );
+  return o && o.apiVersion === APIVersions.apiVersion && o.kind === APIVersions.kind;
 }
 
 export namespace APIVersions {
@@ -282,11 +272,7 @@ export class DeleteOptions {
 }
 
 export function isDeleteOptions(o: any): o is DeleteOptions {
-  return (
-    o &&
-    o.apiVersion === DeleteOptions.apiVersion &&
-    o.kind === DeleteOptions.kind
-  );
+  return o && o.apiVersion === DeleteOptions.apiVersion && o.kind === DeleteOptions.kind;
 }
 
 export namespace DeleteOptions {
@@ -750,9 +736,7 @@ export class WatchEvent {
 }
 
 export function isWatchEvent(o: any): o is WatchEvent {
-  return (
-    o && o.apiVersion === WatchEvent.apiVersion && o.kind === WatchEvent.kind
-  );
+  return o && o.apiVersion === WatchEvent.apiVersion && o.kind === WatchEvent.kind;
 }
 
 export namespace WatchEvent {

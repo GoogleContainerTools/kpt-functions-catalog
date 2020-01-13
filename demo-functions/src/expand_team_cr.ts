@@ -21,11 +21,11 @@ import { RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';
 
 const ENVIRONMENTS = ['dev', 'prod'];
 
-export const expandTeamCr: KptFunc = configs => {
-  configs.get(isTeam).forEach(team => {
+export const expandTeamCr: KptFunc = (configs) => {
+  configs.get(isTeam).forEach((team) => {
     const name = team.metadata.name;
 
-    ENVIRONMENTS.forEach(suffix => {
+    ENVIRONMENTS.forEach((suffix) => {
       const ns = `${name}-${suffix}`;
       configs.insert(Namespace.named(ns));
       configs.insert(...expandTeam(team, ns));
@@ -35,24 +35,24 @@ export const expandTeamCr: KptFunc = configs => {
 
 function roleSubjects(item: Team.Spec.Item): Subject[] {
   const userSubjects: Subject[] = (item.users || []).map(
-    user =>
+    (user) =>
       new Subject({
         kind: 'User',
         name: user,
-      })
+      }),
   );
   const groupSubjects: Subject[] = (item.groups || []).map(
-    group =>
+    (group) =>
       new Subject({
         kind: 'Group',
         name: group,
-      })
+      }),
   );
   return userSubjects.concat(groupSubjects);
 }
 
 function expandTeam(team: Team, namespace: string): RoleBinding[] {
-  return (team.spec.roles || []).map(item => {
+  return (team.spec.roles || []).map((item) => {
     return new RoleBinding({
       metadata: {
         name: item.role,

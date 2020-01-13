@@ -55,11 +55,7 @@ export class NetworkPolicy implements KubernetesObject {
 }
 
 export function isNetworkPolicy(o: any): o is NetworkPolicy {
-  return (
-    o &&
-    o.apiVersion === NetworkPolicy.apiVersion &&
-    o.kind === NetworkPolicy.kind
-  );
+  return o && o.apiVersion === NetworkPolicy.apiVersion && o.kind === NetworkPolicy.kind;
 }
 
 export namespace NetworkPolicy {
@@ -116,18 +112,14 @@ export class NetworkPolicyList {
 
   constructor(desc: NetworkPolicyList) {
     this.apiVersion = NetworkPolicyList.apiVersion;
-    this.items = desc.items.map(i => new NetworkPolicy(i));
+    this.items = desc.items.map((i) => new NetworkPolicy(i));
     this.kind = NetworkPolicyList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isNetworkPolicyList(o: any): o is NetworkPolicyList {
-  return (
-    o &&
-    o.apiVersion === NetworkPolicyList.apiVersion &&
-    o.kind === NetworkPolicyList.kind
-  );
+  return o && o.apiVersion === NetworkPolicyList.apiVersion && o.kind === NetworkPolicyList.kind;
 }
 
 export namespace NetworkPolicyList {

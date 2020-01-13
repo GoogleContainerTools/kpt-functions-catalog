@@ -16,7 +16,7 @@
 
 import { KptFunc } from '@googlecontainertools/kpt-functions';
 
-export const noOp: KptFunc = configs => {};
+export const noOp: KptFunc = (configs) => {};
 
 noOp.usage = `
 A NO OP kpt function used for testing and demo purposes.

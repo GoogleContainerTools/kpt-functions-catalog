@@ -43,9 +43,7 @@ export class APIService implements KubernetesObject {
 }
 
 export function isAPIService(o: any): o is APIService {
-  return (
-    o && o.apiVersion === APIService.apiVersion && o.kind === APIService.kind
-  );
+  return o && o.apiVersion === APIService.apiVersion && o.kind === APIService.kind;
 }
 
 export namespace APIService {
@@ -110,18 +108,14 @@ export class APIServiceList {
 
   constructor(desc: APIServiceList) {
     this.apiVersion = APIServiceList.apiVersion;
-    this.items = desc.items.map(i => new APIService(i));
+    this.items = desc.items.map((i) => new APIService(i));
     this.kind = APIServiceList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isAPIServiceList(o: any): o is APIServiceList {
-  return (
-    o &&
-    o.apiVersion === APIServiceList.apiVersion &&
-    o.kind === APIServiceList.kind
-  );
+  return o && o.apiVersion === APIServiceList.apiVersion && o.kind === APIServiceList.kind;
 }
 
 export namespace APIServiceList {

@@ -165,16 +165,14 @@ export class EventList {
 
   constructor(desc: EventList) {
     this.apiVersion = EventList.apiVersion;
-    this.items = desc.items.map(i => new Event(i));
+    this.items = desc.items.map((i) => new Event(i));
     this.kind = EventList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isEventList(o: any): o is EventList {
-  return (
-    o && o.apiVersion === EventList.apiVersion && o.kind === EventList.kind
-  );
+  return o && o.apiVersion === EventList.apiVersion && o.kind === EventList.kind;
 }
 
 export namespace EventList {

@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  Configs,
-  TestRunner,
-  ConfigError,
-} from '@googlecontainertools/kpt-functions';
-import {
-  ClusterRoleBinding,
-  RoleBinding,
-  Subject,
-} from './gen/io.k8s.api.rbac.v1';
+import { Configs, TestRunner, ConfigError } from '@googlecontainertools/kpt-functions';
+import { ClusterRoleBinding, RoleBinding, Subject } from './gen/io.k8s.api.rbac.v1';
 import { validateRolebinding, SUBJECT_NAME } from './validate_rolebinding';
 import { ConfigMap } from './gen/io.k8s.api.core.v1';
 
@@ -35,14 +27,14 @@ function roleBinding(name: string, ...subjects: Subject[]): RoleBinding {
       kind: 'Role',
       name: 'alice',
     },
-    subjects,
+    subjects: subjects,
   });
 }
 
 const RUNNER = new TestRunner(validateRolebinding);
 
 describe(validateRolebinding.name, () => {
-  const functionConfig = ConfigMap.named('config');
+  let functionConfig = ConfigMap.named('config');
   functionConfig.data = {};
   functionConfig.data![SUBJECT_NAME] = 'alice@example.com';
 
@@ -58,9 +50,9 @@ describe(validateRolebinding.name, () => {
             kind: 'User',
           }),
         ],
-        functionConfig
-      )
-    )
+        functionConfig,
+      ),
+    ),
   );
 
   it(
@@ -73,10 +65,10 @@ describe(validateRolebinding.name, () => {
             kind: 'User',
           }),
         ],
-        functionConfig
+        functionConfig,
       ),
-      new ConfigError('Found RoleBindings with banned subjects')
-    )
+      new ConfigError('Found RoleBindings with banned subjects'),
+    ),
   );
 
   it(
@@ -99,8 +91,8 @@ describe(validateRolebinding.name, () => {
             ],
           }),
         ],
-        functionConfig
-      )
-    )
+        functionConfig,
+      ),
+    ),
   );
 });

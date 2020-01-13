@@ -77,9 +77,7 @@ export class DaemonSet implements KubernetesObject {
 }
 
 export function isDaemonSet(o: any): o is DaemonSet {
-  return (
-    o && o.apiVersion === DaemonSet.apiVersion && o.kind === DaemonSet.kind
-  );
+  return o && o.apiVersion === DaemonSet.apiVersion && o.kind === DaemonSet.kind;
 }
 
 export namespace DaemonSet {
@@ -147,18 +145,14 @@ export class DaemonSetList {
 
   constructor(desc: DaemonSetList) {
     this.apiVersion = DaemonSetList.apiVersion;
-    this.items = desc.items.map(i => new DaemonSet(i));
+    this.items = desc.items.map((i) => new DaemonSet(i));
     this.kind = DaemonSetList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isDaemonSetList(o: any): o is DaemonSetList {
-  return (
-    o &&
-    o.apiVersion === DaemonSetList.apiVersion &&
-    o.kind === DaemonSetList.kind
-  );
+  return o && o.apiVersion === DaemonSetList.apiVersion && o.kind === DaemonSetList.kind;
 }
 
 export namespace DaemonSetList {
@@ -288,9 +282,7 @@ export class Deployment implements KubernetesObject {
 }
 
 export function isDeployment(o: any): o is Deployment {
-  return (
-    o && o.apiVersion === Deployment.apiVersion && o.kind === Deployment.kind
-  );
+  return o && o.apiVersion === Deployment.apiVersion && o.kind === Deployment.kind;
 }
 
 export namespace Deployment {
@@ -362,18 +354,14 @@ export class DeploymentList {
 
   constructor(desc: DeploymentList) {
     this.apiVersion = DeploymentList.apiVersion;
-    this.items = desc.items.map(i => new Deployment(i));
+    this.items = desc.items.map((i) => new Deployment(i));
     this.kind = DeploymentList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isDeploymentList(o: any): o is DeploymentList {
-  return (
-    o &&
-    o.apiVersion === DeploymentList.apiVersion &&
-    o.kind === DeploymentList.kind
-  );
+  return o && o.apiVersion === DeploymentList.apiVersion && o.kind === DeploymentList.kind;
 }
 
 export namespace DeploymentList {
@@ -419,11 +407,7 @@ export class DeploymentRollback {
 }
 
 export function isDeploymentRollback(o: any): o is DeploymentRollback {
-  return (
-    o &&
-    o.apiVersion === DeploymentRollback.apiVersion &&
-    o.kind === DeploymentRollback.kind
-  );
+  return o && o.apiVersion === DeploymentRollback.apiVersion && o.kind === DeploymentRollback.kind;
 }
 
 export namespace DeploymentRollback {
@@ -681,16 +665,14 @@ export class IngressList {
 
   constructor(desc: IngressList) {
     this.apiVersion = IngressList.apiVersion;
-    this.items = desc.items.map(i => new Ingress(i));
+    this.items = desc.items.map((i) => new Ingress(i));
     this.kind = IngressList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isIngressList(o: any): o is IngressList {
-  return (
-    o && o.apiVersion === IngressList.apiVersion && o.kind === IngressList.kind
-  );
+  return o && o.apiVersion === IngressList.apiVersion && o.kind === IngressList.kind;
 }
 
 export namespace IngressList {
@@ -772,11 +754,7 @@ export class NetworkPolicy implements KubernetesObject {
 }
 
 export function isNetworkPolicy(o: any): o is NetworkPolicy {
-  return (
-    o &&
-    o.apiVersion === NetworkPolicy.apiVersion &&
-    o.kind === NetworkPolicy.kind
-  );
+  return o && o.apiVersion === NetworkPolicy.apiVersion && o.kind === NetworkPolicy.kind;
 }
 
 export namespace NetworkPolicy {
@@ -833,18 +811,14 @@ export class NetworkPolicyList {
 
   constructor(desc: NetworkPolicyList) {
     this.apiVersion = NetworkPolicyList.apiVersion;
-    this.items = desc.items.map(i => new NetworkPolicy(i));
+    this.items = desc.items.map((i) => new NetworkPolicy(i));
     this.kind = NetworkPolicyList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isNetworkPolicyList(o: any): o is NetworkPolicyList {
-  return (
-    o &&
-    o.apiVersion === NetworkPolicyList.apiVersion &&
-    o.kind === NetworkPolicyList.kind
-  );
+  return o && o.apiVersion === NetworkPolicyList.apiVersion && o.kind === NetworkPolicyList.kind;
 }
 
 export namespace NetworkPolicyList {
@@ -933,11 +907,7 @@ export class PodSecurityPolicy implements KubernetesObject {
 }
 
 export function isPodSecurityPolicy(o: any): o is PodSecurityPolicy {
-  return (
-    o &&
-    o.apiVersion === PodSecurityPolicy.apiVersion &&
-    o.kind === PodSecurityPolicy.kind
-  );
+  return o && o.apiVersion === PodSecurityPolicy.apiVersion && o.kind === PodSecurityPolicy.kind;
 }
 
 export namespace PodSecurityPolicy {
@@ -976,7 +946,7 @@ export class PodSecurityPolicyList {
 
   constructor(desc: PodSecurityPolicyList) {
     this.apiVersion = PodSecurityPolicyList.apiVersion;
-    this.items = desc.items.map(i => new PodSecurityPolicy(i));
+    this.items = desc.items.map((i) => new PodSecurityPolicy(i));
     this.kind = PodSecurityPolicyList.kind;
     this.metadata = desc.metadata;
   }
@@ -984,9 +954,7 @@ export class PodSecurityPolicyList {
 
 export function isPodSecurityPolicyList(o: any): o is PodSecurityPolicyList {
   return (
-    o &&
-    o.apiVersion === PodSecurityPolicyList.apiVersion &&
-    o.kind === PodSecurityPolicyList.kind
+    o && o.apiVersion === PodSecurityPolicyList.apiVersion && o.kind === PodSecurityPolicyList.kind
   );
 }
 
@@ -1135,9 +1103,7 @@ export class ReplicaSet implements KubernetesObject {
 }
 
 export function isReplicaSet(o: any): o is ReplicaSet {
-  return (
-    o && o.apiVersion === ReplicaSet.apiVersion && o.kind === ReplicaSet.kind
-  );
+  return o && o.apiVersion === ReplicaSet.apiVersion && o.kind === ReplicaSet.kind;
 }
 
 export namespace ReplicaSet {
@@ -1205,18 +1171,14 @@ export class ReplicaSetList {
 
   constructor(desc: ReplicaSetList) {
     this.apiVersion = ReplicaSetList.apiVersion;
-    this.items = desc.items.map(i => new ReplicaSet(i));
+    this.items = desc.items.map((i) => new ReplicaSet(i));
     this.kind = ReplicaSetList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isReplicaSetList(o: any): o is ReplicaSetList {
-  return (
-    o &&
-    o.apiVersion === ReplicaSetList.apiVersion &&
-    o.kind === ReplicaSetList.kind
-  );
+  return o && o.apiVersion === ReplicaSetList.apiVersion && o.kind === ReplicaSetList.kind;
 }
 
 export namespace ReplicaSetList {

@@ -126,16 +126,14 @@ export class IngressList {
 
   constructor(desc: IngressList) {
     this.apiVersion = IngressList.apiVersion;
-    this.items = desc.items.map(i => new Ingress(i));
+    this.items = desc.items.map((i) => new Ingress(i));
     this.kind = IngressList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isIngressList(o: any): o is IngressList {
-  return (
-    o && o.apiVersion === IngressList.apiVersion && o.kind === IngressList.kind
-  );
+  return o && o.apiVersion === IngressList.apiVersion && o.kind === IngressList.kind;
 }
 
 export namespace IngressList {

@@ -67,11 +67,7 @@ export class StorageClass implements KubernetesObject {
 }
 
 export function isStorageClass(o: any): o is StorageClass {
-  return (
-    o &&
-    o.apiVersion === StorageClass.apiVersion &&
-    o.kind === StorageClass.kind
-  );
+  return o && o.apiVersion === StorageClass.apiVersion && o.kind === StorageClass.kind;
 }
 
 export namespace StorageClass {
@@ -126,18 +122,14 @@ export class StorageClassList {
 
   constructor(desc: StorageClassList) {
     this.apiVersion = StorageClassList.apiVersion;
-    this.items = desc.items.map(i => new StorageClass(i));
+    this.items = desc.items.map((i) => new StorageClass(i));
     this.kind = StorageClassList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isStorageClassList(o: any): o is StorageClassList {
-  return (
-    o &&
-    o.apiVersion === StorageClassList.apiVersion &&
-    o.kind === StorageClassList.kind
-  );
+  return o && o.apiVersion === StorageClassList.apiVersion && o.kind === StorageClassList.kind;
 }
 
 export namespace StorageClassList {
@@ -185,11 +177,7 @@ export class VolumeAttachment implements KubernetesObject {
 }
 
 export function isVolumeAttachment(o: any): o is VolumeAttachment {
-  return (
-    o &&
-    o.apiVersion === VolumeAttachment.apiVersion &&
-    o.kind === VolumeAttachment.kind
-  );
+  return o && o.apiVersion === VolumeAttachment.apiVersion && o.kind === VolumeAttachment.kind;
 }
 
 export namespace VolumeAttachment {
@@ -229,7 +217,7 @@ export class VolumeAttachmentList {
 
   constructor(desc: VolumeAttachmentList) {
     this.apiVersion = VolumeAttachmentList.apiVersion;
-    this.items = desc.items.map(i => new VolumeAttachment(i));
+    this.items = desc.items.map((i) => new VolumeAttachment(i));
     this.kind = VolumeAttachmentList.kind;
     this.metadata = desc.metadata;
   }
@@ -237,9 +225,7 @@ export class VolumeAttachmentList {
 
 export function isVolumeAttachmentList(o: any): o is VolumeAttachmentList {
   return (
-    o &&
-    o.apiVersion === VolumeAttachmentList.apiVersion &&
-    o.kind === VolumeAttachmentList.kind
+    o && o.apiVersion === VolumeAttachmentList.apiVersion && o.kind === VolumeAttachmentList.kind
   );
 }
 
