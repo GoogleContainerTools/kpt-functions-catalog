@@ -27,7 +27,7 @@
     "js-yaml": "^3.13.1"
   },
   "devDependencies": {
-    "@googlecontainertools/create-kpt-functions": "^0.9.0",
+    "@googlecontainertools/create-kpt-functions": "^0.11.0",
     "@types/fs-extra": "^8.0.1",
     "@types/glob": "^7.1.1",
     "@types/jasmine": "^3.3.12",
