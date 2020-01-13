@@ -90,7 +90,7 @@ export class TeamList {
 
   constructor(desc: TeamList) {
     this.apiVersion = TeamList.apiVersion;
-    this.items = desc.items.map((i) => new Team(i));
+    this.items = desc.items.map(i => new Team(i));
     this.kind = TeamList.kind;
     this.metadata = desc.metadata;
   }

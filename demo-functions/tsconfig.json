@@ -1,21 +1,27 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
-    "resolveJsonModule": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "baseUrl": ".",
+    "declaration": true,
     "esModuleInterop": true,
-    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": true,
+    "lib": ["es2016"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
+    "noUnusedLocals": true,
     "outDir": "dist",
-    "baseUrl": "..",
-    "lib": ["es2015"],
-    "rootDir": "src/"
+    "pretty": true,
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017"
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["src/**/*"]
+  "include": ["index.ts", "src/**/*.ts"]
 }

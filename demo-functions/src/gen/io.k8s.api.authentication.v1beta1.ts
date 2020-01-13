@@ -43,7 +43,9 @@ export class TokenReview implements KubernetesObject {
 }
 
 export function isTokenReview(o: any): o is TokenReview {
-  return o && o.apiVersion === TokenReview.apiVersion && o.kind === TokenReview.kind;
+  return (
+    o && o.apiVersion === TokenReview.apiVersion && o.kind === TokenReview.kind
+  );
 }
 
 export namespace TokenReview {
