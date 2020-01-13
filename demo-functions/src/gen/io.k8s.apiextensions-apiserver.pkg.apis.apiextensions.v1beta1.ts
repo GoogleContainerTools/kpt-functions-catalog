@@ -90,7 +90,9 @@ export class CustomResourceDefinition implements KubernetesObject {
   }
 }
 
-export function isCustomResourceDefinition(o: any): o is CustomResourceDefinition {
+export function isCustomResourceDefinition(
+  o: any
+): o is CustomResourceDefinition {
   return (
     o &&
     o.apiVersion === CustomResourceDefinition.apiVersion &&
@@ -157,13 +159,15 @@ export class CustomResourceDefinitionList {
 
   constructor(desc: CustomResourceDefinitionList) {
     this.apiVersion = CustomResourceDefinitionList.apiVersion;
-    this.items = desc.items.map((i) => new CustomResourceDefinition(i));
+    this.items = desc.items.map(i => new CustomResourceDefinition(i));
     this.kind = CustomResourceDefinitionList.kind;
     this.metadata = desc.metadata;
   }
 }
 
-export function isCustomResourceDefinitionList(o: any): o is CustomResourceDefinitionList {
+export function isCustomResourceDefinitionList(
+  o: any
+): o is CustomResourceDefinitionList {
   return (
     o &&
     o.apiVersion === CustomResourceDefinitionList.apiVersion &&

@@ -88,14 +88,16 @@ export class CronJobList {
 
   constructor(desc: CronJobList) {
     this.apiVersion = CronJobList.apiVersion;
-    this.items = desc.items.map((i) => new CronJob(i));
+    this.items = desc.items.map(i => new CronJob(i));
     this.kind = CronJobList.kind;
     this.metadata = desc.metadata;
   }
 }
 
 export function isCronJobList(o: any): o is CronJobList {
-  return o && o.apiVersion === CronJobList.apiVersion && o.kind === CronJobList.kind;
+  return (
+    o && o.apiVersion === CronJobList.apiVersion && o.kind === CronJobList.kind
+  );
 }
 
 export namespace CronJobList {

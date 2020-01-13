@@ -42,7 +42,9 @@ export class LocalSubjectAccessReview implements KubernetesObject {
   }
 }
 
-export function isLocalSubjectAccessReview(o: any): o is LocalSubjectAccessReview {
+export function isLocalSubjectAccessReview(
+  o: any
+): o is LocalSubjectAccessReview {
   return (
     o &&
     o.apiVersion === LocalSubjectAccessReview.apiVersion &&
@@ -163,7 +165,9 @@ export class SelfSubjectAccessReview implements KubernetesObject {
   }
 }
 
-export function isSelfSubjectAccessReview(o: any): o is SelfSubjectAccessReview {
+export function isSelfSubjectAccessReview(
+  o: any
+): o is SelfSubjectAccessReview {
   return (
     o &&
     o.apiVersion === SelfSubjectAccessReview.apiVersion &&
@@ -281,7 +285,9 @@ export class SubjectAccessReview implements KubernetesObject {
 
 export function isSubjectAccessReview(o: any): o is SubjectAccessReview {
   return (
-    o && o.apiVersion === SubjectAccessReview.apiVersion && o.kind === SubjectAccessReview.kind
+    o &&
+    o.apiVersion === SubjectAccessReview.apiVersion &&
+    o.kind === SubjectAccessReview.kind
   );
 }
 

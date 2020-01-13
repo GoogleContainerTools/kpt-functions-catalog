@@ -23,16 +23,21 @@ import { isRoleBinding } from './gen/io.k8s.api.rbac.v1';
 
 export const SUBJECT_NAME = 'subject_name';
 
-export const validateRolebinding: KptFunc = (configs) => {
+export const validateRolebinding: KptFunc = configs => {
   const subjectName = configs.getFunctionConfigValueOrThrow(SUBJECT_NAME);
 
-  let errors: KubernetesObjectError[] = configs
+  const errors: KubernetesObjectError[] = configs
     .get(isRoleBinding)
-    .filter((rb) => rb && rb.subjects && rb.subjects.find((s) => s.name === subjectName))
-    .map((rb) => new KubernetesObjectError('Object has banned subject', rb));
+    .filter(
+      rb => rb && rb.subjects && rb.subjects.find(s => s.name === subjectName)
+    )
+    .map(rb => new KubernetesObjectError('Object has banned subject', rb));
 
   if (errors.length) {
-    return new MultiConfigError('Found RoleBindings with banned subjects', errors);
+    return new MultiConfigError(
+      'Found RoleBindings with banned subjects',
+      errors
+    );
   }
   return;
 };

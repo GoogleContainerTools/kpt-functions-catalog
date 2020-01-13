@@ -40,11 +40,11 @@ describe('mutatePsp', () => {
 
   it(
     'modifies PSP with allowPrivilegeEscalation = true to false',
-    RUNNER.run(new Configs([psp(true)]), new Configs([psp(false)])),
+    RUNNER.run(new Configs([psp(true)]), new Configs([psp(false)]))
   );
 
   it(
     'leaves PSP with allowPrivilegeEscalation = false alone',
-    RUNNER.run(new Configs([psp(false)])),
+    RUNNER.run(new Configs([psp(false)]))
   );
 });
