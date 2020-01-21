@@ -40,10 +40,10 @@ See [definition of sink functions][sink].
 
 ## Transformers
 
-| Image                                | Description                                                                                 | Source                                                                                                                 |
-| ------------------------------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-functions/mutate-psp      | [Demo] Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/mutate_psp.ts)      |
-| gcr.io/kpt-functions/label-namespace | [Demo] Adds a label to all Namespaces.                                                      | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/label_namespace.ts) |
+| Image                                | Description                                                                                 | Source                                                                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| gcr.io/kpt-functions/mutate-psp      | [Demo] Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/mutate_psp.ts)   |
+| gcr.io/kpt-functions/label-namespace | [Demo] Adds a label to all Namespaces.                                                      | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/hello-world/src/label_namespace.ts) |
 
 ## Miscellaneous
 
