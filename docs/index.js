@@ -2,14 +2,14 @@ const data = require('../catalog.json');
 const table = require('markdown-table');
 
 function tableByType(type) {
-    let t = [['Image', 'Description', 'Source']];
+    let t = [['Image', 'Args', 'Description', 'Source']];
     data.filter(r => r.type === type).forEach(r => {
-        let d = r.description;
+        let desc = r.description;
         if (r.demo === true) {
-            d = '[Demo] ' + d;
+            desc = '[Demo] ' + desc;
         }
-        const s = `[Link](${r.source})`;
-        t.push([r.image, d, s]);
+        const source = `[Link](${r.source})`;
+        t.push([r.image, r.args, desc, source]);
     });
     return table(t);
 }
@@ -54,8 +54,8 @@ ${tableByType('transformer')}
 ${tableByType('misc')}
 
 [spec]: https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md
-[source]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/README.md#source-function
-[sink]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/README.md#sink-function
+[source]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/docs/concepts.md#source-function
+[sink]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/docs/concepts.md#sink-function
 [sdk]: https://github.com/GoogleContainerTools/kpt-functions-sdk
 `;
 
