@@ -1,17 +1,20 @@
-const data = require('../catalog.json');
-const table = require('markdown-table');
+const data = require("../catalog.json");
+const table = require("markdown-table");
 
 function tableByType(type) {
-    let t = [['Image', 'Args', 'Description', 'Source']];
-    data.filter(r => r.type === type).forEach(r => {
-        let desc = r.description;
-        if (r.demo === true) {
-            desc = '[Demo] ' + desc;
-        }
-        const source = `[Link](${r.source})`;
-        t.push([r.image, r.args, desc, source]);
+  let t = [["Image", "Args", "Description", "Source"]];
+  data
+    .filter(r => r.type === type)
+    .forEach(r => {
+      let desc = r.description;
+      if (r.demo === true) {
+        desc = "[Demo] " + desc;
+      }
+      const image = `[${r.image}](https://${r.image})`;
+      const source = `[Link](${r.source})`;
+      t.push([image, r.args, desc, source]);
     });
-    return table(t);
+  return table(t);
 }
 
 const README = `
@@ -29,29 +32,29 @@ These functions can be implemented using any toolchain such as the [KPT Function
 
 See [definition of source functions][source].
 
-${tableByType('source')}
+${tableByType("source")}
 
 ## Sinks
 
 See [definition of sink functions][sink].
 
-${tableByType('sink')}
+${tableByType("sink")}
 
 ## Validators
 
-${tableByType('validator')}
+${tableByType("validator")}
 
 ## Generators
 
-${tableByType('generator')}
+${tableByType("generator")}
 
 ## Transformers
 
-${tableByType('transformer')}
+${tableByType("transformer")}
 
 ## Miscellaneous
 
-${tableByType('misc')}
+${tableByType("misc")}
 
 [spec]: https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md
 [source]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/docs/concepts.md#source-function
