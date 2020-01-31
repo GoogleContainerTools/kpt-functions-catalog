@@ -13,10 +13,11 @@ These functions can be implemented using any toolchain such as the [KPT Function
 
 See [definition of source functions][source].
 
-| Image                          | Args          | Description                                                       | Source                                                                                                           |
-| ------------------------------ | ------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-dev/kpt             | kpt fn source | Reads a directory of Kubernetes configuration recursively.        | [Link](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/source.go)          |
-| gcr.io/kpt-functions/read-yaml |               | [Demo] Reads a directory of Kubernetes configuration recursively. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/read_yaml.ts) |
+| Image                          | Args              | Description                                                       | Source                                                                                                           |
+| ------------------------------ | ----------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| gcr.io/kpt-dev/kpt             | kpt fn source     | Reads a directory of Kubernetes configuration recursively.        | [Link](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/source.go)          |
+| gcr.io/kpt-functions/read-yaml |                   | [Demo] Reads a directory of Kubernetes configuration recursively. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/read_yaml.ts) |
+| gcr.io/cloud-builders/kubectl  | get [...] -o yaml | Get one or many resources from a Kubernetes cluster.              | [Link](https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/kubectl/Dockerfile)                     |
 
 ## Sinks
 

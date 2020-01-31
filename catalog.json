@@ -14,6 +14,13 @@
     "demo": true
   },
   {
+    "image": "gcr.io/cloud-builders/kubectl",
+    "args": "get [...] -o yaml",
+    "source": "https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/kubectl/Dockerfile",
+    "description": "Get one or many resources from a Kubernetes cluster.",
+    "type": "source"
+  },
+  {
     "image": "gcr.io/kpt-dev/kpt",
     "args": "kpt fn sink",
     "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/sink.go",
