@@ -55,7 +55,7 @@ See [definition of sink functions][sink].
 | gcr.io/kpt-functions/no-op |      | [Demo] No Op function for testing purposes | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/no_op.ts) |
 
 [spec]: https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md
-[source]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/docs/concepts.md#source-function
-[sink]: https://github.com/GoogleContainerTools/kpt-functions-sdk/blob/master/docs/concepts.md#sink-function
-[sdk]: https://github.com/GoogleContainerTools/kpt-functions-sdk
+[source]: https://googlecontainertools.github.io/kpt-functions-sdk/docs/concepts.html#source-function
+[sink]: https://googlecontainertools.github.io/kpt-functions-sdk/docs/concepts.html#sink-function
+[sdk]: https://googlecontainertools.github.io/kpt-functions-sdk/
 
