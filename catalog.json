@@ -1,7 +1,7 @@
 [
   {
     "image": "gcr.io/kpt-dev/kpt",
-    "args": "kpt fn source",
+    "args": "fn source",
     "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/source.go",
     "description": "Reads a directory of Kubernetes configuration recursively.",
     "type": "source"
@@ -22,7 +22,7 @@
   },
   {
     "image": "gcr.io/kpt-dev/kpt",
-    "args": "kpt fn sink",
+    "args": "fn sink",
     "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/sink.go",
     "description": "Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions.",
     "type": "sink"
