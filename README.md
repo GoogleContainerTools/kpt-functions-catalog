@@ -15,7 +15,7 @@ See [definition of source functions][source].
 
 | Image                          | Args              | Description                                                       | Source                                                                                                           |
 | ------------------------------ | ----------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-dev/kpt             | kpt fn source     | Reads a directory of Kubernetes configuration recursively.        | [Link](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/source.go)          |
+| gcr.io/kpt-dev/kpt             | fn source         | Reads a directory of Kubernetes configuration recursively.        | [Link](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/source.go)          |
 | gcr.io/kpt-functions/read-yaml |                   | [Demo] Reads a directory of Kubernetes configuration recursively. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/read_yaml.ts) |
 | gcr.io/cloud-builders/kubectl  | get [...] -o yaml | Get one or many resources from a Kubernetes cluster.              | [Link](https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/kubectl/Dockerfile)                     |
 
@@ -23,10 +23,10 @@ See [definition of source functions][source].
 
 See [definition of sink functions][sink].
 
-| Image                           | Args        | Description                                                                                                                       | Source                                                                                                            |
-| ------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-dev/kpt              | kpt fn sink | Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions.        | [Link](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/sink.go)             |
-| gcr.io/kpt-functions/write-yaml |             | [Demo] Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/write_yaml.ts) |
+| Image                           | Args    | Description                                                                                                                       | Source                                                                                                            |
+| ------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| gcr.io/kpt-dev/kpt              | fn sink | Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions.        | [Link](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/sink.go)             |
+| gcr.io/kpt-functions/write-yaml |         | [Demo] Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/write_yaml.ts) |
 
 ## Validators
 
