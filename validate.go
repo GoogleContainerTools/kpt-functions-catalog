@@ -86,7 +86,7 @@ func gatherConstraints(configs *types.Configs) ([]types.KubernetesObject, error)
 
 // Validate makes sure the configs passed to it comply with any Constraints and
 // Constraint Templates present in the list of configs
-func Validate(configs *types.Configs, _ types.Props) error {
+func Validate(configs *types.Configs) error {
 	client, err := createClient()
 	if err != nil {
 		return err
