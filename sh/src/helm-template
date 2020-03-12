@@ -8,10 +8,10 @@ NAME="name"
 CHART_PATH="chart_path"
 VALUES_PATH="values_path"
 USAGE=$(cat << END
-Render chart templates locally using helm template. Display the output objects
-as a Kubernetes List. If piped a Kubernetes List in addition to arguments then
-render the chart objects into the piped list, overwriting any chart objects
-that already exist in the list.
+Render chart templates locally using helm template.
+Display the output objects as a Kubernetes List. If piped a Kubernetes List in
+addition to arguments then render the chart objects into the piped list,
+overwriting any chart objects that already exist in the list.
 
 Configured using a ConfigMap with the following keys:
 
