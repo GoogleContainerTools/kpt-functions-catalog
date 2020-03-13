@@ -74,10 +74,6 @@ create_tmp() {
   fi
 }
 
-delete_tmp() {
-  rm -rf "$tmp"
-}
-
 expand_helm() {
   # Overwrite files if they exist
   if ! output="$(helm template "${name}" "${chartPath}" -f "${valuesPath}" --output-dir "${tmp}" )"; then
@@ -91,10 +87,6 @@ run_main() {
   read_arguments "$@"
   create_tmp
   expand_helm
-  delete_tmp
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
-then
-  run_main "$@"
-fi
+run_main "$@"

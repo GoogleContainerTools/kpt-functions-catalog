@@ -7,7 +7,7 @@ RUN curl -fsSL -o /usr/local/bin/kpt https://storage.googleapis.com/kpt-dev/late
 RUN chmod +x /usr/local/bin/kpt
 ENV PATH /usr/local/bin:$PATH
 
-COPY src/helm-template /
+COPY helm-template /
 RUN chmod +x /helm-template
 
 ENTRYPOINT [ "/helm-template" ]

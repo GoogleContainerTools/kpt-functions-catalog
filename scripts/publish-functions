@@ -5,13 +5,12 @@
 set -eo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. >/dev/null 2>&1 && pwd)"
-DIST=${REPO}/sh/build
 TAG=${TAG:-dev}
 FUNCS=(helm-template)
 
 for FN_NAME in "${FUNCS[@]}"; do
   DOCKER_IMAGE="gcr.io/kpt-functions/${FN_NAME}:${TAG}"
-  DOCKER_FILE="${DIST}/${FN_NAME}.Dockerfile"
+  DOCKER_FILE="${REPO}/sh/${FN_NAME}/${FN_NAME}.Dockerfile"
   docker build -t "$DOCKER_IMAGE" -f "$DOCKER_FILE" sh
 	docker push "$DOCKER_IMAGE"
 done
