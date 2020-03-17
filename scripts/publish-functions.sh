@@ -26,5 +26,5 @@ for FN_NAME in "${FUNCS[@]}"; do
   DOCKER_IMAGE="gcr.io/kpt-functions/${FN_NAME}:${TAG}"
   DOCKER_FILE="${REPO}/functions/${FN_NAME}/Dockerfile"
   docker build -t "$DOCKER_IMAGE" -f "$DOCKER_FILE" functions
-	docker push "$DOCKER_IMAGE"
+  docker push "$DOCKER_IMAGE"
 done

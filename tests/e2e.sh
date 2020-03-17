@@ -81,7 +81,7 @@ assert_dir_exists redis
 # kpt fn Tests
 ############################
 
-# TODO: Add kpt_helm_template_short test after kpt fn run --image fix <https://github.com/GoogleContainerTools/kpt/issues/359>
+# TODO: Add kpt_helm_template_imperative_short and kpt_helm_template_declarative tests after fixing <https://github.com/GoogleContainerTools/kpt/issues/359>
 testcase "kpt_helm_template_imperative"
 kpt fn source example-configs |
   docker run -i -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template chart_path=/source/mongodb name=my-mongodb |
