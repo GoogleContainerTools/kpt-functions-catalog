@@ -30,8 +30,15 @@ jobs:
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
+    - name: Set up gcloud
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+          version: '275.0.0'
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+    - run: gcloud auth configure-docker
     - uses: actions/checkout@v1
-    - name: Build docker images
+    - name: Release docker images
       run: |
         ./scripts/publish-functions.sh
     - name: Run all e2e tests
