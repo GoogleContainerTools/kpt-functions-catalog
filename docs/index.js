@@ -56,7 +56,6 @@ ${tableByType('misc')}
 [spec]: https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md
 [source]: https://googlecontainertools.github.io/kpt-functions-sdk/docs/concepts.html#source-function
 [sink]: https://googlecontainertools.github.io/kpt-functions-sdk/docs/concepts.html#sink-function
-[sdk]: https://googlecontainertools.github.io/kpt-functions-sdk/
-`;
+[sdk]: https://googlecontainertools.github.io/kpt-functions-sdk/`;
 
 console.log(README);
