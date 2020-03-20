@@ -21,6 +21,7 @@ set -eo pipefail
 NAME="name"
 CHART_PATH="chart_path"
 VALUES_PATH="values_path"
+declare -a EXTRA_ARGS=()
 USAGE=$(cat << END
 Render chart templates locally using helm template.
 Display the output objects as a Kubernetes List. If piped a Kubernetes List in
@@ -68,10 +69,7 @@ read_arguments() {
       "${NAME}="*) name="${arg#*=}" ;;
       "${CHART_PATH}="*) chartPath="${arg#*=}" ;;
       "${VALUES_PATH}="*) valuesPath="${arg#*=}" ;;
-      *)
-        err "${USAGE}"
-        exit 1
-        ;;
+      *) EXTRA_ARGS+=("$arg") ;;
     esac
   done
 
@@ -90,7 +88,7 @@ create_tmp() {
 
 expand_helm() {
   # Overwrite files if they exist
-  if ! output="$(helm template "${name}" "${chartPath}" -f "${valuesPath}" --output-dir "${tmp}" )"; then
+  if ! output="$(helm template "${name}" "${chartPath}" -f "${valuesPath}" --output-dir "${tmp}" "$@" 2>&1 )"; then
     err "Helm template error: ${output}"
     exit 1
   fi
@@ -100,7 +98,7 @@ expand_helm() {
 run_main() {
   read_arguments "$@"
   create_tmp
-  expand_helm
+  expand_helm "${EXTRA_ARGS[@]}"
 }
 
 run_main "$@"

@@ -57,9 +57,13 @@ testcase "docker_helm_template_usage_too_few_args"
 docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" name=too-few-args 2>err.txt || true
 assert_contains_string err.txt "${HELM_USAGE_SNIPPET}"
 
-testcase "docker_helm_template_usage_too_many_args"
-docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" chart_path=/source/redis name=too-many-args extra=args_provided 2>err.txt || true
-assert_contains_string err.txt "${HELM_USAGE_SNIPPET}"
+testcase "docker_helm_template_usage_error_case"
+docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" --verify chart_path=/source/redis name=extra-args-provided 2>err.txt || true
+assert_contains_string err.txt "unpacked charts cannot be verified"
+
+testcase "docker_helm_template_usage_extra_args_provided"
+docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" chart_path=/source/redis name=extra-args-provided --dependency-update >out.yaml
+assert_contains_string out.yaml "extra-args-provided"
 
 testcase "docker_helm_template_correct_args"
 docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" name=correct-args chart_path=/source/redis >out.yaml
