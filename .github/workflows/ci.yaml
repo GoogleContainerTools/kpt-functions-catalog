@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron:  '0 17 * * *'
+
+jobs:
+  shell-ci:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Lint shell scripts, ignoring third-party files
+      run: |
+        find . -name "*.sh" > shell_files.out
+        shellcheck $(cat shell_files.out)  
+
+  e2e-ci:
+    needs: [shell-ci]
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build docker images
+      run: |
+        ./scripts/publish-functions.sh
+    - name: Run all e2e tests
+      run: |
+        sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
+        sudo chmod +x /usr/local/bin/kpt
+        tests/e2e.sh
