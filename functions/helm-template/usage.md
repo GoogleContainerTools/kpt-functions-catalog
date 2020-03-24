@@ -14,13 +14,14 @@ limitations under the License. -->
 
 # Helm-template Usage
 
+Kpt packages are just configuration so any solution, like the `helm template` command, which emits configuration can also be used to generate kpt packages. `Helm-template` is a kpt function which generates a new kpt package from a local Helm chart or upserts Helm chart configuration to an existing kpt package. In the context of a pipeline, these packages can then be further customized using other kpt functions.
+
 ## FAQs
 
 ### How can I set arbitrary values in my chart using `--set`
 
-We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional `values_path` argument to the helm-template command containing the relative path to your new file.
-
-`$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis` **`values_path=/source/redis/values-production.yaml`**`
+We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional `values_path` argument to the helm-template command containing the relative path to your new file.  
+`$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis` **`values_path=/source/redis/values-production.yaml`**
 
 ## Examples
 
@@ -30,9 +31,9 @@ We recommend that you create a new values.yaml file with the values you want so 
 
 * Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster.
 * Install kpt.  
-    `gcloud components install kpt`
+    `$ gcloud components install kpt`
 * Download the helm chart to your filesystem.  
-    `git clone -q https://https://github.com/bitnami/charts.git`
+    `$ git clone -q https://https://github.com/bitnami/charts.git`
 
 #### Steps
 
@@ -43,5 +44,5 @@ We recommend that you create a new values.yaml file with the values you want so 
 2. See a summary of this operation using `kpt config tree`.  
 `$ kpt fn source output | kpt config tree`
 
-3. Apply these configs to a kubernetes cluster.
+3. Apply these configs to a kubernetes cluster.  
 `$ kubectl apply -R -f ./output`
