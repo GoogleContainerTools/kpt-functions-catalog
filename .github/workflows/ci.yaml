@@ -17,7 +17,7 @@ jobs:
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Lint shell scripts, ignoring third-party files
       run: |
         find . -name "*.sh" > shell_files.out
@@ -30,14 +30,18 @@ jobs:
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
+    - uses: actions/checkout@v2
     - name: Set up gcloud
       uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
-          version: '275.0.0'
+          version: '285.0.0'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+    - run: gcloud info
+    # Configure docker to use the gcloud command-line tool as a credential helper
     - run: gcloud auth configure-docker
-    - uses: actions/checkout@v1
     - name: Release docker images
       run: |
         ./scripts/publish-functions.sh
