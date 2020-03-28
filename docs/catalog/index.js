@@ -60,8 +60,8 @@ ${tableByType('transformer')}
 ${tableByType('misc')}
 
 [spec]: https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/docs/api-conventions/functions-spec.md
-[source]: https://googlecontainertools.github.io/kpt-functions-sdk/docs/concepts.html#source-function
-[sink]: https://googlecontainertools.github.io/kpt-functions-sdk/docs/concepts.html#sink-function
+[source]: https://googlecontainertools.github.io/kpt-functions-sdk/concepts/#source-function
+[sink]: https://googlecontainertools.github.io/kpt-functions-sdk/concepts/#sink-function
 [sdk]: https://googlecontainertools.github.io/kpt-functions-sdk/
 `;
 
