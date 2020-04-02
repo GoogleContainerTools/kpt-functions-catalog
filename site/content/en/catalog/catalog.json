@@ -1,0 +1,78 @@
+[
+  {
+    "image": "gcr.io/kpt-dev/kpt",
+    "args": "fn source",
+    "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/source.go",
+    "description": "Reads a directory of Kubernetes configuration recursively.",
+    "type": "source"
+  },
+  {
+    "image": "gcr.io/kpt-functions/read-yaml",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/read_yaml.ts",
+    "description": "Reads a directory of Kubernetes configuration recursively.",
+    "type": "source",
+    "demo": true
+  },
+  {
+    "image": "gcr.io/cloud-builders/kubectl",
+    "args": "get [...] -o yaml",
+    "source": "https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/kubectl/Dockerfile",
+    "description": "Get one or many resources from a Kubernetes cluster.",
+    "type": "source"
+  },
+  {
+    "image": "gcr.io/kpt-dev/kpt",
+    "args": "fn sink",
+    "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/sink.go",
+    "description": "Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions.",
+    "type": "sink"
+  },
+  {
+    "image": "gcr.io/kpt-functions/write-yaml",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/write_yaml.ts",
+    "description": "Writes a directory of Kubernetes configuration. It maintains the original directory structure as read by source functions.",
+    "type": "sink",
+    "demo": true
+  },
+  {
+    "image": "gcr.io/kpt-functions/gatekeeper-validate",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/go/pkg/functions/gatekeeper/validate.go",
+    "description": "Enforces OPA constraints on input objects. The constraints are also passed as part of the input to the function.",
+    "type": "validator"
+  },
+  {
+    "image": "gcr.io/kpt-functions/mutate-psp",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/mutate_psp.ts",
+    "description": "Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.",
+    "type": "transformer",
+    "demo": true
+  },
+  {
+    "image": "gcr.io/kpt-functions/label-namespace",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/hello-world/src/label_namespace.ts",
+    "description": "Adds a label to all Namespaces.",
+    "type": "transformer",
+    "demo": true
+  },
+  {
+    "image": "gcr.io/kpt-functions/validate-rolebinding",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/validate_rolebinding.ts",
+    "description": "Enforces a blacklist of subjects in RoleBinding objects.",
+    "type": "validator",
+    "demo": true
+  },
+  {
+    "image": "gcr.io/kpt-functions/expand-team-cr",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/expand_team_cr.ts",
+    "description": "Reads custom resources of type Team and generates multiple Namespace and RoleBinding objects.",
+    "type": "generator",
+    "demo": true
+  },
+  {
+    "image": "gcr.io/kpt-functions/no-op",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/no_op.ts",
+    "description": "No Op function for testing purposes",
+    "type": "misc",
+    "demo": true
+  }
+]
