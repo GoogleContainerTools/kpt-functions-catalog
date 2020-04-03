@@ -36,7 +36,7 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 `$ docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example`
 
 1. Save the expanded configuration locally as yaml files by piping through `kpt fn sink`.  
-`$ mkdir helloworld-configs`
+`$ mkdir helloworld-configs`  
 `$ docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example |`  
   `kpt fn sink helloworld-configs`
 
@@ -73,4 +73,4 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 ### How can I set arbitrary values in my chart using `--set`
 
 We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional `values_path` argument to the helm-template command containing the relative path to your new file.  
-`$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis` **`values_path=/source/redis/values-production.yaml`**
+`$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis`**`values_path=/source/redis/values-production.yaml`**

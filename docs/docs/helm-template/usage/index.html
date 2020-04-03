@@ -25,12 +25,12 @@
 Examples Example 1: Hello World Prerequisites  Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://googlecontainertools.github.io/kpt-functions-catalog/docs/helm-template/usage/" />
-<meta property="og:site_name" content="Kpt Functions Catalog" />
+<meta property="article:modified_time" content="2020-04-02T19:43:47-07:00" /><meta property="og:site_name" content="Kpt Functions Catalog" />
 <meta itemprop="name" content="">
 <meta itemprop="description" content="Using helm-template Kpt packages are just configuration so any solution, like the helm template command, which emits configuration can also be used to generate kpt packages. The helm-template kpt function generates a new kpt package from a local Helm chart or upserts Helm chart configuration to an existing kpt package. In the context of a pipeline, these packages can then be further customized using other kpt functions.
 Examples Example 1: Hello World Prerequisites  Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster.">
-
-<meta itemprop="wordCount" content="380">
+<meta itemprop="dateModified" content="2020-04-02T19:43:47-07:00" />
+<meta itemprop="wordCount" content="379">
 
 
 
@@ -239,7 +239,7 @@ Examples Example 1: Hello World Prerequisites  Install kubectl and have an appro
 </li>
 <li>
 <p>Save the expanded configuration locally as yaml files by piping through <code>kpt fn sink</code>.<br>
-<code>$ mkdir helloworld-configs</code>
+<code>$ mkdir helloworld-configs</code><br>
 <code>$ docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example |</code><br>
   <code>kpt fn sink helloworld-configs</code></p>
 </li>
@@ -278,11 +278,11 @@ Examples Example 1: Hello World Prerequisites  Install kubectl and have an appro
 <h2 id="faqs">FAQs</h2>
 <h3 id="how-can-i-set-arbitrary-values-in-my-chart-using---set">How can I set arbitrary values in my chart using <code>--set</code></h3>
 <p>We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional <code>values_path</code> argument to the helm-template command containing the relative path to your new file.<br>
-<code>$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis</code> <strong><code>values_path=/source/redis/values-production.yaml</code></strong></p>
+<code>$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis</code><strong><code>values_path=/source/redis/values-production.yaml</code></strong></p>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified January 1, 0001
+	<div class="text-muted mt-5 pt-3 border-top">Last modified April 2, 2020: <a  href="https://github.com/GoogleContainerTools/kpt-functions-catalog/commit/52581a681674f76fca2c7b833c8d076f1c65747c">Address helm-template usage code review comments (52581a6)</a>
 </div>
 </div>
 

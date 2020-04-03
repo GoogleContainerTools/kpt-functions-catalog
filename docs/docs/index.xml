@@ -45,7 +45,7 @@
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Save the expanded configuration locally as yaml files by piping through &lt;code&gt;kpt fn sink&lt;/code&gt;.&lt;br&gt;
-&lt;code&gt;$ mkdir helloworld-configs&lt;/code&gt;
+&lt;code&gt;$ mkdir helloworld-configs&lt;/code&gt;&lt;br&gt;
 &lt;code&gt;$ docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example |&lt;/code&gt;&lt;br&gt;
   &lt;code&gt;kpt fn sink helloworld-configs&lt;/code&gt;&lt;/p&gt;
 &lt;/li&gt;
@@ -84,7 +84,7 @@
 &lt;h2 id=&#34;faqs&#34;&gt;FAQs&lt;/h2&gt;
 &lt;h3 id=&#34;how-can-i-set-arbitrary-values-in-my-chart-using---set&#34;&gt;How can I set arbitrary values in my chart using &lt;code&gt;--set&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional &lt;code&gt;values_path&lt;/code&gt; argument to the helm-template command containing the relative path to your new file.&lt;br&gt;
-&lt;code&gt;$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis&lt;/code&gt; &lt;strong&gt;&lt;code&gt;values_path=/source/redis/values-production.yaml&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;code&gt;$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis&lt;/code&gt;&lt;strong&gt;&lt;code&gt;values_path=/source/redis/values-production.yaml&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
 
       </description>
     </item>
