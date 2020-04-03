@@ -4,7 +4,7 @@
   
   <url>
     <loc>https://googlecontainertools.github.io/kpt-functions-catalog/</loc>
-    <lastmod>2020-03-27T16:13:50-07:00</lastmod>
+    <lastmod>2020-03-27T18:05:45-07:00</lastmod>
   </url>
   
   <url>
@@ -12,7 +12,15 @@
   </url>
   
   <url>
+    <loc>https://googlecontainertools.github.io/kpt-functions-catalog/docs/helm-template/usage/</loc>
+  </url>
+  
+  <url>
     <loc>https://googlecontainertools.github.io/kpt-functions-catalog/catalog/</loc>
+  </url>
+  
+  <url>
+    <loc>https://googlecontainertools.github.io/kpt-functions-catalog/docs/</loc>
   </url>
   
 </urlset>

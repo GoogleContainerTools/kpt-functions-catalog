@@ -23,7 +23,7 @@
   {
     "image": "gcr.io/kpt-functions/helm-template",
     "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/run.sh",
-    "description": "Render chart templates locally using helm template. (See [usage](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/usage.md)).",
+    "description": "Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)).",
     "type": "source"
   },
   {
@@ -63,7 +63,7 @@
   {
     "image": "gcr.io/kpt-functions/helm-template",
     "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/run.sh",
-    "description": "Render chart templates locally using helm template. (See [usage](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/usage.md)).",
+    "description": "Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)).",
     "type": "transformer"
   },
   {
