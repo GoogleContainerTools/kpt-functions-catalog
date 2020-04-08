@@ -19,11 +19,12 @@ These functions can be implemented using any toolchain such as the [KPT Function
 
 See [definition of source functions][source].
 
-| Image                          | Args              | Description                                                       | Source                                                                                                           |
-| ------------------------------ | ----------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-dev/kpt             | fn source         | Reads a directory of Kubernetes configuration recursively.        | [Link](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/source.go)          |
-| gcr.io/kpt-functions/read-yaml |                   | [Demo] Reads a directory of Kubernetes configuration recursively. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/read_yaml.ts) |
-| gcr.io/cloud-builders/kubectl  | get [...] -o yaml | Get one or many resources from a Kubernetes cluster.              | [Link](https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/kubectl/Dockerfile)                     |
+| Image                              | Args              | Description                                                                                             | Source                                                                                                           |
+| ---------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| gcr.io/kpt-dev/kpt                 | fn source         | Reads a directory of Kubernetes configuration recursively.                                              | [Link](https://github.com/kubernetes-sigs/kustomize/blob/master/cmd/config/internal/commands/source.go)          |
+| gcr.io/kpt-functions/read-yaml     |                   | [Demo] Reads a directory of Kubernetes configuration recursively.                                       | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/read_yaml.ts) |
+| gcr.io/cloud-builders/kubectl      | get [...] -o yaml | Get one or many resources from a Kubernetes cluster.                                                    | [Link](https://github.com/GoogleCloudPlatform/cloud-builders/blob/master/kubectl/Dockerfile)                     |
+| gcr.io/kpt-functions/helm-template |                   | Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)). | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/run.sh) |
 
 ## Sinks
 
@@ -49,10 +50,11 @@ See [definition of sink functions][sink].
 
 ## Transformers
 
-| Image                                | Args | Description                                                                                 | Source                                                                                                              |
-| ------------------------------------ | ---- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| gcr.io/kpt-functions/mutate-psp      |      | [Demo] Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false. | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/mutate_psp.ts)   |
-| gcr.io/kpt-functions/label-namespace |      | [Demo] Adds a label to all Namespaces.                                                      | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/hello-world/src/label_namespace.ts) |
+| Image                                | Args | Description                                                                                             | Source                                                                                                              |
+| ------------------------------------ | ---- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| gcr.io/kpt-functions/mutate-psp      |      | [Demo] Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.             | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/mutate_psp.ts)   |
+| gcr.io/kpt-functions/label-namespace |      | [Demo] Adds a label to all Namespaces.                                                                  | [Link](https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/hello-world/src/label_namespace.ts) |
+| gcr.io/kpt-functions/helm-template   |      | Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)). | [Link](https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/run.sh)    |
 
 ## Miscellaneous
 
