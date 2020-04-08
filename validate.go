@@ -47,7 +47,7 @@ func init() {
 	}
 }
 
-func createClient() (opaclient.Client, error) {
+func createClient() (*opaclient.Client, error) {
 	driver := local.New(local.Tracing(false))
 	backend, err := opaclient.NewBackend(opaclient.Driver(driver))
 	if err != nil {
