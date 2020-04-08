@@ -24,21 +24,34 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 
 * Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster.
 * Install kpt.  
-    `$ gcloud components install kpt`
+
+    ```sh
+    gcloud components install kpt
+    ```
+
 * Install helm.
 
 #### Steps
 
 1. Create a new helm chart called "helloworld-chart".  
-`$ helm create helloworld-chart`
+
+    ```sh
+    helm create helloworld-chart
+    ```
 
 1. Run `helm-template` to expand "helloworld-chart" using name "my-first-example" and see the configuration in a ResourceList.  
-`$ docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example`
+
+    ```sh
+    docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example
+    ```
 
 1. Save the expanded configuration locally as yaml files by piping through `kpt fn sink`.  
-`$ mkdir helloworld-configs`  
-`$ docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example |`  
-  `kpt fn sink helloworld-configs`
+
+    ```sh
+    mkdir helloworld-configs
+    docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example |
+    kpt fn sink helloworld-configs
+    ```
 
 ### Example 2: Expand and apply multiple charts to a cluster
 
@@ -46,31 +59,50 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 
 * Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster.
 * Install kpt.  
-    `$ gcloud components install kpt`
+
+    ```sh
+    gcloud components install kpt
+    ```
+
 * Install helm.
 * Download the helm charts for this example to your filesystem or use your own.  
-    `$ helm repo add bitnami https://charts.bitnami.com/bitnami`  
-    `$ helm pull bitnami/mongodb --untar`  
-    `$ helm pull bitnami/redis --untar`
+
+    ```sh
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm pull bitnami/mongodb --untar
+    helm pull bitnami/redis --untar
+    ```
 
 #### Steps
 
 1. Run `helm-template` on each of the charts you need. You can pipe these commands, as shown below. The following commands expand the mongodb and redis charts and store the resulting yaml into a new output directory.  
-`$ mkdir output`  
-`$ docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/mongodb name=my-mongodb |`  
-  `docker run -i -v $(pwd):/source gcr.io/kpt-functions/helm-template name=my-redis chart_path=/source/redis |`  
-  `kpt fn sink output`
 
-1. See a summary of the output using `kpt config tree`.  
-`$ kpt fn source output |`  
-  `kpt config tree`
+    ```sh
+    mkdir output
+    docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/mongodb name=my-mongodb |
+    docker run -i -v $(pwd):/source gcr.io/kpt-functions/helm-template name=my-redis chart_path=/source/redis |
+    kpt fn sink output
+    ```
 
-1. Apply these configs to a kubernetes cluster.  
-`$ kubectl apply -R -f output`
+2. See a summary of the output using `kpt config tree`.  
+
+    ```sh
+    kpt fn source output |
+    kpt config tree
+    ```
+
+3. Apply these configs to a kubernetes cluster.  
+
+    ```sh
+    kubectl apply -R -f output
+    ```
 
 ## FAQs
 
 ### How can I set arbitrary values in my chart using `--set`
 
 We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional `values_path` argument to the helm-template command containing the relative path to your new file.  
-`$ docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template chart_path=/source/redis name=my-redis`**`values_path=/source/redis/values-production.yaml`**
+
+```sh
+docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template values_path=/source/redis/values-production.yaml chart_path=/source/redis name=my-redis
+```
