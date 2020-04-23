@@ -42,14 +42,14 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 1. Run `helm-template` to expand "helloworld-chart" using name "my-first-example" and see the configuration in a ResourceList.  
 
     ```sh
-    docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example
+    docker run --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example
     ```
 
 1. Save the expanded configuration locally as yaml files by piping through `kpt fn sink`.  
 
     ```sh
     mkdir helloworld-configs
-    docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example |
+    docker run --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example |
     kpt fn sink helloworld-configs
     ```
 
@@ -79,8 +79,8 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 
     ```sh
     mkdir output
-    docker run -v $(pwd):/source gcr.io/kpt-functions/helm-template chart_path=/source/mongodb name=my-mongodb |
-    docker run -i -v $(pwd):/source gcr.io/kpt-functions/helm-template name=my-redis chart_path=/source/redis |
+    docker run --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template chart_path=/source/mongodb name=my-mongodb |
+    docker run -i --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template name=my-redis chart_path=/source/redis |
     kpt fn sink output
     ```
 
@@ -104,5 +104,5 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional `values_path` argument to the helm-template command containing the relative path to your new file.  
 
 ```sh
-docker run -v $(pwd)/charts/bitnami:/source gcr.io/kpt-functions/helm-template values_path=/source/redis/values-production.yaml chart_path=/source/redis name=my-redis
+docker run --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template values_path=/source/redis/values-production.yaml chart_path=/source/redis name=my-redis
 ```
