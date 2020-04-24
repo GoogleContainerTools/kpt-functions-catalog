@@ -25,11 +25,11 @@
 Examples Example 1: Hello World Prerequisites   Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://googlecontainertools.github.io/kpt-functions-catalog/docs/helm-template/usage/" />
-<meta property="article:modified_time" content="2020-04-02T19:52:28-07:00" /><meta property="og:site_name" content="Kpt Functions Catalog" />
+<meta property="article:modified_time" content="2020-04-08T15:01:25-07:00" /><meta property="og:site_name" content="Kpt Functions Catalog" />
 <meta itemprop="name" content="">
 <meta itemprop="description" content="Using helm-template Kpt packages are just configuration so any solution, like the helm template command, which emits configuration can also be used to generate kpt packages. The helm-template kpt function generates a new kpt package from a local Helm chart or upserts Helm chart configuration to an existing kpt package. In the context of a pipeline, these packages can then be further customized using other kpt functions.
 Examples Example 1: Hello World Prerequisites   Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster.">
-<meta itemprop="dateModified" content="2020-04-02T19:52:28-07:00" />
+<meta itemprop="dateModified" content="2020-04-08T15:01:25-07:00" />
 <meta itemprop="wordCount" content="366">
 
 
@@ -241,12 +241,12 @@ Examples Example 1: Hello World Prerequisites   Install kubectl and have an appr
 </code></pre></div></li>
 <li>
 <p>Run <code>helm-template</code> to expand &ldquo;helloworld-chart&rdquo; using name &ldquo;my-first-example&rdquo; and see the configuration in a ResourceList.</p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">docker run -v <span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>:/source gcr.io/kpt-functions/helm-template <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/helloworld-chart <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-first-example
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">docker run --mount <span style="color:#000">type</span><span style="color:#ce5c00;font-weight:bold">=</span>bind,source<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>,destination<span style="color:#ce5c00;font-weight:bold">=</span>/source gcr.io/kpt-functions/helm-template <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/helloworld-chart <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-first-example
 </code></pre></div></li>
 <li>
 <p>Save the expanded configuration locally as yaml files by piping through <code>kpt fn sink</code>.</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">mkdir helloworld-configs
-docker run -v <span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>:/source gcr.io/kpt-functions/helm-template <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/helloworld-chart <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-first-example <span style="color:#000;font-weight:bold">|</span>
+docker run --mount <span style="color:#000">type</span><span style="color:#ce5c00;font-weight:bold">=</span>bind,source<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>,destination<span style="color:#ce5c00;font-weight:bold">=</span>/source gcr.io/kpt-functions/helm-template <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/helloworld-chart <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-first-example <span style="color:#000;font-weight:bold">|</span>
 kpt fn sink helloworld-configs
 </code></pre></div></li>
 </ol>
@@ -275,8 +275,8 @@ helm pull bitnami/redis --untar
 <li>
 <p>Run <code>helm-template</code> on each of the charts you need. You can pipe these commands, as shown below. The following commands expand the mongodb and redis charts and store the resulting yaml into a new output directory.</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">mkdir output
-docker run -v <span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>:/source gcr.io/kpt-functions/helm-template <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/mongodb <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-mongodb <span style="color:#000;font-weight:bold">|</span>
-docker run -i -v <span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>:/source gcr.io/kpt-functions/helm-template <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-redis <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis <span style="color:#000;font-weight:bold">|</span>
+docker run --mount <span style="color:#000">type</span><span style="color:#ce5c00;font-weight:bold">=</span>bind,source<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>,destination<span style="color:#ce5c00;font-weight:bold">=</span>/source gcr.io/kpt-functions/helm-template <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/mongodb <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-mongodb <span style="color:#000;font-weight:bold">|</span>
+docker run -i --mount <span style="color:#000">type</span><span style="color:#ce5c00;font-weight:bold">=</span>bind,source<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>,destination<span style="color:#ce5c00;font-weight:bold">=</span>/source gcr.io/kpt-functions/helm-template <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-redis <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis <span style="color:#000;font-weight:bold">|</span>
 kpt fn sink output
 </code></pre></div></li>
 <li>
@@ -292,11 +292,11 @@ kpt config tree
 <h2 id="faqs">FAQs</h2>
 <h3 id="how-can-i-set-arbitrary-values-in-my-chart-using---set">How can I set arbitrary values in my chart using <code>--set</code></h3>
 <p>We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional <code>values_path</code> argument to the helm-template command containing the relative path to your new file.</p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">docker run -v <span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>/charts/bitnami:/source gcr.io/kpt-functions/helm-template <span style="color:#000">values_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis/values-production.yaml <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-redis
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">docker run --mount <span style="color:#000">type</span><span style="color:#ce5c00;font-weight:bold">=</span>bind,source<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>/charts/bitnami,destination<span style="color:#ce5c00;font-weight:bold">=</span>/source gcr.io/kpt-functions/helm-template <span style="color:#000">values_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis/values-production.yaml <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-redis
 </code></pre></div>
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified April 2, 2020: <a  href="https://github.com/GoogleContainerTools/kpt-functions-catalog/commit/242f7f3e1d3e0d46ab30fa9afc07eb99793c6331">Modify spacing in helm-template usage (242f7f3)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified April 8, 2020: <a  href="https://github.com/GoogleContainerTools/kpt-functions-catalog/commit/873d3ae4bc6ed64d1b006ef2bbd43b19401239b0">Fence console commands in usage doc (873d3ae)</a>
 </div>
 </div>
 
