@@ -8,13 +8,21 @@
   </url>
   
   <url>
+    <loc>https://googlecontainertools.github.io/kpt-functions-catalog/catalog/node_modules/markdown-table/readme/</loc>
+  </url>
+  
+  <url>
     <loc>https://googlecontainertools.github.io/kpt-functions-catalog/docs/helm-template/usage/</loc>
-    <lastmod>2020-04-08T15:01:25-07:00</lastmod>
+    <lastmod>2020-04-24T11:21:25-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://googlecontainertools.github.io/kpt-functions-catalog/catalog/</loc>
   </url>
   
   <url>
     <loc>https://googlecontainertools.github.io/kpt-functions-catalog/docs/</loc>
-    <lastmod>2020-04-08T15:01:25-07:00</lastmod>
+    <lastmod>2020-04-24T11:21:25-07:00</lastmod>
   </url>
   
 </urlset>

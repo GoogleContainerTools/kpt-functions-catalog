@@ -25,11 +25,11 @@
 Examples Example 1: Hello World Prerequisites   Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://googlecontainertools.github.io/kpt-functions-catalog/docs/helm-template/usage/" />
-<meta property="article:modified_time" content="2020-04-08T15:01:25-07:00" /><meta property="og:site_name" content="Kpt Functions Catalog" />
+<meta property="article:modified_time" content="2020-04-24T11:21:25-07:00" /><meta property="og:site_name" content="Kpt Functions Catalog" />
 <meta itemprop="name" content="">
 <meta itemprop="description" content="Using helm-template Kpt packages are just configuration so any solution, like the helm template command, which emits configuration can also be used to generate kpt packages. The helm-template kpt function generates a new kpt package from a local Helm chart or upserts Helm chart configuration to an existing kpt package. In the context of a pipeline, these packages can then be further customized using other kpt functions.
 Examples Example 1: Hello World Prerequisites   Install kubectl and have an appropriate kubeconfig entry to your Kubernetes cluster.">
-<meta itemprop="dateModified" content="2020-04-08T15:01:25-07:00" />
+<meta itemprop="dateModified" content="2020-04-24T11:21:25-07:00" />
 <meta itemprop="wordCount" content="366">
 
 
@@ -292,11 +292,11 @@ kpt config tree
 <h2 id="faqs">FAQs</h2>
 <h3 id="how-can-i-set-arbitrary-values-in-my-chart-using---set">How can I set arbitrary values in my chart using <code>--set</code></h3>
 <p>We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional <code>values_path</code> argument to the helm-template command containing the relative path to your new file.</p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">docker run --mount <span style="color:#000">type</span><span style="color:#ce5c00;font-weight:bold">=</span>bind,source<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>/charts/bitnami,destination<span style="color:#ce5c00;font-weight:bold">=</span>/source gcr.io/kpt-functions/helm-template <span style="color:#000">values_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis/values-production.yaml <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-redis
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">docker run --mount <span style="color:#000">type</span><span style="color:#ce5c00;font-weight:bold">=</span>bind,source<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#204a87;font-weight:bold">$(</span><span style="color:#204a87">pwd</span><span style="color:#204a87;font-weight:bold">)</span>,destination<span style="color:#ce5c00;font-weight:bold">=</span>/source gcr.io/kpt-functions/helm-template <span style="color:#000">values_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis/values-production.yaml <span style="color:#000">chart_path</span><span style="color:#ce5c00;font-weight:bold">=</span>/source/redis <span style="color:#000">name</span><span style="color:#ce5c00;font-weight:bold">=</span>my-redis
 </code></pre></div>
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified April 8, 2020: <a  href="https://github.com/GoogleContainerTools/kpt-functions-catalog/commit/873d3ae4bc6ed64d1b006ef2bbd43b19401239b0">Fence console commands in usage doc (873d3ae)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified April 24, 2020: <a  href="https://github.com/GoogleContainerTools/kpt-functions-catalog/commit/28e638f9ea7b236ecca3c0ab00ba2d2f2d800df3">Update helm-template examples to use docker bind mounts (#49) (28e638f)</a>
 </div>
 </div>
 
