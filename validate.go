@@ -155,7 +155,8 @@ func parseResults(results []*opatypes.Result) error {
 		if !found {
 			path = "?"
 		}
-		msgs = append(msgs, fmt.Sprintf("%s\n\nname: %q\npath: %s", r.Msg, name, path))
+		constraintName := r.Constraint.GetName()
+		msgs = append(msgs, fmt.Sprintf("%s\n\nname: %q\npath: %s\nviolatedConstraint: %s", r.Msg, name, path, constraintName))
 	}
 
 	sort.Strings(msgs)
