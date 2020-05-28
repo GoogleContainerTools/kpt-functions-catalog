@@ -42,14 +42,14 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 1. Run `helm-template` to expand "helloworld-chart" using name "my-first-example" and see the configuration in a ResourceList.  
 
     ```sh
-    docker run --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example
+    docker run -u "$(id -u)" --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template -d name=my-first-example -d chart_path=/source/helloworld-chart
     ```
 
 1. Save the expanded configuration locally as yaml files by piping through `kpt fn sink`.  
 
     ```sh
     mkdir helloworld-configs
-    docker run --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template chart_path=/source/helloworld-chart name=my-first-example |
+    docker run -u "$(id -u)" --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template -d name=my-first-example -d chart_path=/source/helloworld-chart |
     kpt fn sink helloworld-configs
     ```
 
@@ -79,8 +79,8 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 
     ```sh
     mkdir output
-    docker run --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template chart_path=/source/mongodb name=my-mongodb |
-    docker run -i --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template name=my-redis chart_path=/source/redis |
+    docker run -u "$(id -u)" --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template -d name=my-mongodb -d chart_path=/source/mongodb |
+    docker run -i -u "$(id -u)" --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template -d name=my-redis -d chart_path=/source/redis |
     kpt fn sink output
     ```
 
@@ -99,10 +99,20 @@ Kpt packages are just configuration so any solution, like the `helm template` co
 
 ## FAQs
 
-### How can I set arbitrary values in my chart using `--set`
+### How can I set arbitrary values in my chart
 
-We recommend that you create a new values.yaml file with the values you want so you can check the new file into a version-controlled repository. You can specify an optional `values_path` argument to the helm-template command containing the relative path to your new file.  
+We recommend that you create a function config file with the values you want so you can check the new file into a version-controlled repository. You can specify arbitrary arguments to the helm-template command in this way. The below example specifies a different values file than the default. 
 
 ```sh
-docker run --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template values_path=/source/redis/values-production.yaml chart_path=/source/redis name=my-redis
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+data:
+  name: my-prod-redis
+  chart_path: /source/redis
+  --values: /source/redis/values-production.yaml
+metadata:
+  name: my-function-config
+EOF
+docker run -u "$(id -u)" --mount type=bind,source=$(pwd),destination=/source gcr.io/kpt-functions/helm-template -f /source/fc.yaml
 ```
