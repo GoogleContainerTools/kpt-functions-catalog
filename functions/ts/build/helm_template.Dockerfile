@@ -46,6 +46,6 @@ COPY --from=builder /home/node/app /home/node/app
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 ENV PATH /usr/local/bin:$PATH
-ENV HELM_PATH_CACHE /tmp
+ENV HELM_PATH_CACHE /var/cache
 
 ENTRYPOINT ["node", "/home/node/app/dist/helm_template_run.js"]

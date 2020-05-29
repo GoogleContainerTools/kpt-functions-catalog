@@ -34,10 +34,10 @@
     "jasmine": "^3.4.0",
     "license-checker": "^25.0.1",
     "prettier": "1.18.2",
-    "tslint": "^5.19.0",
+    "tslint": "^6.0.0",
     "tslint-config-prettier": "1.18.0",
     "tslint-consistent-codestyle": "^1.16.0",
-    "typescript": "^3.5.3"
+    "typescript": "~3.7.0"
   },
   "kpt": {
     "docker_repo_base": "gcr.io/kpt-functions"

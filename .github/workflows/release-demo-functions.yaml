@@ -1,0 +1,44 @@
+name: release-demo-functions
+
+on:
+  push:
+    tags:
+      - release-demo-functions-*
+
+jobs:
+  e2e-ci:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up gcloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: "275.0.0"
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+      - run: gcloud auth configure-docker
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install NPM packages
+        run: |
+          cd functions/ts
+          npm ci
+          npm test
+      - name: Build docker images
+        run: |
+          cd functions/ts
+          npm run kpt:docker-build -- --tag=latest
+      - name: Run all e2e tests
+        run: |
+          sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
+          sudo chmod +x /usr/local/bin/kpt
+          TAG=latest tests/e2e.sh
+      - name: Push docker images
+        run: |
+          cd functions/ts
+          npm run kpt:docker-push -- --tag=latest

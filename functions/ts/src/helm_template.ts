@@ -53,24 +53,26 @@ export async function helmTemplate(configs: Configs) {
 
 function readArguments(configs: Configs) {
   const args: string[] = [];
-
-  // Helm template expects name then chart path then remaining flags
-  const name = configs.getFunctionConfigValue(CHART_NAME);
-  if (name) {
-    args.push(name);
-  }
-  const chartPath = configs.getFunctionConfigValue(CHART_PATH);
-  if (chartPath) {
-    args.push(chartPath);
-  }
-
-  // Remaining flags
+  let nameArg;
+  let pathArg;
   const data = readConfigDataOrThrow(configs);
   for (const key in data) {
-    if (key !== CHART_NAME && key !== CHART_PATH) {
+    if (key === CHART_NAME) {
+      nameArg = data[key];
+    } else if (key === CHART_PATH) {
+      pathArg = data[key];
+    } else {
       args.push(key);
       args.push(data[key]);
     }
+  }
+
+  // Helm template expects name and chart path first so place those at the beginning
+  if (pathArg) {
+    args.unshift(pathArg);
+  }
+  if (nameArg) {
+    args.unshift(nameArg);
   }
 
   return args;
@@ -95,12 +97,11 @@ function readConfigDataOrThrow(configs: Configs) {
 }
 
 helmTemplate.usage = `
-Render chart templates locally using helm template. If piped a Kubernetes List in
-addition to arguments then render the chart objects into the piped list,
-overwriting any chart objects that already exist in the list.
+Render chart templates locally using helm template. If input a list of configs in
+addition to arguments will overwrite any chart objects that already exist in the list.
 
-Configured using a ConfigMap with keys for ${CHART_NAME}, ${CHART_PATH}, and optional helm
-template flags like --values:
+Configured using a ConfigMap with keys for ${CHART_NAME}, ${CHART_PATH}.
+Works with arbitrary helm template flags like --values:
 
 ${CHART_NAME}: Name of helm chart.
 ${CHART_PATH}: Chart templates directory.
