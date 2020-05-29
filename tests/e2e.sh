@@ -19,6 +19,7 @@
 set -eo pipefail
 
 TAG=${TAG:-dev}
+NODOCKER=${NODOCKER:-}
 SDK_REPO=https://github.com/GoogleContainerTools/kpt-functions-sdk
 CHARTS_SRC="charts/bitnami"
 
@@ -58,6 +59,10 @@ function assert_dir_exists() {
 ############################
 # Docker Tests
 ############################
+[[ -z ${NODOCKER} ]] || {
+  echo "Skipping docker tests"
+  exit 0
+}
 
 helm_testcase "docker_helm_template_expected_args"
 docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -d name=expected-args -d chart_path=/source/redis >out.yaml
@@ -88,22 +93,19 @@ docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/
 assert_dir_exists default
 assert_contains_string default/secret_sink-redis.yaml "sink-redis"
 
+helm_testcase "docker_helm_template_pipeline"
+docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -d chart_path=/source/mongodb -d name=my-mongodb |
+  docker run -i -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -d name=my-redis -d chart_path=/source/redis |
+  docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
+assert_dir_exists default
+assert_contains_string default/secret_my-mongodb.yaml "my-mongodb"
+assert_contains_string default/secret_my-redis.yaml "my-redis"
+
 ############################
 # kpt fn Tests
 ############################
 
 testcase "kpt_suggest_psp_imperative_short"
 kpt fn source example-configs |
-  kpt fn run --image gcr.io/kpt-functions/suggest-psp:"${TAG}" 2>err.txt |
+  kpt fn run --image gcr.io/kpt-functions/suggest-psp:"${TAG}" |
   kpt fn sink example-configs
-assert_contains_string err.txt "Suggest explicitly disabling privilege escalation"
-
-# TODO: Add kpt_helm_template_imperative_short and kpt_helm_template_declarative tests after fixing <https://github.com/GoogleContainerTools/kpt/issues/587>
-helm_testcase "kpt_helm_template_imperative"
-kpt fn source example-configs |
-  docker run -i -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -d chart_path=/source/mongodb -d name=my-mongodb |
-  docker run -i -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -d name=my-redis -d chart_path=/source/redis |
-  kpt fn sink example-configs
-assert_dir_exists example-configs/default
-assert_contains_string example-configs/default/secret_my-mongodb.yaml "my-mongodb"
-assert_contains_string example-configs/default/secret_my-redis.yaml "my-redis"
