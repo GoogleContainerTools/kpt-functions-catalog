@@ -1,9 +1,9 @@
-name: release-demo-functions
+name: release-kpt-functions-catalog
 
 on:
   push:
     tags:
-      - release-demo-functions-*
+      - release-kpt-functions-catalog-*
 
 jobs:
   e2e-ci:
@@ -12,13 +12,16 @@ jobs:
       matrix:
         node-version: [12.x]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up gcloud
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          version: "275.0.0"
+          version: '285.0.0'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+      # Configure docker to use the gcloud command-line tool as a credential helper
       - run: gcloud auth configure-docker
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
