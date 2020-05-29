@@ -22,7 +22,7 @@
   },
   {
     "image": "gcr.io/kpt-functions/helm-template",
-    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/run.sh",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/ts/src/helm_template.ts",
     "description": "Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)).",
     "type": "source"
   },
@@ -84,6 +84,12 @@
     "type": "validator"
   },
   {
+    "image": "gcr.io/kpt-functions/suggest-psp",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/ts/src/suggest_psp.ts",
+    "description": "Lints PodSecurityPolicy by suggesting 'spec.allowPrivilegeEscalation' field be set to 'false'.",
+    "type": "validator"
+  },
+  {
     "image": "gcr.io/kpt-functions/mutate-psp",
     "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/mutate_psp.ts",
     "description": "Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.",
@@ -99,7 +105,7 @@
   },
   {
     "image": "gcr.io/kpt-functions/helm-template",
-    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/run.sh",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/ts/src/helm_template.ts",
     "description": "Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)).",
     "type": "transformer"
   },
