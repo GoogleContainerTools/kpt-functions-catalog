@@ -61,7 +61,7 @@ function readArguments(configs: Configs) {
       nameArg = data[key];
     } else if (key === CHART_PATH) {
       pathArg = data[key];
-    } else {
+    } else if (data.hasOwnProperty(key)) {
       args.push(key);
       args.push(data[key]);
     }

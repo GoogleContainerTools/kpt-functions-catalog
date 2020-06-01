@@ -1,9 +1,9 @@
-name: release-kpt-functions-catalog
+name: release-ts-functions
 
 on:
   push:
     tags:
-      - release-kpt-functions-catalog-*
+      - release-ts-functions-*
 
 jobs:
   e2e-ci:

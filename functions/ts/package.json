@@ -1,7 +1,7 @@
 {
-  "name": "kpt-functions-catalog",
+  "name": "ts-functions",
   "version": "0.0.1",
-  "description": "kpt functions catalog",
+  "description": "kpt typescript sdk functions",
   "author": "kpt Authors",
   "license": "Apache-2.0",
   "scripts": {

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# E2E tests for kpt-functions-catalog.
+# E2E tests for ts-functions.
 
 set -eo pipefail
 
@@ -100,12 +100,3 @@ docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/
 assert_dir_exists default
 assert_contains_string default/secret_my-mongodb.yaml "my-mongodb"
 assert_contains_string default/secret_my-redis.yaml "my-redis"
-
-############################
-# kpt fn Tests
-############################
-
-testcase "kpt_suggest_psp_imperative_short"
-kpt fn source example-configs |
-  kpt fn run --image gcr.io/kpt-functions/suggest-psp:"${TAG}" |
-  kpt fn sink example-configs
