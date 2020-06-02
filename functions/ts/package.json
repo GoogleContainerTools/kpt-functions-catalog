@@ -1,0 +1,48 @@
+{
+  "name": "ts-functions",
+  "version": "0.0.1",
+  "description": "kpt typescript sdk functions",
+  "author": "kpt Authors",
+  "license": "Apache-2.0",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -Rf node_modules/ dist/",
+    "lint": "tslint -p package.json && prettier \"src/**\" \"*.json\" --check",
+    "lint-license": "license-checker --onlyAllow 'Apache-2.0;MIT;BSD;BSD-2-Clause;BSD-3-Clause;ISC;CC-BY-3.0;CC0-1.0;Unlicense'",
+    "format": "prettier \"src/**\" \"*.json\" --write",
+    "pretest": "npm run build",
+    "test": "jasmine --config=jasmine.json",
+    "posttest": "npm run lint",
+    "kpt:docker-create": "kpt docker-create",
+    "kpt:docker-build": "kpt docker-build",
+    "kpt:docker-push": "kpt docker-push",
+    "kpt:function-create": "kpt function-create",
+    "kpt:type-create": "kpt type-create"
+  },
+  "dependencies": {
+    "child_process": "1.0.2",
+    "js-yaml": "^3.13.1",
+    "kpt-functions": "^0.14.0"
+  },
+  "devDependencies": {
+    "create-kpt-functions": "^0.16.0",
+    "@types/jasmine": "^3.3.12",
+    "@types/js-yaml": "^3.12.1",
+    "@types/node": "^12.7.2",
+    "jasmine": "^3.4.0",
+    "license-checker": "^25.0.1",
+    "prettier": "1.18.2",
+    "tslint": "^6.0.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "typescript": "~3.7.0"
+  },
+  "kpt": {
+    "docker_repo_base": "gcr.io/kpt-functions"
+  },
+  "repository": {
+    "type": "git"
+  }
+}
