@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# E2E tests for kpt-functions-catalog.
+# E2E tests for ts-functions.
 
 set -eo pipefail
 
 TAG=${TAG:-dev}
+NODOCKER=${NODOCKER:-}
 SDK_REPO=https://github.com/GoogleContainerTools/kpt-functions-sdk
-HELM_USAGE_SNIPPET="Render chart templates locally"
 CHARTS_SRC="charts/bitnami"
 
 ############################
@@ -28,6 +28,13 @@ CHARTS_SRC="charts/bitnami"
 ############################
 
 function testcase() {
+  echo "testcase: ${1}"
+  tmp=$(mktemp -d "/tmp/e2e.${1}.XXXXXXXX")
+  cd "${tmp}"
+  kpt pkg get $SDK_REPO/example-configs example-configs
+}
+
+function helm_testcase() {
   echo "testcase: ${1}"
   tmp=$(mktemp -d "/tmp/e2e.${1}.XXXXXXXX")
   cd "${tmp}"
@@ -52,40 +59,44 @@ function assert_dir_exists() {
 ############################
 # Docker Tests
 ############################
+[[ -z ${NODOCKER} ]] || {
+  echo "Skipping docker tests"
+  exit 0
+}
 
-testcase "docker_helm_template_usage_too_few_args"
-docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" name=too-few-args 2>err.txt || true
-assert_contains_string err.txt "${HELM_USAGE_SNIPPET}"
+helm_testcase "docker_helm_template_expected_args"
+docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -d name=expected-args -d chart_path=/source/redis >out.yaml
+assert_contains_string out.yaml "expected-args"
 
-testcase "docker_helm_template_usage_too_many_args"
-docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" chart_path=/source/redis name=too-many-args extra=args_provided 2>err.txt || true
-assert_contains_string err.txt "${HELM_USAGE_SNIPPET}"
+helm_testcase "docker_helm_template_extra_args"
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/helm-template
+    config.kubernetes.io/local-config: "true"
+data:
+  name: extra-args
+  chart_path: /source/charts/bitnami/redis
+  --values: /source/charts/bitnami/redis/values-production.yaml
+EOF
+docker run -u "$(id -u)" -v "$(pwd)":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -f /source/fc.yaml >out.yaml
+assert_contains_string out.yaml "extra-args"
 
-testcase "docker_helm_template_correct_args"
-docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" name=correct-args chart_path=/source/redis >out.yaml
-assert_contains_string out.yaml "correct-args"
-
-testcase "docker_helm_template_values_arg_sink"
-docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" chart_path=/source/redis name=prod-values values_path=/source/redis/values-production.yaml |
+helm_testcase "docker_helm_template_sink"
+docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -d chart_path=/source/redis -d name=sink-redis |
   docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
-assert_dir_exists redis
+assert_dir_exists default
+assert_contains_string default/secret_sink-redis.yaml "sink-redis"
 
-testcase "docker_helm_template_stdin_correct_args_sink"
-docker run -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template chart_path=/source/mongodb name=my-mongodb |
-  docker run -i -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template name=my-redis chart_path=/source/redis |
+helm_testcase "docker_helm_template_pipeline"
+docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -d chart_path=/source/mongodb -d name=my-mongodb |
+  docker run -i -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -d name=my-redis -d chart_path=/source/redis |
   docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
-assert_dir_exists mongodb
-assert_dir_exists redis
-
-############################
-# kpt fn Tests
-############################
-
-# TODO: Add kpt_helm_template_imperative_short and kpt_helm_template_declarative tests after fixing <https://github.com/GoogleContainerTools/kpt/issues/359>
-testcase "kpt_helm_template_imperative"
-kpt fn source example-configs |
-  docker run -i -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template chart_path=/source/mongodb name=my-mongodb |
-  docker run -i -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template name=my-redis chart_path=/source/redis |
-  kpt fn sink example-configs
-assert_dir_exists ./example-configs/mongodb
-assert_dir_exists ./example-configs/redis
+assert_dir_exists default
+assert_contains_string default/secret_my-mongodb.yaml "my-mongodb"
+assert_contains_string default/secret_my-redis.yaml "my-redis"

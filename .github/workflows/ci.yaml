@@ -21,32 +21,61 @@ jobs:
     - name: Lint shell scripts, ignoring third-party files
       run: |
         find . -name "*.sh" > shell_files.out
-        shellcheck $(cat shell_files.out)  
+        shellcheck $(cat shell_files.out)
 
-  e2e-ci:
-    needs: [shell-ci]
+  node-ci:
     strategy:
       matrix:
-        platform: [ubuntu-latest]
+        platform: [ubuntu-latest, macos-latest]
+        node-version: [12.x]
     runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v2
-    - name: Set up gcloud
-      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
       with:
-        version: '285.0.0'
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
-    - run: gcloud info
-    # Configure docker to use the gcloud command-line tool as a credential helper
-    - run: gcloud auth configure-docker
-    - name: Release docker images
+        node-version: ${{ matrix.node-version }}
+    - name: Install and test NPM packages
       run: |
-        ./scripts/publish-functions.sh
+        cd functions/ts
+        npm ci
+        npm test
+    - name: Check licenses
+      run: |
+        cd functions/ts
+        npm run lint-license
+
+  e2e-ci:
+    needs: [node-ci]
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+        node-version: [12.x]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install NPM packages
+      run: |
+        cd functions/ts
+        npm ci
+    - name: Build docker images
+      if: matrix.platform == 'ubuntu-latest'
+      run: |
+        cd functions/ts
+        npm run kpt:docker-build
     - name: Run all e2e tests
+      if: matrix.platform == 'ubuntu-latest'
       run: |
         sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
         sudo chmod +x /usr/local/bin/kpt
         tests/e2e.sh
+    - name: Run non-docker e2e tests
+      if: matrix.platform == 'macos-latest'
+      run: |
+        sudo curl https://storage.googleapis.com/kpt-dev/latest/darwin_amd64/kpt -o /usr/local/bin/kpt
+        sudo chmod +x /usr/local/bin/kpt
+        NODOCKER=true tests/e2e.sh
