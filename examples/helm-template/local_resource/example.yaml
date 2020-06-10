@@ -1,0 +1,12 @@
+# call `kpt fn run` on a directory containing this file
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo
+  annotations:
+    config.kubernetes.io/function: |
+      container:
+        image: gcr.io/kpt-functions/helm-template
+data:
+  name: my-demo
+  chart: helloworld-chart
