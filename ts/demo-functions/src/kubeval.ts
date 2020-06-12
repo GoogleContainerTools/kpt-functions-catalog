@@ -157,10 +157,17 @@ function readStdoutToString(childProcess: ChildProcess): Promise<string> {
 kubeval.usage = `
 Validates configuration using kubeval.
 
-Configured using a ConfigMap with the following keys:
-${SCHEMA_LOCATION}: Comma-seperated list of secondary base URLs used to download schemas.
-${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to download schemas.
-${IGNORE_MISSING_SCHEMAS}: Skip validation for resource definitions without a schema.
-${SKIP_KINDS}: Comma-separated list of case-sensitive kinds to skip when validating against schemas.
-${STRICT}: Disallow additional properties not in schema.
+Configured using a ConfigMap with the following keys, all of which are optional:
+${SCHEMA_LOCATION}: The base URL used to download schemas.  If not specified,
+  the default location at https://kubernetesjsonschema.dev/ will be used.
+${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to download
+  schemas.  These URLs will be used if the URL specified by ${SCHEMA_LOCATION}
+  did not have the required schema.  By default, there are no secondary URLs,
+  and only the primary base URL will be used.
+${IGNORE_MISSING_SCHEMAS}: Skip validation for resource definitions without a
+  schema.  If omitted, a default value of false will be assumed.
+${SKIP_KINDS}: Comma-separated list of case-sensitive kinds to skip when
+  validating against schemas.  If omitted, no kinds will be skipped.
+${STRICT}: Disallow additional properties not in schema.  If omitted, a default
+  value of false will be assumed.
 `;
