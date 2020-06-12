@@ -18,12 +18,12 @@ import {
   Configs,
   FunctionConfigError,
   configFileResult,
+  kubernetesObjectResult,
   Severity,
 } from 'kpt-functions';
 import { spawnSync } from 'child_process';
 import { isConfigMap } from './gen/io.k8s.api.core.v1';
 
-const FILE_ARGS = 'files';
 const FLAG_ARGS = 'flags';
 const USE_KUBE_FLAG = '--use-kube';
 const OUTPUT_SHORT_FLAG = '-o';
@@ -42,50 +42,54 @@ interface IstioResult {
 export async function istioctlAnalyze(configs: Configs) {
   // Validate config data and read arguments.
   const args = readArguments(configs);
-  args.unshift('analyze');
 
-  let error;
-  try {
-    const child = spawnSync('istioctl', args);
-    error = child.stderr;
-    if (child.stdout && child.stdout !== 'null') {
-      const istioOutput: IstioResult[] = JSON.parse(child.stdout);
-      if (istioOutput && istioOutput.length) {
-        istioOutput.forEach(istioResult => {
-          const result = configFileResult(
-            istioResult.message,
-            istioResult.reference,
-            istioResult.level.toLowerCase() as Severity
-          );
-          result.tags = {
-            ['documentation_url']: istioResult.documentation_url,
-            ['origin']: istioResult.origin,
-            ['code']: istioResult.code,
-          };
-          configs.addResults(result);
-        });
+  for (const object of configs.getAll()) {
+    try {
+      const child = spawnSync('istioctl', args, {
+        input: JSON.stringify(object),
+        encoding: 'utf-8',
+      });
+      const error = child.stderr;
+      if (error && error.length > 0) {
+        configs.addResults(
+          configFileResult(
+            `Istioctl analyze command results in error: ${error}`,
+            '',
+            'error'
+          )
+        );
       }
+      if (child.stdout && child.stdout !== 'null') {
+        const output: IstioResult[] = JSON.parse(child.stdout);
+        if (output && output.length) {
+          output.forEach(istioResult => {
+            const result = kubernetesObjectResult(
+              istioResult.message,
+              object,
+              undefined,
+              istioResult.level.toLowerCase() as Severity
+            );
+            result.tags = {
+              ['documentation_url']: istioResult.documentation_url,
+              ['origin']: istioResult.origin,
+              ['code']: istioResult.code,
+            };
+            configs.addResults(result);
+          });
+        }
+      }
+    } catch (err) {
+      configs.addResults(configFileResult(`${err}`, '', 'error'));
     }
-  } catch (err) {
-    configs.addResults(configFileResult(`${err}`, '', 'error'));
-  }
-  if (error && error.length > 0) {
-    configs.addResults(
-      configFileResult(
-        `Istioctl analyze command results in error: ${error}`,
-        '',
-        'error'
-      )
-    );
   }
 }
 
 function readArguments(configs: Configs) {
   // Initialize to output json
-  const args: string[] = ['-o', 'json'];
+  const args: string[] = ['analyze', '-', '-o', 'json'];
   const data = readConfigDataOrThrow(configs);
   for (const key in data) {
-    if (key === FILE_ARGS || key === FLAG_ARGS) {
+    if (key === FLAG_ARGS) {
       args.push(data[key]);
     } else if (key === OUTPUT_SHORT_FLAG || key === OUTPUT_LONG_FLAG) {
       continue;
@@ -119,22 +123,21 @@ function readConfigDataOrThrow(configs: Configs) {
 }
 
 istioctlAnalyze.usage = `
-Istioctl analyze is a diagnostic tool that can detect potential issues with your
-Istio configuration and output errors to the results field. This function runs
-against local configuration files to catch problems before you apply changes to a
-cluster.
+Istioctl analyze is a diagnostic tool that can detect potential issues with
+your Istio configuration and output errors to the results field. This function
+runs against local configuration files to catch problems before you apply
+changes to a cluster.
 
-Configure this function using a ConfigMap with keys for "${FILE_ARGS}", "${FLAG_ARGS}", and
-arbitrary istioctl analyze flags. The "${FILE_ARGS}" argument takes an array of
-files and directories to analyze. The "${FLAG_ARGS}" argument takes an array of
-flags which do not take arguments. Arbitrary istioctl analyze flags which take their
-own arguments, like --suppress, should be passed as separate arguments. The --output
-flag is ignored as all output is included in config results.
+Configure this function using a ConfigMap with keys for "${FLAG_ARGS}" and
+arbitrary istioctl analyze flags. The "${FLAG_ARGS}" argument takes an array of
+flags which do not take arguments while flags which take their own arguments,
+like --suppress, should be passed as separate arguments. The “${OUTPUT_SHORT_FLAG}” and “${OUTPUT_LONG_FLAG}”
+flags are ignored as all output is included in config results. Consult the
+reference for additional flags at:
+https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-analyze
 
 Accepted arguments:
-${FILE_ARGS}: [Required] List of file or directory arguments to istioctl analyze.
 ${FLAG_ARGS}: [Optional] List of flag arguments to istioctl analyze.
-...
 
 Example: Analyze '/path/to/istio/configs' recursively using '--use-kube=false'
 apiVersion: v1
@@ -147,7 +150,6 @@ metadata:
         image:  gcr.io/kpt-functions/istioctl-analyze
     config.kubernetes.io/local-config: "true"
 data:
-  "${FILE_ARGS}": ["/path/to/istio/configs"]
   "${FLAG_ARGS}": ["--recursive"]
   "${USE_KUBE_FLAG}": "false"
 `;

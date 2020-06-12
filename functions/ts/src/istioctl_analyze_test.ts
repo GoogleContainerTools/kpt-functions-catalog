@@ -60,9 +60,9 @@ describe('istioctlAnalyze', () => {
     metadata: { name: 'config' },
     data: { '--use-kube': 'false' },
   });
-  it('keeps configs unchanged', async () => {
-    const input = new Configs(undefined, configMap);
-    const output = new Configs(undefined, configMap);
+  it('handles empty configs', async () => {
+    const input = new Configs([], configMap);
+    const output = new Configs([], configMap);
     await RUNNER.assert(input, output);
   });
 });

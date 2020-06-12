@@ -3,11 +3,11 @@ FROM node:lts-alpine as builder
 RUN apk add bash curl git
 RUN apk update
 
-ENV HELM_LATEST_VERSION="v3.2.1"
-RUN curl -fsSL -o /helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz && \
-    tar -zxvf /helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz && \
+ENV HELM_VERSION="v3.2.1"
+RUN curl -fsSL -o /helm-${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz && \
+    tar -zxvf /helm-${HELM_VERSION}-linux-amd64.tar.gz && \
     mv /linux-amd64/helm /usr/local/bin/helm && \
-    rm -f /helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz && \
+    rm -f /helm-${HELM_VERSION}-linux-amd64.tar.gz && \
     rm -rf /linux-amd64
 
 RUN curl -fsSL -o /usr/local/bin/kpt https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt && \
