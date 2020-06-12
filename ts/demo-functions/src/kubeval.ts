@@ -38,17 +38,16 @@ export async function kubeval(configs: Configs): Promise<void> {
   const strict = JSON.parse(configs.getFunctionConfigValue(STRICT) || 'false');
 
   const results: Result[] = [];
+  const args = buildKubevalArgs(
+    schemaLocation,
+    additionalSchemaLocations,
+    ignoreMissingSchemas,
+    skipKinds,
+    strict
+  );
 
   for (const object of configs.getAll()) {
-    await runKubeval(
-      object,
-      results,
-      schemaLocation,
-      additionalSchemaLocations,
-      ignoreMissingSchemas,
-      skipKinds,
-      strict
-    );
+    await runKubeval(object, results, args);
   }
 
   configs.addResults(...results);
@@ -57,37 +56,8 @@ export async function kubeval(configs: Configs): Promise<void> {
 async function runKubeval(
   object: KubernetesObject,
   results: Result[],
-  schemaLocation?: string,
-  additionalSchemaLocations?: string[],
-  ignoreMissingSchemas?: boolean,
-  skipKinds?: string[],
-  strict?: boolean
+  args: string[]
 ): Promise<void> {
-  const args = ['--output', 'json'];
-
-  if (schemaLocation) {
-    args.push('--schema-location');
-    args.push(schemaLocation);
-  }
-
-  if (additionalSchemaLocations) {
-    args.push('--additional-schema-locations');
-    args.push(additionalSchemaLocations.join(','));
-  }
-
-  if (ignoreMissingSchemas) {
-    args.push('--ignore-missing-schemas');
-  }
-
-  if (skipKinds) {
-    args.push('--skip-kinds');
-    args.push(skipKinds.join(','));
-  }
-
-  if (strict) {
-    args.push('--strict');
-  }
-
   const kubevalProcess = spawn('kubeval', args, {
     stdio: ['pipe', 'pipe', process.stderr],
   });
@@ -130,6 +100,40 @@ async function runKubeval(
       )
     );
   }
+}
+
+function buildKubevalArgs(
+  schemaLocation: string | undefined,
+  additionalSchemaLocations: string[],
+  ignoreMissingSchemas: boolean,
+  skipKinds: string[],
+  strict: boolean
+) {
+  const args = ['--output', 'json'];
+
+  if (schemaLocation) {
+    args.push('--schema-location');
+    args.push(schemaLocation);
+  }
+
+  if (additionalSchemaLocations) {
+    args.push('--additional-schema-locations');
+    args.push(additionalSchemaLocations.join(','));
+  }
+
+  if (ignoreMissingSchemas) {
+    args.push('--ignore-missing-schemas');
+  }
+
+  if (skipKinds) {
+    args.push('--skip-kinds');
+    args.push(skipKinds.join(','));
+  }
+
+  if (strict) {
+    args.push('--strict');
+  }
+  return args;
 }
 
 function writeToStream(stream: Writable, data: string): Promise<void> {
