@@ -51,9 +51,7 @@ export async function kubeval(configs: Configs): Promise<void> {
     );
   }
 
-  if (results.length > 0) {
-    configs.addResults(...results);
-  }
+  configs.addResults(...results);
 }
 
 async function runKubeval(
