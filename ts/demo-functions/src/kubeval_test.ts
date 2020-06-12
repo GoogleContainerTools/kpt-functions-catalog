@@ -10,13 +10,15 @@ import {
 const RUNNER = new TestRunner(kubeval);
 
 describe('kubeval', () => {
-  it('handles objects without errors', async () => {
+  // TODO(dflemstr): disabled until we've figured out whether to mock the
+  // kubeval invocation or shell out to a sandboxed version.
+  xit('handles objects without errors', async () => {
     await RUNNER.assert(
       new Configs([Namespace.named('something')]),
       new Configs([Namespace.named('something')])
     );
   });
-  it('reacts on errors', async () => {
+  xit('reacts on errors', async () => {
     const deployment = new Deployment({
       metadata: new ObjectMeta({
         name: 'something',
