@@ -1,4 +1,4 @@
-FROM node:10-alpine as builder
+FROM node:lts-alpine as builder
 
 RUN mkdir -p /home/node/app && \
     chown -R node:node /home/node/app
@@ -9,7 +9,7 @@ WORKDIR /home/node/app
 
 # Install dependencies and cache them.
 COPY --chown=node:node package*.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # Build the source.
 COPY --chown=node:node tsconfig.json .
@@ -20,7 +20,7 @@ RUN npm run build && \
 
 #############################################
 
-FROM node:10-alpine
+FROM node:lts-alpine
 
 RUN apk add curl && \
     curl -sSLf https://github.com/instrumenta/kubeval/releases/download/0.14.0/kubeval-linux-amd64.tar.gz | \
