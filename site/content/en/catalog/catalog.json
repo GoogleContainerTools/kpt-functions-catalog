@@ -21,27 +21,9 @@
     "type": "source"
   },
   {
-    "image": "gcr.io/kpt-functions/helm-template",
-    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/run.sh",
-    "description": "Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)).",
-    "type": "source"
-  },
-  {
     "image": "gcr.io/kustomize-functions/create-application",
     "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/functions/examples/application-cr/image/main.go",
     "description": "Add an Application CR to a group of resources.",
-    "type": "source"
-  },
-  {
-    "image": "gcr.io/kustomize-functions/example-nginx",
-    "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/functions/examples/template-go-nginx/image/main.go",
-    "description": "Generate configuration from go templates using the functionConfig as the template input.",
-    "type": "source"
-  },
-  {
-    "image": "gcr.io/kustomize-functions/example-cockroachdb",
-    "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/functions/examples/template-heredoc-cockroachdb/image/cockroachdb-template.sh",
-    "description": "Generate configuration from heredoc template using the functionConfig as the template input.",
     "type": "source"
   },
   {
@@ -84,6 +66,13 @@
     "type": "validator"
   },
   {
+    "image": "gcr.io/kpt-functions/suggest-psp",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/suggest_psp.ts",
+    "description": "Lints PodSecurityPolicy by suggesting 'spec.allowPrivilegeEscalation' field be set to 'false'.",
+    "type": "validator",
+    "demo": true
+  },
+  {
     "image": "gcr.io/kpt-functions/mutate-psp",
     "source": "https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/ts/demo-functions/src/mutate_psp.ts",
     "description": "Mutates PodSecurityPolicy objects by setting spec.allowPrivilegeEscalation to false.",
@@ -99,7 +88,7 @@
   },
   {
     "image": "gcr.io/kpt-functions/helm-template",
-    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/helm-template/run.sh",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/ts/src/helm_template.ts",
     "description": "Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)).",
     "type": "transformer"
   },
@@ -115,6 +104,24 @@
     "description": "Reads custom resources of type Team and generates multiple Namespace and RoleBinding objects.",
     "type": "generator",
     "demo": true
+  },
+  {
+    "image": "gcr.io/kpt-functions/helm-template",
+    "source": "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/ts/src/helm_template.ts",
+    "description": "Render chart templates locally using helm template. (See [usage](docs/helm-template/usage/index.html)).",
+    "type": "generator"
+  },
+  {
+    "image": "gcr.io/kustomize-functions/example-nginx",
+    "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/functions/examples/template-go-nginx/image/main.go",
+    "description": "Generate configuration from go templates using the functionConfig as the template input.",
+    "type": "generator"
+  },
+  {
+    "image": "gcr.io/kustomize-functions/example-cockroachdb",
+    "source": "https://github.com/kubernetes-sigs/kustomize/blob/master/functions/examples/template-heredoc-cockroachdb/image/cockroachdb-template.sh",
+    "description": "Generate configuration from heredoc template using the functionConfig as the template input.",
+    "type": "generator"
   },
   {
     "image": "gcr.io/kpt-functions/no-op",
