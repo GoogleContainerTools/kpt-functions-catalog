@@ -1,14 +1,11 @@
 FROM node:lts-alpine as builder
 
-RUN apk add bash curl git
-RUN apk update
+RUN apk add bash curl git && apk update
 
 ENV ISTIOCTL_VERSION="1.6.2"
 RUN curl -fsSL -o /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz https://github.com/istio/istio/releases/download/${ISTIOCTL_VERSION}/istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
     tar -zxvf /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
-    mv /istio-${ISTIOCTL_VERSION}/bin/istioctl /usr/local/bin/istioctl && \
-    rm -f /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
-    rm -rf /istio-${ISTIOCTL_VERSION}
+    mv /istio-${ISTIOCTL_VERSION}/bin/istioctl /usr/local/bin/istioctl
 
 RUN curl -fsSL -o /usr/local/bin/kpt https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt && \
     chmod +x /usr/local/bin/kpt

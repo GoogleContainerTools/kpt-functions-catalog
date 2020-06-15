@@ -100,7 +100,11 @@ assert_dir_exists default
 assert_contains_string default/secret_my-mongodb.yaml "my-mongodb"
 assert_contains_string default/secret_my-redis.yaml "my-redis"
 
-testcase "docker_istioctl_analyze_success"
+############################
+# kpt fn Tests
+############################
+
+testcase "kpt_istioctl_analyze_success"
 kpt pkg get https://github.com/istio/istio.git/samples/addons .
 cat >fc.yaml <<EOF
 apiVersion: v1
@@ -116,15 +120,10 @@ data:
   "flags": [ "--recursive" ]
   "--use-kube": "false"
 EOF
-docker run -i -u "$(id -u)" --mount type=bind,src="$(pwd)",dst=/source gcr.io/kpt-functions/read-yaml:dev -i /dev/null -d source_dir=/source/addons |
-  docker run -i -u "$(id -u)" --mount type=bind,src="$(pwd)",dst=/source gcr.io/kpt-functions/istioctl-analyze:dev -f /source/fc.yaml >out.json
-if grep -q "results" out.json; then
-  fail "Validation error found using istio addons sample: " + out.json
+kpt fn source addons | kpt fn run --fn-path fc.yaml 2>addons.err | kpt fn sink addons
+if [ -s addons.err ]; then
+  fail "Validation error found using istio addons sample: " + addons.err
 fi
-
-############################
-# kpt fn Tests
-############################
 
 testcase "kpt_istioctl_analyze_error"
 kpt pkg get https://github.com/istio/istio.git/galley/pkg/config/analysis/analyzers/testdata .

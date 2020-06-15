@@ -20,6 +20,7 @@ import {
   configFileResult,
   kubernetesObjectResult,
   Severity,
+  KubernetesObject,
 } from 'kpt-functions';
 import { spawnSync } from 'child_process';
 import { isConfigMap } from './gen/io.k8s.api.core.v1';
@@ -60,27 +61,35 @@ export async function istioctlAnalyze(configs: Configs) {
         );
       }
       if (child.stdout && child.stdout !== 'null') {
-        const output: IstioResult[] = JSON.parse(child.stdout);
-        if (output && output.length) {
-          output.forEach(istioResult => {
-            const result = kubernetesObjectResult(
-              istioResult.message,
-              object,
-              undefined,
-              istioResult.level.toLowerCase() as Severity
-            );
-            result.tags = {
-              ['documentation_url']: istioResult.documentation_url,
-              ['origin']: istioResult.origin,
-              ['code']: istioResult.code,
-            };
-            configs.addResults(result);
-          });
-        }
+        const outputs: IstioResult[] = JSON.parse(child.stdout);
+        addIstioResults(outputs, object, configs);
       }
     } catch (err) {
       configs.addResults(configFileResult(`${err}`, '', 'error'));
     }
+  }
+}
+
+function addIstioResults(
+  outputs: IstioResult[],
+  object: KubernetesObject,
+  configs: Configs
+) {
+  if (outputs && outputs.length) {
+    outputs.forEach(output => {
+      const result = kubernetesObjectResult(
+        output.message,
+        object,
+        undefined,
+        output.level.toLowerCase() as Severity
+      );
+      result.tags = {
+        ['documentation_url']: output.documentation_url,
+        ['origin']: output.origin,
+        ['code']: output.code,
+      };
+      configs.addResults(result);
+    });
   }
 }
 
