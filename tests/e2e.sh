@@ -31,7 +31,6 @@ function testcase() {
   echo "testcase: ${1}"
   tmp=$(mktemp -d "/tmp/e2e.${1}.XXXXXXXX")
   cd "${tmp}"
-  kpt pkg get $SDK_REPO/example-configs example-configs
 }
 
 function helm_testcase() {
@@ -64,6 +63,7 @@ function assert_dir_exists() {
   exit 0
 }
 
+# TODO: Convert helm tests to kpt fn after fixing https://github.com/GoogleContainerTools/kpt/issues/587
 helm_testcase "docker_helm_template_expected_args"
 docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -d name=expected-args -d chart_path=/source/redis >out.yaml
 assert_contains_string out.yaml "expected-args"
@@ -77,7 +77,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/helm-template
+        image:  gcr.io/kpt-functions/helm-template:dev
     config.kubernetes.io/local-config: "true"
 data:
   name: extra-args
@@ -100,3 +100,25 @@ docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/
 assert_dir_exists default
 assert_contains_string default/secret_my-mongodb.yaml "my-mongodb"
 assert_contains_string default/secret_my-redis.yaml "my-redis"
+
+############################
+# kpt fn Tests
+############################
+
+testcase "kpt_set_namespace_success"
+kpt pkg get $SDK_REPO/example-configs example-configs
+cat >fc.yaml <<EOF
+apiVersion: example.com/v1beta1
+kind: ExampleKind
+metadata:
+  name: function-input
+  namespace: example-ns
+  annotations:
+    config.kubernetes.io/function: |
+      starlark: {path: starlark/set_namespace.star, name: example-name}
+spec:
+  namespace_value: example-ns
+EOF
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/functions/starlark@set-namespace ./
+kpt fn run . --enable-star
+assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
