@@ -63,6 +63,7 @@ function assert_dir_exists() {
   exit 0
 }
 
+# TODO: Convert helm tests to kpt fn after fixing https://github.com/GoogleContainerTools/kpt/issues/587
 helm_testcase "docker_helm_template_expected_args"
 docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -d name=expected-args -d chart_path=/source/redis >out.yaml
 assert_contains_string out.yaml "expected-args"
