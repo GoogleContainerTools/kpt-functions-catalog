@@ -120,9 +120,9 @@ data:
   "flags": [ "--recursive" ]
   "--use-kube": "false"
 EOF
-kpt fn source addons | kpt fn run --fn-path fc.yaml 2>addons.err | kpt fn sink addons
-if [ -s addons.err ]; then
-  fail "Validation error found using istio addons sample: " + addons.err
+kpt fn source addons | kpt fn run --fn-path fc.yaml 2>error.txt | kpt fn sink addons
+if [ -s error.txt ]; then
+  fail "Validation error found using istio addons sample: " + error.txt
 fi
 
 testcase "kpt_istioctl_analyze_error"
@@ -141,5 +141,5 @@ data:
   "flags": [ "--recursive" ]
   "--use-kube": "false"
 EOF
-kpt fn run testdata --fn-path fc.yaml 2> err.txt || true
-assert_contains_string err.txt "Referenced selector not found"
+kpt fn run testdata --fn-path fc.yaml 2>error.txt || true
+assert_contains_string error.txt "Referenced selector not found"
