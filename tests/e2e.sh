@@ -31,7 +31,6 @@ function testcase() {
   echo "testcase: ${1}"
   tmp=$(mktemp -d "/tmp/e2e.${1}.XXXXXXXX")
   cd "${tmp}"
-  kpt pkg get $SDK_REPO/example-configs example-configs
 }
 
 function helm_testcase() {
@@ -77,7 +76,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/helm-template
+        image:  gcr.io/kpt-functions/helm-template:dev
     config.kubernetes.io/local-config: "true"
 data:
   name: extra-args
@@ -100,3 +99,47 @@ docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/
 assert_dir_exists default
 assert_contains_string default/secret_my-mongodb.yaml "my-mongodb"
 assert_contains_string default/secret_my-redis.yaml "my-redis"
+
+############################
+# kpt fn Tests
+############################
+
+testcase "kpt_istioctl_analyze_success"
+kpt pkg get https://github.com/istio/istio.git/samples/addons .
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/istioctl-analyze:dev
+    config.kubernetes.io/local-config: 'true'
+data:
+  "flags": [ "--recursive" ]
+  "--use-kube": "false"
+EOF
+kpt fn source addons | kpt fn run --fn-path fc.yaml 2>error.txt | kpt fn sink addons
+if [ -s error.txt ]; then
+  fail "Validation error found using istio addons sample: " + error.txt
+fi
+
+testcase "kpt_istioctl_analyze_error"
+kpt pkg get https://github.com/istio/istio.git/galley/pkg/config/analysis/analyzers/testdata .
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/istioctl-analyze:dev
+    config.kubernetes.io/local-config: 'true'
+data:
+  "flags": [ "--recursive" ]
+  "--use-kube": "false"
+EOF
+kpt fn run testdata --fn-path fc.yaml 2>error.txt || true
+assert_contains_string error.txt "Referenced selector not found"
