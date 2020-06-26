@@ -2,10 +2,10 @@ FROM node:lts-alpine as builder
 
 RUN apk add bash curl git && apk update
 
-ENV HELM_VERSION="v3.2.1"
-RUN curl -fsSL -o /helm-${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz && \
-    tar -zxvf /helm-${HELM_VERSION}-linux-amd64.tar.gz && \
-    mv /linux-amd64/helm /usr/local/bin/helm
+ENV ISTIOCTL_VERSION="1.6.2"
+RUN curl -fsSL -o /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz https://github.com/istio/istio/releases/download/${ISTIOCTL_VERSION}/istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
+    tar -zxvf /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
+    mv /istio-${ISTIOCTL_VERSION}/bin/istioctl /usr/local/bin/istioctl
 
 RUN curl -fsSL -o /usr/local/bin/kpt https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt && \
     chmod +x /usr/local/bin/kpt
@@ -43,6 +43,5 @@ COPY --from=builder /home/node/app /home/node/app
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 ENV PATH /usr/local/bin:$PATH
-ENV HELM_PATH_CACHE /var/cache
 
-ENTRYPOINT ["node", "/home/node/app/dist/helm_template_run.js"]
+ENTRYPOINT ["node", "/home/node/app/dist/istioctl_analyze_run.js"]
