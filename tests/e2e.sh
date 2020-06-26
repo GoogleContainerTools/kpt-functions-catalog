@@ -105,6 +105,64 @@ assert_contains_string default/secret_my-redis.yaml "my-redis"
 # kpt fn Tests
 ############################
 
+testcase "kpt_set_namespace_success"
+kpt pkg get $SDK_REPO/example-configs example-configs
+cat >fc.yaml <<EOF
+apiVersion: example.com/v1beta1
+kind: ExampleKind
+metadata:
+  name: function-input
+  namespace: example-ns
+  annotations:
+    config.kubernetes.io/function: |
+      starlark: {path: starlark/set_namespace.star, name: example-name}
+spec:
+  namespace_value: example-ns
+EOF
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/functions/starlark@set-namespace ./
+kpt fn run . --enable-star
+assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
+
+testcase "kpt_istioctl_analyze_success"
+kpt pkg get https://github.com/istio/istio.git/samples/addons .
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/istioctl-analyze:dev
+    config.kubernetes.io/local-config: 'true'
+data:
+  "flags": [ "--recursive" ]
+  "--use-kube": "false"
+EOF
+kpt fn source addons | kpt fn run --fn-path fc.yaml 2>error.txt | kpt fn sink addons
+if [ -s error.txt ]; then
+  fail "Validation error found using istio addons sample: " + error.txt
+fi
+
+testcase "kpt_istioctl_analyze_error"
+kpt pkg get https://github.com/istio/istio.git/galley/pkg/config/analysis/analyzers/testdata .
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/istioctl-analyze:dev
+    config.kubernetes.io/local-config: 'true'
+data:
+  "flags": [ "--recursive" ]
+  "--use-kube": "false"
+EOF
+kpt fn run testdata --fn-path fc.yaml 2>error.txt || true
+assert_contains_string error.txt "Referenced selector not found"
+
 testcase "kpt_kubeval_success"
 kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
 cat >fc.yaml <<EOF
