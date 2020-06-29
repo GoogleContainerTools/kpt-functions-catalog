@@ -162,3 +162,43 @@ data:
 EOF
 kpt fn run testdata --fn-path fc.yaml 2>error.txt || true
 assert_contains_string error.txt "Referenced selector not found"
+
+testcase "kpt_kubeval_success"
+kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/kubeval:dev
+        network:
+          required: true
+    config.kubernetes.io/local-config: 'true'
+EOF
+kpt fn source fixtures/valid* |
+kpt fn run --fn-path fc.yaml --network >out.yaml
+if grep -q "results" out.yaml; then
+  fail "Validation error found using kubeval fixtures valid config: " + out.yaml
+fi
+
+testcase "kpt_kubeval_error"
+kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/kubeval:dev
+        network:
+          required: true
+    config.kubernetes.io/local-config: 'true'
+EOF
+kpt fn source fixtures/*invalid.yaml |
+kpt fn run --fn-path fc.yaml --network 2>error.txt || true
+assert_contains_string error.txt "Invalid type. Expected: \[integer,null\], given: string"
