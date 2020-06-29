@@ -21,6 +21,7 @@ set -eo pipefail
 TAG=${TAG:-dev}
 NODOCKER=${NODOCKER:-}
 SDK_REPO=https://github.com/GoogleContainerTools/kpt-functions-sdk
+CATALOG_REPO=https://github.com/GoogleContainerTools/kpt-functions-catalog
 CHARTS_SRC="charts/bitnami"
 
 ############################
@@ -119,7 +120,7 @@ metadata:
 spec:
   namespace_value: example-ns
 EOF
-kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/functions/starlark@set-namespace ./
+kpt pkg get $CATALOG_REPO/functions/starlark ./
 kpt fn run . --enable-star
 assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
 
