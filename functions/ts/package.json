@@ -1,6 +1,6 @@
 {
   "name": "ts-functions",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "kpt typescript sdk functions",
   "author": "kpt Authors",
   "license": "Apache-2.0",

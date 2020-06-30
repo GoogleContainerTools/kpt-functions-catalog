@@ -78,7 +78,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/helm-template:dev
+        image:  gcr.io/kpt-functions/helm-template:${TAG}
     config.kubernetes.io/local-config: "true"
 data:
   name: extra-args
@@ -134,7 +134,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/istioctl-analyze:dev
+        image:  gcr.io/kpt-functions/istioctl-analyze:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "flags": [ "--recursive" ]
@@ -142,7 +142,7 @@ data:
 EOF
 kpt fn source addons | kpt fn run --fn-path fc.yaml 2>error.txt | kpt fn sink addons
 if [ -s error.txt ]; then
-  fail "Validation error found using istio addons sample: " + error.txt
+  fail "Validation error found using istio addons sample: " "$(< error.txt)"
 fi
 
 testcase "kpt_istioctl_analyze_error"
@@ -155,7 +155,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/istioctl-analyze:dev
+        image:  gcr.io/kpt-functions/istioctl-analyze:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "flags": [ "--recursive" ]
@@ -174,7 +174,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kubeval:dev
+        image:  gcr.io/kpt-functions/kubeval:${TAG}
         network:
           required: true
     config.kubernetes.io/local-config: 'true'
@@ -182,7 +182,7 @@ EOF
 kpt fn source fixtures/valid* |
 kpt fn run --fn-path fc.yaml --network >out.yaml
 if grep -q "results" out.yaml; then
-  fail "Validation error found using kubeval fixtures valid config: " + out.yaml
+  fail "Validation error found using kubeval fixtures valid config: " "$(< out.yaml)"
 fi
 
 testcase "kpt_kubeval_error"
@@ -195,7 +195,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kubeval:dev
+        image:  gcr.io/kpt-functions/kubeval:${TAG}
         network:
           required: true
     config.kubernetes.io/local-config: 'true'
