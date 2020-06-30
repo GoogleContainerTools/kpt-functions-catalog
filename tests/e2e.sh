@@ -145,7 +145,18 @@ assert_dir_exists knative-serving
 # kpt fn Tests
 ############################
 
-testcase "kpt_set_namespace_success"
+testcase "kpt_set_namespace_go_docker_success"
+kpt pkg get $SDK_REPO/example-configs example-configs
+kpt fn run . --image gcr.io/kpt-functions/set-namespace -- namespace=example-ns
+assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
+
+testcase "kpt_set_namespace_go_success"
+kpt pkg get $SDK_REPO/example-configs example-configs
+kpt pkg get $CATALOG_REPO/functions/go ./
+kpt fn run example-configs --enable-exec --exec-path "$(pwd)"/go/set-namespace/set-namespace -- namespace=example-ns
+assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
+
+testcase "kpt_set_namespace_starlark_success"
 kpt pkg get $SDK_REPO/example-configs example-configs
 cat >fc.yaml <<EOF
 apiVersion: example.com/v1beta1
