@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-import { safeLoadAll } from 'js-yaml';
 import { Configs, isKubernetesObject, generalResult } from 'kpt-functions';
 import { spawnSync } from 'child_process';
+import { safeLoadAll } from 'js-yaml';
 
-const CHART_NAME = 'name';
-const CHART_PATH = 'chart_path';
-const VALUES_PATH = '--values';
+const BUILD_PATH = 'path';
 
-// Render chart templates locally using helm template.
-export async function helmTemplate(configs: Configs) {
+export async function kustomizeBuild(configs: Configs) {
   // Validate config data and read arguments.
   const args = readArguments(configs);
-  args.unshift('template');
+  args.unshift('build');
 
   let error;
   try {
-    const child = spawnSync('helm', args);
+    const child = spawnSync('kustomize', args);
     error = child.stderr;
     let objects = safeLoadAll(child.stdout);
     objects = objects.filter(o => isKubernetesObject(o));
@@ -40,53 +37,41 @@ export async function helmTemplate(configs: Configs) {
   }
   if (error && error.length > 0) {
     configs.addResults(
-      generalResult(`Helm template command results in error: ${error}`, 'error')
+      generalResult(
+        `Kustomize build command results in error: ${error}`,
+        'error'
+      )
     );
   }
 }
 
 function readArguments(configs: Configs) {
   const args: string[] = [];
-  let nameArg;
-  let pathArg;
   const configMap = configs.getFunctionConfigMap();
   configMap.forEach((value: string, key: string) => {
-    if (key === CHART_NAME) {
-      nameArg = value;
-    } else if (key === CHART_PATH) {
-      pathArg = value;
+    if (key === BUILD_PATH) {
+      args.push(value);
     } else {
       args.push(key);
       args.push(value);
     }
   });
-
-  // Helm template expects name and chart path first so place those at the beginning
-  if (pathArg) {
-    args.unshift(pathArg);
-  }
-  if (nameArg) {
-    args.unshift(nameArg);
-  }
-
   return args;
 }
 
-helmTemplate.usage = `
-Render chart templates locally using helm template. If input a list of configs in
-addition to arguments will overwrite any chart objects that already exist in the list.
+kustomizeBuild.usage = `
+Build Kubernetes manifests using kustomize build. 
 
-Configured using a ConfigMap with keys for ${CHART_NAME}, ${CHART_PATH}.
-Works with arbitrary helm template flags like --values:
+Configured using a ConfigMap with a key for {${BUILD_PATH}}.
+Works with arbitrary kustomize build flags like --reorder:
 
-${CHART_NAME}: Name of helm chart.
-${CHART_PATH}: Chart templates directory.
-${VALUES_PATH}: [Optional] Path to values file.
+${BUILD_PATH}: [Optional, default '.'] Path to kustomization.yaml.
+--reorder: [Optional] Reorder the resources just before output.
 ...
 
 Example:
 
-To expand a chart named 'my-chart' at '../path/to/helm/chart' using './values.yaml':
+To build a kustomization at '/path/to/kustomization' using '--reorder none':
 
 apiVersion: v1
 kind: ConfigMap
@@ -95,10 +80,9 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/helm-template
+        image:  gcr.io/kpt-functions/kustomize-build
     config.kubernetes.io/local-config: "true"
 data:
-  ${CHART_NAME}: my-chart
-  ${CHART_PATH}: ../path/to/helm/chart
-  ${VALUES_PATH}: ./values.yaml
+  ${BUILD_PATH}: /path/to/kustomization
+  --reorder: none
 `;

@@ -8,7 +8,7 @@ describe('kubeval', () => {
   it('handles undefined function config', async () => {
     const input = new Configs(undefined, undefined);
 
-    await RUNNER.assert(input, new Configs(undefined));
+    await RUNNER.assert(input, new Configs(undefined), Error);
   });
 
   const namespace = Namespace.named('namespace');
