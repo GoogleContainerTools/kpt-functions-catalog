@@ -24,7 +24,7 @@
   "dependencies": {
     "child_process": "1.0.2",
     "js-yaml": "^3.13.1",
-    "kpt-functions": "^0.14.0"
+    "kpt-functions": "^0.14.2"
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.12",

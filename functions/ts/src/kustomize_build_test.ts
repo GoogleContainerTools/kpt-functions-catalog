@@ -15,12 +15,12 @@
  */
 
 import { Configs, TestRunner, FunctionConfigError } from 'kpt-functions';
-import { istioctlAnalyze } from './istioctl_analyze';
-import { Namespace, ConfigMap } from './gen/io.k8s.api.core.v1';
+import { kustomizeBuild } from './kustomize_build';
+import { Namespace } from './gen/io.k8s.api.core.v1';
 
-const RUNNER = new TestRunner(istioctlAnalyze);
+const RUNNER = new TestRunner(kustomizeBuild);
 
-describe('istioctlAnalyze', () => {
+describe('kustomizeBuild', () => {
   it('outputs error given undefined function config', async () => {
     const input = new Configs(undefined, undefined);
 
@@ -36,21 +36,6 @@ describe('istioctlAnalyze', () => {
   it('outputs error given namespace function config', async () => {
     const input = new Configs(undefined, namespace);
 
-    await RUNNER.assert(
-      input,
-      new Configs(undefined, namespace),
-      FunctionConfigError,
-      'functionConfig expected to be of kind ConfigMap, instead got: Namespace'
-    );
-  });
-
-  const configMap = new ConfigMap({
-    metadata: { name: 'config' },
-    data: { '--use-kube': 'false' },
-  });
-  it('handles empty configs', async () => {
-    const input = new Configs([], configMap);
-    const output = new Configs([], configMap);
-    await RUNNER.assert(input, output);
+    await RUNNER.assert(input, new Configs(undefined, namespace), Error);
   });
 });

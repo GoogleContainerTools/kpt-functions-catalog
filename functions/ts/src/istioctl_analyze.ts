@@ -16,14 +16,12 @@
 
 import {
   Configs,
-  FunctionConfigError,
   configFileResult,
   kubernetesObjectResult,
   Severity,
   KubernetesObject,
 } from 'kpt-functions';
 import { spawnSync } from 'child_process';
-import { isConfigMap } from './gen/io.k8s.api.core.v1';
 
 const FLAG_ARGS = 'flags';
 const USE_KUBE_FLAG = '--use-kube';
@@ -96,39 +94,22 @@ function addIstioResults(
 function readArguments(configs: Configs) {
   // Initialize to output json
   const args: string[] = ['analyze', '-', '-o', 'json'];
-  const data = readConfigDataOrThrow(configs);
-  for (const key in data) {
+  const configMap = configs.getFunctionConfigMap();
+  configMap.forEach((value: string, key: string) => {
     if (key === FLAG_ARGS) {
-      args.push(data[key]);
+      args.push(value);
     } else if (key === OUTPUT_SHORT_FLAG || key === OUTPUT_LONG_FLAG) {
-      continue;
     } else if (key === USE_KUBE_FLAG) {
-      // use-kube flag which needs equals sign instead of space separator
-      args.push(`${key}=${data[key]}`);
-    } else if (data.hasOwnProperty(key)) {
+      // use-kube flag needs equals sign instead of space separator
+      if (value) {
+        args.push(`${key}=${value}`);
+      }
+    } else {
       args.push(key);
-      args.push(data[key]);
+      args.push(value);
     }
-  }
+  });
   return args;
-}
-
-function readConfigDataOrThrow(configs: Configs) {
-  const cm = configs.getFunctionConfig();
-  if (!cm) {
-    throw new FunctionConfigError(`functionConfig expected, instead undefined`);
-  }
-  if (!isConfigMap(cm)) {
-    throw new FunctionConfigError(
-      `functionConfig expected to be of kind ConfigMap, instead got: ${cm.kind}`
-    );
-  }
-  if (!cm.data) {
-    throw new FunctionConfigError(
-      `functionConfig expected to contain data, instead empty`
-    );
-  }
-  return cm.data;
 }
 
 istioctlAnalyze.usage = `

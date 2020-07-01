@@ -64,7 +64,7 @@ function assert_dir_exists() {
   exit 0
 }
 
-# TODO: Convert helm tests to kpt fn after fixing https://github.com/GoogleContainerTools/kpt/issues/587
+# TODO: Convert source function tests to kpt fn after fixing https://github.com/GoogleContainerTools/kpt/issues/587
 helm_testcase "docker_helm_template_expected_args"
 docker run -u "$(id -u)" -v "$(pwd)/${CHARTS_SRC}":/source gcr.io/kpt-functions/helm-template:"${TAG}" -i /dev/null -d name=expected-args -d chart_path=/source/redis >out.yaml
 assert_contains_string out.yaml "expected-args"
@@ -102,6 +102,39 @@ docker run -u "$(id -u)" -v "$(pwd)/helm-charts":/source gcr.io/kpt-functions/he
 assert_dir_exists default
 assert_contains_string default/configmap_my-haproxy-ingress-controller.yaml "name: my-haproxy-ingress"
 assert_contains_string default/secret_my-redis.yaml "name: my-redis"
+
+testcase "docker_kustomize_build_extra_args"
+kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/kustomize-build:dev
+    config.kubernetes.io/local-config: "true"
+data:
+  path: /source/helloWorld
+  --output: /source/kustomize_build_output.yaml
+EOF
+docker run -u "$(id -u)" --mount type=bind,src="$(pwd)",dst=/source gcr.io/kpt-functions/kustomize-build:dev -f /source/fc.yaml
+assert_contains_string kustomize_build_output.yaml "app: hello"
+
+testcase "docker_kustomize_build_sink"
+kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
+docker run -u "$(id -u)" --mount type=bind,src="$(pwd)",dst=/source gcr.io/kpt-functions/kustomize-build:dev -d path=/source/helloWorld |
+  docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
+assert_contains_string configmap_the-map.yaml "app: hello"
+
+testcase "docker_kustomize_build_pipeline"
+kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples examples
+docker run -u "$(id -u)" --mount type=bind,src="$(pwd)/examples",dst=/source gcr.io/kpt-functions/kustomize-build:dev -d path=/source/loadHttp |
+  docker run -i -u "$(id -u)" --mount type=bind,src="$(pwd)/examples",dst=/source gcr.io/kpt-functions/kustomize-build:dev -d path=/source/helloWorld |
+  docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
+assert_contains_string configmap_the-map.yaml "app: hello"
+assert_dir_exists knative-serving
 
 ############################
 # kpt fn Tests
