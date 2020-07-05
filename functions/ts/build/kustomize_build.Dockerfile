@@ -32,6 +32,8 @@ RUN npm run build && \
 
 FROM node:lts-alpine
 
+RUN apk add git
+
 # Run as non-root user as a best-practices:
 # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
 USER node
