@@ -2,7 +2,7 @@ FROM node:lts-alpine as builder
 
 RUN apk add bash curl git && apk update
 
-ENV ISTIOCTL_VERSION="1.6.2"
+ARG ISTIOCTL_VERSION="1.6.2"
 RUN curl -fsSL -o /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz https://github.com/istio/istio/releases/download/${ISTIOCTL_VERSION}/istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
     tar -zxvf /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
     mv /istio-${ISTIOCTL_VERSION}/bin/istioctl /usr/local/bin/istioctl

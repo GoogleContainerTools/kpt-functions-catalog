@@ -2,7 +2,7 @@ FROM node:lts-alpine as builder
 
 RUN apk add bash curl git && apk update
 
-ENV KUSTOMIZE_VERSION="v3.6.1"
+ARG KUSTOMIZE_VERSION="v3.6.1"
 RUN curl -fsSL -o /kustomize-${KUSTOMIZE_VERSION}-linux-amd64.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz && \
     tar -zxvf /kustomize-${KUSTOMIZE_VERSION}-linux-amd64.tar.gz && \
     mv kustomize /usr/local/bin/kustomize
