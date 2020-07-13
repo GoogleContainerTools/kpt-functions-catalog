@@ -2,7 +2,7 @@ FROM node:lts-alpine as builder
 
 RUN apk add bash curl git && apk update
 
-ENV HELM_VERSION="v3.2.1"
+ARG HELM_VERSION="v3.2.1"
 RUN curl -fsSL -o /helm-${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz && \
     tar -zxvf /helm-${HELM_VERSION}-linux-amd64.tar.gz && \
     mv /linux-amd64/helm /usr/local/bin/helm

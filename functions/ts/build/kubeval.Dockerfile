@@ -1,6 +1,6 @@
 FROM node:lts-alpine as builder
 
-ENV KUBEVAL_VERSION="0.15.0"
+ARG KUBEVAL_VERSION="0.15.0"
 RUN apk add curl && \
     curl -sSLf https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_VERSION}/kubeval-linux-amd64.tar.gz | \
     tar xzf - -C /usr/local/bin
