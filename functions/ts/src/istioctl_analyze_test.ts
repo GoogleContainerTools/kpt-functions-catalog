@@ -21,15 +21,10 @@ import { Namespace, ConfigMap } from './gen/io.k8s.api.core.v1';
 const RUNNER = new TestRunner(istioctlAnalyze);
 
 describe('istioctlAnalyze', () => {
-  it('outputs error given undefined function config', async () => {
+  it('outputs undefined given undefined function config', async () => {
     const input = new Configs(undefined, undefined);
 
-    await RUNNER.assert(
-      input,
-      new Configs(undefined),
-      FunctionConfigError,
-      'functionConfig expected, instead undefined'
-    );
+    await RUNNER.assert(input, new Configs(undefined));
   });
 
   const namespace = Namespace.named('namespace');

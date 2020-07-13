@@ -38,7 +38,7 @@ export async function kustomizeBuild(configs: Configs) {
   if (error && error.length > 0) {
     configs.addResults(
       generalResult(
-        `Kustomize build command results in error: ${error}`,
+        `Kustomize build command results in error: ${error.toString()}`,
         'error'
       )
     );
@@ -48,6 +48,9 @@ export async function kustomizeBuild(configs: Configs) {
 function readArguments(configs: Configs) {
   const args: string[] = [];
   const configMap = configs.getFunctionConfigMap();
+  if (!configMap) {
+    return args;
+  }
   configMap.forEach((value: string, key: string) => {
     if (key === BUILD_PATH) {
       args.push(value);

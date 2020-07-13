@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-import { Configs, TestRunner, FunctionConfigError } from 'kpt-functions';
+import { Configs, TestRunner, Result } from 'kpt-functions';
 import { kustomizeBuild } from './kustomize_build';
 import { Namespace } from './gen/io.k8s.api.core.v1';
 
 const RUNNER = new TestRunner(kustomizeBuild);
 
 describe('kustomizeBuild', () => {
-  it('outputs error given undefined function config', async () => {
+  it('outputs kustomize error result given undefined function config', async () => {
     const input = new Configs(undefined, undefined);
+    const kustomizeError = `Kustomize build command results in error: Error: unable to find one of 'kustomization.yaml', 'kustomization.yml' or 'Kustomization' in directory '${process.cwd()}'\n`;
+    const errorResult: Result = {
+      severity: 'error',
+      message: kustomizeError,
+    };
+    const output = new Configs(undefined);
+    output.addResults(errorResult);
 
-    await RUNNER.assert(
-      input,
-      new Configs(undefined),
-      FunctionConfigError,
-      'functionConfig expected, instead undefined'
-    );
+    await RUNNER.assert(input, output);
   });
 
   const namespace = Namespace.named('namespace');

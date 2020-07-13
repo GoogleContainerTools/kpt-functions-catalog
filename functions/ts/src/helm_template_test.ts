@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-import { Configs, TestRunner, FunctionConfigError } from 'kpt-functions';
+import { Configs, TestRunner, Result } from 'kpt-functions';
 import { helmTemplate } from './helm_template';
 import { Namespace } from './gen/io.k8s.api.core.v1';
 
 const RUNNER = new TestRunner(helmTemplate);
 
 describe('helmTemplate', () => {
-  it('outputs error given undefined function config', async () => {
+  it('outputs helm template error result given undefined function config', async () => {
     const input = new Configs(undefined, undefined);
+    const helmError = `Helm template command results in error: Error: "helm template" requires at least 1 argument\n\nUsage:  helm template [NAME] [CHART] [flags]\n`;
+    const errorResult: Result = {
+      severity: 'error',
+      message: helmError,
+    };
+    const output = new Configs(undefined);
+    output.addResults(errorResult);
 
-    await RUNNER.assert(
-      input,
-      new Configs(undefined),
-      FunctionConfigError,
-      'functionConfig expected, instead undefined'
-    );
+    await RUNNER.assert(input, output);
   });
 
   const namespace = Namespace.named('namespace');

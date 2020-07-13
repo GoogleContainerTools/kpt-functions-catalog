@@ -40,7 +40,10 @@ export async function helmTemplate(configs: Configs) {
   }
   if (error && error.length > 0) {
     configs.addResults(
-      generalResult(`Helm template command results in error: ${error}`, 'error')
+      generalResult(
+        `Helm template command results in error: ${error.toString()}`,
+        'error'
+      )
     );
   }
 }
@@ -50,6 +53,9 @@ function readArguments(configs: Configs) {
   let nameArg;
   let pathArg;
   const configMap = configs.getFunctionConfigMap();
+  if (!configMap) {
+    return args;
+  }
   configMap.forEach((value: string, key: string) => {
     if (key === CHART_NAME) {
       nameArg = value;

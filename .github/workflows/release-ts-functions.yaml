@@ -36,6 +36,7 @@ jobs:
         run: |
           cd functions/ts
           npm run kpt:docker-build -- --tag=latest
+          npm run kpt:docker-build -- --tag=stable
       - name: Run all e2e tests
         run: |
           sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
@@ -45,3 +46,4 @@ jobs:
         run: |
           cd functions/ts
           npm run kpt:docker-push -- --tag=latest
+          npm run kpt:docker-push -- --tag=stable
