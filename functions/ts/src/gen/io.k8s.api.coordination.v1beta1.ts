@@ -63,7 +63,7 @@ export class LeaseList {
 
   constructor(desc: LeaseList) {
     this.apiVersion = LeaseList.apiVersion;
-    this.items = desc.items.map(i => new Lease(i));
+    this.items = desc.items.map((i) => new Lease(i));
     this.kind = LeaseList.kind;
     this.metadata = desc.metadata;
   }

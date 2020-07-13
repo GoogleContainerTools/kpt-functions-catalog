@@ -74,7 +74,7 @@ function addIstioResults(
   configs: Configs
 ) {
   if (outputs && outputs.length) {
-    outputs.forEach(output => {
+    outputs.forEach((output) => {
       const result = kubernetesObjectResult(
         output.message,
         object,

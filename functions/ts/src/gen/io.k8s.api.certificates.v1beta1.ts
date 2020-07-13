@@ -92,7 +92,7 @@ export class CertificateSigningRequestList {
 
   constructor(desc: CertificateSigningRequestList) {
     this.apiVersion = CertificateSigningRequestList.apiVersion;
-    this.items = desc.items.map(i => new CertificateSigningRequest(i));
+    this.items = desc.items.map((i) => new CertificateSigningRequest(i));
     this.kind = CertificateSigningRequestList.kind;
     this.metadata = desc.metadata;
   }

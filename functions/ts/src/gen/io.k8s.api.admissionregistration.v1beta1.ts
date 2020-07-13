@@ -161,7 +161,7 @@ export class MutatingWebhookConfigurationList {
 
   constructor(desc: MutatingWebhookConfigurationList) {
     this.apiVersion = MutatingWebhookConfigurationList.apiVersion;
-    this.items = desc.items.map(i => new MutatingWebhookConfiguration(i));
+    this.items = desc.items.map((i) => new MutatingWebhookConfiguration(i));
     this.kind = MutatingWebhookConfigurationList.kind;
     this.metadata = desc.metadata;
   }
@@ -389,7 +389,7 @@ export class ValidatingWebhookConfigurationList {
 
   constructor(desc: ValidatingWebhookConfigurationList) {
     this.apiVersion = ValidatingWebhookConfigurationList.apiVersion;
-    this.items = desc.items.map(i => new ValidatingWebhookConfiguration(i));
+    this.items = desc.items.map((i) => new ValidatingWebhookConfiguration(i));
     this.kind = ValidatingWebhookConfigurationList.kind;
     this.metadata = desc.metadata;
   }

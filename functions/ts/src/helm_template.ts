@@ -33,7 +33,7 @@ export async function helmTemplate(configs: Configs) {
     const child = spawnSync('helm', args);
     error = child.stderr;
     let objects = safeLoadAll(child.stdout);
-    objects = objects.filter(o => isKubernetesObject(o));
+    objects = objects.filter((o) => isKubernetesObject(o));
     configs.insert(...objects);
   } catch (err) {
     configs.addResults(generalResult(err, 'error'));
