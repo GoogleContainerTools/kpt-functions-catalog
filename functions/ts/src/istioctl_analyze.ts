@@ -52,7 +52,7 @@ export async function istioctlAnalyze(configs: Configs) {
       if (error && error.length > 0) {
         configs.addResults(
           configFileResult(
-            `Istioctl analyze command results in error: ${error}`,
+            `Istioctl analyze command results in error: ${error.toString}`,
             '',
             'error'
           )
@@ -74,7 +74,7 @@ function addIstioResults(
   configs: Configs
 ) {
   if (outputs && outputs.length) {
-    outputs.forEach(output => {
+    outputs.forEach((output) => {
       const result = kubernetesObjectResult(
         output.message,
         object,
@@ -95,6 +95,9 @@ function readArguments(configs: Configs) {
   // Initialize to output json
   const args: string[] = ['analyze', '-', '-o', 'json'];
   const configMap = configs.getFunctionConfigMap();
+  if (!configMap) {
+    return args;
+  }
   configMap.forEach((value: string, key: string) => {
     if (key === FLAG_ARGS) {
       args.push(value);

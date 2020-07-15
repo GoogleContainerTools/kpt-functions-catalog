@@ -138,14 +138,14 @@ function buildKubevalArgs(
 
 function writeToStream(stream: Writable, data: string): Promise<void> {
   return new Promise((resolve, reject) =>
-    stream.write(data, 'utf-8', err => (err ? reject(err) : resolve()))
+    stream.write(data, 'utf-8', (err) => (err ? reject(err) : resolve()))
   );
 }
 
 function readStdoutToString(childProcess: ChildProcess): Promise<string> {
-  return new Promise<string>(resolve => {
+  return new Promise<string>((resolve) => {
     let result = '';
-    childProcess.stdout!!.on('data', data => {
+    childProcess.stdout!!.on('data', (data) => {
       result += data.toString();
     });
     childProcess.on('close', () => {

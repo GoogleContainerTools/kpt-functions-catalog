@@ -33,14 +33,17 @@ export async function helmTemplate(configs: Configs) {
     const child = spawnSync('helm', args);
     error = child.stderr;
     let objects = safeLoadAll(child.stdout);
-    objects = objects.filter(o => isKubernetesObject(o));
+    objects = objects.filter((o) => isKubernetesObject(o));
     configs.insert(...objects);
   } catch (err) {
     configs.addResults(generalResult(err, 'error'));
   }
   if (error && error.length > 0) {
     configs.addResults(
-      generalResult(`Helm template command results in error: ${error}`, 'error')
+      generalResult(
+        `Helm template command results in error: ${error.toString()}`,
+        'error'
+      )
     );
   }
 }
@@ -50,6 +53,9 @@ function readArguments(configs: Configs) {
   let nameArg;
   let pathArg;
   const configMap = configs.getFunctionConfigMap();
+  if (!configMap) {
+    return args;
+  }
   configMap.forEach((value: string, key: string) => {
     if (key === CHART_NAME) {
       nameArg = value;

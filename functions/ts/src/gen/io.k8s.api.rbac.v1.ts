@@ -131,7 +131,7 @@ export class ClusterRoleBindingList {
 
   constructor(desc: ClusterRoleBindingList) {
     this.apiVersion = ClusterRoleBindingList.apiVersion;
-    this.items = desc.items.map(i => new ClusterRoleBinding(i));
+    this.items = desc.items.map((i) => new ClusterRoleBinding(i));
     this.kind = ClusterRoleBindingList.kind;
     this.metadata = desc.metadata;
   }
@@ -177,7 +177,7 @@ export class ClusterRoleList {
 
   constructor(desc: ClusterRoleList) {
     this.apiVersion = ClusterRoleList.apiVersion;
-    this.items = desc.items.map(i => new ClusterRole(i));
+    this.items = desc.items.map((i) => new ClusterRole(i));
     this.kind = ClusterRoleList.kind;
     this.metadata = desc.metadata;
   }
@@ -346,7 +346,7 @@ export class RoleBindingList {
 
   constructor(desc: RoleBindingList) {
     this.apiVersion = RoleBindingList.apiVersion;
-    this.items = desc.items.map(i => new RoleBinding(i));
+    this.items = desc.items.map((i) => new RoleBinding(i));
     this.kind = RoleBindingList.kind;
     this.metadata = desc.metadata;
   }
@@ -392,7 +392,7 @@ export class RoleList {
 
   constructor(desc: RoleList) {
     this.apiVersion = RoleList.apiVersion;
-    this.items = desc.items.map(i => new Role(i));
+    this.items = desc.items.map((i) => new Role(i));
     this.kind = RoleList.kind;
     this.metadata = desc.metadata;
   }

@@ -94,7 +94,7 @@ export class HorizontalPodAutoscalerList {
 
   constructor(desc: HorizontalPodAutoscalerList) {
     this.apiVersion = HorizontalPodAutoscalerList.apiVersion;
-    this.items = desc.items.map(i => new HorizontalPodAutoscaler(i));
+    this.items = desc.items.map((i) => new HorizontalPodAutoscaler(i));
     this.kind = HorizontalPodAutoscalerList.kind;
     this.metadata = desc.metadata;
   }

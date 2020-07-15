@@ -100,7 +100,7 @@ export class NetworkPolicyList {
 
   constructor(desc: NetworkPolicyList) {
     this.apiVersion = NetworkPolicyList.apiVersion;
-    this.items = desc.items.map(i => new NetworkPolicy(i));
+    this.items = desc.items.map((i) => new NetworkPolicy(i));
     this.kind = NetworkPolicyList.kind;
     this.metadata = desc.metadata;
   }

@@ -84,7 +84,7 @@ export class PriorityClassList {
 
   constructor(desc: PriorityClassList) {
     this.apiVersion = PriorityClassList.apiVersion;
-    this.items = desc.items.map(i => new PriorityClass(i));
+    this.items = desc.items.map((i) => new PriorityClass(i));
     this.kind = PriorityClassList.kind;
     this.metadata = desc.metadata;
   }

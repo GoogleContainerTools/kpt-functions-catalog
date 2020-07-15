@@ -144,7 +144,7 @@ export class CustomResourceDefinitionList {
 
   constructor(desc: CustomResourceDefinitionList) {
     this.apiVersion = CustomResourceDefinitionList.apiVersion;
-    this.items = desc.items.map(i => new CustomResourceDefinition(i));
+    this.items = desc.items.map((i) => new CustomResourceDefinition(i));
     this.kind = CustomResourceDefinitionList.kind;
     this.metadata = desc.metadata;
   }

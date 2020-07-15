@@ -149,7 +149,7 @@ export class EventList {
 
   constructor(desc: EventList) {
     this.apiVersion = EventList.apiVersion;
-    this.items = desc.items.map(i => new Event(i));
+    this.items = desc.items.map((i) => new Event(i));
     this.kind = EventList.kind;
     this.metadata = desc.metadata;
   }
