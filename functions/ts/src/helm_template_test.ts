@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-import { Configs, TestRunner, FunctionConfigError } from 'kpt-functions';
+import { Configs, TestRunner } from 'kpt-functions';
 import { helmTemplate } from './helm_template';
 import { Namespace } from './gen/io.k8s.api.core.v1';
 
 const RUNNER = new TestRunner(helmTemplate);
 
 describe('helmTemplate', () => {
-  it('outputs error given undefined function config', async () => {
-    const input = new Configs(undefined, undefined);
-
-    await RUNNER.assert(
-      input,
-      new Configs(undefined),
-      FunctionConfigError,
-      'functionConfig expected, instead undefined'
-    );
-  });
-
   const namespace = Namespace.named('namespace');
   it('outputs error given namespace function config', async () => {
     const input = new Configs(undefined, namespace);

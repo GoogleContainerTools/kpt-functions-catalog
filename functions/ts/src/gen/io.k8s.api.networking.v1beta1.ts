@@ -110,7 +110,7 @@ export class IngressList {
 
   constructor(desc: IngressList) {
     this.apiVersion = IngressList.apiVersion;
-    this.items = desc.items.map(i => new Ingress(i));
+    this.items = desc.items.map((i) => new Ingress(i));
     this.kind = IngressList.kind;
     this.metadata = desc.metadata;
   }

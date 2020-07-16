@@ -15,14 +15,8 @@
  */
 
 import { safeLoadAll } from 'js-yaml';
-import {
-  Configs,
-  FunctionConfigError,
-  isKubernetesObject,
-  generalResult,
-} from 'kpt-functions';
+import { Configs, isKubernetesObject, generalResult } from 'kpt-functions';
 import { spawnSync } from 'child_process';
-import { isConfigMap } from './gen/io.k8s.api.core.v1';
 
 const CHART_NAME = 'name';
 const CHART_PATH = 'chart_path';
@@ -39,14 +33,17 @@ export async function helmTemplate(configs: Configs) {
     const child = spawnSync('helm', args);
     error = child.stderr;
     let objects = safeLoadAll(child.stdout);
-    objects = objects.filter(o => isKubernetesObject(o));
+    objects = objects.filter((o) => isKubernetesObject(o));
     configs.insert(...objects);
   } catch (err) {
     configs.addResults(generalResult(err, 'error'));
   }
   if (error && error.length > 0) {
     configs.addResults(
-      generalResult(`Helm template command results in error: ${error}`, 'error')
+      generalResult(
+        `Helm template command results in error: ${error.toString()}`,
+        'error'
+      )
     );
   }
 }
@@ -55,17 +52,20 @@ function readArguments(configs: Configs) {
   const args: string[] = [];
   let nameArg;
   let pathArg;
-  const data = readConfigDataOrThrow(configs);
-  for (const key in data) {
-    if (key === CHART_NAME) {
-      nameArg = data[key];
-    } else if (key === CHART_PATH) {
-      pathArg = data[key];
-    } else if (data.hasOwnProperty(key)) {
-      args.push(key);
-      args.push(data[key]);
-    }
+  const configMap = configs.getFunctionConfigMap();
+  if (!configMap) {
+    return args;
   }
+  configMap.forEach((value: string, key: string) => {
+    if (key === CHART_NAME) {
+      nameArg = value;
+    } else if (key === CHART_PATH) {
+      pathArg = value;
+    } else {
+      args.push(key);
+      args.push(value);
+    }
+  });
 
   // Helm template expects name and chart path first so place those at the beginning
   if (pathArg) {
@@ -76,24 +76,6 @@ function readArguments(configs: Configs) {
   }
 
   return args;
-}
-
-function readConfigDataOrThrow(configs: Configs) {
-  const cm = configs.getFunctionConfig();
-  if (!cm) {
-    throw new FunctionConfigError(`functionConfig expected, instead undefined`);
-  }
-  if (!isConfigMap(cm)) {
-    throw new FunctionConfigError(
-      `functionConfig expected to be of kind ConfigMap, instead got: ${cm.kind}`
-    );
-  }
-  if (!cm.data) {
-    throw new FunctionConfigError(
-      `functionConfig expected to contain data, instead empty`
-    );
-  }
-  return cm.data;
 }
 
 helmTemplate.usage = `

@@ -110,7 +110,7 @@ export class StorageClassList {
 
   constructor(desc: StorageClassList) {
     this.apiVersion = StorageClassList.apiVersion;
-    this.items = desc.items.map(i => new StorageClass(i));
+    this.items = desc.items.map((i) => new StorageClass(i));
     this.kind = StorageClassList.kind;
     this.metadata = desc.metadata;
   }
@@ -213,7 +213,7 @@ export class VolumeAttachmentList {
 
   constructor(desc: VolumeAttachmentList) {
     this.apiVersion = VolumeAttachmentList.apiVersion;
-    this.items = desc.items.map(i => new VolumeAttachment(i));
+    this.items = desc.items.map((i) => new VolumeAttachment(i));
     this.kind = VolumeAttachmentList.kind;
     this.metadata = desc.metadata;
   }

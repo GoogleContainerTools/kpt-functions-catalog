@@ -131,7 +131,7 @@ export class DaemonSetList {
 
   constructor(desc: DaemonSetList) {
     this.apiVersion = DaemonSetList.apiVersion;
-    this.items = desc.items.map(i => new DaemonSet(i));
+    this.items = desc.items.map((i) => new DaemonSet(i));
     this.kind = DaemonSetList.kind;
     this.metadata = desc.metadata;
   }
@@ -346,7 +346,7 @@ export class DeploymentList {
 
   constructor(desc: DeploymentList) {
     this.apiVersion = DeploymentList.apiVersion;
-    this.items = desc.items.map(i => new Deployment(i));
+    this.items = desc.items.map((i) => new Deployment(i));
     this.kind = DeploymentList.kind;
     this.metadata = desc.metadata;
   }
@@ -665,7 +665,7 @@ export class IngressList {
 
   constructor(desc: IngressList) {
     this.apiVersion = IngressList.apiVersion;
-    this.items = desc.items.map(i => new Ingress(i));
+    this.items = desc.items.map((i) => new Ingress(i));
     this.kind = IngressList.kind;
     this.metadata = desc.metadata;
   }
@@ -817,7 +817,7 @@ export class NetworkPolicyList {
 
   constructor(desc: NetworkPolicyList) {
     this.apiVersion = NetworkPolicyList.apiVersion;
-    this.items = desc.items.map(i => new NetworkPolicy(i));
+    this.items = desc.items.map((i) => new NetworkPolicy(i));
     this.kind = NetworkPolicyList.kind;
     this.metadata = desc.metadata;
   }
@@ -960,7 +960,7 @@ export class PodSecurityPolicyList {
 
   constructor(desc: PodSecurityPolicyList) {
     this.apiVersion = PodSecurityPolicyList.apiVersion;
-    this.items = desc.items.map(i => new PodSecurityPolicy(i));
+    this.items = desc.items.map((i) => new PodSecurityPolicy(i));
     this.kind = PodSecurityPolicyList.kind;
     this.metadata = desc.metadata;
   }
@@ -1193,7 +1193,7 @@ export class ReplicaSetList {
 
   constructor(desc: ReplicaSetList) {
     this.apiVersion = ReplicaSetList.apiVersion;
-    this.items = desc.items.map(i => new ReplicaSet(i));
+    this.items = desc.items.map((i) => new ReplicaSet(i));
     this.kind = ReplicaSetList.kind;
     this.metadata = desc.metadata;
   }
