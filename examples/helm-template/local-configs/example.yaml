@@ -1,12 +1,11 @@
-# call `kpt fn run` on a directory containing this file
+# call `kpt fn run` on a directory containing this file, mounting the helm chart at /source
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo
+  name: my-func-config
   annotations:
     config.kubernetes.io/function: |
       container:
         image: gcr.io/kpt-functions/helm-template
 data:
-  name: my-demo
-  chart: helloworld-chart
+  chart: /source
