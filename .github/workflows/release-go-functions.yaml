@@ -1,0 +1,43 @@
+name: release-go-functions
+
+on:
+  push:
+    tags:
+      - release-go-functions-*
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
+      GO111MODULE: on
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up gcloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '285.0.0'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+      # Configure docker to use the gcloud command-line tool as a credential helper
+      - run: gcloud auth configure-docker
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+      - name: Check out code into GOPATH
+        uses: actions/checkout@v1
+        with:
+          path: go/src/github.com/${{ github.repository }}
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}
+      - name: Publish images to container registry
+        run: |
+          cd functions/go
+          ./publish-functions.sh
+        env:
+          TAG: ${{ steps.branch_name.outputs.TAG_NAME }}
