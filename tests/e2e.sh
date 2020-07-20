@@ -103,12 +103,24 @@ assert_dir_exists default
 assert_contains_string default/configmap_my-haproxy-ingress-controller.yaml "name: my-haproxy-ingress"
 assert_contains_string default/secret_my-redis.yaml "name: my-redis"
 
-testcase "docker_kustomize_build_git"
-docker run -u "$(id -u)" gcr.io/kpt-functions/kustomize-build -d path=https://github.com/kubernetes-sigs/kustomize/examples/multibases/ |
-  docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
+############################
+# kpt fn Tests
+############################
+
+testcase "kpt_kustomize_build_git"
+kpt fn run . --image gcr.io/kpt-functions/kustomize-build -- path=https://github.com/kubernetes-sigs/kustomize/examples/multibases/
 assert_contains_string pod_cluster-a-staging-myapp-pod.yaml "name: cluster-a-staging-myapp-pod"
 
-testcase "docker_kustomize_build_extra_args"
+testcase "kpt_kustomize_build_imperative"
+kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
+kpt fn run --mount type=bind,src="$(pwd)",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/helloWorld
+assert_contains_string configmap_the-map.yaml "app: hello"
+
+testcase "kpt_kustomize_build_declarative"
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog/examples/kustomize-build@kustomize-build-example . || true
+kpt fn run kustomize-build/local-configs --mount type=bind,src="$(pwd)"/kustomize-build/kustomize-dir,dst=/source
+
+testcase "kpt_kustomize_build_fn_path"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
 cat >fc.yaml <<EOF
 apiVersion: v1
@@ -124,26 +136,16 @@ data:
   path: /source/helloWorld
   --output: /source/kustomize_build_output.yaml
 EOF
-docker run -u "$(id -u)" --mount type=bind,src="$(pwd)",dst=/source gcr.io/kpt-functions/kustomize-build:"${TAG}" -f /source/fc.yaml
+kpt fn run . --mount type=bind,src="$(pwd)",dst=/source --fn-path fc.yaml
 assert_contains_string kustomize_build_output.yaml "app: hello"
 
-testcase "docker_kustomize_build_sink"
-kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
-docker run -u "$(id -u)" --mount type=bind,src="$(pwd)",dst=/source gcr.io/kpt-functions/kustomize-build:"${TAG}" -d path=/source/helloWorld |
-  docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
-assert_contains_string configmap_the-map.yaml "app: hello"
-
-testcase "docker_kustomize_build_pipeline"
+testcase "kpt_kustomize_build_pipeline"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples examples
-docker run -u "$(id -u)" --mount type=bind,src="$(pwd)/examples",dst=/source gcr.io/kpt-functions/kustomize-build:"${TAG}" -d path=/source/loadHttp |
-  docker run -i -u "$(id -u)" --mount type=bind,src="$(pwd)/examples",dst=/source gcr.io/kpt-functions/kustomize-build:"${TAG}" -d path=/source/helloWorld |
-  docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
+kpt fn run --mount type=bind,src="$(pwd)/examples",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/loadHttp |
+  kpt fn run --mount type=bind,src="$(pwd)/examples",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/helloWorld |
+  kpt fn sink .
 assert_contains_string configmap_the-map.yaml "app: hello"
 assert_dir_exists knative-serving
-
-############################
-# kpt fn Tests
-############################
 
 testcase "kpt_set_namespace_go_docker_success"
 kpt pkg get $SDK_REPO/example-configs example-configs
