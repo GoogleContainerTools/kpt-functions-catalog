@@ -1,24 +1,20 @@
 # Helm Template
 
-This is an example of invoking the helm template function using declarative configuration.
+The `helm-template` config function generates a new kpt package from a local Helm chart. This
+example invokes the helm template function using declarative configuration.
 
 ## Function invocation
 
-The function is invoked by authoring a function configuration in local-configs/example.yaml
-with `metadata.annotations.[config.kubernetes.io/function]` set to
-`gcr.io/kpt-functions/helm-template`.
+The function is invoked using the function configuration in `local-configs/example.yaml`.
 
 Get this example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/helm-template .
-cd helm-template; kpt cfg cat local-configs
-kpt fn run local-configs --mount type=bind,src=$(pwd)/helloworld-chart,dst=/source
+kpt fn run helm-template/local-configs --mount type=bind,src=$(pwd)/helloworld-chart,dst=/source
 ```
 
-The first commands fetch this example and show that `local-configs` only contains `example.yaml`.
-
-The last command:
+The first commands fetches this example. The last command:
 
 * loads the chart directory from `helloworld-chart` into `/source` (from the `--mount` flag)
 * reads configs from the `local-configs` folder (from invoking `kpt fn run` on `local-configs`)
