@@ -78,7 +78,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/helm-template:${TAG}
+        image: gcr.io/kpt-functions/helm-template:${TAG}
     config.kubernetes.io/local-config: "true"
 data:
   name: extra-args
@@ -103,22 +103,27 @@ assert_dir_exists default
 assert_contains_string default/configmap_my-haproxy-ingress-controller.yaml "name: my-haproxy-ingress"
 assert_contains_string default/secret_my-redis.yaml "name: my-redis"
 
+# TODO: Revisit after adressing https://github.com/GoogleContainerTools/kpt/issues/839
+testcase "docker_kustomize_build_git"
+docker run -u "$(id -u)" gcr.io/kpt-functions/kustomize-build -d path=https://github.com/kubernetes-sigs/kustomize/examples/multibases/ |
+  docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
+assert_contains_string pod_cluster-a-staging-myapp-pod.yaml "name: cluster-a-staging-myapp-pod"
+
 ############################
 # kpt fn Tests
 ############################
 
-testcase "kpt_kustomize_build_git"
-kpt fn run . --image gcr.io/kpt-functions/kustomize-build -- path=https://github.com/kubernetes-sigs/kustomize/examples/multibases/
-assert_contains_string pod_cluster-a-staging-myapp-pod.yaml "name: cluster-a-staging-myapp-pod"
-
 testcase "kpt_kustomize_build_imperative"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
-kpt fn run --mount type=bind,src="$(pwd)",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/helloWorld
+kpt fn source helloWorld |
+  kpt fn run --mount type=bind,src="$(pwd)",dst=/source,rw=true --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/helloWorld |
+  kpt fn sink .
 assert_contains_string configmap_the-map.yaml "app: hello"
 
 testcase "kpt_kustomize_build_declarative"
 kpt pkg get https://github.com/prachirp/kpt-functions-catalog/examples/kustomize-build@kustomize-build-example . || true
 kpt fn run kustomize-build/local-configs --mount type=bind,src="$(pwd)"/kustomize-build/kustomize-dir,dst=/source
+assert_contains_string kustomize-build/local-configs/configmap_example-cm.yaml "name: example-cm"
 
 testcase "kpt_kustomize_build_fn_path"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
@@ -130,19 +135,20 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kustomize-build:${TAG}
+        image: gcr.io/kpt-functions/kustomize-build:${TAG}
     config.kubernetes.io/local-config: "true"
 data:
   path: /source/helloWorld
   --output: /source/kustomize_build_output.yaml
 EOF
-kpt fn run . --mount type=bind,src="$(pwd)",dst=/source --fn-path fc.yaml
+kpt fn run . --mount type=bind,src="$(pwd)",dst=/source,rw=true --fn-path fc.yaml
 assert_contains_string kustomize_build_output.yaml "app: hello"
 
 testcase "kpt_kustomize_build_pipeline"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples examples
-kpt fn run --mount type=bind,src="$(pwd)/examples",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/loadHttp |
-  kpt fn run --mount type=bind,src="$(pwd)/examples",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/helloWorld |
+kpt fn source examples |
+  kpt fn run --mount type=bind,src="$(pwd)/examples",dst=/source,rw=true --network --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/loadHttp |
+  kpt fn run --mount type=bind,src="$(pwd)/examples",dst=/source,rw=true --network --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/helloWorld |
   kpt fn sink .
 assert_contains_string configmap_the-map.yaml "app: hello"
 assert_dir_exists knative-serving
@@ -186,7 +192,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/istioctl-analyze:${TAG}
+        image: gcr.io/kpt-functions/istioctl-analyze:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "flags": [ "--recursive" ]
@@ -207,7 +213,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/istioctl-analyze:${TAG}
+        image: gcr.io/kpt-functions/istioctl-analyze:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "flags": [ "--recursive" ]
@@ -226,7 +232,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kubeval:${TAG}
+        image: gcr.io/kpt-functions/kubeval:${TAG}
         network:
           required: true
     config.kubernetes.io/local-config: 'true'
@@ -247,7 +253,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kubeval:${TAG}
+        image: gcr.io/kpt-functions/kubeval:${TAG}
         network:
           required: true
     config.kubernetes.io/local-config: 'true'
