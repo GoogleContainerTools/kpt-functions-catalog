@@ -40,4 +40,4 @@ jobs:
           cd functions/go
           ./publish-functions.sh
         env:
-          TAG: ${{ steps.branch_name.outputs.TAG_NAME }}
+          TAG: ${{ steps.get_version.outputs.TAG_NAME }}
