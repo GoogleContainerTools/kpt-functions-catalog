@@ -15,7 +15,12 @@
 
 set -euo pipefail
 
+# if the `TAG` environment variable is not defined, set image_tag to `latest`.
 image_tag=${TAG:-latest}
+
+# if `image_tag` starts with "release-go-functions-", remove the prefix.
+prefix="release-go-functions-"
+[[ "${image_tag}" = "${prefix}"* ]] && image_tag="${image_tag#$prefix}"
 
 # iterate over each subdir, build and push Docker images.
 for dir in  */
