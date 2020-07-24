@@ -24,7 +24,7 @@ source "$DIR"/common.sh
 ############################
 # Docker Tests
 ############################
-[[ -z ${NODOCKER} ]] || {
+[[ -z "${NODOCKER}" ]] || {
   echo "Skipping docker tests"
   exit 0
 }

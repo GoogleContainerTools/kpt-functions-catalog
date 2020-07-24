@@ -24,13 +24,13 @@ source "$DIR"/common.sh
 ############################
 # Docker Tests
 ############################
-[[ -z ${NODOCKER} ]] || {
+[[ -z "${NODOCKER}" ]] || {
   echo "Skipping docker tests"
   exit 0
 }
 
 testcase "docker_kustomize_build_imperative_git"
-docker run -u "$(id -u)" gcr.io/kpt-functions/kustomize-build -d path=https://github.com/kubernetes-sigs/kustomize/examples/multibases/ |
+docker run -u "$(id -u)" gcr.io/kpt-functions/kustomize-build:"${TAG}" -d path=https://github.com/kubernetes-sigs/kustomize/examples/multibases/ |
   docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
 assert_contains_string pod_cluster-a-staging-myapp-pod.yaml "name: cluster-a-staging-myapp-pod"
 
