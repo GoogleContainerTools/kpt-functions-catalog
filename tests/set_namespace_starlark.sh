@@ -18,6 +18,7 @@
 
 set -eo pipefail
 DIR="$(dirname "$0")"
+# shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
 ############################

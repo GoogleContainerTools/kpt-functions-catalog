@@ -21,8 +21,8 @@ set -eo pipefail
 TAG=${TAG:-dev}
 NODOCKER=${NODOCKER:-}
 SDK_REPO=https://github.com/GoogleContainerTools/kpt-functions-sdk
-CATALOG_REPO=https://github.com/GoogleContainerTools/kpt-functions-catalog
-CHARTS_SRC="charts/bitnami"
+export CATALOG_REPO=https://github.com/GoogleContainerTools/kpt-functions-catalog
+export CHARTS_SRC="charts/bitnami"
 
 ############################
 # Test framework
