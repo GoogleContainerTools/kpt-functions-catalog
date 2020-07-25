@@ -46,7 +46,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/annotate-config:${TAG}
+        image: gcr.io/kpt-functions/annotate-config:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   annotation_name: configmanagement.gke.io/namespace-selector
@@ -78,7 +78,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/annotate-config:${TAG}
+        image: gcr.io/kpt-functions/annotate-config:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   annotation_name: configmanagement.gke.io/namespace-selector

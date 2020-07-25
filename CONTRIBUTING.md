@@ -23,10 +23,11 @@ to this catalog by making the following changes:
    following the [kpt contribution guidelines].
 5. Reach out to the maintainers to publish the function.
 
-After finishing these changes, you'll make two PRs and request reviews.
-You can follow the pull request structure below:
+Make PRs and request reviews for these changes. You can follow the pull request
+changes below:
 
 * [function implementation PR]
+* [example and e2e test PR]
 * [catalog documentation PR]
 
 ### Code Changes
@@ -74,6 +75,7 @@ from you!
 [examples/]: examples/
 [e2e tests]: tests/e2e.sh
 [function implementation PR]: https://github.com/GoogleContainerTools/kpt-functions-catalog/pull/61/
+[example and e2e test PR]: https://github.com/GoogleContainerTools/kpt-functions-catalog/pull/71
 [catalog documentation PR]: https://github.com/GoogleContainerTools/kpt/pull/785/
 [Slack channel]: https://kubernetes.slack.com/channels/kpt/
 [email list]: https://groups.google.com/forum/?oldui=1#!forum/kpt-users

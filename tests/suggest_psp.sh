@@ -56,7 +56,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/suggest-psp:${TAG}
+        image: gcr.io/kpt-functions/suggest-psp:${TAG}
     config.kubernetes.io/local-config: 'true'
 EOF
 kpt fn source example-configs |
