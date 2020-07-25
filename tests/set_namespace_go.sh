@@ -25,12 +25,12 @@ source "$DIR"/common.sh
 # kpt fn Tests
 ############################
 
-# Use the macos executable to test using kpt exec runtime
+# Use the macos executable to test using kpt exec runtime on macos
 if [ -n "${NODOCKER}" ]
 then
-testcase "kpt_set_namespace_go_exec_imperative_success_macos"
+testcase "kpt_set_namespace_go_exec_imperative_macos"
 kpt pkg get "$SDK_REPO"/example-configs example-configs
-kpt pkg get https://github.com/prachirp/kpt-functions-catalog/functions/go@e2e-revamp ./
+kpt pkg get "$CATALOG_REPO"/functions/go ./
 kpt fn run example-configs --enable-exec --exec-path "$(pwd)"/go/set-namespace/set-namespace-macos -- namespace=example-ns
 assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
 fi
@@ -40,13 +40,32 @@ fi
   exit 0
 }
 
-testcase "kpt_set_namespace_go_exec_imperative_success_linux"
+testcase "kpt_set_namespace_go_docker_imperative"
 kpt pkg get "$SDK_REPO"/example-configs example-configs
-kpt pkg get https://github.com/prachirp/kpt-functions-catalog/functions/go@e2e-revamp ./
-kpt fn run example-configs --enable-exec --exec-path "$(pwd)"/go/set-namespace/set-namespace-linux -- namespace=example-ns
+kpt fn run . --image gcr.io/kpt-functions/set-namespace:"${TAG}" -- namespace=example-ns
 assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
 
-testcase "kpt_set_namespace_go_docker_imperative_success"
+testcase "kpt_set_namespace_go_docker_declarative"
 kpt pkg get "$SDK_REPO"/example-configs example-configs
-kpt fn run . --image gcr.io/kpt-functions/set-namespace -- namespace=example-ns
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/set-namespace:${TAG}
+    config.kubernetes.io/local-config: 'true'
+data:
+  "namespace": "example-ns"
+EOF
+kpt fn run .
+assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
+
+# Use the linux executable to test using kpt exec runtime on linux
+testcase "kpt_set_namespace_go_exec_imperative_linux"
+kpt pkg get "$SDK_REPO"/example-configs example-configs
+kpt pkg get "$CATALOG_REPO"/functions/go ./
+kpt fn run example-configs --enable-exec --exec-path "$(pwd)"/go/set-namespace/set-namespace-linux -- namespace=example-ns
 assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"

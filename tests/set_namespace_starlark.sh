@@ -25,8 +25,12 @@ source "$DIR"/common.sh
 # kpt fn Tests
 ############################
 
-testcase "kpt_set_namespace_starlark_declarative_success"
+# TODO: Write imperative e2e test calling starlark
+# Blocked because passing arguments to `kpt fn run` puts them in the data field instead of the spec field
+# https://github.com/GoogleContainerTools/kpt/issues/757
+testcase "kpt_set_namespace_starlark_declarative"
 kpt pkg get "$SDK_REPO"/example-configs example-configs
+kpt pkg get "$CATALOG_REPO"/functions/starlark ./
 cat >fc.yaml <<EOF
 apiVersion: example.com/v1beta1
 kind: ExampleKind
@@ -39,6 +43,5 @@ metadata:
 spec:
   namespace_value: example-ns
 EOF
-kpt pkg get "$CATALOG_REPO"/functions/starlark ./
 kpt fn run . --enable-star
 assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
