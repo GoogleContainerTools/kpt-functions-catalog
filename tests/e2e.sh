@@ -19,11 +19,11 @@
 set -eo pipefail
 DIR="$(dirname "$0")"
 
-"$DIR"/annotate_config.sh
-"$DIR"/helm_template.sh
-"$DIR"/istioctl_analyze.sh
-"$DIR"/kubeval.sh
+#"$DIR"/annotate_config.sh
+#"$DIR"/helm_template.sh
+#"$DIR"/istioctl_analyze.sh
+#"$DIR"/kubeval.sh
 "$DIR"/kustomize_build.sh
-"$DIR"/set_namespace_go.sh
-"$DIR"/set_namespace_starlark.sh
-"$DIR"/suggest_psp.sh
+#"$DIR"/set_namespace_go.sh
+#"$DIR"/set_namespace_starlark.sh
+#"$DIR"/suggest_psp.sh
