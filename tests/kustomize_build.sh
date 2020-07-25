@@ -73,6 +73,8 @@ assert_dir_exists knative-serving
 
 testcase "kpt_kustomize_build_imperative"
 #docker --help
+echo "$(pwd)"
+ls -la ../
 kpt version
 which kpt
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
@@ -80,3 +82,8 @@ kpt fn source helloWorld |
   kpt fn run --mount type=bind,src="$(pwd)/helloWorld",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source |
   kpt fn sink .
 assert_contains_string configmap_the-map.yaml "app: hello"
+#just to compare
+kpt fn source helloWorld |
+  kpt fn run --mount type=bind,src="$(pwd)",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/helloWorld |
+  kpt fn sink . || echo 2nd test failed
+
