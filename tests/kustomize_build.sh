@@ -73,7 +73,7 @@ assert_dir_exists knative-serving
 
 testcase "kpt_kustomize_build_imperative"
 #docker --help
-echo "$(pwd)"
+pwd
 ls -la ../
 kpt version
 which kpt
