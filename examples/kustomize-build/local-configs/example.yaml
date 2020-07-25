@@ -6,8 +6,8 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kustomize-build
-    config.kubernetes.io/local-config: 'true'
+        image: gcr.io/kpt-functions/kustomize-build
+    config.kubernetes.io/local-config: "true"
 data:
   path: /source
-  '--reorder': none
+  "--reorder": none

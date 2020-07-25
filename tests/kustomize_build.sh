@@ -75,7 +75,7 @@ assert_dir_exists knative-serving
 testcase "kpt_kustomize_build_imperative"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
 kpt fn source helloWorld |
-  kpt fn run --mount type=bind,src="$(pwd)",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source/helloWorld |
+  kpt fn run --mount type=bind,src="$(pwd)/helloWorld",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source |
   kpt fn sink .
 assert_contains_string configmap_the-map.yaml "app: hello"
 
@@ -84,7 +84,7 @@ kpt pkg get https://github.com/prachirp/kpt-functions-catalog/examples/kustomize
 kpt fn run kustomize-build/local-configs --mount type=bind,src="$(pwd)"/kustomize-build/kustomize-dir,dst=/source
 assert_contains_string kustomize-build/local-configs/configmap_example-cm.yaml "name: example-cm"
 
-testcase "kpt_kustomize_build_fn_path"
+testcase "kpt_kustomize_build_declarative_fn_path"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
 cat >fc.yaml <<EOF
 apiVersion: v1
@@ -98,7 +98,7 @@ metadata:
     config.kubernetes.io/local-config: "true"
 data:
   path: /source
-  --output: kustomize_build_output.yaml
+  --load_restrictor: LoadRestrictionsNone
 EOF
 kpt fn run . --mount type=bind,src="$(pwd)/helloWorld",dst=/source --fn-path fc.yaml
 assert_contains_string kustomize_build_output.yaml "app: hello"
