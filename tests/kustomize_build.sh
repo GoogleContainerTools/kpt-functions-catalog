@@ -72,7 +72,7 @@ assert_dir_exists knative-serving
 ############################
 
 testcase "kpt_kustomize_build_imperative"
-docker verion
+docker --help
 kpt version
 which kpt
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
