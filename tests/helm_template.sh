@@ -67,3 +67,48 @@ docker run -u "$(id -u)" -v "$(pwd)/helm-charts":/source gcr.io/kpt-functions/he
 assert_dir_exists default
 assert_contains_string default/configmap_my-haproxy-ingress-controller.yaml "name: my-haproxy-ingress"
 assert_contains_string default/secret_my-redis.yaml "name: my-redis"
+
+############################
+# kpt fn Tests
+############################
+
+helm_testcase "kpt_helm_template_imperative_expected_args"
+kpt fn source example-configs |
+  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-template:"${TAG}" -- name=expected-args chart_path=/source/redis >out.yaml
+assert_contains_string out.yaml "expected-args"
+
+testcase "kpt_helm_template_declarative_example"
+# TODO: Remove error handling once kpt pkg get shows errors gracefully https://github.com/GoogleContainerTools/kpt/issues/838
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog/examples/helm-template@helm-template-example . || true
+kpt fn run helm-template/local-configs --mount type=bind,src="$(pwd)"/helm-template/helloworld-chart,dst=/source
+assert_contains_string helm-template/local-configs/deployment_chart-helloworld-chart.yaml "name: chart-helloworld-chart"
+
+helm_testcase "kpt_helm_template_declarative_fn_path"
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image:  gcr.io/kpt-functions/helm-template:${TAG}
+    config.kubernetes.io/local-config: "true"
+data:
+  name: extra-args
+  chart_path: /source
+  --values: /source/values-production.yaml
+EOF
+kpt fn source example-configs |
+  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}/redis",dst=/source --fn-path fc.yaml >out.yaml
+assert_contains_string out.yaml "name: extra-args-redis-master"
+
+helm_testcase "kpt_helm_template_imperative_pipeline"
+git clone -q https://github.com/helm/charts.git helm-charts
+kpt fn source example-configs |
+  kpt fn run --mount type=bind,src="$(pwd)/helm-charts",dst=/source --image gcr.io/kpt-functions/helm-template:"${TAG}" -- chart_path=/source/incubator/haproxy-ingress name=my-haproxy-ingress | 
+  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-template:"${TAG}" -- name=my-redis chart_path=/source/redis |
+  kpt fn sink .
+assert_dir_exists default
+assert_contains_string default/configmap_my-haproxy-ingress-controller.yaml "name: my-haproxy-ingress"
+assert_contains_string default/secret_my-redis.yaml "name: my-redis"
