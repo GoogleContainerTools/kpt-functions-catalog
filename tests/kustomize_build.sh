@@ -66,3 +66,17 @@ docker run -u "$(id -u)" --mount type=bind,src="$(pwd)/examples",dst=/source gcr
   docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
 assert_contains_string configmap_the-map.yaml "app: hello"
 assert_dir_exists knative-serving
+
+############################
+# kpt fn Tests
+############################
+
+testcase "kpt_kustomize_build_imperative"
+docker verion
+kpt version
+which kpt
+kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
+kpt fn source helloWorld |
+  kpt fn run --mount type=bind,src="$(pwd)/helloWorld",dst=/source --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=/source |
+  kpt fn sink .
+assert_contains_string configmap_the-map.yaml "app: hello"
