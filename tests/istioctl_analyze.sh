@@ -48,7 +48,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/istioctl-analyze:${TAG}
+        image: gcr.io/kpt-functions/istioctl-analyze:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "flags": [ "--recursive" ]
@@ -77,7 +77,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/istioctl-analyze:${TAG}
+        image: gcr.io/kpt-functions/istioctl-analyze:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "flags": [ "--recursive" ]
@@ -101,7 +101,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/istioctl-analyze:${TAG}
+        image: gcr.io/kpt-functions/istioctl-analyze:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "flags": [ "--recursive" ]
@@ -124,7 +124,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/istioctl-analyze:${TAG}
+        image: gcr.io/kpt-functions/istioctl-analyze:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "flags": [ "--recursive" ]
