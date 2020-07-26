@@ -43,7 +43,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/helm-template:${TAG}
+        image: gcr.io/kpt-functions/helm-template:${TAG}
     config.kubernetes.io/local-config: "true"
 data:
   name: extra-args
@@ -92,7 +92,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/helm-template:${TAG}
+        image: gcr.io/kpt-functions/helm-template:${TAG}
     config.kubernetes.io/local-config: "true"
 data:
   name: extra-args

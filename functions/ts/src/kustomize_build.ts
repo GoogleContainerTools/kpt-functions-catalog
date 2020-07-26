@@ -83,7 +83,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kustomize-build
+        image: gcr.io/kpt-functions/kustomize-build
     config.kubernetes.io/local-config: "true"
 data:
   ${BUILD_PATH}: /path/to/kustomization

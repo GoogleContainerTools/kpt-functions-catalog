@@ -45,7 +45,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kustomize-build:${TAG}
+        image: gcr.io/kpt-functions/kustomize-build:${TAG}
     config.kubernetes.io/local-config: "true"
 data:
   path: /source/helloWorld
