@@ -101,7 +101,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/helm-template
+        image: gcr.io/kpt-functions/helm-template
     config.kubernetes.io/local-config: "true"
 data:
   ${CHART_NAME}: my-chart

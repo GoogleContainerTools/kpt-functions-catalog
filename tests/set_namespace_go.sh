@@ -55,7 +55,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/set-namespace:${TAG}
+        image: gcr.io/kpt-functions/set-namespace:${TAG}
     config.kubernetes.io/local-config: 'true'
 data:
   "namespace": "example-ns"

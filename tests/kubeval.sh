@@ -47,7 +47,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kubeval:${TAG}
+        image: gcr.io/kpt-functions/kubeval:${TAG}
         network:
           required: true
     config.kubernetes.io/local-config: 'true'
@@ -74,7 +74,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kubeval:${TAG}
+        image: gcr.io/kpt-functions/kubeval:${TAG}
         network:
           required: true
     config.kubernetes.io/local-config: 'true'
@@ -105,7 +105,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kubeval:${TAG}
+        image: gcr.io/kpt-functions/kubeval:${TAG}
         network:
           required: true
     config.kubernetes.io/local-config: 'true'
@@ -132,7 +132,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image:  gcr.io/kpt-functions/kubeval:${TAG}
+        image: gcr.io/kpt-functions/kubeval:${TAG}
         network:
           required: true
     config.kubernetes.io/local-config: 'true'
