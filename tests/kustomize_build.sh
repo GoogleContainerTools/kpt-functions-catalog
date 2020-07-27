@@ -100,8 +100,8 @@ data:
   path: /source
   --load_restrictor: LoadRestrictionsNone
 EOF
-kpt fn run . --mount type=bind,src="$(pwd)/helloWorld",dst=/source --fn-path fc.yaml
-assert_contains_string kustomize_build_output.yaml "app: hello"
+kpt fn run . --mount type=bind,src="$(pwd)/helloWorld",dst=/source,rw=true --fn-path fc.yaml
+assert_contains_string configmap_the-map.yaml "app: hello"
 
 testcase "kpt_kustomize_build_imperative_pipeline"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples examples
