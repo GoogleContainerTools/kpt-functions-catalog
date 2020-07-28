@@ -80,7 +80,8 @@ kpt fn source helloWorld |
 assert_contains_string configmap_the-map.yaml "app: hello"
 
 testcase "kpt_kustomize_build_declarative_example"
-kpt pkg get https://github.com/prachirp/kpt-functions-catalog/examples/kustomize-build@kustomize-build-example . || true
+# TODO: Remove error handling once kpt pkg get shows errors gracefully https://github.com/GoogleContainerTools/kpt/issues/838
+kpt pkg get "$CATALOG_REPO"/examples/kustomize-build . || true
 kpt fn run kustomize-build/local-configs --mount type=bind,src="$(pwd)"/kustomize-build/kustomize-dir,dst=/source
 assert_contains_string kustomize-build/local-configs/configmap_example-cm.yaml "name: example-cm"
 
