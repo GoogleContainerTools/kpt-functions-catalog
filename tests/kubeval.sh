@@ -22,70 +22,12 @@ DIR="$(dirname "$0")"
 source "$DIR"/common.sh
 
 ############################
-# Docker Tests
+# kpt fn Tests
 ############################
 [[ -z "${NODOCKER}" ]] || {
   echo "Skipping docker tests"
   exit 0
 }
-
-testcase "docker_kubeval_imperative_no_errors"
-kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
-kpt fn source fixtures/valid* |
-  kpt fn run --network --image gcr.io/kpt-functions/kubeval:"${TAG}" >out.yaml
-if grep -q "results" out.yaml; then
-  fail "Validation error found using kubeval fixtures valid config: " "$(< out.yaml)"
-fi
-
-testcase "docker_kubeval_declarative_no_errors"
-kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
-cat >fc.yaml <<EOF
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-  annotations:
-    config.k8s.io/function: |
-      container:
-        image: gcr.io/kpt-functions/kubeval:${TAG}
-        network:
-          required: true
-    config.kubernetes.io/local-config: 'true'
-EOF
-kpt fn source fixtures/valid* |
-  kpt fn run --fn-path fc.yaml --network >out.yaml
-if grep -q "results" out.yaml; then
-  fail "Validation error found using kubeval fixtures valid config: " "$(< out.yaml)"
-fi
-
-testcase "docker_kubeval_imperative_finds_errors"
-kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
-kpt fn source fixtures/*invalid.yaml |
-  kpt fn run --network --image gcr.io/kpt-functions/kubeval:"${TAG}" 2>error.txt || true
-assert_contains_string error.txt "Invalid type. Expected: \[integer,null\], given: string"
-
-testcase "docker_kubeval_declarative_finds_errors"
-kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
-cat >fc.yaml <<EOF
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-  annotations:
-    config.k8s.io/function: |
-      container:
-        image: gcr.io/kpt-functions/kubeval:${TAG}
-        network:
-          required: true
-    config.kubernetes.io/local-config: 'true'
-EOF
-kpt fn source fixtures/*invalid.yaml |
-  kpt fn run --fn-path fc.yaml --network 2>error.txt || true
-assert_contains_string error.txt "Invalid type. Expected: \[integer,null\], given: string"
-
-############################
-# kpt fn Tests
-############################
 
 testcase "kpt_kubeval_imperative_no_errors"
 kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .

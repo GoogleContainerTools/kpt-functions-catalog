@@ -22,44 +22,12 @@ DIR="$(dirname "$0")"
 source "$DIR"/common.sh
 
 ############################
-# Docker Tests
+# kpt fn Tests
 ############################
 [[ -z "${NODOCKER}" ]] || {
   echo "Skipping docker tests"
   exit 0
 }
-
-testcase "docker_annotate_config_imperative"
-kpt pkg get "$SDK_REPO"/example-configs example-configs
-kpt fn source example-configs |
-  docker run -i -u "$(id -u)" gcr.io/kpt-functions/annotate-config:"${TAG}" -d annotation_name=configmanagement.gke.io/namespace-selector -d annotation_value=sre-supported |
-  kpt fn sink example-configs
-assert_contains_string example-configs/gatekeeper.yaml "configmanagement.gke.io/namespace-selector: sre-supported"
-
-testcase "docker_annotate_config_declarative"
-kpt pkg get "$SDK_REPO"/example-configs example-configs
-cat >fc.yaml <<EOF
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-  annotations:
-    config.k8s.io/function: |
-      container:
-        image: gcr.io/kpt-functions/annotate-config:${TAG}
-    config.kubernetes.io/local-config: 'true'
-data:
-  annotation_name: configmanagement.gke.io/namespace-selector
-  annotation_value: sre-supported
-EOF
-kpt fn source example-configs |
-  docker run -i -u "$(id -u)" --mount type=bind,src="$(pwd)",dst=/source gcr.io/kpt-functions/annotate-config:"${TAG}" -f /source/fc.yaml |
-  kpt fn sink example-configs
-assert_contains_string example-configs/gatekeeper.yaml "configmanagement.gke.io/namespace-selector: sre-supported"
-
-############################
-# kpt fn Tests
-############################
 
 testcase "kpt_annotate_config_imperative"
 kpt pkg get "$SDK_REPO"/example-configs example-configs
