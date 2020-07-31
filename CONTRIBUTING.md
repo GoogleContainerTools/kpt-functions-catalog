@@ -17,10 +17,10 @@ to this catalog by making the following changes:
 1. Make the code changes implementing the function and any unit tests. The code
    belongs under [functions/] in the appropriate directory.
 2. Create an example of how to run your function and put it under [examples/].
-3. Test running your function example imperatively and declaratively in [e2e tests]
-   These tests are run regularly and help catch regressions.
-4. Document your function in the config functions catalog on the [kpt website] by
-   following the [kpt contribution guidelines].
+3. Test running your function example imperatively and declaratively in
+   [e2e tests]. These tests are run regularly and help catch regressions.
+4. Document your function in the config functions catalog on the [kpt website]
+   by following the [kpt contribution guidelines].
 5. Reach out to the maintainers to publish the function.
 
 Make PRs and request reviews for these changes. You can follow the pull request
@@ -40,8 +40,8 @@ this simply gives us permission to use and redistribute your contributions as
 part of the project. Head over to <https://cla.developers.google.com/> to see
 your current agreements on file or to sign a new one.
 
-You generally only need to submit a CLA once, so if you've already submitted one
-(even if it was for a different project), you probably don't need to do it
+You generally only need to submit a CLA once, so if you've already submitted
+one (even if it was for a different project), you probably don't need to do it
 again.
 
 #### Code reviews
@@ -58,6 +58,18 @@ This catalog is documented on the [kpt website]. Follow the
 
 Changes to other documentation such as examples and README files can follow the
 same pull request format as code changes.
+
+## How to Release
+
+We have spearate a release process for each language, golang and typescript.
+All functions written in the language get released together. Maintainers can
+create releases through the Github UI or through the git CLI. Follow the
+commands below to release using the git CLI.
+
+```sh
+git tag release-ts-functions-v0.0.5
+git push upstream release-ts-functions-v0.0.5
+```
 
 ## Contact Us
 
