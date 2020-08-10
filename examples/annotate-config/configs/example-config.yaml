@@ -1,0 +1,21 @@
+# Example ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: the-map
+data:
+  some-key: some-value
+---
+# Example Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: the-service
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+  - port: 2380
+    name: etcd-server-ssl
+  - port: 2379
+    name: etcd-client-ssl
