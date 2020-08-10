@@ -46,6 +46,4 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 ENV PATH /usr/local/bin:$PATH
 
-ENV TMPDIR /tmp
-
 ENTRYPOINT ["node", "/home/node/app/dist/kustomize_build_run.js"]
