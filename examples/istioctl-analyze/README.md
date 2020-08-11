@@ -1,37 +1,34 @@
 # Istioctl Analyze
 
-The `istioctl-analyze` config function detects potential issues with your Istio
-configuration and output errors as results. This example invokes the
-istioctl-analyze function using declarative configuration.
+The `istioctl-analyze` KRM config function detects potential issues with your
+Istio configuration. It takes in a List of KRM configs sourced from a local
+package and outputs validation errors by adding a `results` field to the List.
+Kpt provides the `--results-dir` flag for users to specify a destination to
+write these results to. This example invokes the istioctl-analyze function
+using declarative configuration.
 
-## Function invocation
-
-The function is invoked using the function configuration in
-`functions/fn-config.yaml`.
+## Function Invocation
 
 Get this example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/istioctl-analyze .
-kpt fn run istioctl-analyze/configs --fn-path istioctl-analyze/functions --results-dir istioctl-analyze/results
+kpt fn run istioctl-analyze --results-dir /tmp
 ```
 
-The first command fetches this example. The last command:
-
-* reads configs from the `istioctl-analyze/configs` folder (from invoking
-  `kpt fn run` on `istioctl-analyze/configs`)
-* runs the function config from `istioctl-analyze/functions/fn-config.yaml`
-  (since it contains the function annotation `config.kubernetes.io/function`)
-* analyzes the configs from `istioctl-analyze/configs`
-* writes configs back into the `istioctl-analyze/configs` folder
+## Expected Results
 
 Check the results:
 
 ```sh
-kpt cfg cat istioctl-analyze/results
+kpt cfg cat /tmp/results-0.yaml
 ```
 
-The command results in an error
-`Port name  (port: 5000, targetPort: 0) doesn't follow the naming convention of Istio port`.
-Fix the error and rerun the `kpt fn run` command. This will return success (no
-output).
+They contain the following error:
+
+```sh
+Port name  (port: 5000, targetPort: 0) doesn\'t follow the naming convention of Istio port
+```
+
+The error comes from the `v1/Service//helloworld` resource. Fix the error and
+rerun the command. This will return success (no output).

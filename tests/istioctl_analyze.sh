@@ -95,5 +95,5 @@ assert_contains_string error.txt "Referenced selector not found"
 
 testcase "kpt_istioctl_analyze_declarative_example"
 kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/istioctl-analyze@istioctl-blueprint .
-kpt fn run istioctl-analyze/configs --fn-path istioctl-analyze/functions --results-dir istioctl-analyze/results
-assert_contains_string istioctl-analyze/results/results-0.yaml "Port name  (port: 5000, targetPort: 0) doesn''t follow the naming convention"
+kpt fn run istioctl-analyze --results-dir /tmp
+assert_contains_string /tmp/results-0.yaml "Port name  (port: 5000, targetPort: 0) doesn''t follow the naming convention"
