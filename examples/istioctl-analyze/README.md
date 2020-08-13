@@ -30,5 +30,5 @@ Schema validation error: gateway must have at least one server
 ```
 
 The error comes from the httpbin-gateway resource in
-`configs/example-config.yaml`. Fix the error and rerun the command. This will
-return success (no output).
+`configs/example-config.yaml`. Uncomment the servers section in that file to
+fix the error and rerun the command. This will return success (no output).
