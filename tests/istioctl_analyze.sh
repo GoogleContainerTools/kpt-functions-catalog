@@ -92,3 +92,8 @@ data:
 EOF
 kpt fn run testdata --fn-path fc.yaml 2>error.txt || true
 assert_contains_string error.txt "Referenced selector not found"
+
+testcase "kpt_istioctl_analyze_declarative_example"
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/istioctl-analyze@istioctl-blueprint .
+kpt fn run istioctl-analyze --results-dir /tmp || true
+assert_contains_string /tmp/results-0.yaml "Schema validation error: gateway must have at least one server"
