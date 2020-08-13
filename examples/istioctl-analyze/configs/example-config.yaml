@@ -5,6 +5,7 @@ metadata:
 spec:
   selector:
     istio: ingressgateway
+#   If gateway has no servers, the analyzer will report error.
 #   servers:
 #   - port:
 #       number: 80
