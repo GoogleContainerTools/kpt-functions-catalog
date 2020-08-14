@@ -20,7 +20,7 @@ The `--results-dir` flag let us specify a destination to write function results
 to. Check the results:
 
 ```sh
-kpt cfg cat /tmp/results-0.yaml
+cat /tmp/results-0.yaml
 ```
 
 They contain the following error:
