@@ -1,4 +1,3 @@
-# Example ConfigMap
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,7 +5,6 @@ metadata:
 data:
   some-key: some-value
 ---
-# Example Service
 apiVersion: v1
 kind: Service
 metadata:
