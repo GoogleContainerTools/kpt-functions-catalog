@@ -73,4 +73,4 @@ assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
 testcase "kpt_set_namespace_go_declarative_example"
 kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/set-namespace@namespace-blueprint .
 kpt fn run set-namespace/configs --fn-path set-namespace/functions
-assert_contains_string annotate-config/configs/example-config.yaml "namespace: example-ns"
+assert_contains_string set-namespace/configs/example-config.yaml "namespace: example-ns"
