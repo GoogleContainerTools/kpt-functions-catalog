@@ -86,5 +86,5 @@ assert_contains_string error.txt "Invalid type. Expected: \[integer,null\], give
 # TODO: Remove error handling once kpt pkg get shows errors gracefully https://github.com/GoogleContainerTools/kpt/issues/838
 testcase "kpt_kubeval_declarative_example"
 kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/kubeval@kubeval-blueprint .
-kpt fn run kubeval/config --network --results-dir kubeval/results || true
+kpt fn run kubeval --network --results-dir /tmp || true
 assert_contains_string kubeval/results/results-0.yaml "Invalid type. Expected: \[integer,null\], given: string"
