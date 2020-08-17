@@ -22,34 +22,12 @@ DIR="$(dirname "$0")"
 source "$DIR"/common.sh
 
 ############################
-# Docker Tests
+# kpt fn Tests
 ############################
 [[ -z "${NODOCKER}" ]] || {
   echo "Skipping docker tests"
   exit 0
 }
-
-# TODO: Convert these cases to kpt after fixing the following
-# https://github.com/GoogleContainerTools/kpt/issues/823
-# https://github.com/GoogleContainerTools/kpt/issues/824
-testcase "docker_istioctl_analyze_imperative_no_errors"
-kpt pkg get https://github.com/istio/istio.git/samples/addons .
-kpt fn source addons |
-  docker run -i -u "$(id -u)" gcr.io/kpt-functions/istioctl-analyze:"${TAG}" -d--use-kube=false 2>error.txt |
-  kpt fn sink addons
-if [ -s error.txt ]; then
-  fail "Validation error found using istio addons sample: " "$(< error.txt)"
-fi
-
-testcase "docker_istioctl_analyze_imperative_find_errors"
-kpt pkg get https://github.com/istio/istio.git/galley/pkg/config/analysis/analyzers/testdata .
-kpt fn source testdata |
-  docker run -u "$(id -u)" -i gcr.io/kpt-functions/istioctl-analyze:"${TAG}" -d--use-kube=false >out.yaml || true
-assert_contains_string out.yaml "Referenced gateway not found"
-
-############################
-# kpt fn Tests
-############################
 
 testcase "kpt_istioctl_analyze_declarative_no_errors"
 kpt pkg get https://github.com/istio/istio.git/samples/addons .
@@ -74,6 +52,13 @@ if [ -s error.txt ]; then
   fail "Validation error found using istio addons sample: " "$(< error.txt)"
 fi
 
+testcase "kpt_istioctl_analyze_imperative_no_errors"
+kpt pkg get https://github.com/istio/istio.git/samples/addons .
+kpt fn run addons --image gcr.io/kpt-functions/istioctl-analyze:"${TAG}" -- --use-kube=false 2>error.txt
+if [ -s error.txt ]; then
+  fail "Validation error found using istio addons sample: " "$(< error.txt)"
+fi
+
 testcase "kpt_istioctl_analyze_declarative_find_errors"
 kpt pkg get https://github.com/istio/istio.git/galley/pkg/config/analysis/analyzers/testdata .
 cat >fc.yaml <<EOF
@@ -93,7 +78,13 @@ EOF
 kpt fn run testdata --fn-path fc.yaml 2>error.txt || true
 assert_contains_string error.txt "Referenced selector not found"
 
+testcase "kpt_istioctl_analyze_imperative_find_errors"
+kpt pkg get https://github.com/istio/istio.git/galley/pkg/config/analysis/analyzers/testdata .
+kpt fn source testdata |
+  kpt fn run --image gcr.io/kpt-functions/istioctl-analyze:"${TAG}" -- --use-kube=false 2>error.txt || true
+assert_contains_string error.txt "Referenced gateway not found"
+
 testcase "kpt_istioctl_analyze_declarative_example"
-kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/istioctl-analyze@istioctl-blueprint .
+kpt pkg get "$CATALOG_REPO"/examples/istioctl-analyze .
 kpt fn run istioctl-analyze --results-dir /tmp || true
 assert_contains_string /tmp/results-0.yaml "Schema validation error: gateway must have at least one server"

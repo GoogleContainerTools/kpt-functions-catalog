@@ -104,7 +104,7 @@ function readArguments(configs: Configs) {
     } else if (key === OUTPUT_SHORT_FLAG || key === OUTPUT_LONG_FLAG) {
     } else if (key === USE_KUBE_FLAG) {
       // use-kube flag needs equals sign instead of space separator
-      if (value) {
+      if (value !== '') {
         args.push(`${key}=${value}`);
       }
     } else {
