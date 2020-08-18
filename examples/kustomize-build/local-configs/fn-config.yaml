@@ -1,4 +1,5 @@
-# call `kpt fn run` on a directory containing this file, mounting the kustomization directory at /source
+# call `kpt fn run` on a directory containing this file
+# mount the kustomization directory at /source
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,7 +8,7 @@ metadata:
     config.k8s.io/function: |
       container:
         image: gcr.io/kpt-functions/kustomize-build
-    config.kubernetes.io/local-config: "true"
+    config.kubernetes.io/local-config: 'true'
 data:
   path: /source
-  "--reorder": none
+  '--reorder': none
