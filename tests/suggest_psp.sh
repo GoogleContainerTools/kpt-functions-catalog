@@ -64,7 +64,7 @@ kpt fn source example-configs |
   kpt fn sink example-configs
 assert_contains_string results.err "Suggest explicitly disabling privilege escalation"
 
-testcase "kpt_istioctl_analyze_declarative_example"
+testcase "kpt_suggest_psp_declarative_example"
 kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/suggest-psp@suggest-psp .
-kpt fn run suggest-psp --results-dir /tmp || true
-assert_contains_string /tmp/results-0.yaml "Suggest explicitly disabling privilege escalation"
+kpt fn run suggest-psp --results-dir "$(pwd)" || true
+assert_contains_string results-0.yaml "Suggest explicitly disabling privilege escalation"
