@@ -50,8 +50,8 @@ export async function helmTemplate(configs: Configs) {
 
 function readArguments(configs: Configs) {
   const args: string[] = [];
-  let nameArg = '';
-  let pathArg = '';
+  let nameArg: string | undefined = undefined;
+  let pathArg: string | undefined = undefined;
   const configMap = configs.getFunctionConfigMap();
   if (!configMap) {
     return args;
@@ -68,10 +68,10 @@ function readArguments(configs: Configs) {
   });
 
   // Helm template expects name and chart path first so place those at the beginning
-  if (pathArg !== '') {
+  if (pathArg !== undefined) {
     args.unshift(pathArg);
   }
-  if (nameArg !== '') {
+  if (nameArg !== undefined) {
     args.unshift(nameArg);
   }
 
