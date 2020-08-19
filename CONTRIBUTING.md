@@ -62,14 +62,8 @@ same pull request format as code changes.
 ## How to Release
 
 We have spearate a release process for each language, golang and typescript.
-All functions written in the language get released together. Maintainers can
-create releases through the Github UI or through the git CLI. Follow the
-commands below to release using the git CLI.
-
-```sh
-git tag release-ts-functions-v0.0.5
-git push upstream release-ts-functions-v0.0.5
-```
+All functions written in the language get released together. Maintainers should
+create releases through the Github UI.
 
 ## Contact Us
 
