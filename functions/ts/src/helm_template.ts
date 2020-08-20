@@ -50,8 +50,8 @@ export async function helmTemplate(configs: Configs) {
 
 function readArguments(configs: Configs) {
   const args: string[] = [];
-  let nameArg: string | undefined = undefined;
-  let pathArg: string | undefined = undefined;
+  let nameArg: string | undefined;
+  let pathArg: string | undefined;
   const configMap = configs.getFunctionConfigMap();
   if (!configMap) {
     return args;
