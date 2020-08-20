@@ -83,7 +83,6 @@ kpt fn source fixtures/*invalid.yaml |
   kpt fn run --fn-path fc.yaml --network 2>error.txt || true
 assert_contains_string error.txt "Invalid type. Expected: \[integer,null\], given: string"
 
-# TODO: Remove error handling once kpt pkg get shows errors gracefully https://github.com/GoogleContainerTools/kpt/issues/838
 testcase "kpt_kubeval_declarative_example"
 kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/kubeval@kubeval-blueprint .
 kpt fn run kubeval --network 2>err.txt || true
