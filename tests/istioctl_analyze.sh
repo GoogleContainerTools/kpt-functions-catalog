@@ -86,5 +86,5 @@ assert_contains_string error.txt "Referenced gateway not found"
 
 testcase "kpt_istioctl_analyze_declarative_example"
 kpt pkg get "$CATALOG_REPO"/examples/istioctl-analyze .
-kpt fn run istioctl-analyze --results-dir "$(pwd)" || true
-assert_contains_string results-0.yaml "Schema validation error: gateway must have at least one server"
+kpt fn run istioctl-analyze 2>err.txt || true
+assert_contains_string err.txt "Schema validation error: gateway must have at least one server"

@@ -1,7 +1,8 @@
 # Kubeval
 
-The `kubeval` KRM config function validates configuration using kubeval. This
-example invokes the kubeval function using declarative configuration.
+The `kubeval` KRM config function validates Kubernetes resources against their
+Kubernetes OpenAPI definition using kubeval. This example invokes the kubeval
+function against Kubernetes v1.18.0 using declarative configuration.
 
 ## Function invocation
 
@@ -9,24 +10,17 @@ Get this example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval .
-kpt fn run kubeval --network --results-dir /tmp
+kpt fn run kubeval --network
 ```
 
 ## Expected Results
 
-The `--results-dir` flag let us specify a destination to write function results
-to. Check the results:
+The function outputs the following error:
 
 ```sh
-cat /tmp/results-0.yaml
+[ERROR] Invalid type. Expected: [integer,null], given: string in object 'v1/ReplicationController//bob' in file configs/example-config.yaml
 ```
 
-They contain the following error:
-
-```sh
-Invalid type. Expected: [integer,null], given: string
-```
-
-The error comes from the `bob` resource in `configs/example-config.yaml`.
-Replace the value of `spec.replicas` with an integer to pass validation and
-rerun the command. This will return success (no output).
+In the `configs/example-config.yaml` file, replace the value of `spec.replicas`
+with an integer to pass validation and rerun the command. This will return
+success (no output).

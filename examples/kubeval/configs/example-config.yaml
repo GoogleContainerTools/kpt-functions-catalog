@@ -4,7 +4,8 @@ kind: ReplicationController
 metadata:
   name: bob
 spec:
-  replicas: asd"
+  # If replicas is not an integer, kubeval will report error.
+  replicas: asdf # Replace "asdf" with an integer to fix the error.
   selector:
     app: nginx
   templates:
