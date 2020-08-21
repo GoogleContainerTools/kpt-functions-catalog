@@ -8,4 +8,4 @@ metadata:
       container:
         image: gcr.io/kpt-functions/helm-template
 data:
-  chart: /source
+  chart_path: /source
