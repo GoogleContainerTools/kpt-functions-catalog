@@ -17,11 +17,22 @@ func main() {
 		for i := range resourceList.Items {
 			// modify the resources using the kyaml/yaml library:
 			// https://pkg.go.dev/sigs.k8s.io/kustomize/kyaml/yaml
-			// Set the metadata.namespace field
-			if err := resourceList.Items[i].PipeE(yaml.LookupCreate(
-				yaml.ScalarNode, "metadata", "namespace"),
-				yaml.FieldSetter{StringValue: namespace}); err != nil {
-				return err
+			node := resourceList.Items[i]
+			kindNode, err := node.Pipe(yaml.Lookup("kind"))
+			if err != nil {
+				// ignore the node if it does not have a "kind" field
+				continue
+			}
+			typeMeta := yaml.TypeMeta{
+				Kind: yaml.GetValue(kindNode),
+			}
+			if typeMeta.IsNamespaceable() {
+				// Set the metadata.namespace field
+				if err := node.PipeE(yaml.LookupCreate(
+					yaml.ScalarNode, "metadata", "namespace"),
+					yaml.FieldSetter{StringValue: namespace}); err != nil {
+					return err
+				}
 			}
 		}
 		return nil
