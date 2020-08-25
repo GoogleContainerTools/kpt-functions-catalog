@@ -24,10 +24,20 @@ to. Check the results:
 cat /tmp/results-0.yaml
 ```
 
-They contain the following error message:
+They contain the following results:
 
 ```sh
-Invalid type. Expected: [integer,null], given: string
+- message: 'Invalid type. Expected: [integer,null], given: string'
+  severity: error
+  resourceRef:
+    apiVersion: v1
+    kind: ReplicationController
+    namespace: ''
+    name: bob
+  file:
+    path: configs/example-config.yaml
+  field:
+    path: spec.replicas
 ```
 
 In the `configs/example-config.yaml` file, replace the value of `spec.replicas`
