@@ -24,10 +24,6 @@ source "$DIR"/common.sh
 ############################
 # kpt fn Tests
 ############################
-[[ -z "${NODOCKER}" ]] || {
-  echo "Skipping docker tests"
-  exit 0
-}
 
 helm_testcase "kpt_helm_template_imperative_expected_args"
 kpt fn source example-configs |

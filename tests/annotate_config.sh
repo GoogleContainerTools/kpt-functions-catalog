@@ -24,10 +24,6 @@ source "$DIR"/common.sh
 ############################
 # kpt fn Tests
 ############################
-[[ -z "${NODOCKER}" ]] || {
-  echo "Skipping docker tests"
-  exit 0
-}
 
 testcase "kpt_annotate_config_imperative"
 kpt pkg get "$SDK_REPO"/example-configs example-configs

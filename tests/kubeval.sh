@@ -24,10 +24,6 @@ source "$DIR"/common.sh
 ############################
 # kpt fn Tests
 ############################
-[[ -z "${NODOCKER}" ]] || {
-  echo "Skipping docker tests"
-  exit 0
-}
 
 testcase "kpt_kubeval_imperative_no_errors"
 kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
