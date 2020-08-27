@@ -10,6 +10,8 @@ declarative configuration.
 
 Get this example and try it out by running the following commands:
 
+<!-- TODO: https://github.com/GoogleContainerTools/kpt/issues/983 -->
+
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval .
 kpt fn run kubeval --network --results-dir /tmp
