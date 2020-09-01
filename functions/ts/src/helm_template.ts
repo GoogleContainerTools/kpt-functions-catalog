@@ -20,7 +20,7 @@ import { spawnSync } from 'child_process';
 
 const CHART_NAME = 'name';
 const CHART_PATH = 'chart_path';
-const VALUES_PATH = '--values';
+const VALUES = '--values';
 
 // Render chart templates locally using helm template.
 export async function helmTemplate(configs: Configs) {
@@ -83,11 +83,11 @@ Render chart templates locally using helm template. If input a list of configs i
 addition to arguments will overwrite any chart objects that already exist in the list.
 
 Configured using a ConfigMap with keys for ${CHART_NAME}, ${CHART_PATH}.
-Works with arbitrary helm template flags like --values:
+Works with arbitrary helm template flags like ${VALUES}:
 
-${CHART_NAME}: Name of helm chart.
+${CHART_NAME}: [Optional] Name of helm chart. Default RELEASE-NAME.
 ${CHART_PATH}: Chart templates directory.
-${VALUES_PATH}: [Optional] Path to values file.
+${VALUES}: [Optional] Path to values file.
 ...
 
 Example:
@@ -106,5 +106,5 @@ metadata:
 data:
   ${CHART_NAME}: my-chart
   ${CHART_PATH}: ../path/to/helm/chart
-  ${VALUES_PATH}: ./values.yaml
+  ${VALUES}: ./values.yaml
 `;
