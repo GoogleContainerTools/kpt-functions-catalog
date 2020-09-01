@@ -1,8 +1,6 @@
 # Annotate Config
 
-The `annotate-config` KRM config function adds an annotation to configuration.
-This example invokes the annotate-config function using declarative
-configuration.
+The `annotate-config` KRM config function adds an annotation to resources.
 
 ## Function invocation
 
