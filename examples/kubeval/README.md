@@ -3,8 +3,7 @@
 The `kubeval` KRM config function validates Kubernetes resources using kubeval.
 Learn more on the [kubeval website].
 
-This example invokes the kubeval function against Kubernetes v1.18.0 using
-declarative configuration.
+This example invokes the kubeval function against Kubernetes v1.18.0.
 
 ## Function invocation
 
