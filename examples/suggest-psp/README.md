@@ -1,9 +1,9 @@
-# Suggest Pod Security Policy
+# Suggest Changes to `PodSecurityPolicy`
 
-The `suggest-psp` KRM config function lints pod security policies by suggesting
-the 'spec.allowPrivilegeEscalation' field be set to 'false'. It outputs
-structured results detailing which PSP objects should be changed. This example
-invokes the suggest-psp function using declarative configuration.
+The `suggest-psp` KRM config function lints `PodSecurityPolicy` resources by
+suggesting the 'spec.allowPrivilegeEscalation' field be set to 'false'. It
+outputs structured results detailing which `PodSecurityPolicy` objects should be
+changed.
 
 ## Function Invocation
 
@@ -23,12 +23,25 @@ to. Check the results:
 cat /tmp/results-0.yaml
 ```
 
-They contain the following message:
+They contain the following results:
 
 ```sh
-Suggest explicitly disabling privilege escalation
+- message: Suggest explicitly disabling privilege escalation
+  severity: warn
+  tags:
+    category: security
+  resourceRef:
+    apiVersion: policy/v1beta1
+    kind: PodSecurityPolicy
+    namespace: ''
+    name: psp
+  file:
+    path: configs/example-config.yaml
+  field:
+    path: spec.allowPrivilegeEscalation
+    suggestedValue: false
 ```
 
 The error comes from the psp resource in `configs/example-config.yaml`.
-Uncomment `spec.allowPrivilegeEscalation` in that file to fix the
-error and rerun the command. This will return success (no output).
+Uncomment `spec.allowPrivilegeEscalation` in that file to fix the error and
+rerun the command. This will return success (no output).
