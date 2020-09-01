@@ -85,7 +85,7 @@ addition to arguments will overwrite any chart objects that already exist in the
 Configured using a ConfigMap with keys for ${CHART_NAME}, ${CHART_PATH}.
 Works with arbitrary helm template flags like ${VALUES}:
 
-${CHART_NAME}: Name of helm chart. Default RELEASE-NAME.
+${CHART_NAME}: [Optional] Name of helm chart. Default RELEASE-NAME.
 ${CHART_PATH}: Chart templates directory.
 ${VALUES}: [Optional] Path to values file.
 ...
