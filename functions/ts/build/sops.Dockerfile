@@ -18,18 +18,14 @@ WORKDIR /home/node/app
 
 # Install dependencies and cache them.
 COPY --chown=node:node package*.json ./
-RUN npm ci --ignore-scripts
-
 # Make rw package work
 COPY --chown=node:node @types @types
+
+RUN npm ci --ignore-scripts
 
 # Copy the source.
 COPY --chown=node:node tsconfig.json .
 COPY --chown=node:node src src
-
-# Make rw package work
-COPY --chown=node:node @types @types
-RUN npm install @types/rw
 
 # Build the source.
 RUN npm run build && \
@@ -53,5 +49,6 @@ COPY --from=builder /home/node/app /home/node/app
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 ENV PATH /usr/local/bin:$PATH
+ENV GNUPGHOME /tmp
 
 ENTRYPOINT ["node", "/home/node/app/dist/sops_run.js"]

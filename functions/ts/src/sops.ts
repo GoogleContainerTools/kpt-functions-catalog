@@ -7,27 +7,39 @@ import {
   addAnnotation,
   removeAnnotation,
 } from 'kpt-functions';
-import {
-  DumpOptions,
-  safeDump,
-  safeLoad,
-} from 'js-yaml';
+import { DumpOptions, safeDump, safeLoad } from 'js-yaml';
 import rw from 'rw';
-import {
-  spawnSync,
-} from 'child_process';
+import { spawnSync, execSync } from 'child_process';
+
+const TEMP_PATH = '/tmp/tmp.yaml';
 
 const IGNORE_MAC = 'ignore-mac';
 const VERBOSE = 'verbose';
-const temp_path = '/tmp/tmp.yaml';
+const OVERRIDE_PREEXEC_CMD = 'override-preexec-cmd';
+const OVERRIDE_DETACHED_ANNOTATIONS = 'override-detached-annotations';
 
-//var debuglog = require('debuglog')('sops');
+// pre-exec command may be overriden from config
+let preExecCmd =
+  '[ "$SOPS_IMPORT_PGP" == "" ] || (echo "$SOPS_IMPORT_PGP" | gpg --import)';
 
-interface SopsKubernetesObject extends KubernetesObject {
-}
+// list of annotations that will be detached before decryption
+// this is needed, because tools like kpt add some annotations
+// during processing, but sops fails trying to decrypt them.
+// After decryption they will be attached back unchanged.
+// it can be overriden from config
+let detachedAnnotations: string[] = [
+  'config.kubernetes.io/index',
+  'config.kubernetes.io/path',
+  'config.k8s.io/id',
+  'kustomize.config.k8s.io/id',
+];
 
-function isSopsKubernetesObject(o: any): o is SopsKubernetesObject {
-  return o && o.sops;
+interface SopsKubernetesObject extends KubernetesObject {}
+
+function isSopsKubernetesObject(
+  o: KubernetesObject
+): o is SopsKubernetesObject {
+  return o && o.hasOwnProperty('sops');
 }
 
 const YAML_STYLE: DumpOptions = {
@@ -48,7 +60,7 @@ const YAML_STYLE: DumpOptions = {
 
 async function writeFile(path: string, data: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    rw.writeFile(path, data, 'utf8', (err: any) => {
+    rw.writeFile(path, data, 'utf8', (err: object) => {
       if (err) return reject(err);
       resolve();
     });
@@ -59,18 +71,19 @@ export async function sops(configs: Configs) {
   // Validate config data and read arguments.
   const args = readSopsArguments(configs);
 
+  // run preexec if it's not empty
+  if (preExecCmd !== '') {
+    execSync(preExecCmd);
+  }
+
   // Put all documents into the local place and
   // cleanup the configs storage. This is to keep
   // the order of documents
-  let allDocs = configs.getAll();
+  const allDocs = configs.getAll();
   configs.deleteAll();
 
   for (const object of allDocs) {
     if (isSopsKubernetesObject(object)) {
-    //debuglog('trying to decrypt: apiVersion: %s, kind: %s, name: %s',
-    //        object.apiVersion,
-    //        object.kind,
-    //        object.metadata.name);
       // this function
       await decryptAndInsertSopsKubernetesObject(args, configs, object);
     } else {
@@ -80,16 +93,10 @@ export async function sops(configs: Configs) {
   }
 }
 
-function detachConfigKubernetesIoAnnotations(object: SopsKubernetesObject): Map<string, string> {
-  const annotations: string[] = [
-    'config.kubernetes.io/index',
-    'config.kubernetes.io/path',
-    'config.k8s.io/id',
-  ];
+function detachAnnotations(object: SopsKubernetesObject): Map<string, string> {
+  const detached = new Map<string, string>();
 
-  let detached = new Map<string, string>();
-
-  for (const annotation of annotations) {
+  for (const annotation of detachedAnnotations) {
     const value = getAnnotation(object, annotation);
     if (value !== undefined) {
       detached.set(annotation, value);
@@ -99,40 +106,49 @@ function detachConfigKubernetesIoAnnotations(object: SopsKubernetesObject): Map<
   return detached;
 }
 
-function attachDetachedAnnotations(object: SopsKubernetesObject, detached: Map<string, string>) {
+function attachDetachedAnnotations(
+  object: SopsKubernetesObject,
+  detached: Map<string, string>
+) {
   detached.forEach((value: string, key: string) => {
     addAnnotation(object, key, value);
-  })
+  });
 }
 
-async function decryptAndInsertSopsKubernetesObject(args: string[], configs: Configs, object: SopsKubernetesObject) {
+async function decryptAndInsertSopsKubernetesObject(
+  args: string[],
+  configs: Configs,
+  object: SopsKubernetesObject
+) {
   let error;
-  args.push(...['-d', temp_path]);
+  args.push(...['-d', TEMP_PATH]);
 
   // write encrypted file to the temp file
-  const detached = detachConfigKubernetesIoAnnotations(object);
+  const detached = detachAnnotations(object);
   const stringifiedObject = safeDump(object, YAML_STYLE);
-  await writeFile(temp_path, stringifiedObject);
+  await writeFile(TEMP_PATH, stringifiedObject);
   attachDetachedAnnotations(object, detached);
 
   try {
     // run sops
-    //debuglog('calling sops with args: %s', args.toString())
     const child = spawnSync('sops', args);
     error = child.stderr;
     // read the decrypted yaml from stdout and parse
-    let decryptedObject = safeLoad(child.stdout);
+    const decryptedObject = safeLoad(child.stdout);
     if (object && isKubernetesObject(decryptedObject)) {
       attachDetachedAnnotations(decryptedObject, detached);
       configs.insert(decryptedObject);
       return;
     }
   } catch (err) {
-    //debuglog('got an error from exception: %s', err)
-    configs.addResults(generalResult(`Exception for apiVersion: ${object.apiVersion}, kind: ${object.kind}, name: ${object.metadata.name}: ${err}`, 'error'));
+    configs.addResults(
+      generalResult(
+        `Exception for apiVersion: ${object.apiVersion}, kind: ${object.kind}, name: ${object.metadata.name}: ${err}`,
+        'error'
+      )
+    );
   }
   if (error && error.length > 0) {
-    //debuglog('got an error from stdout: %s', error)
     configs.addResults(
       generalResult(
         `Sops command results in error for\n${stringifiedObject}\n ${error.toString()}`,
@@ -152,11 +168,14 @@ function readSopsArguments(configs: Configs) {
     return args;
   }
   configMap.forEach((value: string, key: string) => {
-    if (key === VERBOSE ||
-        key === IGNORE_MAC) {
-      args.push('--'+key);
+    if (key === OVERRIDE_PREEXEC_CMD) {
+      preExecCmd = value;
+    } else if (key === OVERRIDE_DETACHED_ANNOTATIONS) {
+      detachedAnnotations = value.replace(/\s/g, '').split(',');
+    } else if (key === VERBOSE || key === IGNORE_MAC) {
+      args.push('--' + key);
     } else {
-      args.push('--'+key);
+      args.push('--' + key);
       args.push(value);
     }
   });
@@ -165,13 +184,15 @@ function readSopsArguments(configs: Configs) {
 
 sops.usage = `
 Sops function (see https://github.com/mozilla/sops).
-So far supports only decrypt operation: 
+So far supports only decrypt operation:
 runs sops -d for all documents that have field 'sops:' and put the decrypted result back.
 
 Can be configured using a ConfigMap with the following flags:
-ignore-mac: true [Optional: default empty]
-verbose: true [Optional: default empty]
-keyservice value [Optional: default empty]
+ignore-mac: true [Optional: default empty] Ignore Message Authentication Code during decryption.
+verbose: true [Optional: default empty]    Enable sops verbose logging output.
+keyservice value [Optional: default empty] Specify the key services to use in addition to the local one.
+                                           Can be specified more than once.
+                                           Syntax: protocol://address. Example: tcp://myserver.com:5000
 
 For more details see 'sops --help'.
 
