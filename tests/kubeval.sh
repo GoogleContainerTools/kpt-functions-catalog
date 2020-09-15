@@ -21,10 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# kpt fn Tests
-############################
-
 testcase "kpt_kubeval_imperative_no_errors"
 kpt pkg get https://github.com/instrumenta/kubeval.git/fixtures .
 kpt fn source fixtures/valid* |

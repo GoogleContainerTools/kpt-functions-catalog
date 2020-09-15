@@ -21,10 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# kpt fn Tests
-############################
-
 testcase "kpt_set_namespace_go_docker_imperative"
 kpt pkg get "$SDK_REPO"/example-configs example-configs
 kpt fn run . --image gcr.io/kpt-functions/set-namespace:"${TAG}" -- namespace=example-ns

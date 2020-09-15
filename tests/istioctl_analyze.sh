@@ -21,10 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# kpt fn Tests
-############################
-
 testcase "kpt_istioctl_analyze_declarative_no_errors"
 kpt pkg get https://github.com/istio/istio.git/samples/addons .
 cat >fc.yaml <<EOF

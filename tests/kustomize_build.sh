@@ -21,10 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# kpt fn Tests
-############################
-
 testcase "kpt_kustomize_build_imperative"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
 kpt fn source helloWorld |
