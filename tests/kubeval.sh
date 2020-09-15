@@ -82,3 +82,14 @@ EOF
 kpt fn source fixtures/*invalid.yaml |
   kpt fn run --fn-path fc.yaml --network 2>error.txt || true
 assert_contains_string error.txt "Invalid type. Expected: \[integer,null\], given: string"
+
+testcase "kpt_kubeval_declarative_example"
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/kubeval@kubeval-blueprint .
+kpt fn run kubeval --network 2>err.txt || true
+assert_contains_string err.txt "Invalid type. Expected: \[integer,null\], given: string"
+
+# TODO: Remove after fixing https://github.com/GoogleContainerTools/kpt/issues/983
+testcase "kpt_kubeval_declarative_results"
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/kubeval@kubeval-blueprint .
+kpt fn run kubeval --network --results-dir /tmp || true
+assert_contains_string /tmp/results-0.yaml "path: spec.replicas"
