@@ -27,6 +27,9 @@ let preExecCmd =
 // during processing, but sops fails trying to decrypt them.
 // After decryption they will be attached back unchanged.
 // it can be overriden from config
+// TODO: there is a discusion about the complete list here:
+// https://github.com/kubernetes-sigs/kustomize/issues/2996
+// Please update the list when it is finished.
 let detachedAnnotations: string[] = [
   'config.kubernetes.io/index',
   'config.kubernetes.io/path',
@@ -193,6 +196,12 @@ verbose: true [Optional: default empty]    Enable sops verbose logging output.
 keyservice value [Optional: default empty] Specify the key services to use in addition to the local one.
                                            Can be specified more than once.
                                            Syntax: protocol://address. Example: tcp://myserver.com:5000
+override-detached-annotations: [Optional:
+default see detachedAnnotations var]       The list of annotations that didn't present when the document
+                                           was encrypted, but added by different tools later. The function
+                                           will detach them before decryption and added unchanged
+                                           after successfull decryption. This allows sops to check the
+                                           consistency of the decrypted document.
 
 For more details see 'sops --help'.
 

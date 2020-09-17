@@ -13,13 +13,13 @@ contain the private key or keys needed to decrypt yamls. If you have a file with
 it's possible to run:
 
 ```
-SOPS_IMPORT_PGP=$(cat <file with exported key>.asc) kpt fn run <folder>
+kpt fn run --env SOPS_IMPORT_PGP="$(cat <file with exported key>.asc)" <folder>
 ```
 
 or if your keys are already in gpg, it's possibe to run:
 
 ```
-SOPS_IMPORT_PGP=$(gpg --armor --export-secret-keys) kpt fn run <folder>
+kpt fn run --env SOPS_IMPORT_PGP="$(gpg --armor --export-secret-keys)" <folder>
 ```
 
 ## Function invocation
@@ -32,7 +32,7 @@ curl -fsSL -o sops/key.asc https://raw.githubusercontent.com/mozilla/sops/master
 # download sops kpt-function example
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/sops .
 # run the function
-SOPS_IMPORT_PGP=$(cat sops/key.asc) kpt fn run sops/local-configs
+kpt fn run --env SOPS_IMPORT_PGP="$(cat sops/key.asc)" sops/local-configs
 ```
 
 ## Expected result

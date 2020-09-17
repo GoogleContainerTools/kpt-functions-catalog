@@ -30,10 +30,10 @@ source "$DIR"/common.sh
 }
 
 testcase "kpt_sops_imperative_expected_args"
-mkdir example-configs && curl -fsSL -o example-configs/example.yaml https://raw.githubusercontent.com/mozilla/sops/master/example.yaml
-curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
+mkdir example-configs && curl -fsSL -o example-configs/example.yaml https://raw.githubusercontent.com/mozilla/sops/master/example.yaml || echo "couldn't create example.yaml"
+curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc || echo "couldn't create key.asc"
 kpt fn source example-configs |
-	SOPS_IMPORT_PGP=$(cat key.asc) kpt fn run --image gcr.io/kpt-functions/sops:"${TAG}" -- verbose=true >out.yaml
+  kpt fn run --env SOPS_IMPORT_PGP="$(cat key.asc)" --image gcr.io/kpt-functions/sops:"${TAG}" -- verbose=true >out.yaml
 assert_contains_string out.yaml "t00m4nys3cr3tzupdated"
 
 if false; then
@@ -43,7 +43,7 @@ testcase "kpt_sops_declarative_example"
 # TODO: This is a temporary fix till declarative example e2e tests run using the $TAG being tested
 kpt pkg get https://github.com/aodinokov/kpt-functions-catalog.git/examples/sops@sops . || true
 curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
-SOPS_IMPORT_PGP=$(cat key.asc) kpt fn run sops/local-configs
+kpt fn run --env SOPS_IMPORT_PGP="$(cat key.asc)" sops/local-configs
 assert_contains_string sops/local-configs/encrypted-gvk.yaml "nnn-password: k8spassphrase"
 fi
 
@@ -60,8 +60,8 @@ metadata:
     config.kubernetes.io/local-config: "true"
 data:
 EOF
-mkdir example-configs && curl -fsSL -o example-configs/example.yaml https://raw.githubusercontent.com/mozilla/sops/master/example.yaml
-curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
+mkdir example-configs && curl -fsSL -o example-configs/example.yaml https://raw.githubusercontent.com/mozilla/sops/master/example.yaml || echo "couldn't create example.yaml"
+curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc || echo "couldn't create key.asc"
 kpt fn source example-configs |
-  SOPS_IMPORT_PGP=$(cat key.asc) kpt fn run --fn-path fc.yaml >out.yaml
+  kpt fn run --env SOPS_IMPORT_PGP="$(cat key.asc)" --fn-path fc.yaml >out.yaml
 assert_contains_string out.yaml "t00m4nys3cr3tzupdated"

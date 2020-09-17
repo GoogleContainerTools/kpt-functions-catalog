@@ -63,3 +63,8 @@ kpt fn source example-configs |
   kpt fn run --fn-path fc.yaml 2>results.err |
   kpt fn sink example-configs
 assert_contains_string results.err "Suggest explicitly disabling privilege escalation"
+
+testcase "kpt_suggest_psp_declarative_example"
+kpt pkg get "$CATALOG_REPO"/examples/suggest-psp .
+kpt fn run suggest-psp --results-dir "$(pwd)" || true
+assert_contains_string results-0.yaml "Suggest explicitly disabling privilege escalation"
