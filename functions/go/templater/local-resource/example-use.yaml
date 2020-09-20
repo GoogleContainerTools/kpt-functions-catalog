@@ -1,0 +1,23 @@
+apiVersion: v1alpha1
+kind: Templater
+metadata:
+  annotations:
+    config.kubernetes.io/function: |
+      container:
+        image: gcr.io/kpt-functions/templater:stable
+    template: |
+      {{ range .hosts -}}
+      ---
+      apiVersion: metal3.io/v1alpha1
+      kind: BareMetalHost
+      metadata:
+        name: {{ .name }}
+      spec:
+        bootMACAddress: {{ .macAddress }}
+      {{ end -}}
+data:
+  hosts:
+    - macAddress: 00:aa:bb:cc:dd
+      name: node-1
+    - macAddress: 00:aa:bb:cc:ee
+      name: node-2
