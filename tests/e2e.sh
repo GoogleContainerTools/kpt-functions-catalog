@@ -19,6 +19,7 @@
 set -eo pipefail
 DIR="$(dirname "$0")"
 
+"$DIR"/templater_go.sh
 "$DIR"/annotate_config.sh
 "$DIR"/helm_template.sh
 "$DIR"/istioctl_analyze.sh

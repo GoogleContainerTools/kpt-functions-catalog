@@ -26,10 +26,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: notImportantHere
-  annotations:
-    template: |
-      value1: {{ .literal1 }}
 data:
+  template: |
+    value1: {{ .literal1 }}
   literal1: value1
   literal2: value2
 `,
@@ -42,9 +41,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: notImportantHere
-  annotations:
-    template: |
-      value: {{ env "TESTTEMPLATE" }}
+data:
+  template: 'value: {{ env "TESTTEMPLATE" }}'
 `,
 			expectedOut: `value: testtemplatevalue
 `,
@@ -55,18 +53,17 @@ apiVersion: v1alpha1
 kind: Templater
 metadata:
   name: notImportantHere
-  annotations:
-    template: |
-      {{ range .hosts -}}
-      ---
-      apiVersion: metal3.io/v1alpha1
-      kind: BareMetalHost
-      metadata:
-        name: {{ .name }}
-      spec:
-        bootMACAddress: {{ .macAddress }}
-      {{ end -}}
 data:
+  template: |
+    {{ range .hosts -}}
+    ---
+    apiVersion: metal3.io/v1alpha1
+    kind: BareMetalHost
+    metadata:
+      name: {{ .name }}
+    spec:
+      bootMACAddress: {{ .macAddress }}
+    {{ end -}}
   hosts:
     - macAddress: 00:aa:bb:cc:dd
       name: node-1
@@ -94,10 +91,9 @@ apiVersion: v1alpha1
 kind: Templater
 metadata:
   name: notImportantHere
-  annotations:
-    template: |
-      {{ toYaml . -}}
 data:
+  template: '{{ toYaml . -}}'
+
   test:
     of:
       - toYaml
@@ -113,10 +109,9 @@ apiVersion: v1alpha1
 kind: Templater
 metadata:
   name: notImportantHere
-  annotations:
-    template: |
-      {{ toYaml ignorethisbadinput -}}
 data:
+  template: |
+    {{ toYaml ignorethisbadinput -}}
   test:
     of:
       - badToYamlInput
@@ -129,9 +124,43 @@ apiVersion: v1alpha1
 kind: Templater
 metadata:
   name: notImportantHere
-  annotations:
-    template: |
-      {{ end }
+data:
+  template: |
+    {{ end }
+`,
+			expectedErr: true,
+		},
+		{
+			cfg: `
+apiVersion: v1alpha1
+kind: Templater
+metadata:
+  name: notImportantHere
+data:
+`,
+			expectedErr: true,
+		},
+		{
+			cfg: `
+apiVersion: v1alpha1
+kind: Templater
+metadata:
+  name: notImportantHere
+data:
+  template: 234
+`,
+			expectedErr: true,
+		},
+		{
+			cfg: `
+apiVersion: v1alpha1
+kind: Templater
+metadata:
+  name: notImportantHere
+data:
+  template:
+    x:
+      y: z
 `,
 			expectedErr: true,
 		},
@@ -141,19 +170,21 @@ metadata:
 		fcfg := Config{}
 		err := yaml.Unmarshal([]byte(ti.cfg), &fcfg)
 		if err != nil {
-			t.Errorf("can't unmarshal config %s. continue", ti.cfg)
+			t.Errorf("can't unmarshal config %s: %v. continue", ti.cfg, err)
 			continue
 		}
 
 		nodes, err := (&kio.ByteReader{Reader: bytes.NewBufferString(ti.in)}).Read()
 		if err != nil {
-			t.Errorf("can't unmarshal config %s. continue", ti.in)
+			t.Errorf("can't unmarshal in yamls %s: %v. continue", ti.in, err)
 			continue
 		}
 
 		f, err := NewFilter(&fcfg)
 		if err != nil {
-			t.Errorf("can't unmarshal config %s. continue", ti.in)
+			if !ti.expectedErr {
+				t.Errorf("can't create filter for config %s: %v. continue", ti.in, err)
+			}
 			continue
 		}
 		nodes, err = f.Filter(nodes)

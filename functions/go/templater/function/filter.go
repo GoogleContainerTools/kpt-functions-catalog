@@ -16,23 +16,26 @@ type Config struct {
 	// it's compatible with ConfigMap object, but isn't limited to strings
 	// there is a possibility to use complex objects
 	Data map[string]interface{} `json:"data,omitempty" yaml:"data,omitempty"`
-	// Metadata container template annotation
-	Metadata struct {
-		// annotations
-		Annotations struct {
-			// Template annoation is used to specify actual go-template which is going
-			// to be used to render the object defined here
-			Template string `json:"template,omitempty"`
-		} `json:"annotations,omitempty" yaml:"annotations,omitempty"`
-	} `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 }
 
 type Filter struct {
-	Config *Config
+	Template string                 `json:"template" yaml:"template"`
+	Data     map[string]interface{} `json:"data,omitempty" yaml:"data,omitempty"`
 }
 
 func NewFilter(cfg *Config) (kio.Filter, error) {
-	f := Filter{Config: cfg}
+	val, ok := cfg.Data["template"]
+	if !ok {
+		return nil, fmt.Errorf("config doesn't have data.template field: %v", cfg)
+	}
+
+	template, ok := val.(string)
+	if !ok {
+		return nil, fmt.Errorf("data.template must be string")
+	}
+
+	f := Filter{Template: template, Data: cfg.Data}
+	delete(f.Data, "template")
 	return &f, nil
 }
 
@@ -41,12 +44,12 @@ func (f *Filter) Filter(items []*yaml.RNode) ([]*yaml.RNode, error) {
 
 	funcMap := sprig.TxtFuncMap()
 	funcMap["toYaml"] = toYaml
-	tmpl, err := template.New("tmpl").Funcs(funcMap).Parse(f.Config.Metadata.Annotations.Template)
+	tmpl, err := template.New("tmpl").Funcs(funcMap).Parse(f.Template)
 	if err != nil {
 		return nil, err
 	}
 
-	err = tmpl.Execute(&out, f.Config.Data)
+	err = tmpl.Execute(&out, f.Data)
 	if err != nil {
 		return nil, fmt.Errorf("template returned error: %v", err)
 	}
