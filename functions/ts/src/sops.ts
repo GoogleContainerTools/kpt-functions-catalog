@@ -216,7 +216,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: (put here the image url)
+        image: gcr.io/kpt-functions/sops
     config.kubernetes.io/local-config: "true"
 data:
   verbose: true
