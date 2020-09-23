@@ -11,22 +11,16 @@ Get this example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/istioctl-analyze .
-kpt fn run istioctl-analyze --results-dir /tmp
+kpt fn run istioctl-analyze
 ```
 
 ## Expected Results
 
-The `--results-dir` flag let us specify a destination to write function results
-to. Check the results:
+This should give the following output:
 
 ```sh
-cat /tmp/results-0.yaml
-```
-
-They contain the following error:
-
-```sh
-Schema validation error: gateway must have at least one server
+[ERROR] Schema validation error: gateway must have at least one server in object 'networking.istio.io/v1alpha3/Gateway//httpbin-gateway' in file configs/example-config.yaml
+error: exit status 1
 ```
 
 The error comes from the httpbin-gateway resource in
