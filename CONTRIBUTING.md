@@ -75,7 +75,7 @@ from you!
 
 [Google's Open Source Community Guidelines]: https://opensource.google.com/conduct/
 [Code of Conduct]: CODE_OF_CONDUCT.md
-[kpt website]: https://googlecontainertools.github.io/kpt/guides/consumer/function/catalog/
+[kpt website]: https://googlecontainertools.github.io/kpt/guides/consumer/function/
 [kpt contribution guidelines]: https://github.com/GoogleContainerTools/kpt/blob/master/CONTRIBUTING.md#adding-or-updating-catalog-functions
 [functions/]: functions/
 [examples/]: examples/
