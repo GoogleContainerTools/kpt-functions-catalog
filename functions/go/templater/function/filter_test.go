@@ -164,6 +164,49 @@ data:
 `,
 			expectedErr: true,
 		},
+		{
+			in: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map1
+`,
+			cfg: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notImportantHere
+data:
+  cleanPipeline: true
+  template: 'value: {{ env "TESTTEMPLATE" }}'
+`,
+			expectedOut: `value: testtemplatevalue
+`,
+		},
+		{
+			in: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map1
+`,
+			cfg: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notImportantHere
+data:
+  cleanPipeline: false
+  template: 'value: {{ env "TESTTEMPLATE" }}'
+`,
+			expectedOut: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map1
+---
+value: testtemplatevalue
+`,
+		},
 	}
 
 	for i, ti := range tc {

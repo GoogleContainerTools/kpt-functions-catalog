@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# E2E tests for set_namespace_go.
+# E2E tests for templater.
 
 set -eo pipefail
 DIR="$(dirname "$0")"
@@ -30,17 +30,16 @@ source "$DIR"/common.sh
   exit 0
 }
 
-testcase "kpt_templater_go_docker_imperative"
+testcase "kpt_templater_imperative"
 kpt fn run . --env TESTTEMPLATERENV="testval" --image gcr.io/kpt-functions/templater:"${TAG}" -- template="apiVersion: v1
 kind: ConfigMap
 metadata:
   name: testcfg
 data:
   value: {{env \"TESTTEMPLATERENV\" }}"
-ls -la
 assert_contains_string configmap_testcfg.yaml "value: testval"
 
-testcase "kpt_templater_go_docker_declarative"
+testcase "kpt_templater_declarative"
 cat >fc.yaml <<EOF
 apiVersion: v1
 kind: ConfigMap

@@ -1,5 +1,10 @@
-// Package main implements pod emulation function to run arbitrary scripts and
-// is run with `kustomize config run -- DIR/`.
+// Package main implements a templater kpt-function, that
+// allows to generate documents using go-tempates.
+// Templater allows to use Sprig functions, including env and expandenv[1].
+// All other fields except `template` are passed as values to go-template
+// engine.
+// [1] http://masterminds.github.io/sprig/os.html
+
 package main
 
 import (

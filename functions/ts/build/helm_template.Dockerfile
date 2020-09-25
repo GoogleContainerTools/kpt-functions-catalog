@@ -19,6 +19,9 @@ WORKDIR /home/node/app
 
 # Install dependencies and cache them.
 COPY --chown=node:node package*.json ./
+# Make rw package for sops package.
+# TODO: Please remove next line when https://github.com/GoogleContainerTools/kpt/issues/1026 is done
+COPY --chown=node:node @types @types
 RUN npm ci --ignore-scripts
 
 # Build the source.

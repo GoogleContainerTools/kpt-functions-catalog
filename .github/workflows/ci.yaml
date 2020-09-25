@@ -68,7 +68,7 @@ jobs:
         cd functions/ts
         npm run kpt:docker-build
         cd ../go
-        docker build -t gcr.io/kpt-functions/templater:dev -t gcr.io/kpt-functions/templater -f templater/Dockerfile templater
+        BUILDONLY=true TAG=dev ./publish-functions.sh
     - name: Run all e2e tests
       if: matrix.platform == 'ubuntu-latest'
       run: |

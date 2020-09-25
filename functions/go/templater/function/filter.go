@@ -19,8 +19,9 @@ type Config struct {
 }
 
 type Filter struct {
-	Template string                 `json:"template" yaml:"template"`
-	Data     map[string]interface{} `json:"data,omitempty" yaml:"data,omitempty"`
+	CleanPipeline bool                   `json:"cleanPipeline,omitempty" yaml:"cleanPipeline,omitempty"`
+	Template      string                 `json:"template" yaml:"template"`
+	Data          map[string]interface{} `json:"data,omitempty" yaml:"data,omitempty"`
 }
 
 func NewFilter(cfg *Config) (kio.Filter, error) {
@@ -34,8 +35,15 @@ func NewFilter(cfg *Config) (kio.Filter, error) {
 		return nil, fmt.Errorf("data.template must be string")
 	}
 
-	f := Filter{Template: template, Data: cfg.Data}
+	cleanPipeline := false
+	val, ok = cfg.Data["cleanPipeline"]
+	if ok {
+		cleanPipeline = val.(bool)
+	}
+
+	f := Filter{Template: template, CleanPipeline: cleanPipeline, Data: cfg.Data}
 	delete(f.Data, "template")
+	delete(f.Data, "cleanPipeline")
 	return &f, nil
 }
 
@@ -63,6 +71,9 @@ func (f *Filter) Filter(items []*yaml.RNode) ([]*yaml.RNode, error) {
 	err = p.Execute()
 	if err != nil {
 		return nil, err
+	}
+	if f.CleanPipeline {
+		return b.Nodes, nil
 	}
 	return append(items, b.Nodes...), nil
 }

@@ -1,9 +1,27 @@
 # Templater function
 
 This is an example of implementing a templater function.
+Templater allows generating documents using go-template
+engine and Sprig library.
+`ConfigMap` may be used as a function configuration.
+The function doesn't check GVKN of the configuration.
+`data.template` field contains the template that will be
+used by go-template engine.
+If `data.cleanPipeline` field is true filter will remove
+all previously exited documents in pipeline and will add
+only generated. By default this function appends the 
+pipeline.
+All other literals inside `data` will be passed as values.
 
-This example is written in `go` and uses the `kyaml` libraries for parsing the
-input and writing the output.  Writing in `go` is not a requirement.
+It's allowed to use not only scalars as values, but also
+complex objects.
+
+The idea is similar to helm, but in contrast with helm,
+it doesn't require chart folder or link and allows
+such Sprig-functions as env and expandenv (see [details](http://masterminds.github.io/sprig/os.html))
+that gives more flexibility to build documents based
+on combination of values written in the function
+configuration and environment variables.
 
 ## Function implementation
 
