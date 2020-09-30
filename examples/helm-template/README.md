@@ -15,7 +15,7 @@ kpt fn run helm-template/local-configs --mount type=bind,src=$(pwd)/helm-templat
 
 ## Expected result
 
-Checking the contents of the `local-configs` directory should reveal the follwoing new yaml files:
+Checking the contents of the `local-configs` directory should reveal the following new yaml files:
 
 ```sh
 ./local-configs:
