@@ -19,7 +19,6 @@
 set -eo pipefail
 
 TAG=${TAG:-dev}
-NODOCKER=${NODOCKER:-}
 SDK_REPO=https://github.com/GoogleContainerTools/kpt-functions-sdk
 export CATALOG_REPO=https://github.com/GoogleContainerTools/kpt-functions-catalog
 export CHARTS_SRC="charts/bitnami"

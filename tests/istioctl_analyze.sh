@@ -21,14 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# kpt fn Tests
-############################
-[[ -z "${NODOCKER}" ]] || {
-  echo "Skipping docker tests"
-  exit 0
-}
-
 testcase "kpt_istioctl_analyze_declarative_no_errors"
 kpt pkg get https://github.com/istio/istio.git/samples/addons .
 cat >fc.yaml <<EOF
