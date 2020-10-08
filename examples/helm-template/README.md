@@ -15,12 +15,15 @@ kpt fn run helm-template/local-configs --mount type=bind,src=$(pwd)/helm-templat
 
 ## Expected result
 
-Checking the contents of the `local-configs` directory should reveal the following new yaml files:
+Checking the contents of the `local-configs` directory with `kpt cfg tree helm-template/local-configs/` should reveal the following new yaml files:
 
 ```sh
-./local-configs:
-deployment_chart-helloworld-chart.yaml  pod_chart-helloworld-chart-test-connection.yaml  service_chart-helloworld-chart.yaml
-fn-config.yaml                          serviceaccount_chart-helloworld-chart.yaml
+helm-template/local-configs
+├── [deployment_chart-helloworld-chart.yaml]  Deployment chart-helloworld-chart
+├── [fn-config.yaml]  ConfigMap my-func-config
+├── [pod_chart-helloworld-chart-test-connection.yaml]  Pod chart-helloworld-chart-test-connection
+├── [service_chart-helloworld-chart.yaml]  Service chart-helloworld-chart
+└── [serviceaccount_chart-helloworld-chart.yaml]  ServiceAccount chart-helloworld-chart
 ```
 
 Verify the expanded configuration:
@@ -31,7 +34,7 @@ kpt cfg cat local-configs
 
 The expected output should match the following:
 
-```sh
+```yml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
