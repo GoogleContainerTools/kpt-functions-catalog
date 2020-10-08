@@ -26,10 +26,10 @@ helm-template/local-configs
 └── [serviceaccount_chart-helloworld-chart.yaml]  ServiceAccount chart-helloworld-chart
 ```
 
-Verify the expanded configuration:
+Verify the expanded configuration in a dry run:
 
 ```sh
-kpt cfg cat local-configs
+kpt fn run helm-template/local-configs --mount type=bind,src=$(pwd)/helm-template/helloworld-chart,dst=/source --dry-run
 ```
 
 The expected output should match the following:
@@ -40,43 +40,45 @@ kind: Deployment
 metadata:
   name: chart-helloworld-chart
   labels:
-    app.kubernetes.io/instance: chart
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: helloworld-chart
-    app.kubernetes.io/version: 1.16.0
     helm.sh/chart: helloworld-chart-0.1.0
+    app.kubernetes.io/name: helloworld-chart
+    app.kubernetes.io/instance: chart
+    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    config.kubernetes.io/path: 'deployment_chart-helloworld-chart.yaml'
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/instance: chart
       app.kubernetes.io/name: helloworld-chart
+      app.kubernetes.io/instance: chart
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: chart
         app.kubernetes.io/name: helloworld-chart
+        app.kubernetes.io/instance: chart
     spec:
       serviceAccountName: chart-helloworld-chart
+      securityContext: {}
       containers:
       - name: helloworld-chart
+        securityContext: {}
         image: 'nginx:1.16.0'
+        imagePullPolicy: IfNotPresent
         ports:
         - name: http
-          protocol: TCP
           containerPort: 80
-        resources: {}
+          protocol: TCP
         livenessProbe:
           httpGet:
-            port: http
             path: /
+            port: http
         readinessProbe:
           httpGet:
-            port: http
             path: /
-        imagePullPolicy: IfNotPresent
-        securityContext: {}
-      securityContext: {}
+            port: http
+        resources: {}
 ---
 # call `kpt fn run` on a directory containing this file, mounting the helm chart at /source
 apiVersion: v1
@@ -87,6 +89,7 @@ metadata:
     config.kubernetes.io/function: |
       container:
         image: gcr.io/kpt-functions/helm-template
+    config.kubernetes.io/path: fn-config.yaml
 data:
   name: chart
   chart_path: /source
@@ -96,15 +99,15 @@ kind: Pod
 metadata:
   name: chart-helloworld-chart-test-connection
   labels:
-    app.kubernetes.io/instance: chart
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: helloworld-chart
-    app.kubernetes.io/version: 1.16.0
     helm.sh/chart: helloworld-chart-0.1.0
+    app.kubernetes.io/name: helloworld-chart
+    app.kubernetes.io/instance: chart
+    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/managed-by: Helm
   annotations:
     helm.sh/hook: test-success
+    config.kubernetes.io/path: 'pod_chart-helloworld-chart-test-connection.yaml'
 spec:
-  restartPolicy: Never
   containers:
   - name: wget
     image: busybox
@@ -112,37 +115,41 @@ spec:
     - wget
     args:
     - 'chart-helloworld-chart:80'
+  restartPolicy: Never
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: chart-helloworld-chart
   labels:
-    app.kubernetes.io/instance: chart
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: helloworld-chart
-    app.kubernetes.io/version: 1.16.0
     helm.sh/chart: helloworld-chart-0.1.0
+    app.kubernetes.io/name: helloworld-chart
+    app.kubernetes.io/instance: chart
+    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    config.kubernetes.io/path: 'service_chart-helloworld-chart.yaml'
 spec:
   type: ClusterIP
-  selector:
-    app.kubernetes.io/instance: chart
-    app.kubernetes.io/name: helloworld-chart
   ports:
-  - name: http
-    protocol: TCP
-    port: 80
+  - port: 80
     targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app.kubernetes.io/name: helloworld-chart
+    app.kubernetes.io/instance: chart
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: chart-helloworld-chart
   labels:
-    app.kubernetes.io/instance: chart
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: helloworld-chart
-    app.kubernetes.io/version: 1.16.0
     helm.sh/chart: helloworld-chart-0.1.0
----
+    app.kubernetes.io/name: helloworld-chart
+    app.kubernetes.io/instance: chart
+    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    config.kubernetes.io/path: 'serviceaccount_chart-helloworld-chart.yaml'
 ```
