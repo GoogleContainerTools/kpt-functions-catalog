@@ -26,7 +26,7 @@ helm-template/local-configs
 └── [serviceaccount_chart-helloworld-chart.yaml]  ServiceAccount chart-helloworld-chart
 ```
 
-Verify the expanded configuration in a dry run:
+To view changes without writing them into a file, a dry run can be performed as follows:
 
 ```sh
 kpt fn run helm-template/local-configs --mount type=bind,src=$(pwd)/helm-template/helloworld-chart,dst=/source --dry-run
