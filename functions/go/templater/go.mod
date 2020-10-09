@@ -9,5 +9,6 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.10 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.4.1
+	k8s.io/apimachinery v0.19.2
+	sigs.k8s.io/kustomize/kyaml v0.9.1
 )

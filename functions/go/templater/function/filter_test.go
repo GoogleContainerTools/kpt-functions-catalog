@@ -12,7 +12,7 @@ import (
 
 func TestTemplates(t *testing.T) {
 
-	os.Setenv("TESTTEMPLATE", "testtemplatevalue")
+	os.Setenv("TESTENV", "testenvvalue")
 
 	tc := []struct {
 		cfg         string
@@ -27,8 +27,8 @@ kind: ConfigMap
 metadata:
   name: notImportantHere
 data:
-  template: |
-    value1: {{ .literal1 }}
+  entrypoint: |
+    value1: {{ .Data.literal1 }}
   literal1: value1
   literal2: value2
 `,
@@ -42,9 +42,9 @@ kind: ConfigMap
 metadata:
   name: notImportantHere
 data:
-  template: 'value: {{ env "TESTTEMPLATE" }}'
+  entrypoint: 'value: {{ env "TESTENV" }}'
 `,
-			expectedOut: `value: testtemplatevalue
+			expectedOut: `value: testenvvalue
 `,
 		},
 		{
@@ -54,8 +54,8 @@ kind: Templater
 metadata:
   name: notImportantHere
 data:
-  template: |
-    {{ range .hosts -}}
+  entrypoint: |
+    {{ range .Data.hosts -}}
     ---
     apiVersion: metal3.io/v1alpha1
     kind: BareMetalHost
@@ -92,7 +92,7 @@ kind: Templater
 metadata:
   name: notImportantHere
 data:
-  template: '{{ toYaml . -}}'
+  entrypoint: '{{ toYaml .Data -}}'
 
   test:
     of:
@@ -110,7 +110,7 @@ kind: Templater
 metadata:
   name: notImportantHere
 data:
-  template: |
+  entrypoint: |
     {{ toYaml ignorethisbadinput -}}
   test:
     of:
@@ -125,7 +125,7 @@ kind: Templater
 metadata:
   name: notImportantHere
 data:
-  template: |
+  entrypoint: |
     {{ end }
 `,
 			expectedErr: true,
@@ -147,7 +147,7 @@ kind: Templater
 metadata:
   name: notImportantHere
 data:
-  template: 234
+  entrypoint: 234
 `,
 			expectedErr: true,
 		},
@@ -158,7 +158,7 @@ kind: Templater
 metadata:
   name: notImportantHere
 data:
-  template:
+  entrypoint:
     x:
       y: z
 `,
@@ -177,10 +177,11 @@ kind: ConfigMap
 metadata:
   name: notImportantHere
 data:
-  cleanPipeline: true
-  template: 'value: {{ env "TESTTEMPLATE" }}'
+  entrypoint: |
+    {{- $_ := (set . "Items" (list)) -}}
+    value: {{ env "TESTENV" }}
 `,
-			expectedOut: `value: testtemplatevalue
+			expectedOut: `value: testenvvalue
 `,
 		},
 		{
@@ -196,15 +197,154 @@ kind: ConfigMap
 metadata:
   name: notImportantHere
 data:
-  cleanPipeline: false
-  template: 'value: {{ env "TESTTEMPLATE" }}'
+  entrypoint: |
+    value: {{ env "TESTENV" }}
 `,
 			expectedOut: `apiVersion: v1
 kind: ConfigMap
 metadata:
   name: map1
 ---
-value: testtemplatevalue
+value: testenvvalue
+`,
+		},
+		// transformer tests
+		{
+			in: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map1
+`,
+			cfg: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notImportantHere
+data:
+  annotationTransf: |
+    kind: AnnotationSetter
+    key: test-annotation
+    value: %s
+  entrypoint: |
+    {{- $_ := KPipe .Items (list (KYFilter (list (YFilter (printf .Data.annotationTransf (env "TESTENV")))))) -}}
+`,
+			expectedOut: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map1
+  annotations:
+    test-annotation: 'testenvvalue'
+`,
+		},
+		{
+			in: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map1
+data:
+  value: value1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map2
+data:
+  value: value2
+`,
+			cfg: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notImportantHere
+data:
+  map1grep: |
+    kind: GrepFilter
+    path: 
+    - metadata
+    - name
+    value: ^map1$
+  pathGet1: |
+    kind: PathGetter
+    path:
+    - data
+    - value
+  map2grep: |
+    kind: GrepFilter
+    path:
+    - metadata
+    - name
+    value: ^map2$
+  map2PathGet: |
+    kind: PathGetter
+    path:
+    - data
+  fieldSet: |
+    kind: FieldSetter
+    name: value
+    stringValue: %s
+  entrypoint: |
+    {{- $map1 := KPipe .Items (list (KFilter .Data.map1grep)) -}}
+    {{- $map1value := YValue (YPipe (index $map1 0) (list (YFilter .Data.pathGet1))) -}}
+    {{- $_ := KPipe .Items (list (KFilter .Data.map2grep) (KYFilter (list (YFilter .Data.map2PathGet) (YFilter (printf .Data.fieldSet $map1value))))) -}}
+`,
+			expectedOut: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map1
+data:
+  value: value1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map2
+data:
+  value: value1
+`,
+		},
+		{
+			in: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map1
+  annotations:
+    test-annotation: x
+data:
+  value: value1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map2
+data:
+  value: value2
+`,
+			cfg: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notImportantHere
+data:
+  grep: |
+    kind: GrepFilter
+    path:
+    - metadata
+    - annotations
+    - test-annotation
+    value: ^x$
+    invertMatch: true
+  entrypoint: |
+    {{- $_ := (set . "Items" (KPipe .Items (list (KFilter .Data.grep)))) -}}
+`,
+			expectedOut: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: map2
+data:
+  value: value2
 `,
 		},
 	}

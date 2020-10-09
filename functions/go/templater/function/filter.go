@@ -19,31 +19,23 @@ type Config struct {
 }
 
 type Filter struct {
-	CleanPipeline bool                   `json:"cleanPipeline,omitempty" yaml:"cleanPipeline,omitempty"`
-	Template      string                 `json:"template" yaml:"template"`
-	Data          map[string]interface{} `json:"data,omitempty" yaml:"data,omitempty"`
+	Entrypoint string                 `json:"entrypoint" yaml:"entrypoint"`
+	Data       map[string]interface{} `json:"data,omitempty" yaml:"data,omitempty"`
 }
 
 func NewFilter(cfg *Config) (kio.Filter, error) {
-	val, ok := cfg.Data["template"]
+	val, ok := cfg.Data["entrypoint"]
 	if !ok {
-		return nil, fmt.Errorf("config doesn't have data.template field: %v", cfg)
+		return nil, fmt.Errorf("config doesn't have data.entrypoint field: %v", cfg)
 	}
 
-	template, ok := val.(string)
+	entrypoint, ok := val.(string)
 	if !ok {
-		return nil, fmt.Errorf("data.template must be string")
+		return nil, fmt.Errorf("data.entrypoint must be string")
 	}
 
-	cleanPipeline := false
-	val, ok = cfg.Data["cleanPipeline"]
-	if ok {
-		cleanPipeline = val.(bool)
-	}
-
-	f := Filter{Template: template, CleanPipeline: cleanPipeline, Data: cfg.Data}
-	delete(f.Data, "template")
-	delete(f.Data, "cleanPipeline")
+	f := Filter{Entrypoint: entrypoint, Data: cfg.Data}
+	delete(f.Data, "entrypoint")
 	return &f, nil
 }
 
@@ -51,13 +43,19 @@ func (f *Filter) Filter(items []*yaml.RNode) ([]*yaml.RNode, error) {
 	var out bytes.Buffer
 
 	funcMap := sprig.TxtFuncMap()
+	funcMap = FuncMapMerge(funcMap, FuncMap())
 	funcMap["toYaml"] = toYaml
-	tmpl, err := template.New("tmpl").Funcs(funcMap).Parse(f.Template)
+	tmpl, err := template.New("tmpl").Funcs(funcMap).Parse(f.Entrypoint)
 	if err != nil {
 		return nil, err
 	}
 
-	err = tmpl.Execute(&out, f.Data)
+	tmplRoot := map[string]interface{}{
+		"Items": items,
+		"Data":  f.Data,
+	}
+
+	err = tmpl.Execute(&out, tmplRoot)
 	if err != nil {
 		return nil, fmt.Errorf("template returned error: %v", err)
 	}
@@ -70,10 +68,11 @@ func (f *Filter) Filter(items []*yaml.RNode) ([]*yaml.RNode, error) {
 	}
 	err = p.Execute()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't unmarshal:\n%s\n, %v", out.String(), err)
 	}
-	if f.CleanPipeline {
-		return b.Nodes, nil
+	items, err = getRNodes(tmplRoot["Items"])
+	if err != nil {
+		return nil, fmt.Errorf("Can't convert Items back: %v", err)
 	}
 	return append(items, b.Nodes...), nil
 }
@@ -86,4 +85,26 @@ func toYaml(v interface{}) string {
 		return ""
 	}
 	return string(data)
+}
+
+func getRNodes(rnodesarr interface{}) ([]*yaml.RNode, error) {
+	rnodes, ok := rnodesarr.([]*yaml.RNode)
+	if ok {
+		return rnodes, nil
+	}
+
+	rnodesx, ok := rnodesarr.([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("unexpected type %T - wanted []", rnodesarr)
+	}
+
+	rns := []*yaml.RNode{}
+	for i, r := range rnodesx {
+		rn, ok := r.(*yaml.RNode)
+		if !ok {
+			return nil, fmt.Errorf("has got element %d with unexpected type %T", i, r)
+		}
+		rns = append(rns, rn)
+	}
+	return rns, nil
 }

@@ -31,7 +31,7 @@ source "$DIR"/common.sh
 }
 
 testcase "kpt_templater_imperative"
-kpt fn run . --env TESTTEMPLATERENV="testval" --image gcr.io/kpt-functions/templater:"${TAG}" -- template="apiVersion: v1
+kpt fn run . --env TESTTEMPLATERENV="testval" --image gcr.io/kpt-functions/templater:"${TAG}" -- entrypoint="apiVersion: v1
 kind: ConfigMap
 metadata:
   name: testcfg
@@ -53,7 +53,7 @@ metadata:
         - TESTTEMPLATERENV=testval
     config.kubernetes.io/local-config: 'true'
 data:
-  template: |
+  entrypoint: |
     apiVersion: v1
     kind: ConfigMap
     metadata:

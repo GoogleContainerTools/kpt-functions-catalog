@@ -6,18 +6,9 @@ metadata:
       container:
         image: gcr.io/kpt-functions/templater:stable
 data:
-  template: |
-    {{ range .hosts -}}
-    ---
-    apiVersion: metal3.io/v1alpha1
-    kind: BareMetalHost
-    metadata:
-      name: {{ .name }}
-    spec:
-      bootMACAddress: {{ .macAddress }}
-    {{ end -}}
-  hosts:
-    - macAddress: 00:aa:bb:cc:dd
-      name: node-1
-    - macAddress: 00:aa:bb:cc:ee
-      name: node-2
+  annotationSet: |
+    kind: AnnotationSetter
+    key: check-datestamp
+    value: %s
+  entrypoint: |
+    {{- $_ := KPipe .Items (list (KYFilter (list (YFilter (printf .Data.annotationSet (now | date "2006-01-02")))))) -}}
