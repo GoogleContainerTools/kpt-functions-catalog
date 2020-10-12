@@ -21,14 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# kpt fn Tests
-############################
-[[ -z "${NODOCKER}" ]] || {
-  echo "Skipping docker tests"
-  exit 0
-}
-
 helm_testcase "kpt_helm_template_imperative_expected_args"
 kpt fn source example-configs |
   kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-template:"${TAG}" -- name=expected-args chart_path=/source/redis >out.yaml

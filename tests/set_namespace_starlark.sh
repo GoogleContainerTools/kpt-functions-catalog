@@ -21,10 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# kpt fn Tests
-############################
-
 # TODO: Write imperative e2e test calling starlark
 # Blocked because passing arguments to `kpt fn run` puts them in the data field instead of the spec field
 # https://github.com/GoogleContainerTools/kpt/issues/757

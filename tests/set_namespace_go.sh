@@ -21,25 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# kpt fn Tests
-############################
-
-# Use the macos executable to test using kpt exec runtime on macos
-if [ -n "${NODOCKER}" ]
-then
-testcase "kpt_set_namespace_go_exec_imperative_macos"
-kpt pkg get "$SDK_REPO"/example-configs example-configs
-kpt pkg get "$CATALOG_REPO"/functions/go ./
-kpt fn run example-configs --enable-exec --exec-path "$(pwd)"/go/set-namespace/set-namespace-macos -- namespace=example-ns
-assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
-fi
-
-[[ -z "${NODOCKER}" ]] || {
-  echo "Skipping docker tests"
-  exit 0
-}
-
 testcase "kpt_set_namespace_go_docker_imperative"
 kpt pkg get "$SDK_REPO"/example-configs example-configs
 kpt fn run . --image gcr.io/kpt-functions/set-namespace:"${TAG}" -- namespace=example-ns
@@ -69,3 +50,8 @@ kpt pkg get "$SDK_REPO"/example-configs example-configs
 kpt pkg get "$CATALOG_REPO"/functions/go ./
 kpt fn run example-configs --enable-exec --exec-path "$(pwd)"/go/set-namespace/set-namespace-linux -- namespace=example-ns
 assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
+
+testcase "kpt_set_namespace_go_declarative_example"
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/set-namespace@namespace-blueprint .
+kpt fn run set-namespace/configs --fn-path set-namespace/functions
+assert_contains_string set-namespace/configs/example-config.yaml "namespace: example-ns"

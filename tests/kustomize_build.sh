@@ -21,24 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# Docker Tests
-############################
-[[ -z "${NODOCKER}" ]] || {
-  echo "Skipping docker tests"
-  exit 0
-}
-
-# TODO: Revisit after adressing https://github.com/GoogleContainerTools/kpt/issues/839
-testcase "docker_kustomize_build_imperative_git"
-docker run -u "$(id -u)" gcr.io/kpt-functions/kustomize-build:"${TAG}" -d path=https://github.com/kubernetes-sigs/kustomize/examples/multibases/ |
-  docker run -i -u "$(id -u)" -v "$(pwd)":/sink gcr.io/kpt-functions/write-yaml:"${TAG}" -o /dev/null -d sink_dir=/sink -d overwrite=true
-assert_contains_string pod_cluster-a-staging-myapp-pod.yaml "name: cluster-a-staging-myapp-pod"
-
-############################
-# kpt fn Tests
-############################
-
 testcase "kpt_kustomize_build_imperative"
 kpt pkg get https://github.com/kubernetes-sigs/kustomize/examples/helloWorld helloWorld
 kpt fn source helloWorld |
@@ -79,3 +61,26 @@ kpt fn source examples |
   kpt fn sink .
 assert_contains_string configmap_the-map.yaml "app: hello"
 assert_dir_exists knative-serving
+
+testcase "kpt_kustomize_build_declarative_git"
+cat >fc.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-functions/kustomize-build:${TAG}
+        network:
+          required: true
+    config.kubernetes.io/local-config: "true"
+data:
+  path: http://github.com/kubernetes-sigs/kustomize/examples/multibases/
+EOF
+kpt fn run . --network
+assert_contains_string pod_cluster-a-staging-myapp-pod.yaml "name: cluster-a-staging-myapp-pod"
+
+testcase "kpt_kustomize_build_imperative_git"
+kpt fn run . --network --image gcr.io/kpt-functions/kustomize-build:"${TAG}" -- path=http://github.com/kubernetes-sigs/kustomize/examples/multibases/
+assert_contains_string pod_cluster-a-staging-myapp-pod.yaml "name: cluster-a-staging-myapp-pod"

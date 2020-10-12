@@ -13,32 +13,16 @@ Get this example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval .
-kpt fn run kubeval --network --results-dir /tmp
+kpt fn run kubeval --network
 ```
 
 ## Expected Results
 
-The `--results-dir` flag let us specify a destination to write function results
-to. Check the results:
+This should give the following output:
 
 ```sh
-cat /tmp/results-0.yaml
-```
-
-They contain the following results:
-
-```sh
-- message: 'Invalid type. Expected: [integer,null], given: string'
-  severity: error
-  resourceRef:
-    apiVersion: v1
-    kind: ReplicationController
-    namespace: ''
-    name: bob
-  file:
-    path: configs/example-config.yaml
-  field:
-    path: spec.replicas
+[ERROR] Invalid type. Expected: [integer,null], given: string in object 'v1/ReplicationController//bob' in file configs/example-config.yaml in field spec.replicas
+error: exit status 1
 ```
 
 In the `configs/example-config.yaml` file, replace the value of `spec.replicas`

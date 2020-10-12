@@ -61,9 +61,14 @@ same pull request format as code changes.
 
 ## How to Release
 
-We have spearate a release process for each language, golang and typescript.
+We have spearate a release process for each language: golang and typescript.
 All functions written in the language get released together. Maintainers should
-create releases through the Github UI.
+create releases through the
+[Github UI](https://github.com/GoogleContainerTools/kpt-functions-catalog/releases).
+
+The release title and the release tag version should both be of the form
+`release-[lang]-functions-v[version number]`. Risky changes are encouraged to be
+tagged as pre-releases to confirm production readiness.
 
 ## Contact Us
 
@@ -75,7 +80,7 @@ from you!
 
 [Google's Open Source Community Guidelines]: https://opensource.google.com/conduct/
 [Code of Conduct]: CODE_OF_CONDUCT.md
-[kpt website]: https://googlecontainertools.github.io/kpt/guides/consumer/function/catalog/
+[kpt website]: https://googlecontainertools.github.io/kpt/guides/consumer/function/
 [kpt contribution guidelines]: https://github.com/GoogleContainerTools/kpt/blob/master/CONTRIBUTING.md#adding-or-updating-catalog-functions
 [functions/]: functions/
 [examples/]: examples/

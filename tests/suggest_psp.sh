@@ -21,24 +21,6 @@ DIR="$(dirname "$0")"
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
-############################
-# Docker Tests
-############################
-[[ -z "${NODOCKER}" ]] || {
-  echo "Skipping docker tests"
-  exit 0
-}
-
-testcase "docker_suggest_psp_imperative"
-kpt pkg get "$SDK_REPO"/example-configs example-configs
-kpt fn source example-configs |
-  docker run -i -e STRUCTURED_RESULTS=1 gcr.io/kpt-functions/suggest-psp:"${TAG}" >results.out
-assert_contains_string results.out "Suggest explicitly disabling privilege escalation"
-
-############################
-# kpt fn Tests
-############################
-
 testcase "kpt_suggest_psp_imperative"
 kpt pkg get "$SDK_REPO"/example-configs example-configs
 kpt fn source example-configs |

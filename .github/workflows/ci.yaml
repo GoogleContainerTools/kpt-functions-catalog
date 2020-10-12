@@ -26,7 +26,7 @@ jobs:
   node-ci:
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-latest]
+        platform: [ubuntu-latest]
         node-version: [12.x]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -49,7 +49,7 @@ jobs:
     needs: [node-ci]
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-latest]
+        platform: [ubuntu-latest]
         node-version: [12.x]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -75,9 +75,3 @@ jobs:
         sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
         sudo chmod +x /usr/local/bin/kpt
         tests/e2e.sh
-    - name: Run non-docker e2e tests
-      if: matrix.platform == 'macos-latest'
-      run: |
-        sudo curl https://storage.googleapis.com/kpt-dev/latest/darwin_amd64/kpt -o /usr/local/bin/kpt
-        sudo chmod +x /usr/local/bin/kpt
-        NODOCKER=true tests/e2e.sh
