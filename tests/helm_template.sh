@@ -28,8 +28,7 @@ assert_contains_string out.yaml "expected-args"
 
 testcase "kpt_helm_template_declarative_example"
 # TODO: Remove error handling once kpt pkg get shows errors gracefully https://github.com/GoogleContainerTools/kpt/issues/838
-# TODO: This is a temporary fix till declarative example e2e tests run using the $TAG being tested
-kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/helm-template@helm-fix . || true
+kpt pkg get "$CATALOG_REPO"/examples/helm-template . || true
 kpt fn run helm-template/local-configs --mount type=bind,src="$(pwd)"/helm-template/helloworld-chart,dst=/source
 assert_contains_string helm-template/local-configs/deployment_chart-helloworld-chart.yaml "name: chart-helloworld-chart"
 
