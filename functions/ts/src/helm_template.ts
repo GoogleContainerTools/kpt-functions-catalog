@@ -254,7 +254,7 @@ metadata:
           required: true
     config.kubernetes.io/local-config: "true"
 data:
-  chart-repo: stable
-  chart-repo-url: https://url/to/repo
-  chart: stable/chart
+  ${CHART_REPO}: stable
+  ${CHART_REPO_URL}: https://url/to/repo
+  ${CHART}: stable/chart
 `;
