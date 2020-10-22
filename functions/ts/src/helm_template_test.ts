@@ -121,6 +121,18 @@ describe('invalid config', () => {
     );
   });
 
+  it('no function config', async () => {
+    const runner = new TestRunner(helmTemplate);
+    const input = new Configs(undefined, undefined);
+    const output = input.deepCopy();
+    await runner.assert(
+      input,
+      output,
+      Error,
+      'Function ConfigMap data cannot be undefined.'
+    );
+  });
+
   it('local and remote', async () => {
     const runner = new TestRunner(helmTemplate);
     const configMap = ConfigMap.named('config');

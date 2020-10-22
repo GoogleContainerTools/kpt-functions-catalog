@@ -40,160 +40,154 @@ class HelmTemplateError extends Error {
   }
 }
 
-class HelmTemplate {
-  configs: Configs;
-  data: Map<string, string> = new Map<string, string>();
+// get and validate the data field from function ConfigMap
+function getConfigMapData(configs: Configs): Map<string, string> {
+  const configMapData = configs.getFunctionConfigMap();
+  if (configMapData === undefined) {
+    throw new Error(`Function ConfigMap data cannot be undefined.`);
+  }
+  validateConfigMapData(configMapData);
+  return configMapData;
+}
 
-  constructor(configs: Configs) {
-    this.configs = configs;
+function validateConfigMapData(configMapData: Map<string, string>) {
+  // either local or remote
+  if (!configMapData.has(CHART) && !configMapData.has(LOCAL_CHART_PATH)) {
+    throw new Error(
+      `Either ${CHART} or ${LOCAL_CHART_PATH} needs to be provided.`
+    );
+  }
+  // cannot use both remote and local chart
+  if (configMapData.has(CHART) && configMapData.has(LOCAL_CHART_PATH)) {
+    throw new Error(
+      `Cannot use ${CHART} and ${LOCAL_CHART_PATH} at the same time.`
+    );
+  }
+  // CHART_REPO and CHART_REPO_URL are required for remote chart
+  if (
+    configMapData.has(CHART) &&
+    (!configMapData.has(CHART_REPO) || !configMapData.has(CHART_REPO_URL))
+  ) {
+    throw new Error(
+      `${CHART_REPO} and ${CHART_REPO_URL} are required for remote chart`
+    );
+  }
+}
 
-    this.getData();
+// run helm repo add to add the remote repo url to helm repo list
+async function addHelmRepo(configMapData: Map<string, string>) {
+  const args: string[] = [
+    'repo',
+    'add',
+    configMapData.get(CHART_REPO)!,
+    configMapData.get(CHART_REPO_URL)!,
+  ];
+  runHelmCommand(args);
+}
+
+// mkTmpDir creates a temporary directory and return the path
+async function mkTmpDir(): Promise<string> {
+  const path = Path.join(tmpdir(), 'remote-helm-chart');
+  // clear at first
+  rmdirSync(path, { recursive: true });
+
+  mkdirSync(path, { recursive: true });
+  return path;
+}
+
+// run the helm command with given args
+function runHelmCommand(args: string[]): { stdout: string; stderr: string } {
+  const child = spawnSync('helm', args);
+  const stderr = child.stderr;
+  const error = child.error;
+
+  if (error || (stderr && stderr.length > 0)) {
+    throw new HelmTemplateError(
+      `Helm command ${args.join(' ')} results in error: ${stderr.toString()}`
+    );
   }
 
-  getData() {
-    const data = this.configs.getFunctionConfigMap();
-    if (data !== undefined) {
-      this.data = data;
-    }
-    this.validData();
+  return {
+    stdout: child.stdout,
+    stderr,
+  };
+}
+
+// run helm pull command
+async function runHelmPull(configMapData: Map<string, string>) {
+  if (!configMapData.has(CHART)) {
+    // not remote chart
+    return;
   }
+  addHelmRepo(configMapData);
+  // prepare source directory
+  const tmpDir = await mkTmpDir();
 
-  validData() {
-    // either local or remote
-    if (!this.data.has(CHART) && !this.data.has(LOCAL_CHART_PATH)) {
-      throw new Error(
-        `Either ${CHART} or ${LOCAL_CHART_PATH} needs to be provided.`
-      );
-    }
-    // cannot use both remote and local chart
-    if (this.data.has(CHART) && this.data.has(LOCAL_CHART_PATH)) {
-      throw new Error(
-        `Cannot use ${CHART} and ${LOCAL_CHART_PATH} at the same time.`
-      );
-    }
-    // CHART_REPO and CHART_REPO_URL are required for remote chart
-    if (
-      this.data.has(CHART) &&
-      (!this.data.has(CHART_REPO) || !this.data.has(CHART_REPO_URL))
-    ) {
-      throw new Error(
-        `${CHART_REPO} and ${CHART_REPO_URL} are required for remote chart`
-      );
-    }
-  }
+  const args: string[] = [
+    'pull',
+    '--untar',
+    '--untardir',
+    tmpDir,
+    configMapData.get(CHART)!,
+  ];
 
-  // get arguments for helm template command
-  templateArgs(): string[] {
-    const args: string[] = [];
-    this.data.forEach((value: string, key: string) => {
-      // template flags should start with '-'
-      if (!key.startsWith('-')) {
-        return;
-      }
-      args.push(key);
-      args.push(value);
-    });
+  runHelmCommand(args);
 
-    // Helm template expects name and chart path first so place those at the beginning
-    if (this.data.get(LOCAL_CHART_PATH) !== undefined) {
-      args.unshift(this.data.get(LOCAL_CHART_PATH)!);
-    }
-    if (this.data.get(CHART_NAME) !== undefined) {
-      args.unshift(this.data.get(CHART_NAME)!);
-    }
+  // helm pull will untar the charts to a subdirectory in destination
+  // we need to use that subdirectory as LOCAL_CHART_PATH
+  const [subDir] = readdirSync(tmpDir);
+  configMapData.set(LOCAL_CHART_PATH, Path.join(tmpDir, subDir));
+}
 
-    return args;
-  }
-
-  // run helm template command
-  async template() {
-    // Validate config data and read arguments.
-    const args = this.templateArgs();
-    args.unshift('template');
-
-    const { stdout } = this.runHelmCommand(args);
-
-    try {
-      let objects = safeLoadAll(stdout);
-      objects = objects.filter((o) => isKubernetesObject(o));
-      this.configs.insert(...objects);
-    } catch (err) {
-      throw new HelmTemplateError(err);
-    }
-  }
-
-  // run helm pull command
-  async pull() {
-    if (!this.data.has(CHART)) {
-      // not remote chart
+// get arguments for helm template command
+function getTemplateArgs(configMapData: Map<string, string>): string[] {
+  const args: string[] = [];
+  configMapData.forEach((value: string, key: string) => {
+    // template flags should start with '-'
+    if (!key.startsWith('-')) {
       return;
     }
-    this.addRepo();
-    // prepare source directory
-    const tmpDir = await this.mkTmpDir();
+    args.push(key);
+    args.push(value);
+  });
 
-    const args: string[] = [
-      'pull',
-      '--untar',
-      '--untardir',
-      tmpDir,
-      this.data.get(CHART)!,
-    ];
-
-    this.runHelmCommand(args);
-
-    // helm pull will untar the charts to a subdirectory in destination
-    // we need to use that subdirectory as LOCAL_CHART_PATH
-    const [subDir] = readdirSync(tmpDir);
-    this.data.set(LOCAL_CHART_PATH, Path.join(tmpDir, subDir));
+  // Helm template expects name and chart path first so place those at the beginning
+  if (configMapData.get(LOCAL_CHART_PATH) !== undefined) {
+    args.unshift(configMapData.get(LOCAL_CHART_PATH)!);
+  }
+  if (configMapData.get(CHART_NAME) !== undefined) {
+    args.unshift(configMapData.get(CHART_NAME)!);
   }
 
-  // run helm repo add to add the remote repo url to helm repo list
-  async addRepo() {
-    const args: string[] = [
-      'repo',
-      'add',
-      this.data.get(CHART_REPO)!,
-      this.data.get(CHART_REPO_URL)!,
-    ];
-    this.runHelmCommand(args);
-  }
+  return args;
+}
 
-  // mkTmpDir creates a temporary directory and return the path
-  async mkTmpDir(): Promise<string> {
-    const path = Path.join(tmpdir(), 'remote-helm-chart');
-    // clear at first
-    rmdirSync(path, { recursive: true });
+// run helm template command
+async function runHelmTemplate(
+  configs: Configs,
+  configMapData: Map<string, string>
+) {
+  // Validate config data and read arguments.
+  const args = getTemplateArgs(configMapData);
+  args.unshift('template');
 
-    mkdirSync(path, { recursive: true });
-    return path;
-  }
+  const { stdout } = runHelmCommand(args);
 
-  // run the helm command with given args
-  runHelmCommand(args: string[]): { stdout: string; stderr: string } {
-    const child = spawnSync('helm', args);
-    const stderr = child.stderr;
-    const error = child.error;
-
-    if (error || (stderr && stderr.length > 0)) {
-      throw new HelmTemplateError(
-        `Helm command ${args.join(' ')} results in error: ${stderr.toString()}`
-      );
-    }
-
-    return {
-      stdout: child.stdout,
-      stderr,
-    };
+  try {
+    let objects = safeLoadAll(stdout);
+    objects = objects.filter((o) => isKubernetesObject(o));
+    configs.insert(...objects);
+  } catch (err) {
+    throw new HelmTemplateError(err);
   }
 }
 
 // Render local ot remote chart templates using helm template.
 export async function helmTemplate(configs: Configs) {
   try {
-    const helm = new HelmTemplate(configs);
-    await helm.pull();
-    await helm.template();
+    const configMapData = getConfigMapData(configs);
+    await runHelmPull(configMapData);
+    await runHelmTemplate(configs, configMapData);
   } catch (err) {
     if (err instanceof HelmTemplateError) {
       configs.addResults(generalResult(err.toString(), 'error'));
@@ -224,23 +218,7 @@ ${CHART_REPO_URL}: Repo list URL which will be added to the helm repo list with 
 
 Examples:
 
-1. To expand a chart named 'my-chart' at '../path/to/helm/chart' using './values.yaml':
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-  annotations:
-    config.k8s.io/function: |
-      container:
-        image: gcr.io/kpt-functions/helm-template
-    config.kubernetes.io/local-config: "true"
-data:
-  ${CHART_NAME}: my-chart
-  ${LOCAL_CHART_PATH}: ../path/to/helm/chart
-  ${VALUES_PATH}: ./values.yaml
-
-2. To expand a chart named 'my-chart' at remote chart 'stable/chart'
+1. To expand a chart named 'my-chart' at remote chart 'stable/chart'
 
 apiVersion: v1
 kind: ConfigMap
@@ -257,4 +235,20 @@ data:
   ${CHART_REPO}: stable
   ${CHART_REPO_URL}: https://url/to/repo
   ${CHART}: stable/chart
+
+2. To expand a chart named 'my-chart' at '../path/to/helm/chart' using './values.yaml':
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-functions/helm-template
+    config.kubernetes.io/local-config: "true"
+data:
+  ${CHART_NAME}: my-chart
+  ${LOCAL_CHART_PATH}: ../path/to/helm/chart
+  ${VALUES_PATH}: ./values.yaml
 `;
