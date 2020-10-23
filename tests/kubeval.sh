@@ -40,8 +40,7 @@ metadata:
     config.k8s.io/function: |
       container:
         image: gcr.io/kpt-functions/kubeval:${TAG}
-        network:
-          required: true
+        network: true
     config.kubernetes.io/local-config: 'true'
 EOF
 kpt fn source fixtures/valid* |
@@ -67,8 +66,7 @@ metadata:
     config.k8s.io/function: |
       container:
         image: gcr.io/kpt-functions/kubeval:${TAG}
-        network:
-          required: true
+        network: true
     config.kubernetes.io/local-config: 'true'
 EOF
 kpt fn source fixtures/*invalid.yaml |
