@@ -72,8 +72,7 @@ metadata:
     config.k8s.io/function: |
       container:
         image: gcr.io/kpt-functions/kustomize-build:${TAG}
-        network:
-          required: true
+        network: true
     config.kubernetes.io/local-config: "true"
 data:
   path: http://github.com/kubernetes-sigs/kustomize/examples/multibases/
