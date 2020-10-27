@@ -31,12 +31,12 @@ const CHART_REPO = 'chart-repo';
 // CHART_REPO_URL is the repo remote URL
 const CHART_REPO_URL = 'chart-repo-url';
 
-class HelmTemplateError extends Error {
+class HelmError extends Error {
   constructor(m: string) {
     super(m);
 
     // Set the prototype explicitly.
-    Object.setPrototypeOf(this, HelmTemplateError.prototype);
+    Object.setPrototypeOf(this, HelmError.prototype);
   }
 }
 
@@ -102,7 +102,7 @@ function runHelmCommand(args: string[]): { stdout: string; stderr: string } {
   const error = child.error;
 
   if (error || (stderr && stderr.length > 0)) {
-    throw new HelmTemplateError(
+    throw new HelmError(
       `Helm command ${args.join(' ')} results in error: ${stderr.toString()}`
     );
   }
@@ -178,7 +178,7 @@ async function runHelmTemplate(
     objects = objects.filter((o) => isKubernetesObject(o));
     configs.insert(...objects);
   } catch (err) {
-    throw new HelmTemplateError(err);
+    throw new HelmError(err);
   }
 }
 
@@ -189,7 +189,7 @@ export async function helmTemplate(configs: Configs) {
     await runHelmPull(configMapData);
     await runHelmTemplate(configs, configMapData);
   } catch (err) {
-    if (err instanceof HelmTemplateError) {
+    if (err instanceof HelmError) {
       configs.addResults(generalResult(err.toString(), 'error'));
     } else {
       throw err;
@@ -208,12 +208,12 @@ in the directory ${LOCAL_CHART_PATH}.
 Configured using a ConfigMap with keys for ${CHART_NAME}, ${LOCAL_CHART_PATH}, ${CHART}, ${CHART_REPO} or ${CHART_REPO_URL}.
 Works with arbitrary helm template flags like --values:
 
-${CHART_NAME}: Name of helm chart.
-${LOCAL_CHART_PATH}: Chart templates directory.
+${CHART_NAME}: [Optional] Name of helm chart.
+${LOCAL_CHART_PATH}: [Optional] Chart templates directory.
 ${VALUES_PATH}: [Optional] Path to values file.
-${CHART}: A url to pull the remote chart instead of using local templates. This flag only works with remote charts.
-${CHART_REPO}: Repo name that helm should pull the templates from. Only used when chart is provided.
-${CHART_REPO_URL}: Repo list URL which will be added to the helm repo list with repo name chart-repo. Only used when chart is provided.
+${CHART}: [Optional] A url to pull the remote chart instead of using local templates. This flag only works with remote charts.
+${CHART_REPO}: [Optional] Repo name that helm should pull the templates from. Only used when chart is provided.
+${CHART_REPO_URL}: [Optional] Repo list URL which will be added to the helm repo list with repo name chart-repo. Only used when chart is provided.
 ...
 
 Examples:
@@ -235,6 +235,7 @@ data:
   ${CHART_REPO}: stable
   ${CHART_REPO_URL}: https://url/to/repo
   ${CHART}: stable/chart
+  ${CHART_NAME}: my-chart
 
 2. To expand a chart named 'my-chart' at '../path/to/helm/chart' using './values.yaml':
 
