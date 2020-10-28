@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-func-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-functions/annotate-config
+    config.kubernetes.io/local-config: 'true'
+data:
+  annotation_name: configmanagement.gke.io/namespace-selector
+  annotation_value: sre-supported

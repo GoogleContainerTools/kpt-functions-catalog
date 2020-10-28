@@ -48,3 +48,8 @@ kpt fn source example-configs |
   kpt fn run --fn-path fc.yaml |
   kpt fn sink example-configs
 assert_contains_string example-configs/gatekeeper.yaml "configmanagement.gke.io/namespace-selector: sre-supported"
+
+testcase "kpt_annotate_config_declarative_example"
+kpt pkg get https://github.com/prachirp/kpt-functions-catalog.git/examples/annotate-config@annotate-blueprint .
+kpt fn run annotate-config/configs --fn-path annotate-config/functions
+assert_contains_string annotate-config/configs/example-config.yaml "configmanagement.gke.io/namespace-selector: sre-supported"
