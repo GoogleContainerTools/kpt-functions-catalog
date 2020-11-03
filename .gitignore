@@ -4,3 +4,4 @@ node_modules
 *.iml
 .npmrc
 .DS_Store
+.nyc_output

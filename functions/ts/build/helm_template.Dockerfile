@@ -39,13 +39,17 @@ FROM node:lts-alpine
 # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
 USER node
 
-WORKDIR /home/node/app
+# Use /home/node because user node has write permission in this directory.
+# https://github.com/nodejs/docker-node/issues/740
+WORKDIR /home/node
 
-COPY --from=builder /home/node/app /home/node/app
+COPY --from=builder /home/node/app /home/node
 
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 ENV PATH /usr/local/bin:$PATH
 ENV HELM_PATH_CACHE /var/cache
+ENV HELM_CONFIG_HOME /tmp/helm/config
+ENV HELM_CACHE_HOME /tmp/helm/cache
 
-ENTRYPOINT ["node", "/home/node/app/dist/helm_template_run.js"]
+ENTRYPOINT ["node", "/home/node/dist/helm_template_run.js"]

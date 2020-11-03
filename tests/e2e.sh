@@ -24,7 +24,6 @@ DIR="$(dirname "$0")"
 "$DIR"/helm_template.sh
 "$DIR"/istioctl_analyze.sh
 "$DIR"/kubeval.sh
-"$DIR"/kustomize_build.sh
 "$DIR"/set_namespace_go.sh
 "$DIR"/set_namespace_starlark.sh
 "$DIR"/sops.sh

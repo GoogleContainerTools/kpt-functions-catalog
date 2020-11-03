@@ -5,8 +5,8 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: gcr.io/kpt-functions/kubeval
-        network: true
+        image: gcr.io/kpt-functions/annotate-config
     config.kubernetes.io/local-config: 'true'
 data:
-  schema_location: https://kubernetesjsonschema.dev/
+  annotation_name: configmanagement.gke.io/namespace-selector
+  annotation_value: sre-supported

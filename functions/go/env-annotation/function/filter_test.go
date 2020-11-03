@@ -13,7 +13,6 @@ import (
 func TestTemplates(t *testing.T) {
 
 	os.Setenv("TESTENV1", "testenvvalue1")
-	os.Setenv("TESTENV2", "testenvvalue2")
 
 	tc := []struct {
 		cfg         string
@@ -29,7 +28,6 @@ metadata:
   name: notImportantHere
 data:
   literal1: value1
-  literal2: value2
 `,
 			in: `apiVersion: v1
 kind: ConfigMap
@@ -42,7 +40,6 @@ metadata:
   name: map1
   annotations:
     literal1: 'value1'
-    literal2: 'value2'
 `,
 		},
 		{
@@ -53,7 +50,6 @@ metadata:
   name: notImportantHere
 data:
   TESTENV1: ''
-  TESTENV2: ''
 `,
 			in: `apiVersion: v1
 kind: ConfigMap
@@ -66,7 +62,6 @@ metadata:
   name: map1
   annotations:
     TESTENV1: 'testenvvalue1'
-    TESTENV2: 'testenvvalue2'
 `,
 		},
 	}
