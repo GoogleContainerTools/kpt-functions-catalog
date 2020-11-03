@@ -12,7 +12,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/templater/function"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/env-annotation/function"
 
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 )

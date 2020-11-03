@@ -20,6 +20,7 @@ set -eo pipefail
 DIR="$(dirname "$0")"
 
 "$DIR"/annotate_config.sh
+"$DIR"/env-annotation.sh
 "$DIR"/helm_template.sh
 "$DIR"/istioctl_analyze.sh
 "$DIR"/kubeval.sh
@@ -28,4 +29,3 @@ DIR="$(dirname "$0")"
 "$DIR"/set_namespace_starlark.sh
 "$DIR"/sops.sh
 "$DIR"/suggest_psp.sh
-"$DIR"/templater.sh

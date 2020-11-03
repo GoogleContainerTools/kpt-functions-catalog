@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# E2E tests for templater.
+# E2E tests for env-annotation.
 
 set -eo pipefail
 DIR="$(dirname "$0")"
@@ -25,16 +25,23 @@ source "$DIR"/common.sh
 # kpt fn Tests
 ############################
 
-testcase "kpt_templater_imperative"
-kpt fn run . --env TESTTEMPLATERENV="testval" --image gcr.io/kpt-functions/templater:"${TAG}" -- entrypoint="apiVersion: v1
+testcase "env_annotation_imperative"
+cat >configmap_testcfg.yaml <<EOF
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: testcfg
-data:
-  value: {{env \"TESTTEMPLATERENV\" }}"
-assert_contains_string configmap_testcfg.yaml "value: testval"
+EOF
+kpt fn run . --env TESTENV="testval" --image gcr.io/kpt-functions/env-annotation:"${TAG}" -- TESTENV=""
+assert_contains_string configmap_testcfg.yaml "TESTENV: 'testval'"
 
-testcase "kpt_templater_declarative"
+testcase "env_annotation_declarative"
+cat >configmap_testcfg.yaml <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: testcfg
+EOF
 cat >fc.yaml <<EOF
 apiVersion: v1
 kind: ConfigMap
@@ -43,18 +50,12 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: gcr.io/kpt-functions/templater:${TAG}
+        image: gcr.io/kpt-functions/env-annotation:${TAG}
         envs:
-        - TESTTEMPLATERENV=testval
+        - TESTENV=testval
     config.kubernetes.io/local-config: 'true'
 data:
-  entrypoint: |
-    apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: testcfg
-    data:
-      value: {{env "TESTTEMPLATERENV" }}
+  TESTENV: ''
 EOF
 kpt fn run .
-assert_contains_string configmap_testcfg.yaml "value: testval"
+assert_contains_string configmap_testcfg.yaml "TESTENV: 'testval"

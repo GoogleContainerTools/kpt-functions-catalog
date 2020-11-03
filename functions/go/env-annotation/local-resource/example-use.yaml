@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: configMap
+metadata:
+  annotations:
+    config.kubernetes.io/function: |
+      container:
+        image: gcr.io/kpt-functions/env-annotation:stable
+        envs:
+        - datestamp
+data:
+  datestamp: ''
