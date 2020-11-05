@@ -67,6 +67,8 @@ jobs:
       run: |
         cd functions/ts
         npm run kpt:docker-build
+        cd ../go
+        BUILDONLY=true TAG=dev ./publish-functions.sh
     - name: Run all e2e tests
       if: matrix.platform == 'ubuntu-latest'
       run: |
