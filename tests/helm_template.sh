@@ -53,13 +53,12 @@ kpt fn source example-configs |
 assert_contains_string out.yaml "name: extra-args-redis-master"
 
 helm_testcase "kpt_helm_template_imperative_pipeline"
-git clone -q https://github.com/helm/charts.git helm-charts
 kpt fn source example-configs |
-  kpt fn run --mount type=bind,src="$(pwd)/helm-charts",dst=/source --image gcr.io/kpt-functions/helm-template:"${TAG}" --as-current-user -- local-chart-path=/source/incubator/haproxy-ingress name=my-haproxy-ingress | 
+  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-template:"${TAG}" --as-current-user -- local-chart-path=/source/zookeeper name=my-zookeeper | 
   kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-template:"${TAG}" --as-current-user -- name=my-redis local-chart-path=/source/redis |
   kpt fn sink .
 assert_dir_exists default
-assert_contains_string default/configmap_my-haproxy-ingress-controller.yaml "name: my-haproxy-ingress"
+assert_contains_string default/service_my-zookeeper.yaml "name: my-zookeeper"
 assert_contains_string default/secret_my-redis.yaml "name: my-redis"
 
 helm_testcase "kpt_helm_template_remote_imperative_expected_args"
@@ -91,9 +90,9 @@ assert_contains_string out.yaml "name: extra-args-redis-master"
 
 helm_testcase "kpt_helm_template_remote_imperative_pipeline"
 kpt fn source example-configs |
-  kpt fn run --network --image gcr.io/kpt-functions/helm-template:"${TAG}" -- chart=incubator/haproxy-ingress chart-repo=incubator chart-repo-url=https://kubernetes-charts-incubator.storage.googleapis.com name=my-haproxy-ingress | 
+  kpt fn run --network --image gcr.io/kpt-functions/helm-template:"${TAG}" -- chart=bitnami/zookeeper chart-repo=bitnami chart-repo-url=https://charts.bitnami.com/bitnami name=my-zookeeper | 
   kpt fn run --network --image gcr.io/kpt-functions/helm-template:"${TAG}" -- chart=bitnami/redis chart-repo=bitnami chart-repo-url=https://charts.bitnami.com/bitnami name=my-redis |
   kpt fn sink .
 assert_dir_exists default
-assert_contains_string default/configmap_my-haproxy-ingress-controller.yaml "name: my-haproxy-ingress"
+assert_contains_string default/service_my-zookeeper.yaml "name: my-zookeeper"
 assert_contains_string default/secret_my-redis.yaml "name: my-redis"
