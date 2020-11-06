@@ -33,8 +33,8 @@ do
   set -x
   ( cd "${dir}" && make )
   docker build -t "${image}" -t "${image_name}" -f "${dir}"/Dockerfile "${dir}"
-  [[ -z "${BUILDONLY}" ]] && {
+  if [ -z "${BUILDONLY}" ]; then
     docker push "${image_name}"
-  }
+  fi
   set +x
 done
