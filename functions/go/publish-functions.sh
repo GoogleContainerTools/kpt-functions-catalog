@@ -15,6 +15,9 @@
 
 set -euo pipefail
 
+# if `BUILDONLY` env var isn't defined set it empty
+BUILDONLY=${BUILDONLY:-}
+
 # if the `TAG` environment variable is not defined, set image_tag to `latest`.
 image_tag=${TAG:-latest}
 
@@ -30,6 +33,8 @@ do
   set -x
   ( cd "${dir}" && make )
   docker build -t "${image}" -t "${image_name}" -f "${dir}"/Dockerfile "${dir}"
-  docker push "${image_name}"
+  if [ -z "${BUILDONLY}" ]; then
+    docker push "${image_name}"
+  fi
   set +x
 done

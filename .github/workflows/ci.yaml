@@ -62,11 +62,16 @@ jobs:
       run: |
         cd functions/ts
         npm ci
-    - name: Build docker images
+    - name: Build node docker images
       if: matrix.platform == 'ubuntu-latest'
       run: |
         cd functions/ts
         npm run kpt:docker-build
+    - name: Build go images
+      if: matrix.platform == 'ubuntu-latest'
+      run: |
+        cd functions/go
+        BUILDONLY=true TAG=dev ./publish-functions.sh
     - name: Run all e2e tests
       if: matrix.platform == 'ubuntu-latest'
       run: |
