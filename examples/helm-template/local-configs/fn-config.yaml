@@ -9,4 +9,4 @@ metadata:
         image: gcr.io/kpt-functions/helm-template
 data:
   name: chart
-  chart_path: /source
+  local-chart-path: /source
