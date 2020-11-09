@@ -1,7 +1,7 @@
 # Helm Template
 
-The `helm-template` KRM config function generates a new kpt package from a
-local Helm chart. This example invokes the helm template function using
+The `helm-inflator` KRM config function generates a new kpt package from a
+local Helm chart. This example invokes the helm inflator function using
 declarative configuration.
 
 ## Function invocation
@@ -9,16 +9,16 @@ declarative configuration.
 Get this example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/helm-template .
-kpt fn run helm-template/local-configs --mount type=bind,src=$(pwd)/helm-template/helloworld-chart,dst=/source
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/helm-inflator .
+kpt fn run helm-inflator/local-configs --mount type=bind,src=$(pwd)/helm-inflator/helloworld-chart,dst=/source
 ```
 
 ## Expected result
 
-Checking the contents of the `local-configs` directory with `kpt cfg tree helm-template/local-configs/` should reveal the following new yaml files:
+Checking the contents of the `local-configs` directory with `kpt cfg tree helm-inflator/local-configs/` should reveal the following new yaml files:
 
 ```sh
-helm-template/local-configs
+helm-inflator/local-configs
 ├── [deployment_chart-helloworld-chart.yaml]  Deployment chart-helloworld-chart
 ├── [fn-config.yaml]  ConfigMap my-func-config
 ├── [pod_chart-helloworld-chart-test-connection.yaml]  Pod chart-helloworld-chart-test-connection
@@ -29,7 +29,7 @@ helm-template/local-configs
 To view changes without writing them into a file, a dry run can be performed as follows:
 
 ```sh
-kpt fn run helm-template/local-configs --mount type=bind,src=$(pwd)/helm-template/helloworld-chart,dst=/source --dry-run
+kpt fn run helm-inflator/local-configs --mount type=bind,src=$(pwd)/helm-inflator/helloworld-chart,dst=/source --dry-run
 ```
 
 The expected output should match the following:
@@ -46,7 +46,7 @@ metadata:
     app.kubernetes.io/version: 1.16.0
     app.kubernetes.io/managed-by: Helm
   annotations:
-    config.kubernetes.io/path: 'deployment_chart-helloworld-chart.yaml'
+    config.kubernetes.io/path: "deployment_chart-helloworld-chart.yaml"
 spec:
   replicas: 1
   selector:
@@ -62,23 +62,23 @@ spec:
       serviceAccountName: chart-helloworld-chart
       securityContext: {}
       containers:
-      - name: helloworld-chart
-        securityContext: {}
-        image: 'nginx:1.16.0'
-        imagePullPolicy: IfNotPresent
-        ports:
-        - name: http
-          containerPort: 80
-          protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /
-            port: http
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
-        resources: {}
+        - name: helloworld-chart
+          securityContext: {}
+          image: "nginx:1.16.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources: {}
 ---
 # call `kpt fn run` on a directory containing this file, mounting the helm chart at /source
 apiVersion: v1
@@ -88,7 +88,7 @@ metadata:
   annotations:
     config.kubernetes.io/function: |
       container:
-        image: gcr.io/kpt-functions/helm-template
+        image: gcr.io/kpt-functions/helm-inflator
     config.kubernetes.io/path: fn-config.yaml
 data:
   name: chart
@@ -106,15 +106,15 @@ metadata:
     app.kubernetes.io/managed-by: Helm
   annotations:
     helm.sh/hook: test-success
-    config.kubernetes.io/path: 'pod_chart-helloworld-chart-test-connection.yaml'
+    config.kubernetes.io/path: "pod_chart-helloworld-chart-test-connection.yaml"
 spec:
   containers:
-  - name: wget
-    image: busybox
-    command:
-    - wget
-    args:
-    - 'chart-helloworld-chart:80'
+    - name: wget
+      image: busybox
+      command:
+        - wget
+      args:
+        - "chart-helloworld-chart:80"
   restartPolicy: Never
 ---
 apiVersion: v1
@@ -128,14 +128,14 @@ metadata:
     app.kubernetes.io/version: 1.16.0
     app.kubernetes.io/managed-by: Helm
   annotations:
-    config.kubernetes.io/path: 'service_chart-helloworld-chart.yaml'
+    config.kubernetes.io/path: "service_chart-helloworld-chart.yaml"
 spec:
   type: ClusterIP
   ports:
-  - port: 80
-    targetPort: http
-    protocol: TCP
-    name: http
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
   selector:
     app.kubernetes.io/name: helloworld-chart
     app.kubernetes.io/instance: chart
@@ -151,5 +151,5 @@ metadata:
     app.kubernetes.io/version: 1.16.0
     app.kubernetes.io/managed-by: Helm
   annotations:
-    config.kubernetes.io/path: 'serviceaccount_chart-helloworld-chart.yaml'
+    config.kubernetes.io/path: "serviceaccount_chart-helloworld-chart.yaml"
 ```

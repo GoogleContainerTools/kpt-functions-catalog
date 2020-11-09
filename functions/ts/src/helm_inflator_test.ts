@@ -15,12 +15,12 @@
  */
 
 import { Configs, TestRunner, KptFunc, generalResult } from 'kpt-functions';
-import { helmTemplate } from './helm_template';
+import { helmInflator } from './helm_inflator';
 import { Namespace, ConfigMap } from './gen/io.k8s.api.core.v1';
 import * as proxyquire from 'proxyquire';
 
-describe('helmTemplate', () => {
-  const runner = new TestRunner(helmTemplate);
+describe('helmInflator', () => {
+  const runner = new TestRunner(helmInflator);
   it('outputs error given namespace function config', async () => {
     const namespace = Namespace.named('namespace');
     const input = new Configs(undefined, namespace);
@@ -30,10 +30,10 @@ describe('helmTemplate', () => {
 });
 
 describe('helm tamplate happy path', () => {
-  let helmTemplateMocked: { helmTemplate: KptFunc };
+  let helmInflatorMocked: { helmInflator: KptFunc };
   let runner: TestRunner;
   beforeAll(() => {
-    helmTemplateMocked = proxyquire.noCallThru()('./helm_template', {
+    helmInflatorMocked = proxyquire.noCallThru()('./helm_inflator', {
       child_process: {
         spawnSync: (command: string, args: string[]) => {
           switch (args[0]) {
@@ -77,10 +77,10 @@ foo: bar
         readdirSync: () => ['tmpdir'],
       },
     });
-    runner = new TestRunner(helmTemplateMocked.helmTemplate);
+    runner = new TestRunner(helmInflatorMocked.helmInflator);
   });
 
-  it('helm template local happy', async () => {
+  it('helm inflator local happy', async () => {
     const configMap = ConfigMap.named('config');
     configMap.data = {
       'local-chart-path': 'bar',
@@ -93,7 +93,7 @@ foo: bar
     await runner.assert(input, output);
   });
 
-  it('helm template remote happy', async () => {
+  it('helm inflator remote happy', async () => {
     const configMap = ConfigMap.named('config');
     configMap.data = {
       chart: 'stable/chart',
@@ -109,7 +109,7 @@ foo: bar
 
 describe('invalid config', () => {
   it('not local or remote', async () => {
-    const runner = new TestRunner(helmTemplate);
+    const runner = new TestRunner(helmInflator);
     const configMap = ConfigMap.named('config');
     const input = new Configs(undefined, configMap);
     const output = input.deepCopy();
@@ -122,7 +122,7 @@ describe('invalid config', () => {
   });
 
   it('no function config', async () => {
-    const runner = new TestRunner(helmTemplate);
+    const runner = new TestRunner(helmInflator);
     const input = new Configs(undefined, undefined);
     const output = input.deepCopy();
     await runner.assert(
@@ -134,7 +134,7 @@ describe('invalid config', () => {
   });
 
   it('local and remote', async () => {
-    const runner = new TestRunner(helmTemplate);
+    const runner = new TestRunner(helmInflator);
     const configMap = ConfigMap.named('config');
     configMap.data = {
       chart: 'stable/chart',
@@ -151,7 +151,7 @@ describe('invalid config', () => {
   });
 
   it('lack remote info', async () => {
-    const runner = new TestRunner(helmTemplate);
+    const runner = new TestRunner(helmInflator);
     const configMap = ConfigMap.named('config');
     configMap.data = {
       chart: 'stable/chart',
@@ -167,7 +167,7 @@ describe('invalid config', () => {
   });
 
   it('lack remote repo url', async () => {
-    const runner = new TestRunner(helmTemplate);
+    const runner = new TestRunner(helmInflator);
     const configMap = ConfigMap.named('config');
     configMap.data = {
       chart: 'stable/chart',
@@ -185,10 +185,10 @@ describe('invalid config', () => {
 });
 
 describe('error when run helm command', () => {
-  let helmTemplateMocked: { helmTemplate: KptFunc };
+  let helmInflatorMocked: { helmInflator: KptFunc };
   let runner: TestRunner;
   beforeAll(() => {
-    helmTemplateMocked = proxyquire.noCallThru()('./helm_template', {
+    helmInflatorMocked = proxyquire.noCallThru()('./helm_inflator', {
       child_process: {
         spawnSync: (command: string, args: string[]) => {
           return {
@@ -199,7 +199,7 @@ describe('error when run helm command', () => {
         },
       },
     });
-    runner = new TestRunner(helmTemplateMocked.helmTemplate);
+    runner = new TestRunner(helmInflatorMocked.helmInflator);
   });
 
   it('error when run helm command', async () => {

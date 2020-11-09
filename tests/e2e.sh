@@ -20,7 +20,7 @@ set -eo pipefail
 DIR="$(dirname "$0")"
 
 "$DIR"/annotate_config.sh
-"$DIR"/helm_template.sh
+"$DIR"/helm_inflator.sh
 "$DIR"/istioctl_analyze.sh
 "$DIR"/kubeval.sh
 "$DIR"/set_namespace_go.sh

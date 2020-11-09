@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { helmTemplate } from './helm_template';
+import { helmInflator } from './helm_inflator';
 import { run } from 'kpt-functions';
 
-run(helmTemplate);
+run(helmInflator);

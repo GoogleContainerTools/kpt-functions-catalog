@@ -52,4 +52,4 @@ ENV HELM_PATH_CACHE /var/cache
 ENV HELM_CONFIG_HOME /tmp/helm/config
 ENV HELM_CACHE_HOME /tmp/helm/cache
 
-ENTRYPOINT ["node", "/home/node/dist/helm_template_run.js"]
+ENTRYPOINT ["node", "/home/node/dist/helm_inflator_run.js"]
