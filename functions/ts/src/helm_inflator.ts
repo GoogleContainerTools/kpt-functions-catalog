@@ -183,7 +183,7 @@ async function runHelmTemplate(
 }
 
 // Render local ot remote chart templates using helm template.
-export async function helmTemplate(configs: Configs) {
+export async function helmInflator(configs: Configs) {
   try {
     const configMapData = getConfigMapData(configs);
     await runHelmPull(configMapData);
@@ -197,7 +197,7 @@ export async function helmTemplate(configs: Configs) {
   }
 }
 
-helmTemplate.usage = `
+helmInflator.usage = `
 Render chart templates locally using local or remote helm template. If input a list of configs in
 addition to arguments will overwrite any chart objects that already exist in the list.
 
@@ -227,7 +227,7 @@ metadata:
   annotations:
     config.kubernetes.io/function: |
       container:
-        image: gcr.io/kpt-functions/helm-template
+        image: gcr.io/kpt-functions/helm-inflator
         network:
           required: true
     config.kubernetes.io/local-config: "true"
@@ -246,7 +246,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: gcr.io/kpt-functions/helm-template
+        image: gcr.io/kpt-functions/helm-inflator
     config.kubernetes.io/local-config: "true"
 data:
   ${CHART_NAME}: my-chart
