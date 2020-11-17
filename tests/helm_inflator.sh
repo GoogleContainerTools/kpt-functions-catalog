@@ -28,10 +28,11 @@ assert_contains_string out.yaml "expected-args"
 
 testcase "kpt_helm_inflator_declarative_example"
 # TODO: Remove error handling once kpt pkg get shows errors gracefully https://github.com/GoogleContainerTools/kpt/issues/838
-# TODO: update helm-template to helm-inflator
-kpt pkg get "$CATALOG_REPO"/examples/helm-template . || true
-kpt fn run helm-template/local-configs --mount type=bind,src="$(pwd)"/helm-template/helloworld-chart,dst=/source --as-current-user
-assert_contains_string helm-template/local-configs/deployment_chart-helloworld-chart.yaml "name: chart-helloworld-chart"
+kpt pkg get "$CATALOG_REPO"/examples/helm-inflator . || true
+# Use proper image tag
+sed -e "s/image: gcr.io\/kpt-functions\/helm-inflator/image: gcr.io\/kpt-functions\/helm-inflator:${TAG}/" -i helm-inflator/local-configs/fn-config.yaml
+kpt fn run helm-inflator/local-configs --mount type=bind,src="$(pwd)"/helm-inflator/helloworld-chart,dst=/source --as-current-user
+assert_contains_string helm-inflator/local-configs/deployment_chart-helloworld-chart.yaml "name: chart-helloworld-chart"
 
 helm_testcase "kpt_helm_inflator_declarative_fn_path"
 cat >fc.yaml <<EOF
