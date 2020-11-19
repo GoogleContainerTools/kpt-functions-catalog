@@ -18,6 +18,7 @@
 
 set -eo pipefail
 DIR="$(dirname "$0")"
+REPODIR="$(dirname "$(realpath "$0")")"/..
 # shellcheck source=tests/common.sh
 source "$DIR"/common.sh
 
@@ -28,16 +29,14 @@ kpt fn source example-configs |
   kpt fn run --env SOPS_IMPORT_PGP="$(cat key.asc)" --image gcr.io/kpt-functions/sops:"${TAG}" -- verbose=true >out.yaml
 assert_contains_string out.yaml "t00m4nys3cr3tzupdated"
 
-if false; then
-# TODO: remove 'if' when gcr.io/kpt-functions/sops:latest is available
 testcase "kpt_sops_declarative_example"
-# TODO: Remove error handling once kpt pkg get shows errors gracefully https://github.com/GoogleContainerTools/kpt/issues/838
-# TODO: This is a temporary fix till declarative example e2e tests run using the $TAG being tested
-kpt pkg get "$CATALOG_REPO"/examples/sops . || true
+# get examples from the current version of repo
+cp -r "$REPODIR"/examples/sops .
+sed -i 's|gcr.io/kpt-functions/sops|gcr.io/kpt-functions/sops:dev|' sops/local-configs/function.yaml
 curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
-kpt fn run --env SOPS_IMPORT_PGP="$(cat key.asc)" sops/local-configs
-assert_contains_string sops/local-configs/encrypted-gvk.yaml "nnn-password: k8spassphrase"
-fi
+SOPS_IMPORT_PGP="$(cat key.asc)" kpt fn run sops/local-configs
+assert_contains_string sops/local-configs/to-decrypt.yaml "nnn-password: k8spassphrase"
+assert_contains_string sops/local-configs/to-encrypt.yaml "nnn-password: 'ENC"
 
 testcase "kpt_sops_declarative_fn_path"
 cat >fc.yaml <<EOF
