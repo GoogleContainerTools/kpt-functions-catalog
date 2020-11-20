@@ -16,8 +16,9 @@ GOPATH := $(shell go env GOPATH)
 TAG ?= dev
 CURATED_GCR = gcr.io/kpt-fn
 
-# Edit this list to contain all of the curated go functions
-CURATED_FUNCTIONS := \
+# Edit this list to contain all go functions
+FUNCTIONS := \
+	set-label \
 	set-namespace
 # Use functions/ts/Makefile as a reference to modify this file to support contrib functions.
 FUNCTIONS := $(CURATED_FUNCTIONS)
