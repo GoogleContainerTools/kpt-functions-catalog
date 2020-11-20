@@ -25,13 +25,14 @@ image_tag=${TAG:-latest}
 prefix="release-go-functions-"
 [[ "${image_tag}" = "${prefix}"* ]] && image_tag="${image_tag#$prefix}"
 
+make
+
 # iterate over each subdir, build and push Docker images.
 for dir in  */
 do
   image_name=gcr.io/kpt-functions/"${dir%/}"
   image="${image_name}":"${image_tag}"
   set -x
-  ( cd "${dir}" && make )
   docker build -t "${image}" -t "${image_name}" -f "${dir}"/Dockerfile "${dir}"
   if [ -z "${BUILDONLY}" ]; then
     docker push "${image_name}"

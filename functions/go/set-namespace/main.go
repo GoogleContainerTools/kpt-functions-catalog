@@ -1,75 +1,97 @@
+// This file will be processed and embedded to pluginator.
+
 package main
 
 import (
 	"fmt"
 	"os"
-	"strings"
 
+	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
+	"sigs.k8s.io/kustomize/api/resmap"
+	"sigs.k8s.io/kustomize/api/resource"
+	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
-	"sigs.k8s.io/kustomize/kyaml/yaml"
+	"sigs.k8s.io/yaml"
 )
 
-var namespace string
-var allowClusterScoped bool
-
-var warning = "due to the difficulty of tracking all the cluster-scoped resource kinds, especially cluster-scoped CRDs."
-
+//nolint
 func main() {
+	var plugin *plugin = &KustomizePlugin
+	defaultConfigString := `
+- path: metadata/namespace
+  create: true
+- path: subjects
+  kind: RoleBinding
+- path: subjects
+  kind: ClusterRoleBinding`
+	var defaultConfig []types.FieldSpec
+	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	resmapFactory := newResMapFactory()
+
+	pluginHelpers := newPluginHelpers(resmapFactory)
+
 	resourceList := &framework.ResourceList{}
+	resourceList.FunctionConfig = map[string]interface{}{}
+
 	cmd := framework.Command(resourceList, func() error {
-		// cmd.Execute() will parse the ResourceList.functionConfig into cmd.Flags from
-		// the ResourceList.functionConfig.data field.
-		clusterScopedResources := []string{}
-		for i := range resourceList.Items {
-			// modify the resources using the kyaml/yaml library:
-			// https://pkg.go.dev/sigs.k8s.io/kustomize/kyaml/yaml
-			node := resourceList.Items[i]
-			kindNode, err := node.Pipe(yaml.Lookup("kind"))
-			if err != nil {
-				// ignore the node if it does not have a "kind" field
-				continue
-			}
-			kind := yaml.GetValue(kindNode)
-			typeMeta := yaml.TypeMeta{
-				Kind: kind,
-			}
-			if typeMeta.IsNamespaceable() {
-				// Set the metadata.namespace field
-				if err := node.PipeE(yaml.LookupCreate(
-					yaml.ScalarNode, "metadata", "namespace"),
-					yaml.FieldSetter{StringValue: namespace}); err != nil {
-					return err
-				}
-			} else {
-				if !allowClusterScoped {
-					apiVersionNode, err := node.Pipe(yaml.Lookup("apiVersion"))
-					if err != nil {
-						continue
-					}
-					apiVersion := yaml.GetValue(apiVersionNode)
-					nameNode, err := node.Pipe(yaml.Lookup("metadata", "name"))
-					if err != nil {
-						continue
-					}
-					name := yaml.GetValue(nameNode)
-					resID := fmt.Sprintf("apiVersion: %s, kind: %s, name: %s", apiVersion, kind, name)
-					clusterScopedResources = append(clusterScopedResources, resID)
-				}
-			}
+		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+		if err != nil {
+			return err
 		}
-		if len(clusterScopedResources) > 0 {
-			return fmt.Errorf("the app config should only include namespace-scoped resources. "+
-				"But the following cluster-scoped resources are found:\n%s\n", strings.Join(clusterScopedResources, "\n"))
+		dataField, err := getDataFromFunctionConfig(resourceList.FunctionConfig)
+		if err != nil {
+			return err
+		}
+		dataValue, err := yaml.Marshal(dataField)
+		if err != nil {
+			return err
+		}
+
+		err = plugin.Config(pluginHelpers, dataValue)
+		if err != nil {
+			return err
+		}
+		if len(plugin.FieldSpecs) == 0 {
+			plugin.FieldSpecs = defaultConfig
+		}
+		err = plugin.Transform(resMap)
+		if err != nil {
+			return err
+		}
+
+		resourceList.Items, err = resMap.ToRNodeSlice()
+		if err != nil {
+			return err
 		}
 		return nil
 	})
-
-	cmd.Flags().BoolVar(&allowClusterScoped, "allow-cluster-scoped", true, "allow cluster-scoped resources or not. "+
-		"This function may not be able to identify all the cluster-scoped resources "+warning)
-	cmd.Flags().StringVar(&namespace, "namespace", "", "the namespace to be added into namespaced resources "+
-		"This function may set the metadata.namespace field of some cluster-scoped resources "+warning)
-
 	if err := cmd.Execute(); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+//nolint
+func newPluginHelpers(resmapFactory *resmap.Factory) *resmap.PluginHelpers {
+	return resmap.NewPluginHelpers(nil, nil, resmapFactory)
+}
+
+//nolint
+func newResMapFactory() *resmap.Factory {
+	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
+	return resmap.NewFactory(resourceFactory, nil)
+}
+
+//nolint
+func getDataFromFunctionConfig(fc interface{}) (interface{}, error) {
+	f, ok := fc.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("function config %#v is not valid", fc)
+	}
+	return f["data"], nil
 }

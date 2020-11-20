@@ -51,6 +51,10 @@ function assert_contains_string() {
   grep -q "$2" "$1" || fail "String $2 not contained in: ${content}"
 }
 
+function assert_files_same() {
+  diff -u "$1" "$2" || fail "File $1 is different from $2: $(diff -u "$1" "$2")"
+}
+
 function assert_dir_exists() {
   [[ -d $1 ]] || fail "Dir not exist: $1"
 }
