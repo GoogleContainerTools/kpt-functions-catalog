@@ -22,7 +22,8 @@ fmt:
 	cd $(CURRENT_FUNCTION) && go fmt ./...
 
 lint:
-	(which $(GOPATH)/bin/golangci-lint || go get github.com/golangci/golangci-lint/cmd/golangci-lint)
+	(which $(GOPATH)/bin/golangci-lint || \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.32.2)
 	cd $(CURRENT_FUNCTION) && $(GOPATH)/bin/golangci-lint run ./...
 
 test:
