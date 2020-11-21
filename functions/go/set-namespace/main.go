@@ -70,10 +70,52 @@ func main() {
 		}
 		return nil
 	})
+	cmd.Long = usage()
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func usage() string {
+	return `Update or add namespace.
+
+Configured using a ConfigMap with the following keys:
+
+namespace: Name of the namespace that will be set.
+
+Example:
+
+To add a namespace 'color' to all resources:
+
+apiVersion: v1
+kind: ConfigMap
+data:
+  namespace: color
+metadata:
+  name: my-config
+
+You can use key "fieldSpecs" to specify the resource selector you
+want to use.
+
+For more information about fieldSpecs, please see 
+https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4
+
+Example:
+
+To add a namespace 'color' to Deployment resource only:
+
+apiVersion: v1
+kind: ConfigMap
+data:
+  namespace: color
+  fieldSpecs:
+  - path: metadata/namespace
+    kind: Deployment
+    create: true
+metadata:
+  name: my-config
+`
 }
 
 //nolint
