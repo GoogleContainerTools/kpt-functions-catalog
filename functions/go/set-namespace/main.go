@@ -1,11 +1,10 @@
-// This file will be processed and embedded to pluginator.
-
 package main
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
@@ -19,11 +18,7 @@ func main() {
 	var plugin *plugin = &KustomizePlugin
 	defaultConfigString := `
 - path: metadata/namespace
-  create: true
-- path: subjects
-  kind: RoleBinding
-- path: subjects
-  kind: ClusterRoleBinding`
+  create: true`
 	var defaultConfig []types.FieldSpec
 	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
 	if err != nil {
@@ -41,32 +36,32 @@ func main() {
 	cmd := framework.Command(resourceList, func() error {
 		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to convert items to resource map")
 		}
 		dataField, err := getDataFromFunctionConfig(resourceList.FunctionConfig)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to get data field from function config")
 		}
 		dataValue, err := yaml.Marshal(dataField)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "error when marshal data values")
 		}
 
 		err = plugin.Config(pluginHelpers, dataValue)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to config plugin")
 		}
 		if len(plugin.FieldSpecs) == 0 {
 			plugin.FieldSpecs = defaultConfig
 		}
 		err = plugin.Transform(resMap)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to run transformer")
 		}
 
 		resourceList.Items, err = resMap.ToRNodeSlice()
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to convert resource map to items")
 		}
 		return nil
 	})
@@ -96,7 +91,16 @@ metadata:
   name: my-config
 
 You can use key "fieldSpecs" to specify the resource selector you
-want to use.
+want to use. By default, the function will use this field spec:
+
+- path: metadata/namespace
+  create: true
+
+This means a "metadata/namespace" field will be added to all resources
+with namespaceable kinds. This information is collected from Kubernetes
+openAPI schema. "create: true" means a field 'metadata/namespace' will
+be created if it doesn't exist. To support your own CRDs you will beed
+to add more items to fieldSpecs list.
 
 For more information about fieldSpecs, please see 
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4

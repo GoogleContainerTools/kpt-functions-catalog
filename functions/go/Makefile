@@ -1,5 +1,6 @@
 GOPATH := $(shell go env GOPATH)
 
+# Edit this list to contain all go functions
 FUNCTIONS := \
 	set-namespace
 
