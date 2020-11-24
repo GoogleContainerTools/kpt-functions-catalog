@@ -10,4 +10,5 @@ require (
 	sigs.k8s.io/yaml v1.2.0
 )
 
+// TODO: pin to api release
 replace sigs.k8s.io/kustomize/api v0.6.4 => sigs.k8s.io/kustomize/api v0.0.0-20201120230733-052a6b4e967b
