@@ -102,6 +102,10 @@ openAPI schema. "create: true" means a field 'metadata/namespace' will
 be created if it doesn't exist. To support your own CRDs you will beed
 to add more items to fieldSpecs list.
 
+"RoleBinding" and "ClusterRoleBinding" will be handled specially because
+the "subject" fields in these 2 kinds of resources have references to
+namespace names.
+
 For more information about fieldSpecs, please see 
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4
 
