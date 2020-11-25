@@ -85,10 +85,10 @@ To add a namespace 'color' to all resources:
 
 apiVersion: v1
 kind: ConfigMap
-data:
-  namespace: color
 metadata:
   name: my-config
+data:
+  namespace: color
 
 You can use key "fieldSpecs" to specify the resource selector you
 want to use. By default, the function will use this field spec:
@@ -111,14 +111,14 @@ To add a namespace 'color' to Deployment resource only:
 
 apiVersion: v1
 kind: ConfigMap
+metadata:
+  name: my-config
 data:
   namespace: color
   fieldSpecs:
   - path: metadata/namespace
     kind: Deployment
     create: true
-metadata:
-  name: my-config
 `
 }
 
