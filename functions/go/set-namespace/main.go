@@ -16,11 +16,7 @@ import (
 //nolint
 func main() {
 	var plugin *plugin = &KustomizePlugin
-	defaultConfigString := `
-- path: metadata/namespace
-  create: true`
-	var defaultConfig []types.FieldSpec
-	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
+	defaultConfig, err := getDefaultConfig()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -143,6 +139,16 @@ and 'ClusterRoleBinding' will be handled implicitly by this function. If you hav
 references to namespaces in you CRDs, use the field spec described above to update
 them.
 `
+}
+
+//nolint
+func getDefaultConfig() ([]types.FieldSpec, error) {
+	defaultConfigString := `
+- path: metadata/namespace
+  create: true`
+	var defaultConfig []types.FieldSpec
+	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
+	return defaultConfig, err
 }
 
 //nolint
