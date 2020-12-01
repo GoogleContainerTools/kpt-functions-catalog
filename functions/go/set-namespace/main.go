@@ -95,8 +95,13 @@ want to use. By default, the function will use this field spec:
   create: true
 
 This means a 'metadata/namespace' field will be added to all resources
-with namespaceable kinds. This information is collected from Kubernetes
-openAPI schema.
+with namespaceable kinds. Whether a resource is namespaceable is determined
+by the Kubernetes API schema. If the API path for that kind contains
+'namespaces/{namespace}' then the resource is considered namespaceable. Otherwise
+it's not. Currently this function is using API version 1.19.1. 
+
+For more information about API schema used in this function, please take a look at
+https://github.com/kubernetes-sigs/kustomize/tree/master/kyaml/openapi
 
 Field spec has following fields:
 
