@@ -78,6 +78,8 @@ func usage() string {
 Configured using a ConfigMap with the following keys:
 
 namespace: Name of the namespace that will be set.
+fieldSpecs: A list of specification to select the resources and fields that 
+the namespace will be applied to.
 
 Example:
 
@@ -90,24 +92,28 @@ metadata:
 data:
   namespace: color
 
-You can use key "fieldSpecs" to specify the resource selector you
+You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will use this field spec:
 
 - path: metadata/namespace
   create: true
 
-This means a "metadata/namespace" field will be added to all resources
+This means a 'metadata/namespace' field will be added to all resources
 with namespaceable kinds. This information is collected from Kubernetes
-openAPI schema. "create: true" means a field 'metadata/namespace' will
-be created if it doesn't exist. To support your own CRDs you will beed
-to add more items to fieldSpecs list.
+openAPI schema.
 
-"RoleBinding" and "ClusterRoleBinding" will be handled specially because
-the "subject" fields in these 2 kinds of resources have references to
-namespace names.
+Field spec has following fields:
 
-For more information about fieldSpecs, please see 
-https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4
+- group: Select the resources by API version group. Will select all groups
+	if omitted.
+- version: Select the resources by API version. Will select all versions
+	if omitted.
+- kind: Select the resources by resource kind. Will select all kinds
+	if omitted.
+- path: Specify the path to the field that the value will be updated. This field
+	is required.
+- create: If it's set to true, the field specified will be created if it doesn't
+	exist. Otherwise the function will only update the existing field.
 
 Example:
 
@@ -120,9 +126,22 @@ metadata:
 data:
   namespace: color
   fieldSpecs:
-  - path: metadata/namespace
-    kind: Deployment
-    create: true
+    - path: metadata/namespace
+      kind: Deployment
+      create: true
+
+For more information about fieldSpecs, please see 
+https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4
+
+To support your own CRDs you will need to add more items to fieldSpecs list.
+
+In addition to simple updating the 'metadata/namespace' fields for resources, it's
+also possible that references to namespace names exist in some resources. In this
+case, these references will also need to be updated at the same time. In Kubernetes
+native resources, the references to namespace in 'subject' fields in 'RoleBinding'
+and 'ClusterRoleBinding' will be handled implicitly by this function. If you have
+references to namespaces in you CRDs, use the field spec described above to update
+them.
 `
 }
 

@@ -25,6 +25,7 @@ image_tag=${TAG:-latest}
 prefix="release-go-functions-"
 [[ "${image_tag}" = "${prefix}"* ]] && image_tag="${image_tag#$prefix}"
 
+# TODO: Put build and publish commands in Makefile
 make
 
 # iterate over each subdir, build and push Docker images.
