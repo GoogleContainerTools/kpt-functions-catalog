@@ -2,7 +2,7 @@ FROM node:lts-alpine as builder
 
 RUN apk add bash curl git && apk update
 
-ARG SOPS_VERSION="v3.6.0"
+ARG SOPS_VERSION="v3.6.1"
 RUN curl -fsSL -o /usr/local/bin/sops https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.linux && \
     chmod +x /usr/local/bin/sops
 
