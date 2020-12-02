@@ -41,17 +41,22 @@ metadata:
 data:
   "namespace": "example-ns"
 EOF
-kpt fn run .
-assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
-
-# Use the linux executable to test using kpt exec runtime on linux
-testcase "kpt_set_namespace_go_exec_imperative_linux"
-kpt pkg get "$SDK_REPO"/example-configs example-configs
-kpt pkg get "$CATALOG_REPO"/functions/go ./
-kpt fn run example-configs --enable-exec --exec-path "$(pwd)"/go/set-namespace/set-namespace-linux -- namespace=example-ns
-assert_contains_string example-configs/gatekeeper.yaml "namespace: example-ns"
+kpt fn source example-configs |
+  kpt fn run --fn-path fc.yaml >out.yaml
+assert_contains_string out.yaml "namespace: example-ns"
 
 testcase "kpt_set_namespace_go_declarative_example"
 kpt pkg get "$CATALOG_REPO"/examples/set-namespace .
 kpt fn run set-namespace/configs --fn-path set-namespace/functions
 assert_contains_string set-namespace/configs/example-config.yaml "namespace: example-ns"
+
+testcase "kpt_set_namespace_go_docker_imperative_idempotency"
+kpt pkg get "$SDK_REPO"/example-configs example-configs
+# Use example-configs/shipping-dev because after the first time of applying namespace,
+# there will be some resources with duplicate IDs. This case is not allowed.
+kpt fn run example-configs/shipping-dev --image gcr.io/kpt-functions/set-namespace:"${TAG}" -- namespace=example-ns
+assert_contains_string example-configs/shipping-dev/rolebinding_viewers.yaml "namespace: example-ns"
+cp example-configs/shipping-dev/rolebinding_viewers.yaml example-configs/shipping-dev/rolebinding_viewers.yaml.orig
+# run function agian with same parameters
+kpt fn run example-configs/shipping-dev --image gcr.io/kpt-functions/set-namespace:"${TAG}" -- namespace=example-ns
+assert_files_same example-configs/shipping-dev/rolebinding_viewers.yaml.orig example-configs/shipping-dev/rolebinding_viewers.yaml
