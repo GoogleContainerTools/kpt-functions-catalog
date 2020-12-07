@@ -35,9 +35,16 @@ jobs:
       - name: Get the version
         id: get_version
         run: echo ::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}
+      - name: BUild images
+        run: |
+          cd functions/go
+          make TAG=${{ steps.get_version.outputs.TAG_NAME }} build
+      - name: Run all e2e tests
+        run: |
+          sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
+          sudo chmod +x /usr/local/bin/kpt
+          make e2e-test
       - name: Publish images to container registry
         run: |
           cd functions/go
-          ./publish-functions.sh
-        env:
-          TAG: ${{ steps.get_version.outputs.TAG_NAME }}
+          make TAG=${{ steps.get_version.outputs.TAG_NAME }} push

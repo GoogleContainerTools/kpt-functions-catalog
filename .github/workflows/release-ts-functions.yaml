@@ -27,23 +27,22 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install NPM packages
+      - name: Run unit tests
         run: |
           cd functions/ts
-          npm ci
-          npm test
+          make test
       - name: Build docker images
         run: |
           cd functions/ts
-          npm run kpt:docker-build -- --tag=latest
-          npm run kpt:docker-build -- --tag=stable
+          make TAG=latest build
+          make TAG=stable build
       - name: Run all e2e tests
         run: |
           sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
           sudo chmod +x /usr/local/bin/kpt
-          TAG=latest tests/e2e.sh
+          make e2e-test
       - name: Push docker images
         run: |
           cd functions/ts
-          npm run kpt:docker-push -- --tag=latest
-          npm run kpt:docker-push -- --tag=stable
+          make TAG=latest push
+          make TAG=stable push
