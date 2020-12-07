@@ -44,7 +44,7 @@ jobs:
         npm run lint-license
 
   e2e-ci:
-    needs: [node-ci]
+    needs: [unit-test-ci]
     strategy:
       matrix:
         platform: [ubuntu-latest]
