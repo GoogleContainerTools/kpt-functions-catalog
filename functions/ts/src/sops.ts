@@ -10,13 +10,28 @@ import {
 import { DumpOptions, safeDump, safeLoad } from 'js-yaml';
 import rw from 'rw';
 import { spawnSync, execSync } from 'child_process';
+import { JSONPath } from 'jsonpath-plus';
 
 const TEMP_PATH = '/tmp/tmp.yaml';
 
+const CMD = 'cmd';
+const CMD_FILTER = 'cmd-json-path-filter';
 const IGNORE_MAC = 'ignore-mac';
 const VERBOSE = 'verbose';
 const OVERRIDE_PREEXEC_CMD = 'override-preexec-cmd';
 const OVERRIDE_DETACHED_ANNOTATIONS = 'override-detached-annotations';
+
+// the sops cmd we're doing now (decrypt/encrypt)
+// decrypt by default for the backward compatibility
+let cmd = 'decrypt';
+
+// the documents must match to the filter
+// to be processed. default - all
+// example:
+// cmd-json-path-filter: '$[?(@.metadata.name=="somename"&&@.kind=="somekind")]'
+// will process only documents that have kind: somekind and metadata.name: somename
+// and all others will be untouched
+let cmdJsonPathFilter = '';
 
 // pre-exec command may be overriden from config
 let preExecCmd =
@@ -43,6 +58,16 @@ function isSopsKubernetesObject(
   o: KubernetesObject
 ): o is SopsKubernetesObject {
   return o && o.hasOwnProperty('sops');
+}
+
+function isKubernetsObjectToProcess(o: KubernetesObject): boolean {
+  if (cmdJsonPathFilter !== '') {
+    const items = JSONPath({ json: [o], path: cmdJsonPathFilter });
+    if (items.length === 0) {
+      return false;
+    }
+  }
+  return true;
 }
 
 const YAML_STYLE: DumpOptions = {
@@ -85,13 +110,28 @@ export async function sops(configs: Configs) {
   const allDocs = configs.getAll();
   configs.deleteAll();
 
-  for (const object of allDocs) {
-    if (isSopsKubernetesObject(object)) {
-      // this function
-      await decryptAndInsertSopsKubernetesObject(args, configs, object);
-    } else {
-      // add it back
-      configs.insert(object);
+  if (cmd === 'decrypt') {
+    for (const object of allDocs) {
+      if (
+        isSopsKubernetesObject(object) &&
+        isKubernetsObjectToProcess(object)
+      ) {
+        // decrypt and add
+        await decryptAndInsertSopsKubernetesObject(args, configs, object);
+      } else {
+        // add it back
+        configs.insert(object);
+      }
+    }
+  } else if (cmd === 'encrypt') {
+    for (const object of allDocs) {
+      if (isKubernetsObjectToProcess(object)) {
+        // encrypt and add
+        await encryptAndInsertKubernetesObject(args, configs, object);
+      } else {
+        // add it back
+        configs.insert(object);
+      }
     }
   }
 }
@@ -123,9 +163,26 @@ async function decryptAndInsertSopsKubernetesObject(
   configs: Configs,
   object: SopsKubernetesObject
 ) {
-  let error;
   args.push(...['-d', TEMP_PATH]);
+  await cmdAndInsertKubernetesObject('decrypt', args, configs, object);
+}
 
+async function encryptAndInsertKubernetesObject(
+  args: string[],
+  configs: Configs,
+  object: KubernetesObject
+) {
+  args.push(...['-e', TEMP_PATH]);
+  await cmdAndInsertKubernetesObject('encrypt', args, configs, object);
+}
+
+async function cmdAndInsertKubernetesObject(
+  cmd: string,
+  args: string[],
+  configs: Configs,
+  object: KubernetesObject
+) {
+  let error;
   // write encrypted file to the temp file
   const detached = detachAnnotations(object);
   const stringifiedObject = safeDump(object, YAML_STYLE);
@@ -154,7 +211,7 @@ async function decryptAndInsertSopsKubernetesObject(
   if (error && error.length > 0) {
     configs.addResults(
       generalResult(
-        `Sops command results in error for\n${stringifiedObject}\n ${error.toString()}`,
+        `Sops ${cmd} command results in error for\n${stringifiedObject}\n ${error.toString()}`,
         'error'
       )
     );
@@ -171,7 +228,11 @@ function readSopsArguments(configs: Configs) {
     return args;
   }
   configMap.forEach((value: string, key: string) => {
-    if (key === OVERRIDE_PREEXEC_CMD) {
+    if (key === CMD) {
+      cmd = value;
+    } else if (key === CMD_FILTER) {
+      cmdJsonPathFilter = value;
+    } else if (key === OVERRIDE_PREEXEC_CMD) {
       preExecCmd = value;
     } else if (key === OVERRIDE_DETACHED_ANNOTATIONS) {
       detachedAnnotations = value.replace(/\s/g, '').split(',');
@@ -187,23 +248,104 @@ function readSopsArguments(configs: Configs) {
 
 sops.usage = `
 Sops function (see https://github.com/mozilla/sops).
-So far supports only decrypt operation:
-runs sops -d for all documents that have field 'sops:' and put the decrypted result back.
 
-Can be configured using a ConfigMap with the following flags:
-ignore-mac: true [Optional: default empty] Ignore Message Authentication Code during decryption.
+The function supports 2 operations: encrypt and decrypt.
+Operation is set with the following parameter:
+cmd: [Optional: default decrypt]           defines the operation that sops will
+                                           perform
+
+The typical configuration example for encryption:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-encrypt-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-functions/sops
+        envs:
+        - SOPS_IMPORT_PGP
+        - SOPS_PGP_FP
+    config.kubernetes.io/local-config: "true"
+data:
+  cmd: 'encrypt'
+  unencrypted-regex: '^(kind|apiVersion|group|metadata)$'
+
+To run this example it will be necessary to set 2 ENV variable values:
+SOPS_IMPORT_PGP must contain the PGP keys that will be imported by the function
+before encryption.
+SOPS_PGP_FP must contain 1 or more key fingerprits separated with comma that
+will be used for encryption.
+E.g.:
+curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
+SOPS_IMPORT_PGP="$(cat key.asc)"
+SOPS_PGP_FP="FBC7B9E2A4F9289AC0C1D4843D16CEE4A27381B4"
+export SOPS_IMPORT_PGP
+export SOPS_PGP_FP
+
+The typical configuration example for decryption:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-decrypt-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-functions/sops
+        envs:
+        - SOPS_IMPORT_PGP
+    config.kubernetes.io/local-config: "true"
+data:
+  cmd: 'decrypt'
+
+To run this example it will be necessary to set 1 ENV variable value:
+SOPS_IMPORT_PGP must contain the PGP keys that will be imported by the function
+before decryption. It has to contain the same keys that were used for
+encryption.
+E.g.
+curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
+SOPS_IMPORT_PGP="$(cat key.asc)"
+export SOPS_IMPORT_PGP
+
+There is a list of the parameters that don't depend on the command:
 verbose: true [Optional: default empty]    Enable sops verbose logging output.
-keyservice value [Optional: default empty] Specify the key services to use in addition to the local one.
-                                           Can be specified more than once.
-                                           Syntax: protocol://address. Example: tcp://myserver.com:5000
 override-detached-annotations: [Optional:
-default see detachedAnnotations var]       The list of annotations that didn't present when the document
-                                           was encrypted, but added by different tools later. The function
-                                           will detach them before decryption and added unchanged
-                                           after successfull decryption. This allows sops to check the
-                                           consistency of the decrypted document.
+default see detachedAnnotations var]       The list of annotations that didn't
+                                           present when the document
+                                           was encrypted, but added by
+                                           different tools later. The function
+                                           will detach them before decryption
+                                           and added unchanged
+                                           after successfull decryption. This
+                                           allows sops to check the
+                                           consistency of the decrypted document
 
-For more details see 'sops --help'.
+cmd-json-path-filter: [Optional: default   The operation will be executed
+empty]                                     only for the documents that
+                                           match to the filter. E.g.
+                                           cmd-json-path-filter:
+                                           '$[?(@.metadata.name=="somename"
+                                           &&@.kind=="somekind")]'
+                                           will process documents with name
+                                           'somename' and kind 'somekind'.
+
+If cmd is 'decrypt' the function runs sops -d for all documents that match the
+json filter and that have field 'sops:'
+and puts the decrypted result back. Decrypt has the following additional flags:
+ignore-mac: true [Optional: default empty] Ignore Message Authentication Code
+                                           during decryption.
+keyservice value [Optional: default empty] Specify the key services to use in
+                                           addition to the local one.
+                                           Can be specified more than once.
+                                           Syntax: protocol://address.
+                                           Example: tcp://myserver.com:5000
+
+If cmd is 'encrypt' the function runs sops -e for all documents that match the
+json filter and puts the encrypted results back.
+Function adds '--' to the field name, adds value and passes all these params to
+the sops binary. For more details on the parameters plese refer to 'sops --help'
 
 Example:
 
@@ -217,6 +359,8 @@ metadata:
     config.k8s.io/function: |
       container:
         image: gcr.io/kpt-functions/sops
+        envs:
+	- SOPS_IMPORT_PGP
     config.kubernetes.io/local-config: "true"
 data:
   verbose: true
