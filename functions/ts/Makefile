@@ -12,25 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 SHELL=/bin/bash
-TAG := latest
+TAG := dev
 
 .DEFAULT_GOAL := help
 .PHONY: help
 help: ## Print this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: test build npm-ci build-dev push
+.PHONY: test build npm-ci push
 npm-ci:
 	npm ci
 
 test: npm-ci ## Run unit tests for all functions
 	npm test
 
-build: test ## Build all function images. Variable 'TAG' is used to specify tag. 'latest' will be used if not set.
+build: test ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 	npm run kpt:docker-build -- --tag $(TAG)
-
-build-dev: test ## Build all function images with tag 'dev'. This is used for local tests.
-	npm run kpt:docker-build -- --tag dev
 
 lint-license: ## Run license linter for source files
 	npm run lint-license

@@ -79,10 +79,10 @@ jobs:
     - name: Build node and Go docker images
       if: matrix.platform == 'ubuntu-latest'
       run: |
-        make build-dev
+        make build
     - name: Run all tests
       if: matrix.platform == 'ubuntu-latest'
       run: |
         sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
         sudo chmod +x /usr/local/bin/kpt
-        make TAG=dev e2e-test
+        make e2e-test

@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 SHELL=/bin/bash
-TAG := latest
+TAG := dev
 
 .DEFAULT_GOAL := help
 .PHONY: help
 help: ## Print this help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: test unit-test e2e-test build build-dev push
+.PHONY: test unit-test e2e-test build push
 
 unit-test: unit-test-go unit-test-ts ## Run unit tests for all functions
 
@@ -34,13 +34,9 @@ e2e-test: ## Run all e2e tests
 
 test: unit-test e2e-test ## Run all unit tests and e2e tests
 
-build: ## Build all function images. Variable 'TAG' is used to specify tag. 'latest' will be used if not set.
+build: ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 	cd functions/go && $(MAKE) TAG=$(TAG) build
 	cd functions/ts && $(MAKE) TAG=$(TAG) build
-
-build-dev: ## Build all function images with tag 'dev'. This is used for local tests.
-	cd functions/go && $(MAKE) build-dev
-	cd functions/ts && $(MAKE) build-dev
 
 push: ## Push images to registry. WARN: This operation should only be done in CI environment.
 	cd functions/go && $(MAKE) push

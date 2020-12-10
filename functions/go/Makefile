@@ -13,7 +13,7 @@
 # limitations under the License.
 SHELL=/bin/bash
 GOPATH := $(shell go env GOPATH)
-TAG := latest
+TAG := dev
 
 # Edit this list to contain all go functions
 FUNCTIONS := \
@@ -23,8 +23,6 @@ FUNCTIONS := \
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
 # Targets to build functions
 FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
-# Targets to build functions with dev tag
-FUNCTION_DEV_BUILDS := $(patsubst %,%-BUILD-DEV,$(FUNCTIONS))
 # Targets to push images
 FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
 # Current function name used by individual function targets
@@ -50,18 +48,11 @@ $(FUNCTION_TESTS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -TEST,,$@) func-test
 
 .PHONY: build
-build: $(FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'latest' will be used if not set.
+build: $(FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
 
 .PHONY: $(FUNCTION_BUILDS)
 $(FUNCTION_BUILDS):
-	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) func-build
-
-.PHONY: build-dev
-build-dev: $(FUNCTION_DEV_BUILDS) ## Build all function images with tag 'dev'. This is used for local tests.
-
-.PHONY: $(FUNCTION_DEV_BUILDS)
-$(FUNCTION_DEV_BUILDS):
-	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD-DEV,,$@) TAG=dev func-build
+	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) TAG=$(TAG) func-build
 
 .PHONY: push
 push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
@@ -94,23 +85,8 @@ func-vet:
 
 func-build: func-verify
 	@echo Building image for $(CURRENT_FUNCTION)...
-	@( \
-		image_tag=$${TAG:-latest}; \
-		prefix="release-go-functions-"; \
-		[[ "$${image_tag}" = "$${prefix}"* ]] && image_tag="$${image_tag#$$prefix}"; \
-		image_name=gcr.io/kpt-functions/"$${CURRENT_FUNCTION}"; \
-		image="$${image_name}":"$${image_tag}"; \
-		docker build -t "$${image}" -t "$${image_name}" -f "$${CURRENT_FUNCTION}"/Dockerfile "$${CURRENT_FUNCTION}"; \
-	)
+	../../scripts/go-function-build.sh
 
 func-push:
 	@echo Pushing image $(CURRENT_FUNCTION)...
-	@( \
-		image_tag=$${TAG:-latest}; \
-		prefix="release-go-functions-"; \
-		[[ "$${image_tag}" = "$${prefix}"* ]] && image_tag="$${image_tag#$$prefix}"; \
-		image_name=gcr.io/kpt-functions/"$${CURRENT_FUNCTION}"; \
-		image="$${image_name}":"$${image_tag}"; \
-		docker push "$${image_name}:latest"; \
-		docker push "$${image}"; \
-	)
+	../../scripts/go-function-push.sh
