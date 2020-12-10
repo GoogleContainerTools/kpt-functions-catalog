@@ -64,7 +64,7 @@ jobs:
         make unit-test-go
 
   e2e-ci:
-    needs: [unit-test-ci]
+    needs: [ts-unit-test-ci, go-unit-test-ci]
     strategy:
       matrix:
         platform: [ubuntu-latest]
