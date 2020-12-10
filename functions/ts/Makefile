@@ -32,5 +32,8 @@ build: test ## Build all function images. Variable 'TAG' is used to specify tag.
 build-dev: test ## Build all function images with tag 'dev'. This is used for local tests.
 	npm run kpt:docker-build -- --tag dev
 
+lint-license: ## Run license linter for source files
+	npm run lint-license
+
 push: ## Push images to registry. WARN: This operation should only be done in CI environment.
 	npm run kpt:docker-push -- --tag=$(TAG)

@@ -68,9 +68,10 @@ $(FUNCTION_PUSH):
 	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) func-push
 
 # Recipes for individual function
+.PHONY: func-fix func-vet func-fmt func-test func-lint \
+	func-build func-push func-verify
 func-verify: func-fix func-vet func-fmt func-test func-lint
 
-.PHONY: func-fix func-vet func-fmt func-test func-lint func-all func-build
 func-fix:
 	cd $(CURRENT_FUNCTION) && go fix ./...
 

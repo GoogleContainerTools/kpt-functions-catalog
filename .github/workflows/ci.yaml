@@ -23,7 +23,7 @@ jobs:
         find . -name "*.sh" > shell_files.out
         shellcheck $(cat shell_files.out)
 
-  unit-test-ci:
+  ts-unit-test-ci:
     strategy:
       matrix:
         platform: [ubuntu-latest]
@@ -37,11 +37,31 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Run unit tests
       run: |
-        make unit-test
+        make unit-test-ts
     - name: Check licenses
       run: |
         cd functions/ts
-        npm run lint-license
+        make lint-license
+
+  go-unit-test-ci:
+    runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
+      GO111MODULE: on
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go 1.15
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.15
+      id: go
+    - name: Check out code into GOPATH
+      uses: actions/checkout@v1
+      with:
+        path: go/src/github.com/${{ github.repository }}
+    - name: Run unit tests
+      run: |
+        make unit-test-go
 
   e2e-ci:
     needs: [unit-test-ci]

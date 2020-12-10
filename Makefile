@@ -21,8 +21,13 @@ help: ## Print this help
 
 .PHONY: test unit-test e2e-test build build-dev push
 
-unit-test: ## Run unit tests for all functions
-	cd functions && $(MAKE) test
+unit-test: unit-test-go unit-test-ts ## Run unit tests for all functions
+
+unit-test-go: ## Run unit tests for Go functions
+	cd functions/go && $(MAKE) test
+
+unit-test-ts: ## Run unit tests for TS functions
+	cd functions/ts && $(MAKE) test
 
 e2e-test: ## Run all e2e tests
 	cd tests && $(MAKE) TAG=$(TAG) test
@@ -30,10 +35,13 @@ e2e-test: ## Run all e2e tests
 test: unit-test e2e-test ## Run all unit tests and e2e tests
 
 build: ## Build all function images. Variable 'TAG' is used to specify tag. 'latest' will be used if not set.
-	cd functions && $(MAKE) TAG=$(TAG) build
+	cd functions/go && $(MAKE) TAG=$(TAG) build
+	cd functions/ts && $(MAKE) TAG=$(TAG) build
 
 build-dev: ## Build all function images with tag 'dev'. This is used for local tests.
-	cd functions && $(MAKE) build-dev
+	cd functions/go && $(MAKE) build-dev
+	cd functions/ts && $(MAKE) build-dev
 
 push: ## Push images to registry. WARN: This operation should only be done in CI environment.
-	cd functions && $(MAKE) push
+	cd functions/go && $(MAKE) push
+	cd functions/ts && $(MAKE) push
