@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -ex
+set -euo pipefail
 
 image_tag=${TAG:-dev}
 prefix="release-go-functions-"
