@@ -23,7 +23,7 @@ jobs:
         find . -name "*.sh" > shell_files.out
         shellcheck $(cat shell_files.out)
 
-  node-ci:
+  ts-unit-test-ci:
     strategy:
       matrix:
         platform: [ubuntu-latest]
@@ -35,18 +35,36 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install and test NPM packages
+    - name: Run unit tests
       run: |
-        cd functions/ts
-        npm ci
-        npm test
+        make unit-test-ts
     - name: Check licenses
       run: |
         cd functions/ts
-        npm run lint-license
+        make lint-license
+
+  go-unit-test-ci:
+    runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
+      GO111MODULE: on
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go 1.15
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.15
+      id: go
+    - name: Check out code into GOPATH
+      uses: actions/checkout@v1
+      with:
+        path: go/src/github.com/${{ github.repository }}
+    - name: Run unit tests
+      run: |
+        make unit-test-go
 
   e2e-ci:
-    needs: [node-ci]
+    needs: [ts-unit-test-ci, go-unit-test-ci]
     strategy:
       matrix:
         platform: [ubuntu-latest]
@@ -58,23 +76,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install NPM packages
-      run: |
-        cd functions/ts
-        npm ci
-    - name: Build node docker images
+    - name: Build node and Go docker images
       if: matrix.platform == 'ubuntu-latest'
       run: |
-        cd functions/ts
-        npm run kpt:docker-build
-    - name: Build go images
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        cd functions/go
-        BUILDONLY=true TAG=dev ./publish-functions.sh
-    - name: Run all e2e tests
+        make build
+    - name: Run all tests
       if: matrix.platform == 'ubuntu-latest'
       run: |
         sudo curl https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt -o /usr/local/bin/kpt
         sudo chmod +x /usr/local/bin/kpt
-        tests/e2e.sh
+        make e2e-test
