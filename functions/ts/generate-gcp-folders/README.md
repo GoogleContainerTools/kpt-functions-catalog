@@ -10,10 +10,10 @@ This function transforms the `ResourceHierarchy` custom resource into `Folder` c
 1. Once all tests pass, you can run via Docker or Node. Regardless, see the "Example input/output" section below for more information on providing well-formed input.
    - Docker
      - Build locally either via the npm script (`npm run kpt:docker-build`) or the `docker` command: `docker build -f build/generate_folders.Dockerfile ./`
-     - Run via `docker run gcr.io/yakima-eap/generate-folders:dev --help` (note: despite the image name, this is indeed local!).
+     - Run via `docker run gcr.io/kpt-fn/generate-gcp-folders:dev --help` (note: despite the image name, this is indeed local!).
    - Node
      - `node dist/generate_folders_run.js -i <PATH TO YAML>`
-1. To push the image with `dev` tag, run `npm run kpt:docker-push`. This will allow you to use the `gcr.io/yakima-eap/generate-folders:dev` image in your KRM manifests and test them with `kpt fn run`.
+1. To push the image with `dev` tag, run `npm run kpt:docker-push`. This will allow you to use the `gcr.io/kpt-fn/generate-gcp-folders:dev` image in your KRM manifests and test them with `kpt fn run`.
 1. Once you're satisfied with your changes, send out a CR using `git push origin HEAD:refs/for/master`
 1. Once the CR is approved, push your changes to the latest image using `npm run kpt:docker-build -- --tag=latest` and `npm run kpt:docker-push -- --tag=latest`.
    - TODO: This step needs to be automated using [prow](go/internal-prow-onboard).
