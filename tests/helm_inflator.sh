@@ -56,7 +56,7 @@ assert_contains_string out.yaml "name: extra-args-redis-master"
 
 helm_testcase "kpt_helm_inflator_imperative_pipeline"
 kpt fn source example-configs |
-  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-inflator:"${TAG}" --as-current-user -- local-chart-path=/source/zookeeper name=my-zookeeper | 
+  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source,rw=true --image gcr.io/kpt-functions/helm-inflator:"${TAG}" --as-current-user --network -- local-chart-path=/source/zookeeper name=my-zookeeper | 
   kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-inflator:"${TAG}" --as-current-user -- name=my-redis local-chart-path=/source/redis |
   kpt fn sink .
 assert_dir_exists default
