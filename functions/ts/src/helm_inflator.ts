@@ -162,11 +162,28 @@ function getTemplateArgs(configMapData: Map<string, string>): string[] {
   return args;
 }
 
+// run help dependency update command
+async function runHelmDepUpdate(configMapData: Map<string, string>) {
+  if (configMapData.get(LOCAL_CHART_PATH) === undefined) {
+    return;
+  }
+
+  const args: string[] = [
+    'dependency',
+    'update',
+    configMapData.get(LOCAL_CHART_PATH)!,
+  ];
+
+  runHelmCommand(args);
+}
+
 // run helm template command
 async function runHelmTemplate(
   configs: Configs,
   configMapData: Map<string, string>
 ) {
+  // Update helm dependency
+  await runHelmDepUpdate(configMapData);
   // Validate config data and read arguments.
   const args = getTemplateArgs(configMapData);
   args.unshift('template');
@@ -216,6 +233,9 @@ ${CHART_REPO}: [Optional] Repo name that helm should pull the templates from. On
 ${CHART_REPO_URL}: [Optional] Repo list URL which will be added to the helm repo list with repo name chart-repo. Only used when chart is provided.
 ...
 
+Using remote charts requires granting network access to this function. If the local or remote chart that will be rendered
+needs dependencies, the network access is also required and the chart directory needs to be mounted in read-write mode.
+
 Examples:
 
 1. To expand a chart named 'my-chart' at remote chart 'stable/chart'
@@ -228,8 +248,7 @@ metadata:
     config.kubernetes.io/function: |
       container:
         image: gcr.io/kpt-functions/helm-inflator
-        network:
-          required: true
+        network: true
     config.kubernetes.io/local-config: "true"
 data:
   ${CHART_REPO}: stable

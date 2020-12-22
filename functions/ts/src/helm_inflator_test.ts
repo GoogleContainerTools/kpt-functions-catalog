@@ -62,6 +62,12 @@ foo: bar
                 stderr: '',
                 error: undefined,
               };
+            case 'dependency':
+              return {
+                stdout: '',
+                stderr: '',
+                error: undefined,
+              };
             default:
               return {
                 stdout: '',
@@ -213,7 +219,7 @@ describe('error when run helm command', () => {
     const output = input.deepCopy();
     output.addResults(
       generalResult(
-        'Error: Helm command template chart-name bar --values whatever results in error: helm error',
+        'Error: Helm command dependency update bar results in error: helm error',
         'error'
       )
     );
