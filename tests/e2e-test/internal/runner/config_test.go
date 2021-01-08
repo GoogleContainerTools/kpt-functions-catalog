@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	. "github.com/GoogleContainerTools/kpt-functions-catalog/tests/e2e-driver/internal/runner"
+	. "github.com/GoogleContainerTools/kpt-functions-catalog/tests/e2etest/internal/runner"
 	"github.com/stretchr/testify/assert"
 )
 

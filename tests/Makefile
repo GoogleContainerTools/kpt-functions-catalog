@@ -14,14 +14,12 @@
 SHELL=/bin/bash
 TAG := dev
 
-.PHONY: help install-test-driver
+.PHONY: help
 help: ## Print this help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: test
 
-test: install-test-driver ## Run all e2e tests
+test: ## Run all e2e tests
 	TAG=$(TAG) ./e2e.sh
-
-install-test-driver: ## Install e2e test driver
-	cd e2e-driver && go test ./... && go install
+	cd e2e-test/tests && go test ./...
