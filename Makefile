@@ -34,6 +34,10 @@ e2e-test: ## Run all e2e tests
 
 test: unit-test e2e-test ## Run all unit tests and e2e tests
 
+check-licenses:
+	cd functions/ts && $(MAKE) check-licenses
+	cd functions/go && $(MAKE) check-licenses
+
 build: ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 	cd functions/go && $(MAKE) TAG=$(TAG) build
 	cd functions/ts && $(MAKE) TAG=$(TAG) build

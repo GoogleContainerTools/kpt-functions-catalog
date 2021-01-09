@@ -41,7 +41,7 @@ jobs:
     - name: Check licenses
       run: |
         cd functions/ts
-        make lint-license
+        make check-licenses
 
   go-unit-test-ci:
     runs-on: ubuntu-latest
@@ -62,6 +62,10 @@ jobs:
     - name: Run unit tests
       run: |
         make unit-test-go
+    - name: Check licenses
+      run: |
+        cd functions/go
+        make check-licenses
 
   e2e-ci:
     needs: [ts-unit-test-ci, go-unit-test-ci]
