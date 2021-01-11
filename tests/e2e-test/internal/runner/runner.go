@@ -22,10 +22,24 @@ const (
 	expectedExitCodeFile string = "exitcode.txt"
 	expectedResultsFile  string = "results.yaml"
 	expectedDiffFile     string = "diff.patch"
+	expectedNetworkFile  string = "network.txt"
 )
 
+func isNetworkEnabled(path string) bool {
+	p := filepath.Join(path, expectedDir, expectedNetworkFile)
+	b, err := ioutil.ReadFile(p)
+	if err != nil {
+		return false
+	}
+	if strings.TrimSpace(string(b)) == "true" {
+		return true
+	}
+	return false
+}
+
 // NewRunner returns a new runner for pkg
-func NewRunner(pkg string, network bool) (*Runner, error) {
+func NewRunner(testCase TestCase) (*Runner, error) {
+	pkg := string(testCase)
 	info, err := os.Stat(pkg)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open path %s: %w", pkg, err)
@@ -36,17 +50,16 @@ func NewRunner(pkg string, network bool) (*Runner, error) {
 	return &Runner{
 		pkgPath: pkg,
 		pkgName: filepath.Base(pkg),
-		network: network,
+		network: isNetworkEnabled(pkg),
 	}, nil
 }
 
-// Run runs the test
-func (r *Runner) Run() error {
+// Run runs the test.
+func (r *Runner) Run(retErr chan error) {
 	fmt.Printf("Running test against package %s\n", r.pkgName)
 	tmpDir, err := ioutil.TempDir("", "kpt-fn-catalog-e2e-*")
-	fmt.Printf("Working directory: %s\n", tmpDir)
 	if err != nil {
-		return fmt.Errorf("failed to create temporary dir: %w", err)
+		retErr <- fmt.Errorf("failed to create temporary dir: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
 	tmpPkgPath := filepath.Join(tmpDir, r.pkgName)
@@ -54,19 +67,19 @@ func (r *Runner) Run() error {
 	resultsPath := filepath.Join(tmpDir, "results")
 	err = os.Mkdir(resultsPath, 0755)
 	if err != nil {
-		return fmt.Errorf("failed to create results dir %s: %w", resultsPath, err)
+		retErr <- fmt.Errorf("failed to create results dir %s: %w", resultsPath, err)
 	}
 
 	// copy package to temp directory
 	err = copyDir(r.pkgPath, tmpPkgPath)
 	if err != nil {
-		return fmt.Errorf("failed to copy package: %w", err)
+		retErr <- fmt.Errorf("failed to copy package: %w", err)
 	}
 
 	// init and commit package files
 	err = r.preparePackage(tmpPkgPath)
 	if err != nil {
-		return fmt.Errorf("failed to prepare package: %w", err)
+		retErr <- fmt.Errorf("failed to prepare package: %w", err)
 	}
 
 	// run function
@@ -80,9 +93,9 @@ func (r *Runner) Run() error {
 	// compare results
 	err = r.compareResult(err, tmpPkgPath, resultsPath)
 	if err != nil {
-		return fmt.Errorf("%w\nkpt output:\n%s", err, o)
+		retErr <- fmt.Errorf("%w\nkpt output:\n%s", err, o)
 	}
-	return nil
+	retErr <- nil
 }
 
 func (r *Runner) preparePackage(pkgPath string) error {
@@ -100,6 +113,10 @@ func (r *Runner) preparePackage(pkgPath string) error {
 }
 
 func (r *Runner) compareResult(exitErr error, tmpPkgPath, resultsPath string) error {
+	expected, err := newExpected(tmpPkgPath)
+	if err != nil {
+		return err
+	}
 	// get exit code
 	exitCode := 0
 	if e, ok := exitErr.(*exec.ExitError); ok {
@@ -107,74 +124,109 @@ func (r *Runner) compareResult(exitErr error, tmpPkgPath, resultsPath string) er
 	} else if exitErr != nil {
 		return fmt.Errorf("cannot get exit code from %w", exitErr)
 	}
-	// compare exit code
-	b, err := ioutil.ReadFile(filepath.Join(tmpPkgPath, expectedDir, expectedExitCodeFile))
-	var expectedExitCode int
-	if os.IsNotExist(err) {
-		expectedExitCode = 0
-	} else if err != nil {
-		return fmt.Errorf("failed to read expected exit code: %w", err)
-	} else {
-		expectedExitCode, err = strconv.Atoi(strings.TrimSpace(string(b)))
-		if err != nil {
-			return fmt.Errorf("cannot convert exit code %s to int: %w", b, err)
-		}
-	}
 
-	if exitCode != expectedExitCode {
-		return fmt.Errorf("actual exit code %d doesn't match expected %d", exitCode, expectedExitCode)
+	if exitCode != expected.ExitCode {
+		return fmt.Errorf("actual exit code %d doesn't match expected %d", exitCode, expected.ExitCode)
 	}
 
 	if exitCode != 0 {
-		// compare results
-		l, err := ioutil.ReadDir(resultsPath)
-		if err != nil {
-			return fmt.Errorf("failed to get files in results dir: %w", err)
-		}
-		if len(l) != 1 {
-			return fmt.Errorf("unexpected results files number %d, should be 1", len(l))
-		}
-		resultsFile := l[0].Name()
-		actualResults, err := ioutil.ReadFile(filepath.Join(resultsPath, resultsFile))
+		actual, err := readActualResults(resultsPath)
 		if err != nil {
 			return fmt.Errorf("failed to read actual results: %w", err)
 		}
-		expectedResults, err := ioutil.ReadFile(filepath.Join(tmpPkgPath, expectedDir, expectedResultsFile))
-		if err != nil {
-			return fmt.Errorf("failed to read expected results: %w", err)
-		}
-		actual := strings.TrimSpace(string(actualResults))
-		expected := strings.TrimSpace(string(expectedResults))
-		if actual != expected {
+		if actual != expected.Results {
 			return fmt.Errorf("actual results doesn't match expected\nActual\n===\n%s\nExpected\n===\n%s",
-				actual, expected)
+				actual, expected.Results)
 		}
 		return nil
 	}
 
 	// compare diff
-	err = gitAddAll(tmpPkgPath)
+	actual, err := readActualDiff(tmpPkgPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read actual diff: %w", err)
 	}
-	err = gitCommit(tmpPkgPath, "second")
-	if err != nil {
-		return err
-	}
-	// diff with first commit
-	actualDiff, err := gitDiff(tmpPkgPath, "HEAD^", "HEAD")
-	if err != nil {
-		return err
-	}
-	expectedDiff, err := ioutil.ReadFile(filepath.Join(tmpPkgPath, expectedDir, expectedDiffFile))
-	if err != nil {
-		return fmt.Errorf("failed to read expected diff: %w", err)
-	}
-	actual := strings.TrimSpace(actualDiff)
-	expected := strings.TrimSpace(string(expectedDiff))
-	if actual != expected {
+	if actual != expected.Diff {
 		return fmt.Errorf("actual diff doesn't match expected\nActual\n===\n%s\nExpected\n===\n%s",
-			actual, expected)
+			actual, expected.Diff)
 	}
 	return nil
+}
+
+func readActualResults(resultsPath string) (string, error) {
+	l, err := ioutil.ReadDir(resultsPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to get files in results dir: %w", err)
+	}
+	if len(l) != 1 {
+		return "", fmt.Errorf("unexpected results files number %d, should be 1", len(l))
+	}
+	resultsFile := l[0].Name()
+	actualResults, err := ioutil.ReadFile(filepath.Join(resultsPath, resultsFile))
+	if err != nil {
+		return "", fmt.Errorf("failed to read actual results: %w", err)
+	}
+	return strings.TrimSpace(string(actualResults)), nil
+}
+
+func readActualDiff(path string) (string, error) {
+	err := gitAddAll(path)
+	if err != nil {
+		return "", err
+	}
+	err = gitCommit(path, "second")
+	if err != nil {
+		return "", err
+	}
+	// diff with first commit
+	actualDiff, err := gitDiff(path, "HEAD^", "HEAD")
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(actualDiff)), nil
+}
+
+// expected contains the expected result for the function running
+type expected struct {
+	ExitCode int
+	Results  string
+	Diff     string
+}
+
+func newExpected(path string) (expected, error) {
+	e := expected{}
+	// get expected exit code
+	b, err := ioutil.ReadFile(filepath.Join(path, expectedDir, expectedExitCodeFile))
+	if os.IsNotExist(err) {
+		e.ExitCode = 0
+	} else if err != nil {
+		return e, fmt.Errorf("failed to read expected exit code: %w", err)
+	} else {
+		e.ExitCode, err = strconv.Atoi(strings.TrimSpace(string(b)))
+		if err != nil {
+			return e, fmt.Errorf("cannot convert exit code %s to int: %w", b, err)
+		}
+	}
+
+	// get expected results
+	expectedResults, err := ioutil.ReadFile(filepath.Join(path, expectedDir, expectedResultsFile))
+	if os.IsNotExist(err) {
+		e.Results = ""
+	} else if err != nil {
+		return e, fmt.Errorf("failed to read expected results: %w", err)
+	} else {
+		e.Results = strings.TrimSpace(string(expectedResults))
+	}
+
+	// get expected diff
+	expectedDiff, err := ioutil.ReadFile(filepath.Join(path, expectedDir, expectedDiffFile))
+	if os.IsNotExist(err) {
+		e.Diff = ""
+	} else if err != nil {
+		return e, fmt.Errorf("failed to read expected diff: %w", err)
+	} else {
+		e.Diff = strings.TrimSpace(string(expectedDiff))
+	}
+
+	return e, nil
 }

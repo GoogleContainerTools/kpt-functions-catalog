@@ -2,48 +2,51 @@ package runner
 
 import (
 	"fmt"
-	"io/ioutil"
-
-	"gopkg.in/yaml.v3"
+	"os"
+	"path/filepath"
 )
 
-// TestConfig contains the information needed to run a test. Each test case
-// run by this driver is described by a `TestConfig`.
-//
-// Example of a test config:
-//
-// 	pkgPath: foo/bar
-//	network: true
-type TestConfig struct {
-	// PkgPath is the path to the package which will be tested.
-	PkgPath string `json:"pkgPath,omitempty" yaml:"pkgPath,omitempty"`
-	// Network indicates whether enable network access for function or not
-	Network bool `json:"network,omitempty" yaml:"network,omitempty"`
+// TestCase contains the information needed to run a test. Each test case
+// run by this driver is described by a `TestCase`.
+type TestCase string
+
+// TestCases contains a list of TestCase.
+type TestCases []TestCase
+
+func isTestCase(path string, info os.FileInfo) bool {
+	if !info.IsDir() {
+		return false
+	}
+
+	expectedPath := filepath.Join(path, expectedDir)
+	expectedInfo, err := os.Stat(expectedPath)
+	if err != nil {
+		return false
+	}
+	if !expectedInfo.IsDir() {
+		return false
+	}
+	return true
 }
 
-// TestConfigs contains a list of TestConfig. These configs should be read
-// from a config YAML file.
-//
-// Example of a config file
-//
-// 	configs:
-// 	- pkgPath: ../examples/set-namespace
-// 	- pkgPath: ../examples/kubeval
-// 	  network: true
-type TestConfigs struct {
-	Configs []TestConfig `json:"configs,omitempty" yaml:"configs,omitempty"`
-}
+// ScanTestCases will recursively scan the directory `path` and return
+// a list of TestConfig found
+func ScanTestCases(path string) (*TestCases, error) {
+	var cases TestCases
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !isTestCase(path, info) {
+			return nil
+		}
 
-// ConfigFromFile returns a list of TestConfig read from path
-func ConfigFromFile(path string) (*TestConfigs, error) {
-	b, err := ioutil.ReadFile(path)
+		cases = append(cases, TestCase(path))
+
+		return nil
+	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to open test config: %w", err)
+		return nil, fmt.Errorf("failed to scan test cases in %s", path)
 	}
-	var configs TestConfigs
-	err = yaml.Unmarshal(b, &configs)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse config file: %w", err)
-	}
-	return &configs, nil
+	return &cases, nil
 }

@@ -7,18 +7,8 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/tests/e2etest/internal/runner"
 )
 
-// TestE2E read a YAML config file 'e2e_config.yaml' which contains the information of tests. Here
-// is an example of the config file:
-//
-// configs:
-// - pkgPath: my-pkg
-//   network: true
-// - pkgPath: another-pkg
-//
-// 'configs' field is a list of test configs. Each config can have 2 fields:
-//  - pkgPath: Path to the package to be tested.
-//  - network: Set to 'true' if the function in package needs network access. Default is
-//    false.
+// TestE2E accepts a path and scans the path to find all available packages that can
+// be tested. A package which contains a directory '.expected' is considered testable.
 //
 // The kpt package should contain a declarative function that will be tested.
 //
@@ -33,6 +23,9 @@ import (
 //  - 'results.yaml' is the expected results output from the command 'kpt fn run'.
 //    The results will be compared only when the exit code matches expected and is not
 //    zero.
+//  - 'network.txt' contains a string which indicates whether network should be enabled
+//    for this test. If this file existis and the content in it is 'true' then the
+//    network is accessible. Otherwise the function cannot access network.
 //
 // Given a package's name is 'my-pkg', this driver will copy the package into a temporary
 // directory and then run command 'kpt fn run my-pkg --results-dir results'. The test
@@ -41,27 +34,37 @@ import (
 //
 // Git is required to generate diff output.
 func TestE2E(t *testing.T) {
-	err := runTests("./e2e_config.yaml")
+	err := runTests("../../..")
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-// runTests will read configs from 'configPath' and run all the
+// runTests will scan test cases in 'path' and run all the
 // tests in it. It returns an error if any of the tests fails.
-func runTests(configPath string) error {
-	config, err := runner.ConfigFromFile(configPath)
+func runTests(path string) error {
+	cases, err := runner.ScanTestCases(path)
 	if err != nil {
-		return fmt.Errorf("failed to get config test: %w", err)
+		return fmt.Errorf("failed to scan test cases: %w", err)
 	}
-	for _, c := range config.Configs {
-		r, err := runner.NewRunner(c.PkgPath, c.Network)
+	fmt.Printf("Found %d tests in %s:\n", len(*cases), path)
+	for _, c := range *cases {
+		fmt.Printf(" - %s\n", c)
+	}
+	fmt.Println("\nStart running...")
+	var retErr []chan error
+	for i, c := range *cases {
+		retErr = append(retErr, make(chan error))
+		r, err := runner.NewRunner(c)
 		if err != nil {
 			return fmt.Errorf("failed to run test: %w", err)
 		}
-		err = r.Run()
+		go r.Run(retErr[i])
+	}
+	for i := range retErr {
+		err := <-retErr[i]
 		if err != nil {
-			return err
+			return fmt.Errorf("%s: %w", (*cases)[i], err)
 		}
 	}
 	return nil
