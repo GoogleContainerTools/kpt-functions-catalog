@@ -55,11 +55,11 @@ func NewRunner(testCase TestCase) (*Runner, error) {
 }
 
 // Run runs the test.
-func (r *Runner) Run(retErr chan error) {
+func (r *Runner) Run() error {
 	fmt.Printf("Running test against package %s\n", r.pkgName)
 	tmpDir, err := ioutil.TempDir("", "kpt-fn-catalog-e2e-*")
 	if err != nil {
-		retErr <- fmt.Errorf("failed to create temporary dir: %w", err)
+		return fmt.Errorf("failed to create temporary dir: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
 	tmpPkgPath := filepath.Join(tmpDir, r.pkgName)
@@ -67,19 +67,19 @@ func (r *Runner) Run(retErr chan error) {
 	resultsPath := filepath.Join(tmpDir, "results")
 	err = os.Mkdir(resultsPath, 0755)
 	if err != nil {
-		retErr <- fmt.Errorf("failed to create results dir %s: %w", resultsPath, err)
+		return fmt.Errorf("failed to create results dir %s: %w", resultsPath, err)
 	}
 
 	// copy package to temp directory
 	err = copyDir(r.pkgPath, tmpPkgPath)
 	if err != nil {
-		retErr <- fmt.Errorf("failed to copy package: %w", err)
+		return fmt.Errorf("failed to copy package: %w", err)
 	}
 
 	// init and commit package files
 	err = r.preparePackage(tmpPkgPath)
 	if err != nil {
-		retErr <- fmt.Errorf("failed to prepare package: %w", err)
+		return fmt.Errorf("failed to prepare package: %w", err)
 	}
 
 	// run function
@@ -93,9 +93,9 @@ func (r *Runner) Run(retErr chan error) {
 	// compare results
 	err = r.compareResult(err, tmpPkgPath, resultsPath)
 	if err != nil {
-		retErr <- fmt.Errorf("%w\nkpt output:\n%s", err, o)
+		return fmt.Errorf("%w\nkpt output:\n%s", err, o)
 	}
-	retErr <- nil
+	return nil
 }
 
 func (r *Runner) preparePackage(pkgPath string) error {

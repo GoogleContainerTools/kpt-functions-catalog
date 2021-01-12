@@ -1,4 +1,0 @@
-configs:
-- pkgPath: ../../../examples/set-namespace
-- pkgPath: ../../../examples/kubeval
-  network: true

@@ -1,7 +1,6 @@
 package e2etest
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/tests/e2etest/internal/runner"
@@ -34,45 +33,28 @@ import (
 //
 // Git is required to generate diff output.
 func TestE2E(t *testing.T) {
-	err := runTests("../../..")
-	if err != nil {
-		t.Fatal(err)
-	}
+	runTests(t, "../../..")
 }
 
 // runTests will scan test cases in 'path' and run all the
 // tests in it. It returns an error if any of the tests fails.
-func runTests(path string) error {
+func runTests(t *testing.T, path string) {
 	cases, err := runner.ScanTestCases(path)
 	if err != nil {
-		return fmt.Errorf("failed to scan test cases: %w", err)
+		t.Fatalf("failed to scan test cases: %s", err)
 	}
-	fmt.Printf("Found %d tests in %s:\n", len(*cases), path)
 	for _, c := range *cases {
-		fmt.Printf(" - %s\n", c)
+		c := c // capture range variable
+		t.Run(string(c), func(t *testing.T) {
+			t.Parallel()
+			r, err := runner.NewRunner(c)
+			if err != nil {
+				t.Fatalf("failed to create test runner: %s", err)
+			}
+			err = r.Run()
+			if err != nil {
+				t.Fatalf("failed to run test: %s", err)
+			}
+		})
 	}
-	fmt.Println("\nStart running...")
-	var retErr []chan error
-	for i, c := range *cases {
-		retErr = append(retErr, make(chan error))
-		r, err := runner.NewRunner(c)
-		if err != nil {
-			return fmt.Errorf("failed to run test: %w", err)
-		}
-		go r.Run(retErr[i])
-	}
-	hasError := false
-	for i := range retErr {
-		err := <-retErr[i]
-		if err != nil {
-			fmt.Printf("FAIL: %s: %s\n", (*cases)[i], err)
-			hasError = true
-		} else {
-			fmt.Printf("PASS: %s\n", (*cases)[i])
-		}
-	}
-	if hasError {
-		return fmt.Errorf("Test failed")
-	}
-	return nil
 }
