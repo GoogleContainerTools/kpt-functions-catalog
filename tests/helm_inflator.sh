@@ -23,7 +23,7 @@ source "$DIR"/common.sh
 
 helm_testcase "kpt_helm_inflator_imperative_expected_args"
 kpt fn source example-configs |
-  kpt fn run --as-current-user --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-inflator:"${TAG}" -- name=expected-args local-chart-path=/source/redis >out.yaml
+  kpt fn run --as-current-user --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source,rw=true --image gcr.io/kpt-functions/helm-inflator:"${TAG}" --network -- name=expected-args local-chart-path=/source/redis >out.yaml
 assert_contains_string out.yaml "expected-args"
 
 testcase "kpt_helm_inflator_declarative_example"
@@ -44,6 +44,7 @@ metadata:
     config.k8s.io/function: |
       container:
         image: gcr.io/kpt-functions/helm-inflator:${TAG}
+        network: true
     config.kubernetes.io/local-config: "true"
 data:
   name: extra-args
@@ -51,13 +52,13 @@ data:
   --values: /source/values-production.yaml
 EOF
 kpt fn source example-configs |
-  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}/redis",dst=/source --fn-path fc.yaml --as-current-user >out.yaml
+  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}/redis",dst=/source,rw=true --network --fn-path fc.yaml --as-current-user >out.yaml
 assert_contains_string out.yaml "name: extra-args-redis-master"
 
 helm_testcase "kpt_helm_inflator_imperative_pipeline"
 kpt fn source example-configs |
   kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source,rw=true --image gcr.io/kpt-functions/helm-inflator:"${TAG}" --as-current-user --network -- local-chart-path=/source/zookeeper name=my-zookeeper | 
-  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source --image gcr.io/kpt-functions/helm-inflator:"${TAG}" --as-current-user -- name=my-redis local-chart-path=/source/redis |
+  kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}",dst=/source,rw=true --image gcr.io/kpt-functions/helm-inflator:"${TAG}" --as-current-user --network -- name=my-redis local-chart-path=/source/redis |
   kpt fn sink .
 assert_dir_exists default
 assert_contains_string default/service_my-zookeeper.yaml "name: my-zookeeper"
