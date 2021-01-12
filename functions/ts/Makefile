@@ -29,8 +29,8 @@ test: npm-ci ## Run unit tests for all functions
 build: test ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 	npm run kpt:docker-build -- --tag $(TAG)
 
-lint-license: ## Run license linter for source files
-	npm run lint-license
+check-licenses: ## Run license checker for source files
+	npm run check-licenses
 
 push: ## Push images to registry. WARN: This operation should only be done in CI environment.
 	npm run kpt:docker-push -- --tag=$(TAG)
