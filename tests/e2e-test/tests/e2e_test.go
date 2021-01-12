@@ -61,11 +61,18 @@ func runTests(path string) error {
 		}
 		go r.Run(retErr[i])
 	}
+	hasError := false
 	for i := range retErr {
 		err := <-retErr[i]
 		if err != nil {
-			return fmt.Errorf("%s: %w", (*cases)[i], err)
+			fmt.Printf("FAIL: %s: %s\n", (*cases)[i], err)
+			hasError = true
+		} else {
+			fmt.Printf("PASS: %s\n", (*cases)[i])
 		}
+	}
+	if hasError {
+		return fmt.Errorf("Test failed")
 	}
 	return nil
 }
