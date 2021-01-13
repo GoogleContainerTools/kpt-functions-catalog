@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-SHELL=/bin/bash
-TAG := dev
+TAG ?= dev
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -37,7 +36,7 @@ FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
 # Targets to run npm ci
 FUNCTION_NPM_CI := $(patsubst %,%-NPM-CI,$(FUNCTIONS))
 # Current function name used by individual function targets
-CURRENT_FUNCTION := unknown
+CURRENT_FUNCTION ?= unknown
 
 npm-ci: $(FUNCTION_NPM_CI) ## Run npm ci command
 
@@ -55,7 +54,7 @@ build: $(FUNCTION_BUILDS) ## Build all function images. Variable 'TAG' is used t
 
 .PHONY: $(FUNCTION_BUILDS)
 $(FUNCTION_BUILDS):
-	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) func-build
+	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) TAG=$(TAG) func-build
 
 push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
 
@@ -81,7 +80,7 @@ func-check-licenses: func-npm-ci
 	cd $(CURRENT_FUNCTION) && npm run check-licenses
 
 func-build: func-test
-	cd $(CURRENT_FUNCTION) && npm run kpt:docker-build -- --tag $(TAG)
+	../../scripts/ts-function-build.sh
 
 func-push:
 	cd $(CURRENT_FUNCTION) && npm run kpt:docker-push -- --tag=$(TAG)
