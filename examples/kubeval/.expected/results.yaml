@@ -1,0 +1,11 @@
+- message: 'Invalid type. Expected: [integer,null], given: string'
+  severity: error
+  resourceRef:
+    apiVersion: v1
+    kind: ReplicationController
+    namespace: ''
+    name: bob
+  file:
+    path: configs/example-config.yaml
+  field:
+    path: spec.replicas

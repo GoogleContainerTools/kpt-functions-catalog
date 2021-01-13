@@ -22,3 +22,4 @@ help: ## Print this help
 
 test: ## Run all e2e tests
 	TAG=$(TAG) ./e2e.sh
+	cd e2e-test/tests && go test ./...
