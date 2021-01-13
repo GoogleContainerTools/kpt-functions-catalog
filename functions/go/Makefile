@@ -13,7 +13,7 @@
 # limitations under the License.
 SHELL=/bin/bash
 GOPATH := $(shell go env GOPATH)
-TAG := dev
+TAG ?= dev
 
 # Edit this list to contain all go functions
 FUNCTIONS := \
@@ -28,7 +28,7 @@ FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
 # Targets to push images
 FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
 # Current function name used by individual function targets
-CURRENT_FUNCTION := unknown
+CURRENT_FUNCTION ?= unknown
 
 .DEFAULT_GOAL := help
 .PHONY: help
