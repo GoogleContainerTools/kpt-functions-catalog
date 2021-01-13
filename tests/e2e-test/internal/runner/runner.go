@@ -88,10 +88,15 @@ func (r *Runner) Run() error {
 	if r.network {
 		kptArgs = append(kptArgs, "--network")
 	}
-	o, err := runCommand("", "kpt", kptArgs)
+	o, fnErr := runCommand("", "kpt", kptArgs)
+	// run formatter
+	_, err = runCommand("", "kpt", []string{"cfg", "fmt", tmpPkgPath})
+	if err != nil {
+		return fmt.Errorf("failed to run kpt cfg fmt: %w", err)
+	}
 
 	// compare results
-	err = r.compareResult(err, tmpPkgPath, resultsPath)
+	err = r.compareResult(fnErr, tmpPkgPath, resultsPath)
 	if err != nil {
 		return fmt.Errorf("%w\nkpt output:\n%s", err, o)
 	}
