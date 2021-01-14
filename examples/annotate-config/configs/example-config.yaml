@@ -10,10 +10,10 @@ kind: Service
 metadata:
   name: the-service
 spec:
+  ports:
+  - name: etcd-server-ssl
+    port: 2380
+  - name: etcd-client-ssl
+    port: 2379
   clusterIP: None
   publishNotReadyAddresses: true
-  ports:
-  - port: 2380
-    name: etcd-server-ssl
-  - port: 2379
-    name: etcd-client-ssl
