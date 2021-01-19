@@ -49,7 +49,6 @@ metadata:
 data:
   name: extra-args
   local-chart-path: /source
-  --values: /source/values-production.yaml
 EOF
 kpt fn source example-configs |
   kpt fn run --mount type=bind,src="$(pwd)/${CHARTS_SRC}/redis",dst=/source,rw=true --network --fn-path fc.yaml --as-current-user >out.yaml
