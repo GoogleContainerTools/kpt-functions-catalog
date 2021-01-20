@@ -20,17 +20,68 @@ help: ## Print this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: test build npm-ci push
-npm-ci:
-	npm ci
+FUNCTIONS := \
+	helm-inflator \
+	istioctl-analyze \
+	kubeval \
+	sops
 
-test: npm-ci ## Run unit tests for all functions
-	npm test
+# Targets for running all function tests
+FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
 
-build: test ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
-	npm run kpt:docker-build -- --tag $(TAG)
+FUNCTION_CHECKLICENSES := $(patsubst %,%-CHECKLICENSES,$(FUNCTIONS))
+# Targets to build functions
+FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
+# Targets to push images
+FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
+# Targets to run npm ci
+FUNCTION_NPM_CI := $(patsubst %,%-NPM-CI,$(FUNCTIONS))
+# Current function name used by individual function targets
+CURRENT_FUNCTION := unknown
 
-check-licenses: ## Run license checker for source files
-	npm run check-licenses
+npm-ci: $(FUNCTION_NPM_CI) ## Run npm ci command
 
-push: ## Push images to registry. WARN: This operation should only be done in CI environment.
-	npm run kpt:docker-push -- --tag=$(TAG)
+.PHONY: $(FUNCTION_NPM_CI)
+$(FUNCTION_NPM_CI):
+	$(MAKE) CURRENT_FUNCTION=$(subst -NPM-CI,,$@) func-npm-ci
+
+test: $(FUNCTION_TESTS) ## Run unit tests for all functions
+
+.PHONY: $(FUNCTION_TESTS)
+$(FUNCTION_TESTS):
+	$(MAKE) CURRENT_FUNCTION=$(subst -TEST,,$@) func-test
+
+build: $(FUNCTION_BUILDS) ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
+
+.PHONY: $(FUNCTION_BUILDS)
+$(FUNCTION_BUILDS):
+	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) func-build
+
+push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
+
+.PHONY: $(FUNCTION_PUSH)
+$(FUNCTION_PUSH):
+	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) func-push
+
+check-licenses: $(FUNCTION_CHECKLICENSES) ## Run license checker for source files
+
+.PHONY: $(FUNCTION_CHECKLICENSES)
+$(FUNCTION_CHECKLICENSES):
+	$(MAKE) CURRENT_FUNCTION=$(subst -CHECKLICENSES,,$@) func-check-licenses
+
+# Recipes for individual function
+.PHONY: func-test func-check-licenses func-build func-push func-npm-ci
+func-npm-ci:
+	cd $(CURRENT_FUNCTION) && npm ci
+
+func-test: func-npm-ci
+	cd $(CURRENT_FUNCTION) && npm test
+
+func-check-licenses: func-npm-ci
+	cd $(CURRENT_FUNCTION) && npm run check-licenses
+
+func-build: func-test
+	cd $(CURRENT_FUNCTION) && npm run kpt:docker-build -- --tag $(TAG)
+
+func-push:
+	cd $(CURRENT_FUNCTION) && npm run kpt:docker-push -- --tag=$(TAG)
