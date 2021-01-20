@@ -42,7 +42,7 @@ func gitCommit(d, msg string) error {
 	if err != nil {
 		return fmt.Errorf("git config error: %w, output: %s", err, o)
 	}
-	o, err = runCommand(d, "git", []string{"commit", "-m", msg})
+	o, err = runCommand(d, "git", []string{"commit", "-m", msg, "--allow-empty"})
 	if err != nil {
 		return fmt.Errorf("git commit error: %w, output: %s", err, o)
 	}
