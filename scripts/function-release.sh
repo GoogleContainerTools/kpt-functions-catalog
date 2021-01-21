@@ -16,8 +16,20 @@
 
 set -euo pipefail
 
-GO_LICENSES_TMP_DIR=$(mktemp -d)
-cd "$GO_LICENSES_TMP_DIR"
-go mod init tmp
-go get github.com/google/go-licenses
-rm -rf "$GO_LICENSES_TMP_DIR"
+# If GIT_TAG is not set, just skip processing.
+if [ -z "${GIT_TAG}" ];
+then
+  exit 0
+fi
+
+scripts_dir="$(dirname "$0")"
+# git-tag-parser.sh has been shell-checked separately.
+# shellcheck source=/dev/null
+source ${scripts_dir}/git-tag-parser.sh
+
+fn_lang=$(parse_git_tag lang)
+fn_name=$(parse_git_tag name)
+fn_ver=$(parse_git_tag version)
+
+cd "${scripts_dir}"/../functions/"${fn_lang}"
+CURRENT_FUNCTION="${fn_name}" TAG="${fn_ver}" make func-build

@@ -60,7 +60,7 @@ push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should o
 
 .PHONY: $(FUNCTION_PUSH)
 $(FUNCTION_PUSH):
-	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) func-push
+	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) TAG=$(TAG) func-push
 
 check-licenses: $(FUNCTION_CHECKLICENSES) ## Run license checker for source files
 
@@ -80,7 +80,7 @@ func-check-licenses: func-npm-ci
 	cd $(CURRENT_FUNCTION) && npm run check-licenses
 
 func-build: func-test
-	../../scripts/ts-function-build.sh
+	../../scripts/ts-function-release.sh build
 
 func-push:
-	cd $(CURRENT_FUNCTION) && npm run kpt:docker-push -- --tag=$(TAG)
+	../../scripts/ts-function-release.sh push
