@@ -1,34 +1,39 @@
 diff --git a/configs/example-config.yaml b/configs/example-config.yaml
-index 1c43349..50feced 100644
+index 1c43349..02e8ab4 100644
 --- a/configs/example-config.yaml
 +++ b/configs/example-config.yaml
-@@ -2,6 +2,8 @@ apiVersion: v1
+@@ -2,7 +2,11 @@ apiVersion: v1
  kind: ConfigMap
  metadata:
    name: the-map
 +  labels:
 +    color: orange
++    fruit: apple
  data:
++  fruit: apple
    some-key: some-value
  ---
-@@ -10,7 +12,11 @@ kind: Service
+ apiVersion: v1
+@@ -10,7 +14,13 @@ kind: Service
  metadata:
    name: the-service
    namespace: the-namespace
 +  labels:
 +    color: orange
++    fruit: apple
  spec:
 +  selector:
 +    color: orange
++    fruit: apple
    ports:
    - name: etcd-server-ssl
      port: 2380
 diff --git a/functions/fn-config.yaml b/functions/fn-config.yaml
 deleted file mode 100644
-index 29f6806..0000000
+index 02b7cc7..0000000
 --- a/functions/fn-config.yaml
 +++ /dev/null
-@@ -1,12 +0,0 @@
+@@ -1,19 +0,0 @@
 -apiVersion: v1
 -kind: ConfigMap
 -metadata:
@@ -39,5 +44,12 @@ index 29f6806..0000000
 -        image: gcr.io/kpt-functions/set-label
 -    config.kubernetes.io/local-config: 'true'
 -data:
--  label_name: color
--  label_value: orange
+-  specs:
+-  - label_name: color
+-    label_value: orange
+-  - label_name: fruit
+-    label_value: apple
+-    fieldSpecs:
+-    - path: data
+-      kind: ConfigMap
+-      create: true
