@@ -6,14 +6,14 @@ metadata:
     config.k8s.io/function: |
       container:
         image: gcr.io/kpt-functions/set-label
-    config.kubernetes.io/local-config: 'true'
+    config.kubernetes.io/local-config: "true"
 data:
-  specs:
+  labels:
   - label_name: color
     label_value: orange
-  - label_name: fruit
-    label_value: apple
-    fieldSpecs:
-    - path: data
-      kind: ConfigMap
+  - fieldSpecs:
+    - kind: ConfigMap
       create: true
+      path: data
+    label_name: fruit
+    label_value: apple

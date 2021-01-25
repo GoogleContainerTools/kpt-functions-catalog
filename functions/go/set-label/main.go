@@ -19,6 +19,10 @@ type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"commonLabels,omitempty" yaml:"commonLabels,omitempty"`
 }
 
+type addLabelSpecs struct {
+	Labels []addLabelSpec `json:"labels,omitempty" yaml:"labels,omitempty"`
+}
+
 type addLabelSpec struct {
 	LabelName  string            `json:"label_name,omitempty" yaml:"label_name,omitempty"`
 	LabelValue string            `json:"label_value,omitempty" yaml:"label_value,omitempty"`
@@ -72,16 +76,16 @@ func main() {
 		if err != nil {
 			return errors.Wrap(err, "failed to convert items to resource map")
 		}
-		specs, err := getSpecs(resourceList.FunctionConfig)
+		labels, err := getLabels(resourceList.FunctionConfig)
 		if err != nil {
 			return errors.Wrap(err, "failed to get data.specs field from function config")
 		}
 
-		for _, spec := range specs {
-			err := addLabel(spec, resMap, tc, pluginHelpers, plugin)
+		for _, l := range labels.Labels {
+			err := addLabel(l, resMap, tc, pluginHelpers, plugin)
 			if err != nil {
 				return errors.Wrapf(err, "failed to add label %s: %s",
-					spec.LabelName, spec.LabelValue)
+					l.LabelName, l.LabelValue)
 			}
 		}
 
@@ -129,7 +133,7 @@ kind: ConfigMap
 metadata:
   name: my-config
 data:
-  specs:
+  labels:
   - label_name: color
     label_value: orange
   - label_name: fruit
@@ -169,7 +173,7 @@ kind: ConfigMap
 metadata:
   name: my-config
 data:
-  specs:
+  labels:
     - label_name: color
       label_value: orange
       fieldSpecs:
@@ -195,25 +199,25 @@ func newResMapFactory() *resmap.Factory {
 	return resmap.NewFactory(resourceFactory, nil)
 }
 
-func getSpecs(fc interface{}) ([]addLabelSpec, error) {
+func getLabels(fc interface{}) (addLabelSpecs, error) {
+	var fcd addLabelSpecs
 	f, ok := fc.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("function config %#v is not valid", fc)
+		return fcd, fmt.Errorf("function config %#v is not valid", fc)
 	}
 	rn, err := kyaml.FromMap(f)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse from function config")
+		return fcd, errors.Wrap(err, "failed to parse from function config")
 	}
-	specsNode, err := rn.Pipe(kyaml.Lookup("data", "specs"))
-	if err != nil {
-		return nil, err
-	}
-	var fcd []addLabelSpec
-	b, err := specsNode.String()
+	specsNode, err := rn.Pipe(kyaml.Lookup("data"))
 	if err != nil {
 		return fcd, err
 	}
 
+	b, err := specsNode.String()
+	if err != nil {
+		return fcd, err
+	}
 	err = yaml.Unmarshal([]byte(b), &fcd)
 	if err != nil {
 		return fcd, err
