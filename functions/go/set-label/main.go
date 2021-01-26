@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
@@ -40,7 +39,7 @@ func setLabel(spec setLabelSpec,
 
 	err := plugin.Config(pluginHelpers, []byte{})
 	if err != nil {
-		return errors.Wrap(err, "failed to config plugin")
+		return fmt.Errorf("failed to config plugin: %w", err)
 	}
 	// append default field specs
 	plugin.FieldSpecs = append(spec.FieldSpecs, tc.FieldSpecs...)
@@ -50,7 +49,7 @@ func setLabel(spec setLabelSpec,
 
 	err = plugin.Transform(resMap)
 	if err != nil {
-		return errors.Wrap(err, "failed to run transformer")
+		return fmt.Errorf("failed to run transformer: %w", err)
 	}
 	return nil
 }
@@ -74,24 +73,24 @@ func main() {
 	cmd := framework.Command(resourceList, func() error {
 		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
 		if err != nil {
-			return errors.Wrap(err, "failed to convert items to resource map")
+			return fmt.Errorf("failed to convert items to resource map: %w", err)
 		}
 		labels, err := getLabels(resourceList.FunctionConfig)
 		if err != nil {
-			return errors.Wrap(err, "failed to get data.specs field from function config")
+			return fmt.Errorf("failed to get data.specs field from function config: %w", err)
 		}
 
 		for _, l := range labels.Labels {
 			err := setLabel(l, resMap, tc, pluginHelpers, plugin)
 			if err != nil {
-				return errors.Wrapf(err, "failed to add label %s: %s",
-					l.LabelName, l.LabelValue)
+				return fmt.Errorf("failed to add label [%s: %s]: %w",
+					l.LabelName, l.LabelValue, err)
 			}
 		}
 
 		resourceList.Items, err = resMap.ToRNodeSlice()
 		if err != nil {
-			return errors.Wrap(err, "failed to convert resource map to items")
+			return fmt.Errorf("failed to convert resource map to items: %w", err)
 		}
 		return nil
 	})
@@ -111,7 +110,7 @@ Configured using a ConfigMap with the following keys:
 label_name: Label name to add to resources.
 label_value: Label value to add to resources.
 
-These keys are in a list in path 'data.specs'.
+These keys are in a list in path 'data.labels'.
 
 Example:
 
@@ -122,7 +121,7 @@ kind: ConfigMap
 metadata:
   name: my-config
 data:
-  specs:
+  labels:
   - label_name: color
     label_value: orange
 
@@ -207,7 +206,7 @@ func getLabels(fc interface{}) (setLabelSpecs, error) {
 	}
 	rn, err := kyaml.FromMap(f)
 	if err != nil {
-		return fcd, errors.Wrap(err, "failed to parse from function config")
+		return fcd, fmt.Errorf("failed to parse from function config: %w", err)
 	}
 	specsNode, err := rn.Pipe(kyaml.Lookup("data"))
 	if err != nil {
