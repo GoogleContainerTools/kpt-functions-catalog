@@ -19,17 +19,17 @@ type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"commonLabels,omitempty" yaml:"commonLabels,omitempty"`
 }
 
-type addLabelSpecs struct {
-	Labels []addLabelSpec `json:"labels,omitempty" yaml:"labels,omitempty"`
+type setLabelSpecs struct {
+	Labels []setLabelSpec `json:"labels,omitempty" yaml:"labels,omitempty"`
 }
 
-type addLabelSpec struct {
+type setLabelSpec struct {
 	LabelName  string            `json:"label_name,omitempty" yaml:"label_name,omitempty"`
 	LabelValue string            `json:"label_value,omitempty" yaml:"label_value,omitempty"`
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 }
 
-func addLabel(spec addLabelSpec,
+func setLabel(spec setLabelSpec,
 	resMap resmap.ResMap,
 	tc transformerConfig,
 	pluginHelpers *resmap.PluginHelpers,
@@ -82,7 +82,7 @@ func main() {
 		}
 
 		for _, l := range labels.Labels {
-			err := addLabel(l, resMap, tc, pluginHelpers, plugin)
+			err := setLabel(l, resMap, tc, pluginHelpers, plugin)
 			if err != nil {
 				return errors.Wrapf(err, "failed to add label %s: %s",
 					l.LabelName, l.LabelValue)
@@ -199,8 +199,8 @@ func newResMapFactory() *resmap.Factory {
 	return resmap.NewFactory(resourceFactory, nil)
 }
 
-func getLabels(fc interface{}) (addLabelSpecs, error) {
-	var fcd addLabelSpecs
+func getLabels(fc interface{}) (setLabelSpecs, error) {
+	var fcd setLabelSpecs
 	f, ok := fc.(map[string]interface{})
 	if !ok {
 		return fcd, fmt.Errorf("function config %#v is not valid", fc)
