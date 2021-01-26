@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# GIT_TAG should be set in format as {language_name}/{function_name}/{semver}.
+# e.g. "go/set-namespace/v1.2.3" and "ts/kubeval/v2.3.4"
+# You can optionally set environment variable GCR_REGISTRY
+# (e.g. "gcr.io/my-project"), then your image will be built as
+# {GCR_REGISTRY}/{function_name}:{tag}.
+
 set -euo pipefail
 
 # If GIT_TAG is not set, just skip processing.
@@ -32,4 +38,15 @@ fn_name=$(parse_git_tag name)
 fn_ver=$(parse_git_tag version)
 
 cd "${scripts_dir}"/../functions/"${fn_lang}"
-CURRENT_FUNCTION="${fn_name}" TAG="${fn_ver}" make func-build
+
+case "$1" in
+  build)
+    CURRENT_FUNCTION="${fn_name}" TAG="${fn_ver}" make func-build
+    ;;
+  push)
+    CURRENT_FUNCTION="${fn_name}" TAG="${fn_ver}" make func-push
+    ;;
+  *)
+    echo "Usage: $0 {build|push}"
+    exit 1
+esac

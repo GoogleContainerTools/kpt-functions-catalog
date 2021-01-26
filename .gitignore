@@ -5,3 +5,6 @@ node_modules
 .npmrc
 .DS_Store
 .nyc_output
+
+# We use sed -i.bak when doing in-line replace, because it works better cross-platform
+*.bak
