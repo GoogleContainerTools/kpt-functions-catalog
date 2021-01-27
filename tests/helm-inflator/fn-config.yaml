@@ -13,3 +13,4 @@ data:
   chart: bitnami/nginx
   chart-repo: bitnami
   chart-repo-url: 'https://charts.bitnami.com/bitnami'
+  chart-version: 8.4.0
