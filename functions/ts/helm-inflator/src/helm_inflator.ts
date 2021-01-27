@@ -30,6 +30,8 @@ const CHART = 'chart';
 const CHART_REPO = 'chart-repo';
 // CHART_REPO_URL is the repo remote URL
 const CHART_REPO_URL = 'chart-repo-url';
+// CHART_VERSION is the version of remote chart
+const CHART_VERSION = 'chart-version';
 
 class HelmError extends Error {
   constructor(m: string) {
@@ -131,6 +133,10 @@ async function runHelmPull(configMapData: Map<string, string>) {
     configMapData.get(CHART)!,
   ];
 
+  if (configMapData.has(CHART_VERSION)) {
+    args.push('--version', configMapData.get(CHART_VERSION)!);
+  }
+
   runHelmCommand(args);
 
   // helm pull will untar the charts to a subdirectory in destination
@@ -231,6 +237,8 @@ ${VALUES_PATH}: [Optional] Path to values file.
 ${CHART}: [Optional] A url to pull the remote chart instead of using local templates. This flag only works with remote charts.
 ${CHART_REPO}: [Optional] Repo name that helm should pull the templates from. Only used when chart is provided.
 ${CHART_REPO_URL}: [Optional] Repo list URL which will be added to the helm repo list with repo name chart-repo. Only used when chart is provided.
+${CHART_VERSION}: [Optional] Chart version that will be pulled from remote repo. Will pull latest version if omitted. 
+  Only used when chart is provided.
 ...
 
 Using remote charts requires granting network access to this function. If the local or remote chart that will be rendered
@@ -255,6 +263,7 @@ data:
   ${CHART_REPO_URL}: https://url/to/repo
   ${CHART}: stable/chart
   ${CHART_NAME}: my-chart
+  ${CHART_VERSION}: 1.0.0
 
 2. To expand a chart named 'my-chart' at '../path/to/helm/chart' using './values.yaml':
 
