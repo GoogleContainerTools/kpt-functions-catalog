@@ -2,13 +2,52 @@ package runner
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"gopkg.in/yaml.v3"
 )
+
+// TestCaseConfig contains the config information for the test case
+type TestCaseConfig struct {
+	ExitCode int  `json:"exitCode,omitempty" yaml:"exitCode,omitempty"`
+	Network  bool `json:"network,omitempty" yaml:"network,omitempty"`
+	RunTimes int  `json:"runTimes,omitempty" yaml:"runTimes,omitempty"`
+}
+
+func newTestCaseConfig(path string) (TestCaseConfig, error) {
+	configPath := filepath.Join(path, expectedDir, expectedConfigFile)
+	b, err := ioutil.ReadFile(configPath)
+	if os.IsNotExist(err) {
+		// return default config
+		return TestCaseConfig{
+			ExitCode: 0,
+			Network:  false,
+			RunTimes: 1,
+		}, nil
+	}
+	if err != nil {
+		return TestCaseConfig{}, fmt.Errorf("filed to read test config file: %w", err)
+	}
+
+	var config TestCaseConfig
+	err = yaml.Unmarshal(b, &config)
+	if err != nil {
+		return config, fmt.Errorf("failed to unmarshal config file: %s\n: %w", string(b), err)
+	}
+	if config.RunTimes == 0 {
+		config.RunTimes = 1
+	}
+	return config, nil
+}
 
 // TestCase contains the information needed to run a test. Each test case
 // run by this driver is described by a `TestCase`.
-type TestCase string
+type TestCase struct {
+	Path   string
+	Config TestCaseConfig
+}
 
 // TestCases contains a list of TestCase.
 type TestCases []TestCase
@@ -41,7 +80,15 @@ func ScanTestCases(path string) (*TestCases, error) {
 			return nil
 		}
 
-		cases = append(cases, TestCase(path))
+		config, err := newTestCaseConfig(path)
+		if err != nil {
+			return err
+		}
+
+		cases = append(cases, TestCase{
+			Path:   path,
+			Config: config,
+		})
 
 		return nil
 	})

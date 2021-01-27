@@ -13,18 +13,22 @@ import (
 //
 // This driver expects a directory '.expected' in the top level of the package and
 // '.expected' should contain 3 files:
-//  - 'exitcode.txt' contains a single number which is expected exit code of command
-//    'kpt fn run'. If this file is missed, driver will assume the expected exit code
-//    is 0.
+//  - 'config.yaml' has the configuration information for this test. It should contain a
+//    map of following fields:
+//    - 'exitCode': Contains a single number which is expected exit code of command
+//      'kpt fn run'. If this field is missed, driver will assume the expected exit code
+//      is 0.
+//    - 'network': A boolean which indicates whether network should be enabled
+//    	for this test. If this field exists and the content in it is 'true' then the
+//    	network is accessible. Otherwise the function cannot access network.
+//    - 'runTimes': A number which sepcifies the times of function running. If this field
+//      missing then the function will be run once.
 //  - 'diff.patch' is the expected diff output between original package files and
 //    files after function running. The diff will be compared only when the exit code
 //    matches expected and is zero.
 //  - 'results.yaml' is the expected results output from the command 'kpt fn run'.
 //    The results will be compared only when the exit code matches expected and is not
 //    zero.
-//  - 'network.txt' contains a string which indicates whether network should be enabled
-//    for this test. If this file existis and the content in it is 'true' then the
-//    network is accessible. Otherwise the function cannot access network.
 //
 // Given a package's name is 'my-pkg', this driver will copy the package into a temporary
 // directory and then run command 'kpt fn run my-pkg --results-dir results'. The test
@@ -45,7 +49,7 @@ func runTests(t *testing.T, path string) {
 	}
 	for _, c := range *cases {
 		c := c // capture range variable
-		t.Run(string(c), func(t *testing.T) {
+		t.Run(c.Path, func(t *testing.T) {
 			t.Parallel()
 			r, err := runner.NewRunner(c)
 			if err != nil {
