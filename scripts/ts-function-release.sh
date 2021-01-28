@@ -14,6 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This script requires TAG and CURRENT_FUNCTION to be set.
+# CURRENT_FUNCTION is the target kpt function. e.g. kubeval.
+# TAG can be any valid docker tags. If the TAG is semver e.g. v1.2.3, shorter
+# versions of this semver will be tagged too. e.g. v1.2 and v1.
+# GCR_REGISTRY is the desired container registry e.g. gcr.io/my-registry. This
+# is optional. If not set, the default value gcr.io/kpt-functions will be used.
+# example 1:
+# Invocation: GCR_REGISTRY=gcr.io/kpt-fn CURRENT_FUNCTION=kubeval TAG=v1.2.3 ts-function-release.sh build
+# It builds gcr.io/kpt-fn/kubeval:v1.2.3, gcr.io/kpt-fn/kubeval:v1.2 and
+# gcr.io/kpt-fn/kubeval:v1.
+# Invocation: GCR_REGISTRY=gcr.io/kpt-fn CURRENT_FUNCTION=kubeval TAG=v1.2.3 ts-function-release.sh push
+# It pushes the above 3 images.
+# example 2:
+# Invocation: CURRENT_FUNCTION=kubeval TAG=unstable ts-function-release.sh build
+# It builds gcr.io/kpt-fn/kubeval:unstable.
+# Invocation: CURRENT_FUNCTION=kubeval TAG=unstable ts-function-release.sh push
+# It pushes gcr.io/kpt-fn/kubeval:unstable.
+
+# This script currently is used in functions/ts/Makefile.
+
 set -euo pipefail
 
 scripts_dir="$(dirname "$0")"
@@ -28,6 +48,7 @@ GCR_REGISTRY=${GCR_REGISTRY:-gcr.io/kpt-functions}
 cd "${scripts_dir}/../functions/ts/${CURRENT_FUNCTION}"
 
 # This make it work for npm 6.*.*
+# https://github.com/GoogleContainerTools/kpt/issues/1394
 sed -i.bak "s|gcr.io/kpt-functions|${GCR_REGISTRY}|g" package.json
 
 # This make it work for npm 7.0.0+

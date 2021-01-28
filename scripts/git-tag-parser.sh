@@ -18,7 +18,13 @@ VERNUM='0|[1-9][0-9]*'
 SEMVER_REGEX="^[vV]?($VERNUM)\\.($VERNUM)\\.($VERNUM)$"
 
 # get_versions return versions: vX.Y.Z, vX.Y and vX if the input matches
-# GIT_TAG_SEMVER_REGEX. Otherwise, it returns the input.
+# SEMVER_REGEX. Otherwise, it returns the input.
+# example 1:
+# Invocation: get_versions v1.2.3
+# Return: v1.2.3 v1.2 v1
+# example 2:
+# Invocation: get_versions unstable
+# Return: unstable
 function get_versions {
   local version=$1
   if [[ "${version}" =~ $SEMVER_REGEX ]]; then
@@ -34,6 +40,19 @@ function get_versions {
   fi
 }
 
+# parse_git_tag expects the GIT_TAG environment variable to be set. Otherwise,
+# it stops and exit with 0.
+# It GIT_TAG is set, it splits the GIT_TAG by "/" and returns the desired part
+# depending on the input argument.
+# example 1:
+# Invocation: GIT_TAG=ts/kubeval/v1.2.3 parse_git_tag lang
+# Return: ts
+# example 2:
+# Invocation: GIT_TAG=ts/kubeval/v1.2.3 parse_git_tag fn_name
+# Return: kubeval
+# example 3:
+# Invocation: GIT_TAG=ts/kubeval/v1.2.3 parse_git_tag fn_ver
+# Return: v1.2.3
 function parse_git_tag {
   # If GIT_TAG is not set, just skip processing.
   if [ -z "${GIT_TAG}" ];
