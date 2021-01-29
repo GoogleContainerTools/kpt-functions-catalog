@@ -11,7 +11,6 @@ import (
 
 // Runner runs an e2e test
 type Runner struct {
-	pkgPath  string
 	pkgName  string
 	testCase TestCase
 }
@@ -25,17 +24,15 @@ const (
 
 // NewRunner returns a new runner for pkg
 func NewRunner(testCase TestCase) (*Runner, error) {
-	pkg := testCase.Path
-	info, err := os.Stat(pkg)
+	info, err := os.Stat(testCase.Path)
 	if err != nil {
-		return nil, fmt.Errorf("cannot open path %s: %w", pkg, err)
+		return nil, fmt.Errorf("cannot open path %s: %w", testCase.Path, err)
 	}
 	if !info.IsDir() {
-		return nil, fmt.Errorf("path %s is not a directory", pkg)
+		return nil, fmt.Errorf("path %s is not a directory", testCase.Path)
 	}
 	return &Runner{
-		pkgPath:  pkg,
-		pkgName:  filepath.Base(pkg),
+		pkgName:  filepath.Base(testCase.Path),
 		testCase: testCase,
 	}, nil
 }
@@ -57,7 +54,7 @@ func (r *Runner) Run() error {
 	}
 
 	// copy package to temp directory
-	err = copyDir(r.pkgPath, tmpPkgPath)
+	err = copyDir(r.testCase.Path, tmpPkgPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy package: %w", err)
 	}
