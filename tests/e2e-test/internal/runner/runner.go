@@ -6,51 +6,34 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
 // Runner runs an e2e test
 type Runner struct {
-	pkgPath string
-	pkgName string
-	network bool
+	pkgName  string
+	testCase TestCase
 }
 
 const (
-	expectedDir          string = ".expected"
-	expectedExitCodeFile string = "exitcode.txt"
-	expectedResultsFile  string = "results.yaml"
-	expectedDiffFile     string = "diff.patch"
-	expectedNetworkFile  string = "network.txt"
+	expectedDir         string = ".expected"
+	expectedResultsFile string = "results.yaml"
+	expectedDiffFile    string = "diff.patch"
+	expectedConfigFile  string = "config.yaml"
 )
-
-func isNetworkEnabled(path string) bool {
-	p := filepath.Join(path, expectedDir, expectedNetworkFile)
-	b, err := ioutil.ReadFile(p)
-	if err != nil {
-		return false
-	}
-	if strings.TrimSpace(string(b)) == "true" {
-		return true
-	}
-	return false
-}
 
 // NewRunner returns a new runner for pkg
 func NewRunner(testCase TestCase) (*Runner, error) {
-	pkg := string(testCase)
-	info, err := os.Stat(pkg)
+	info, err := os.Stat(testCase.Path)
 	if err != nil {
-		return nil, fmt.Errorf("cannot open path %s: %w", pkg, err)
+		return nil, fmt.Errorf("cannot open path %s: %w", testCase.Path, err)
 	}
 	if !info.IsDir() {
-		return nil, fmt.Errorf("path %s is not a directory", pkg)
+		return nil, fmt.Errorf("path %s is not a directory", testCase.Path)
 	}
 	return &Runner{
-		pkgPath: pkg,
-		pkgName: filepath.Base(pkg),
-		network: isNetworkEnabled(pkg),
+		pkgName:  filepath.Base(testCase.Path),
+		testCase: testCase,
 	}, nil
 }
 
@@ -71,7 +54,7 @@ func (r *Runner) Run() error {
 	}
 
 	// copy package to temp directory
-	err = copyDir(r.pkgPath, tmpPkgPath)
+	err = copyDir(r.testCase.Path, tmpPkgPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy package: %w", err)
 	}
@@ -85,10 +68,20 @@ func (r *Runner) Run() error {
 	// run function
 	// TODO: change to pipeline when it's ready
 	kptArgs := []string{"fn", "run", tmpPkgPath, "--results-dir", resultsPath}
-	if r.network {
+	if r.testCase.Config.Network {
 		kptArgs = append(kptArgs, "--network")
 	}
-	o, fnErr := runCommand("", "kpt", kptArgs)
+	var output string
+	var fnErr error
+	for i := 0; i < r.testCase.Config.RunTimes; i++ {
+		output, fnErr = runCommand("", "kpt", kptArgs)
+		if fnErr != nil {
+			// if kpt fn run returns error, we should compare
+			// the result
+			break
+		}
+	}
+
 	// run formatter
 	_, err = runCommand("", "kpt", []string{"cfg", "fmt", tmpPkgPath})
 	if err != nil {
@@ -98,7 +91,7 @@ func (r *Runner) Run() error {
 	// compare results
 	err = r.compareResult(fnErr, tmpPkgPath, resultsPath)
 	if err != nil {
-		return fmt.Errorf("%w\nkpt output:\n%s", err, o)
+		return fmt.Errorf("%w\nkpt output:\n%s", err, output)
 	}
 	return nil
 }
@@ -130,8 +123,8 @@ func (r *Runner) compareResult(exitErr error, tmpPkgPath, resultsPath string) er
 		return fmt.Errorf("cannot get exit code from %w", exitErr)
 	}
 
-	if exitCode != expected.ExitCode {
-		return fmt.Errorf("actual exit code %d doesn't match expected %d", exitCode, expected.ExitCode)
+	if exitCode != r.testCase.Config.ExitCode {
+		return fmt.Errorf("actual exit code %d doesn't match expected %d", exitCode, r.testCase.Config.ExitCode)
 	}
 
 	if exitCode != 0 {
@@ -193,26 +186,12 @@ func readActualDiff(path string) (string, error) {
 
 // expected contains the expected result for the function running
 type expected struct {
-	ExitCode int
-	Results  string
-	Diff     string
+	Results string
+	Diff    string
 }
 
 func newExpected(path string) (expected, error) {
 	e := expected{}
-	// get expected exit code
-	b, err := ioutil.ReadFile(filepath.Join(path, expectedDir, expectedExitCodeFile))
-	if os.IsNotExist(err) {
-		e.ExitCode = 0
-	} else if err != nil {
-		return e, fmt.Errorf("failed to read expected exit code: %w", err)
-	} else {
-		e.ExitCode, err = strconv.Atoi(strings.TrimSpace(string(b)))
-		if err != nil {
-			return e, fmt.Errorf("cannot convert exit code %s to int: %w", b, err)
-		}
-	}
-
 	// get expected results
 	expectedResults, err := ioutil.ReadFile(filepath.Join(path, expectedDir, expectedResultsFile))
 	if os.IsNotExist(err) {
