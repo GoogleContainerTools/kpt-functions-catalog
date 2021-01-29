@@ -1,5 +1,3 @@
-#! /bin/bash
-#
 # Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -euo pipefail
+# This Dockerfile is used for building the base image for testing, building and
+# releasing functions in the CD pipeline. The base image has docker toolchain,
+# golang toolchain and nodejs toolchain
 
-GO_LICENSES_TMP_DIR=$(mktemp -d)
-cd "$GO_LICENSES_TMP_DIR"
-go mod init tmp
-go get github.com/google/go-licenses
-rm -rf "$GO_LICENSES_TMP_DIR"
+FROM docker
+
+# Install gcc, bash, make and curl
+RUN apk add --no-cache build-base
+RUN apk add --no-cache bash
+RUN apk add --no-cache make
+RUN apk add --no-cache curl
+
+# Install golang
+COPY --from=golang:1.15-alpine /usr/local/go/ /usr/local/go/
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+# Install node and npm
+RUN apk add --no-cache --update nodejs npm

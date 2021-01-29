@@ -84,6 +84,12 @@ jobs:
       if: matrix.platform == 'ubuntu-latest'
       run: |
         make build
+      # TODO(https://github.com/GoogleContainerTools/kpt/issues/1368): stop
+      # building docker images with tag "latest".
+    - name: Build node and Go docker images with latest tag
+      if: matrix.platform == 'ubuntu-latest'
+      run: |
+        make TAG=latest build
     - name: Run all tests
       if: matrix.platform == 'ubuntu-latest'
       run: |

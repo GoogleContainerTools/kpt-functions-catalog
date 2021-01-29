@@ -13,7 +13,7 @@
 # limitations under the License.
 SHELL=/bin/bash
 GOPATH := $(shell go env GOPATH)
-TAG := dev
+TAG ?= dev
 
 # Edit this list to contain all go functions
 FUNCTIONS := \
@@ -28,7 +28,7 @@ FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
 # Targets to push images
 FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
 # Current function name used by individual function targets
-CURRENT_FUNCTION := unknown
+CURRENT_FUNCTION ?= unknown
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -61,7 +61,7 @@ push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should o
 
 .PHONY: $(FUNCTION_PUSH)
 $(FUNCTION_PUSH):
-	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) func-push
+	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) TAG=$(TAG) func-push
 
 .PHONY: check-licenses
 check-licenses: install-go-licenses $(FUNCTION_CHECKLICENSES)
@@ -106,8 +106,8 @@ func-check-licenses:
 
 func-build: func-verify
 	@echo Building image for $(CURRENT_FUNCTION)...
-	../../scripts/go-function-build.sh
+	../../scripts/go-function-release.sh build
 
 func-push:
 	@echo Pushing image $(CURRENT_FUNCTION)...
-	../../scripts/go-function-push.sh
+	../../scripts/go-function-release.sh push
