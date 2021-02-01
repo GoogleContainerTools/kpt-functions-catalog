@@ -3,7 +3,7 @@ package e2etest
 import (
 	"testing"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/tests/e2etest/internal/runner"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/tests/e2etest/runner"
 )
 
 // TestE2E accepts a path and scans the path to find all available packages that can
