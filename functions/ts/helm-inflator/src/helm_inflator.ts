@@ -255,7 +255,7 @@ metadata:
   annotations:
     config.kubernetes.io/function: |
       container:
-        image: gcr.io/kpt-functions/helm-inflator
+        image: gcr.io/kpt-fn-contrib/helm-inflator:unstable
         network: true
     config.kubernetes.io/local-config: "true"
 data:
@@ -274,7 +274,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: gcr.io/kpt-functions/helm-inflator
+        image: gcr.io/kpt-fn-contrib/helm-inflator:unstable
     config.kubernetes.io/local-config: "true"
 data:
   ${CHART_NAME}: my-chart

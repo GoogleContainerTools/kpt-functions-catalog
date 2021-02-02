@@ -13,6 +13,8 @@
 # limitations under the License.
 SHELL=/bin/bash
 TAG ?= dev
+CURATED_GCR = gcr.io/kpt-fn
+CONTRIB_GCR = gcr.io/kpt-fn-contrib
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -20,20 +22,31 @@ help: ## Print this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: test build npm-ci push
-FUNCTIONS := \
+
+# Edit this list to contain all of the curated ts functions
+CURATED_FUNCTIONS := \
+	kubeval
+
+# Edit this list to contain all of the non-curated ts functions
+CONTRIB_FUNCTIONS := \
 	helm-inflator \
 	istioctl-analyze \
-	kubeval \
 	sops
+
+FUNCTIONS := $(CURATED_FUNCTIONS) $(CONTRIB_FUNCTIONS)
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
 
 FUNCTION_CHECKLICENSES := $(patsubst %,%-CHECKLICENSES,$(FUNCTIONS))
-# Targets to build functions
-FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
-# Targets to push images
-FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
+# Targets to build curated functions
+CURATED_FUNCTION_BUILDS := $(patsubst %,%-CURATED-BUILD,$(CURATED_FUNCTIONS))
+# Targets to build non-curated functions
+CONTRIB_FUNCTION_BUILDS := $(patsubst %,%-CONTRIB-BUILD,$(CONTRIB_FUNCTIONS))
+# Targets to push curated function images
+CURATED_FUNCTION_PUSH := $(patsubst %,%-CURATED-PUSH,$(CURATED_FUNCTIONS))
+# Targets to push non-curated function images
+CONTRIB_FUNCTION_PUSH := $(patsubst %,%-CONTRIB-PUSH,$(CONTRIB_FUNCTIONS))
 # Targets to run npm ci
 FUNCTION_NPM_CI := $(patsubst %,%-NPM-CI,$(FUNCTIONS))
 # Current function name used by individual function targets
@@ -51,17 +64,25 @@ test: $(FUNCTION_TESTS) ## Run unit tests for all functions
 $(FUNCTION_TESTS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -TEST,,$@) func-test
 
-build: $(FUNCTION_BUILDS) ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
+build: $(CURATED_FUNCTION_BUILDS) $(CONTRIB_FUNCTION_BUILDS) ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 
-.PHONY: $(FUNCTION_BUILDS)
-$(FUNCTION_BUILDS):
-	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) TAG=$(TAG) func-build
+.PHONY: $(CURATED_FUNCTION_BUILDS)
+$(CURATED_FUNCTION_BUILDS):
+	$(MAKE) CURRENT_FUNCTION=$(subst -CURATED-BUILD,,$@) TAG=$(TAG) DEFAULT_GCR=$(CURATED_GCR) func-build
 
-push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
+.PHONY: $(CONTRIB_FUNCTION_BUILDS)
+$(CONTRIB_FUNCTION_BUILDS):
+	$(MAKE) CURRENT_FUNCTION=$(subst -CONTRIB-BUILD,,$@) TAG=$(TAG) DEFAULT_GCR=$(CONTRIB_GCR) func-build
 
-.PHONY: $(FUNCTION_PUSH)
-$(FUNCTION_PUSH):
-	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) TAG=$(TAG) func-push
+push: $(CURATED_FUNCTION_PUSH) $(CONTRIB_FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
+
+.PHONY: $(CURATED_FUNCTION_PUSH)
+$(CURATED_FUNCTION_PUSH):
+	$(MAKE) CURRENT_FUNCTION=$(subst -CURATED-PUSH,,$@) TAG=$(TAG) DEFAULT_GCR=$(CURATED_GCR) func-push
+
+.PHONY: $(CONTRIB_FUNCTION_PUSH)
+$(CONTRIB_FUNCTION_PUSH):
+	$(MAKE) CURRENT_FUNCTION=$(subst -CONTRIB-PUSH,,$@) TAG=$(TAG) DEFAULT_GCR=$(CONTRIB_GCR) func-push
 
 check-licenses: $(FUNCTION_CHECKLICENSES) ## Run license checker for source files
 

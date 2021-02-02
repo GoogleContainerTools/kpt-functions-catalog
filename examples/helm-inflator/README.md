@@ -88,7 +88,7 @@ metadata:
   annotations:
     config.kubernetes.io/function: |
       container:
-        image: gcr.io/kpt-functions/helm-inflator
+        image: gcr.io/kpt-fn-contrib/helm-inflator
     config.kubernetes.io/path: fn-config.yaml
 data:
   name: chart
