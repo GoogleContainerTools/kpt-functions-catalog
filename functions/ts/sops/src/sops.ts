@@ -1,5 +1,6 @@
 import {
   Configs,
+  Severity,
   KubernetesObject,
   isKubernetesObject,
   generalResult,
@@ -16,6 +17,7 @@ const TEMP_PATH = '/tmp/tmp.yaml';
 
 const CMD = 'cmd';
 const CMD_FILTER = 'cmd-json-path-filter';
+const CMD_TOLERATE_FAILURES = 'cmd-tolerate-failures';
 const IGNORE_MAC = 'ignore-mac';
 const VERBOSE = 'verbose';
 const OVERRIDE_PREEXEC_CMD = 'override-preexec-cmd';
@@ -32,6 +34,12 @@ let cmd = 'decrypt';
 // will process only documents that have kind: somekind and metadata.name: somename
 // and all others will be untouched
 let cmdJsonPathFilter = '';
+
+// if enabled this flag
+// allows to skip documents that can't be decrypted/encrypted
+// using the current secrets provided
+// the document will stay intact and plugin won't fail
+let cmdTolerateFailures = false;
 
 // pre-exec command may be overriden from config
 let preExecCmd =
@@ -108,9 +116,9 @@ export async function sops(configs: Configs) {
   // cleanup the configs storage. This is to keep
   // the order of documents
   const allDocs = configs.getAll();
-  configs.deleteAll();
 
   if (cmd === 'decrypt') {
+    configs.deleteAll();
     for (const object of allDocs) {
       if (
         isSopsKubernetesObject(object) &&
@@ -124,6 +132,7 @@ export async function sops(configs: Configs) {
       }
     }
   } else if (cmd === 'encrypt') {
+    configs.deleteAll();
     for (const object of allDocs) {
       if (isKubernetsObjectToProcess(object)) {
         // encrypt and add
@@ -209,10 +218,14 @@ async function cmdAndInsertKubernetesObject(
     );
   }
   if (error && error.length > 0) {
+    let severity: Severity = 'error';
+    if (cmdTolerateFailures) {
+      severity = 'warn';
+    }
     configs.addResults(
       generalResult(
         `Sops ${cmd} command results in error for\n${stringifiedObject}\n ${error.toString()}`,
-        'error'
+        severity
       )
     );
   }
@@ -232,6 +245,8 @@ function readSopsArguments(configs: Configs) {
       cmd = value;
     } else if (key === CMD_FILTER) {
       cmdJsonPathFilter = value;
+    } else if (key === CMD_TOLERATE_FAILURES && value !== 'false') {
+      cmdTolerateFailures = true;
     } else if (key === OVERRIDE_PREEXEC_CMD) {
       preExecCmd = value;
     } else if (key === OVERRIDE_DETACHED_ANNOTATIONS) {
@@ -330,6 +345,11 @@ empty]                                     only for the documents that
                                            &&@.kind=="somekind")]'
                                            will process documents with name
                                            'somename' and kind 'somekind'.
+
+cmd-tolerate-failures: [Optional: default  The operation will continue
+false]                                     even if it wasn't successfull
+                                           and the document will stay
+                                           intact.
 
 If cmd is 'decrypt' the function runs sops -d for all documents that match the
 json filter and that have field 'sops:'
