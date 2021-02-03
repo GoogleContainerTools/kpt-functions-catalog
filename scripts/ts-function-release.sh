@@ -18,13 +18,14 @@
 # CURRENT_FUNCTION is the target kpt function. e.g. kubeval.
 # TAG can be any valid docker tags. If the TAG is semver e.g. v1.2.3, shorter
 # versions of this semver will be tagged too. e.g. v1.2 and v1.
-# GCR_REGISTRY is the desired container registry e.g. gcr.io/my-registry. This
-# is optional. If not set, the default value gcr.io/kpt-functions will be used.
+# DEFAULT_GCR is the desired container registry e.g. gcr.io/kpt-fn. This is
+# optional. If not set, the default value gcr.io/kpt-fn-contrib will be used.
+# If GCR_REGISTRY is set, it will override DEFAULT_GCR.
 # example 1:
-# Invocation: GCR_REGISTRY=gcr.io/kpt-fn CURRENT_FUNCTION=kubeval TAG=v1.2.3 ts-function-release.sh build
+# Invocation: DEFAULT_GCR=gcr.io/kpt-fn CURRENT_FUNCTION=kubeval TAG=v1.2.3 ts-function-release.sh build
 # It builds gcr.io/kpt-fn/kubeval:v1.2.3, gcr.io/kpt-fn/kubeval:v1.2 and
 # gcr.io/kpt-fn/kubeval:v1.
-# Invocation: GCR_REGISTRY=gcr.io/kpt-fn CURRENT_FUNCTION=kubeval TAG=v1.2.3 ts-function-release.sh push
+# Invocation: DEFAULT_GCR=gcr.io/kpt-fn CURRENT_FUNCTION=kubeval TAG=v1.2.3 ts-function-release.sh push
 # It pushes the above 3 images.
 # example 2:
 # Invocation: CURRENT_FUNCTION=kubeval TAG=unstable ts-function-release.sh build
@@ -43,7 +44,8 @@ source ${scripts_dir}/git-tag-parser.sh
 
 DEV_TAG=dev
 versions=$(get_versions "${TAG}")
-GCR_REGISTRY=${GCR_REGISTRY:-gcr.io/kpt-functions}
+DEFAULT_GCR=${DEFAULT_GCR:-gcr.io/kpt-fn-contrib}
+GCR_REGISTRY=${GCR_REGISTRY:-${DEFAULT_GCR}}
 
 cd "${scripts_dir}/../functions/ts/${CURRENT_FUNCTION}"
 

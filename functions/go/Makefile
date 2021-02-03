@@ -14,19 +14,22 @@
 SHELL=/bin/bash
 GOPATH := $(shell go env GOPATH)
 TAG ?= dev
+CURATED_GCR = gcr.io/kpt-fn
 
-# Edit this list to contain all go functions
-FUNCTIONS := \
+# Edit this list to contain all of the curated go functions
+CURATED_FUNCTIONS := \
 	set-namespace
+# Use functions/ts/Makefile as a reference to modify this file to support contrib functions.
+FUNCTIONS := $(CURATED_FUNCTIONS)
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
 
 FUNCTION_CHECKLICENSES := $(patsubst %,%-CHECKLICENSES,$(FUNCTIONS))
 # Targets to build functions
-FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
+CURATED_FUNCTION_BUILDS := $(patsubst %,%-CURATED-BUILD,$(CURATED_FUNCTIONS))
 # Targets to push images
-FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
+CURATED_FUNCTION_PUSH := $(patsubst %,%-CURATED-PUSH,$(CURATED_FUNCTIONS))
 # Current function name used by individual function targets
 CURRENT_FUNCTION ?= unknown
 
@@ -50,18 +53,18 @@ $(FUNCTION_TESTS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -TEST,,$@) func-test
 
 .PHONY: build
-build: $(FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
+build: $(CURATED_FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
 
-.PHONY: $(FUNCTION_BUILDS)
-$(FUNCTION_BUILDS):
-	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) TAG=$(TAG) func-build
+.PHONY: $(CURATED_FUNCTION_BUILDS)
+$(CURATED_FUNCTION_BUILDS):
+	$(MAKE) CURRENT_FUNCTION=$(subst -CURATED-BUILD,,$@) TAG=$(TAG) DEFAULT_GCR=$(CURATED_GCR) func-build
 
 .PHONY: push
-push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
+push: $(CURATED_FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
 
-.PHONY: $(FUNCTION_PUSH)
-$(FUNCTION_PUSH):
-	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) TAG=$(TAG) func-push
+.PHONY: $(CURATED_FUNCTION_PUSH)
+$(CURATED_FUNCTION_PUSH):
+	$(MAKE) CURRENT_FUNCTION=$(subst -CURATED-PUSH,,$@) TAG=$(TAG) DEFAULT_GCR=$(CURATED_GCR) func-push
 
 .PHONY: check-licenses
 check-licenses: install-go-licenses $(FUNCTION_CHECKLICENSES)

@@ -12,7 +12,7 @@ kpt-functions-catalog repo.
    `{funtion-name} {semver}`. The release notes for this function should be in
    the body. 
 1. Click `Publish release` button.
-1. Send an announcement email in the kpt-function users google group.
-   <!--- TODO: create this google group and link it here -->
+1. Send an announcement email in the [kpt users google group].
 
 [releases pages]: https://github.com/GoogleContainerTools/kpt-functions-catalog/releases
+[kpt users google group]: https://groups.google.com/g/kpt-users

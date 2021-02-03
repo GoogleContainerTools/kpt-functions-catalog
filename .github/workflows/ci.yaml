@@ -89,7 +89,7 @@ jobs:
     - name: Build node and Go docker images with latest tag
       if: matrix.platform == 'ubuntu-latest'
       run: |
-        make TAG=latest build
+        make TAG=unstable build
     - name: Run all tests
       if: matrix.platform == 'ubuntu-latest'
       run: |

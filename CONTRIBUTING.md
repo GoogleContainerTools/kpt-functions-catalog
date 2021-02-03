@@ -59,17 +59,6 @@ This catalog is documented on the [kpt website]. Follow the
 Changes to other documentation such as examples and README files can follow the
 same pull request format as code changes.
 
-## How to Release
-
-We have spearate a release process for each language: golang and typescript.
-All functions written in the language get released together. Maintainers should
-create releases through the
-[Github UI](https://github.com/GoogleContainerTools/kpt-functions-catalog/releases).
-
-The release title and the release tag version should both be of the form
-`release-[lang]-functions-v[version number]`. Risky changes are encouraged to be
-tagged as pre-releases to confirm production readiness.
-
 ## Contact Us
 
 Do you need a review or release of configuration functions? We’d love to hear

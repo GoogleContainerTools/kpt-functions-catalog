@@ -26,13 +26,13 @@ testcase "kpt_sops_imperative_expected_args"
 mkdir example-configs && curl -fsSL -o example-configs/example.yaml https://raw.githubusercontent.com/mozilla/sops/master/example.yaml || echo "couldn't create example.yaml"
 curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc || echo "couldn't create key.asc"
 kpt fn source example-configs |
-  kpt fn run --env SOPS_IMPORT_PGP="$(cat key.asc)" --image gcr.io/kpt-functions/sops:"${TAG}" -- verbose=true >out.yaml
+  kpt fn run --env SOPS_IMPORT_PGP="$(cat key.asc)" --image gcr.io/kpt-fn-contrib/sops:"${TAG}" -- verbose=true >out.yaml
 assert_contains_string out.yaml "t00m4nys3cr3tzupdated"
 
 testcase "kpt_sops_declarative_example"
 # get examples from the current version of repo
 cp -r "$REPODIR"/examples/sops .
-sed -i 's|gcr.io/kpt-functions/sops|gcr.io/kpt-functions/sops:dev|' sops/local-configs/function.yaml
+sed -i.bak 's|gcr.io/kpt-fn-contrib/sops:unstable|gcr.io/kpt-fn-contrib/sops:dev|' sops/local-configs/function.yaml
 curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
 SOPS_IMPORT_PGP="$(cat key.asc)" kpt fn run sops/local-configs
 assert_contains_string sops/local-configs/to-decrypt.yaml "nnn-password: k8spassphrase"
@@ -47,7 +47,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: gcr.io/kpt-functions/sops:${TAG}
+        image: gcr.io/kpt-fn-contrib/sops:${TAG}
     config.kubernetes.io/local-config: "true"
 data:
 EOF
