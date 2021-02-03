@@ -83,8 +83,8 @@ endif
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
-	func-build func-push func-verify
-func-verify: func-fix func-vet func-fmt func-test func-lint
+	func-build func-push func-verify func-check-licenses
+func-verify: func-fix func-vet func-fmt func-test func-lint func-check-licenses
 
 func-fix:
 	cd $(CURRENT_FUNCTION) && go fix ./...
@@ -103,7 +103,7 @@ func-test:
 func-vet:
 	cd $(CURRENT_FUNCTION) && go vet ./...
 
-func-check-licenses:
+func-check-licenses: install-go-licenses
 	@echo Checking licenses for $(CURRENT_FUNCTION)...
 	cd $(CURRENT_FUNCTION) && $(GO_LICENSES) check .
 

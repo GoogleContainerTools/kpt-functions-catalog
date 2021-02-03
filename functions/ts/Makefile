@@ -21,7 +21,7 @@ CONTRIB_GCR = gcr.io/kpt-fn-contrib
 help: ## Print this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: test build npm-ci push
+.PHONY: test build npm-ci push check-licenses
 
 # Edit this list to contain all of the curated ts functions
 CURATED_FUNCTIONS := \
@@ -95,10 +95,10 @@ $(FUNCTION_CHECKLICENSES):
 func-npm-ci:
 	cd $(CURRENT_FUNCTION) && npm ci
 
-func-test: func-npm-ci
+func-test: func-npm-ci func-check-licenses
 	cd $(CURRENT_FUNCTION) && npm test
 
-func-check-licenses: func-npm-ci
+func-check-licenses:
 	cd $(CURRENT_FUNCTION) && npm run check-licenses
 
 func-build: func-test
