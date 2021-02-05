@@ -1,4 +1,4 @@
-FROM node:lts-alpine as builder
+FROM node:14.15-alpine3.12 as builder
 
 RUN apk add bash curl git && apk update
 
@@ -30,7 +30,7 @@ RUN npm run build && \
 
 #############################################
 
-FROM node:lts-alpine
+FROM node:14.15-alpine3.12
 
 # Run as non-root user as a best-practices:
 # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
