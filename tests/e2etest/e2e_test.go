@@ -3,7 +3,7 @@ package e2etest
 import (
 	"testing"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/tests/e2etest/runner"
+	"github.com/GoogleContainerTools/kpt/pkg/test/runner"
 )
 
 // TestE2E accepts a path and scans the path to find all available packages that can
@@ -51,7 +51,7 @@ func runTests(t *testing.T, path string) {
 		c := c // capture range variable
 		t.Run(c.Path, func(t *testing.T) {
 			t.Parallel()
-			r, err := runner.NewRunner(c)
+			r, err := runner.NewRunner(c, runner.CommandFn)
 			if err != nil {
 				t.Fatalf("failed to create test runner: %s", err)
 			}
