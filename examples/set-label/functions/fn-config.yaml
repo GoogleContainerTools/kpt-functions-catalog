@@ -5,7 +5,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: gcr.io/kpt-functions/set-label
+        image: gcr.io/kpt-fn/set-label:unstable
     config.kubernetes.io/local-config: "true"
 data:
   labels:

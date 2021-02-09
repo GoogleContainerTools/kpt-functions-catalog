@@ -26,7 +26,7 @@ index 1e641f7..409f6ab 100644
 +      fruit: apple
 diff --git a/functions/fn-config.yaml b/functions/fn-config.yaml
 deleted file mode 100644
-index a3b977f..0000000
+index 58b45f9..0000000
 --- a/functions/fn-config.yaml
 +++ /dev/null
 @@ -1,21 +0,0 @@
@@ -37,7 +37,7 @@ index a3b977f..0000000
 -  annotations:
 -    config.k8s.io/function: |
 -      container:
--        image: gcr.io/kpt-functions/set-label
+-        image: gcr.io/kpt-fn/set-label:unstable
 -    config.kubernetes.io/local-config: "true"
 -data:
 -  labels:
