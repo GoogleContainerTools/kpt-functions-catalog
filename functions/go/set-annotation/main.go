@@ -17,7 +17,7 @@ import (
 )
 
 type transformerConfig struct {
-	FieldSpecs types.FsSlice `json:"commonAnnotations,omitempty" yaml:"commonLabels,omitempty"`
+	FieldSpecs types.FsSlice `json:"commonAnnotations,omitempty" yaml:"commonAnnotations,omitempty"`
 }
 
 type setAnnotationSpecs struct {
@@ -124,7 +124,7 @@ metadata:
 data:
   annotations:
   - annotation_name: color
-	annotation_value: orange
+    annotation_value: orange
 
   To add 2 annotations 'color: orange' and 'fruit: apple' to all resources:
 
