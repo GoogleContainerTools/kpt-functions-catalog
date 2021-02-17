@@ -32,11 +32,11 @@ assert_contains_string out.yaml "t00m4nys3cr3tzupdated"
 testcase "kpt_sops_declarative_example"
 # get examples from the current version of repo
 cp -r "$REPODIR"/examples/sops .
-sed -i.bak 's|gcr.io/kpt-fn-contrib/sops:unstable|gcr.io/kpt-fn-contrib/sops:dev|' sops/local-configs/function.yaml
+sed -i.bak 's|gcr.io/kpt-fn-contrib/sops:unstable|gcr.io/kpt-fn-contrib/sops:dev|' sops/function.yaml
 curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
-SOPS_IMPORT_PGP="$(cat key.asc)" kpt fn run sops/local-configs
-assert_contains_string sops/local-configs/to-decrypt.yaml "nnn-password: k8spassphrase"
-assert_contains_string sops/local-configs/to-encrypt.yaml "nnn-password: 'ENC"
+SOPS_IMPORT_PGP="$(cat key.asc)" kpt fn run sops
+assert_contains_string sops/to-decrypt.yaml "nnn-password: k8spassphrase"
+assert_contains_string sops/to-encrypt.yaml "nnn-password: 'ENC"
 
 testcase "kpt_sops_declarative_fn_path"
 cat >fc.yaml <<EOF

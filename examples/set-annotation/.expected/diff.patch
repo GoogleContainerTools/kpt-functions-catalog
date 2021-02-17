@@ -1,7 +1,7 @@
-diff --git a/configs/example-config.yaml b/configs/example-config.yaml
+diff --git a/example-config.yaml b/example-config.yaml
 index bfeadb4..d726fed 100644
---- a/configs/example-config.yaml
-+++ b/configs/example-config.yaml
+--- a/example-config.yaml
++++ b/example-config.yaml
 @@ -2,6 +2,9 @@ apiVersion: v1
  kind: ConfigMap
  metadata:
