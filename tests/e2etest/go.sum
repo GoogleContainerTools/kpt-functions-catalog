@@ -28,6 +28,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/GoogleContainerTools/kpt v0.37.1-0.20210208215653-2f7a7888e7a5 h1:0qXlDxK7q67VhfXZMWTS73tDpDJy6Y2xY1WvoyZKXw4=
 github.com/GoogleContainerTools/kpt v0.37.1-0.20210208215653-2f7a7888e7a5/go.mod h1:wEe2cXWC0IkcRTL1ox0cPPVa1IZfKfTR5p9d0pexP08=
+github.com/GoogleContainerTools/kpt v0.37.1-0.20210217193217-bb10e3ac3320 h1:DohR1AsnlkykI+qs2FRP/pRC+0uV1GolcBdlIwDsloY=
+github.com/GoogleContainerTools/kpt v0.37.1-0.20210217193217-bb10e3ac3320/go.mod h1:wEe2cXWC0IkcRTL1ox0cPPVa1IZfKfTR5p9d0pexP08=
 github.com/GoogleContainerTools/kpt v0.37.1 h1:BB7DrqxKspOE9zuQQM3NjhaISLfQnrJ8Y/h8p2QbEqU=
 github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd h1:sjQovDkwrZp8u+gxLtPgKGjk5hCxuy2hrRejBTA9xFU=
 github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd/go.mod h1:64YHyfSL2R96J44Nlwm39UHepQbyR5q10x7iYa1ks2E=

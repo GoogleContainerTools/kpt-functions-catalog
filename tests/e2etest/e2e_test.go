@@ -21,7 +21,7 @@ import (
 //    - 'network': A boolean which indicates whether network should be enabled
 //    	for this test. If this field exists and the content in it is 'true' then the
 //    	network is accessible. Otherwise the function cannot access network.
-//    - 'runTimes': A number which sepcifies the times of function running. If this field
+//    - 'runCount': A number which sepcifies the times of function running. If this field
 //      missing then the function will be run *twice*.
 //  - 'diff.patch' is the expected diff output between original package files and
 //    files after function running. The diff will be compared only when the exit code
