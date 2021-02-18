@@ -21,11 +21,11 @@ kpt fn run kubeval --network
 This should give the following output:
 
 ```sh
-[ERROR] Invalid type. Expected: [integer,null], given: string in object 'v1/ReplicationController//bob' in file configs/example-config.yaml in field spec.replicas
+[ERROR] Invalid type. Expected: [integer,null], given: string in object 'v1/ReplicationController//bob' in file example-config.yaml in field spec.replicas
 error: exit status 1
 ```
 
-In the `configs/example-config.yaml` file, replace the value of `spec.replicas`
+In the `example-config.yaml` file, replace the value of `spec.replicas`
 with an integer to pass validation and rerun the command. This will return
 success (no output).
 

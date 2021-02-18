@@ -19,6 +19,7 @@ CURATED_GCR = gcr.io/kpt-fn
 # Edit this list to contain all go functions
 CURATED_FUNCTIONS := \
 	set-label \
+	set-annotation \
 	set-namespace
 # Use functions/ts/Makefile as a reference to modify this file to support contrib functions.
 FUNCTIONS := $(CURATED_FUNCTIONS)

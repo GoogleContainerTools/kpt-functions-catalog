@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-func-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/set-annotation:unstable
+    config.kubernetes.io/local-config: 'true'
+data:
+  annotations:
+  - annotation_name: configmanagement.gke.io/namespace-selector
+    annotation_value: sre-supported
+  - fieldSpecs:
+    - kind: MyResource
+      group: dev.example.com
+      version: v1
+      create: true
+      path: spec/selector/annotations
+    annotation_name: fruit
+    annotation_value: apple

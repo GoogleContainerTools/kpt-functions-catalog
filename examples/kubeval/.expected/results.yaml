@@ -6,6 +6,6 @@
     namespace: ''
     name: bob
   file:
-    path: configs/example-config.yaml
+    path: resources.yaml
   field:
     path: spec.replicas

@@ -19,10 +19,10 @@ kpt fn run istioctl-analyze
 This should give the following output:
 
 ```sh
-[ERROR] Schema validation error: gateway must have at least one server in object 'networking.istio.io/v1alpha3/Gateway//httpbin-gateway' in file configs/example-config.yaml
+[ERROR] Schema validation error: gateway must have at least one server in object 'networking.istio.io/v1alpha3/Gateway//httpbin-gateway' in file example-config.yaml
 error: exit status 1
 ```
 
 The error comes from the httpbin-gateway resource in
-`configs/example-config.yaml`. Uncomment `spec.servers` in that file to fix the
+`example-config.yaml`. Uncomment `spec.servers` in that file to fix the
 error and rerun the command. This will return success (no output).
