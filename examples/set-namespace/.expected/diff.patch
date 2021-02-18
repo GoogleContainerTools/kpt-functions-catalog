@@ -1,24 +1,3 @@
-diff --git a/example-config.yaml b/example-config.yaml
-index 1c43349..2460ffb 100644
---- a/example-config.yaml
-+++ b/example-config.yaml
-@@ -2,6 +2,7 @@ apiVersion: v1
- kind: ConfigMap
- metadata:
-   name: the-map
-+  namespace: example-ns
- data:
-   some-key: some-value
- ---
-@@ -9,7 +10,7 @@ apiVersion: v1
- kind: Service
- metadata:
-   name: the-service
--  namespace: the-namespace
-+  namespace: example-ns
- spec:
-   ports:
-   - name: etcd-server-ssl
 diff --git a/functions/fn-config.yaml b/functions/fn-config.yaml
 deleted file mode 100644
 index f2e0be4..0000000
@@ -36,3 +15,24 @@ index f2e0be4..0000000
 -    config.kubernetes.io/local-config: 'true'
 -data:
 -  "namespace": "example-ns"
+diff --git a/resources.yaml b/resources.yaml
+index 1c43349..2460ffb 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,6 +2,7 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: the-map
++  namespace: example-ns
+ data:
+   some-key: some-value
+ ---
+@@ -9,7 +10,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: the-service
+-  namespace: the-namespace
++  namespace: example-ns
+ spec:
+   ports:
+   - name: etcd-server-ssl
