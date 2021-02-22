@@ -20,7 +20,8 @@ CURATED_GCR = gcr.io/kpt-fn
 CURATED_FUNCTIONS := \
 	set-label \
 	set-annotation \
-	set-namespace
+	set-namespace \
+	set-name-prefix
 # Use functions/ts/Makefile as a reference to modify this file to support contrib functions.
 FUNCTIONS := $(CURATED_FUNCTIONS)
 
