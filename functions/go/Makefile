@@ -21,7 +21,8 @@ FUNCTIONS := \
 	set-label \
 	set-annotation \
 	set-namespace \
-	starlark
+	starlark \
+	apply-setters
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
