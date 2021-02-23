@@ -71,7 +71,7 @@ func main() {
 		}
 		prefix, err := getPrefix(resourceList.FunctionConfig)
 		if err != nil {
-			return fmt.Errorf("failed to get data.specs field from function config: %w", err)
+			return fmt.Errorf("failed to get data field from function config: %w", err)
 		}
 		err = setPrefix(prefix, resMap, tc, pluginHelpers, plugin)
 		if err != nil {
