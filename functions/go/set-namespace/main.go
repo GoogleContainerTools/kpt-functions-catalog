@@ -67,6 +67,9 @@ func run(resourceList *framework.ResourceList) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to config plugin")
 	}
+	if plugin.Namespace == "" {
+		return fmt.Errorf("namespace in the input config cannot be empty")
+	}
 	if len(plugin.FieldSpecs) == 0 {
 		plugin.FieldSpecs = defaultConfig
 	}

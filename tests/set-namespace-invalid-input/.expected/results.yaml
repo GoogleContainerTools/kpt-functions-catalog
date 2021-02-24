@@ -1,8 +1,4 @@
 name: set-namespace
 items:
-- message: 'failed to convert items to resource map: missing metadata.name in object
-    {map[apiVersion:v1 kind:Service metadata:map[annotations:map[config.k8s.io/id:3
-    config.kubernetes.io/index:1 config.kubernetes.io/path:resources.yaml]] spec:map[clusterIP:None
-    ports:[map[name:etcd-server-ssl port:2380] map[name:etcd-client-ssl port:2379]]
-    publishNotReadyAddresses:true]]}'
+- message: namespace in the input config cannot be empty
   severity: error
