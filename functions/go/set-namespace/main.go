@@ -26,7 +26,7 @@ func main() {
 				Items: []framework.Item{
 					{
 						Message:  err.Error(),
-						Severity: "error",
+						Severity: framework.Error,
 					},
 				},
 			}
