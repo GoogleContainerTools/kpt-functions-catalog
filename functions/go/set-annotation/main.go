@@ -25,8 +25,8 @@ type setAnnotationSpecs struct {
 }
 
 type setAnnotationSpec struct {
-	AnnotationName  string            `json:"annotation_name,omitempty" yaml:"annotation_name,omitempty"`
-	AnnotationValue string            `json:"annotation_value,omitempty" yaml:"annotation_value,omitempty"`
+	AnnotationName  string            `json:"name,omitempty" yaml:"name,omitempty"`
+	AnnotationValue string            `json:"value,omitempty" yaml:"value,omitempty"`
 	FieldSpecs      []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 }
 
@@ -36,7 +36,7 @@ func setAnnotation(spec setAnnotationSpec,
 	pluginHelpers *resmap.PluginHelpers,
 	plugin *plugin) error {
 	if spec.AnnotationName == "" || spec.AnnotationValue == "" {
-		return fmt.Errorf("annotation_name and annotation_value cannot be empty")
+		return fmt.Errorf("annotations.name and annotations.value cannot be empty")
 	}
 
 	err := plugin.Config(pluginHelpers, []byte{})
@@ -108,8 +108,8 @@ func usage() string {
 
 Configured using a ConfigMap with the following keys:
 
-annotation_name: Annotation name to add to resources.
-annotation_value: Annotation value to add to resources.
+annotations.name: Annotation name to add to resources.
+annotations.value: Annotation value to add to resources.
 
 These keys are in a list in path 'data.annotations'.
 
@@ -123,8 +123,8 @@ metadata:
   name: my-config
 data:
   annotations:
-  - annotation_name: color
-    annotation_value: orange
+  - name: color
+    value: orange
 
   To add 2 annotations 'color: orange' and 'fruit: apple' to all resources:
 
@@ -134,10 +134,10 @@ metadata:
   name: my-config
 data:
 annotations:
-  - annotation_name: color
-    annotation_value: orange
-  - annotation_name: fruit
-    annotation_value: apple
+  - name: color
+    value: orange
+  - name: fruit
+    value: apple
 
 You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will not only add or update the
@@ -174,8 +174,8 @@ metadata:
   name: my-config
 data:
   annotations:
-    - annotation_name: color
-      annotation_value: orange
+    - name: color
+      value: orange
       fieldSpecs:
       - path: data/selector
         kind: MyOwnKind

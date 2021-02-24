@@ -23,8 +23,8 @@ type setLabelSpecs struct {
 }
 
 type setLabelSpec struct {
-	LabelName  string            `json:"label_name,omitempty" yaml:"label_name,omitempty"`
-	LabelValue string            `json:"label_value,omitempty" yaml:"label_value,omitempty"`
+	LabelName  string            `json:"name,omitempty" yaml:"name,omitempty"`
+	LabelValue string            `json:"value,omitempty" yaml:"value,omitempty"`
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 }
 
@@ -34,7 +34,7 @@ func setLabel(spec setLabelSpec,
 	pluginHelpers *resmap.PluginHelpers,
 	plugin *plugin) error {
 	if spec.LabelName == "" || spec.LabelValue == "" {
-		return fmt.Errorf("label_name and label_value cannot be empty")
+		return fmt.Errorf("labels.name and labels.value cannot be empty")
 	}
 
 	err := plugin.Config(pluginHelpers, []byte{})
@@ -107,8 +107,8 @@ func usage() string {
 
 Configured using a ConfigMap with the following keys:
 
-label_name: Label name to add to resources.
-label_value: Label value to add to resources.
+labels.name: Label name to add to resources.
+labels.value: Label value to add to resources.
 
 These keys are in a list in path 'data.labels'.
 
@@ -122,8 +122,8 @@ metadata:
   name: my-config
 data:
   labels:
-  - label_name: color
-    label_value: orange
+  - name: color
+    value: orange
 
   To add 2 labels 'color: orange' and 'fruit: apple' to all resources:
 
@@ -133,10 +133,10 @@ metadata:
   name: my-config
 data:
   labels:
-  - label_name: color
-    label_value: orange
-  - label_name: fruit
-    label_value: apple
+  - name: color
+    value: orange
+  - name: fruit
+    value: apple
 
 You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will not only add or update the
@@ -173,8 +173,8 @@ metadata:
   name: my-config
 data:
   labels:
-    - label_name: color
-      label_value: orange
+    - name: color
+      value: orange
       fieldSpecs:
       - path: data/selector
         kind: MyOwnKind

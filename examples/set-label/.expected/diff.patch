@@ -1,6 +1,6 @@
 diff --git a/functions/fn-config.yaml b/functions/fn-config.yaml
 deleted file mode 100644
-index 58b45f9..0000000
+index fab9fc9..0000000
 --- a/functions/fn-config.yaml
 +++ /dev/null
 @@ -1,21 +0,0 @@
@@ -15,16 +15,16 @@ index 58b45f9..0000000
 -    config.kubernetes.io/local-config: "true"
 -data:
 -  labels:
--  - label_name: color
--    label_value: orange
+-  - name: color
+-    value: orange
 -  - fieldSpecs:
 -    - kind: MyResource
 -      group: dev.example.com
 -      version: v1
 -      create: true
 -      path: spec/selector/labels
--    label_name: fruit
--    label_value: apple
+-    name: fruit
+-    value: apple
 diff --git a/resources.yaml b/resources.yaml
 index 1e641f7..409f6ab 100644
 --- a/resources.yaml

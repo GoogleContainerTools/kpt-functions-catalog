@@ -1,6 +1,6 @@
 diff --git a/functions/fn-config.yaml b/functions/fn-config.yaml
 deleted file mode 100644
-index ab4dd29..0000000
+index a981acf..0000000
 --- a/functions/fn-config.yaml
 +++ /dev/null
 @@ -1,21 +0,0 @@
@@ -15,16 +15,16 @@ index ab4dd29..0000000
 -    config.kubernetes.io/local-config: 'true'
 -data:
 -  annotations:
--  - annotation_name: configmanagement.gke.io/namespace-selector
--    annotation_value: sre-supported
+-  - name: configmanagement.gke.io/namespace-selector
+-    value: sre-supported
 -  - fieldSpecs:
 -    - kind: MyResource
 -      group: dev.example.com
 -      version: v1
 -      create: true
 -      path: spec/selector/annotations
--    annotation_name: fruit
--    annotation_value: apple
+-    name: fruit
+-    value: apple
 diff --git a/resources.yaml b/resources.yaml
 index bfeadb4..d726fed 100644
 --- a/resources.yaml
