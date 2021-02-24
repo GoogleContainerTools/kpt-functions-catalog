@@ -58,49 +58,67 @@ func setAnnotation(spec setAnnotationSpec,
 
 //nolint
 func main() {
-	var plugin *plugin = &KustomizePlugin
-	tc, err := getDefaultConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	resmapFactory := newResMapFactory()
-
-	pluginHelpers := newPluginHelpers(resmapFactory)
 
 	resourceList := &framework.ResourceList{}
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
-		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+		err := run(resourceList)
 		if err != nil {
-			return err
-		}
-		annotations, err := getAnnotations(resourceList.FunctionConfig)
-		if err != nil {
-			return fmt.Errorf("failed to get data.specs field from function config: %w", err)
-		}
-		for _, a := range annotations.Annotations {
-			err := setAnnotation(a, resMap, tc, pluginHelpers, plugin)
-			if err != nil {
-				return fmt.Errorf("failed to add annotation [%s: %s]: %w",
-					a.AnnotationName, a.AnnotationValue, err)
+			resourceList.Result = &framework.Result{
+				Name: "set-annotation",
+				Items: []framework.Item{
+					{
+						Message:  err.Error(),
+						Severity: "error",
+					},
+				},
 			}
-		}
-
-		resourceList.Items, err = resMap.ToRNodeSlice()
-		if err != nil {
-			return err
+			return resourceList.Result
 		}
 		return nil
 	})
 
 	cmd.Long = usage()
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func run(resourceList *framework.ResourceList) error {
+	var plugin *plugin = &KustomizePlugin
+	tc, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+
+	resmapFactory := newResMapFactory()
+	pluginHelpers := newPluginHelpers(resmapFactory)
+
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+	if err != nil {
+		return err
+	}
+	annotations, err := getAnnotations(resourceList.FunctionConfig)
+	if err != nil {
+		return fmt.Errorf("failed to get data.specs field from function config: %w", err)
+	}
+	if len(annotations.Annotations) == 0 {
+		return fmt.Errorf("input annotation list cannot be empty")
+	}
+	for _, a := range annotations.Annotations {
+		err := setAnnotation(a, resMap, tc, pluginHelpers, plugin)
+		if err != nil {
+			return fmt.Errorf("failed to add annotation [%s: %s]: %w",
+				a.AnnotationName, a.AnnotationValue, err)
+		}
+	}
+
+	resourceList.Items, err = resMap.ToRNodeSlice()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func usage() string {

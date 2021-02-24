@@ -15,57 +15,71 @@ import (
 
 //nolint
 func main() {
-	var plugin *plugin = &KustomizePlugin
-	defaultConfig, err := getDefaultConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	resmapFactory := newResMapFactory()
-
-	pluginHelpers := newPluginHelpers(resmapFactory)
-
 	resourceList := &framework.ResourceList{}
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
-		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+		err := run(resourceList)
 		if err != nil {
-			return errors.Wrap(err, "failed to convert items to resource map")
-		}
-		dataField, err := getDataFromFunctionConfig(resourceList.FunctionConfig)
-		if err != nil {
-			return errors.Wrap(err, "failed to get data field from function config")
-		}
-		dataValue, err := yaml.Marshal(dataField)
-		if err != nil {
-			return errors.Wrap(err, "error when marshal data values")
-		}
-
-		err = plugin.Config(pluginHelpers, dataValue)
-		if err != nil {
-			return errors.Wrap(err, "failed to config plugin")
-		}
-		if len(plugin.FieldSpecs) == 0 {
-			plugin.FieldSpecs = defaultConfig
-		}
-		err = plugin.Transform(resMap)
-		if err != nil {
-			return errors.Wrap(err, "failed to run transformer")
-		}
-
-		resourceList.Items, err = resMap.ToRNodeSlice()
-		if err != nil {
-			return errors.Wrap(err, "failed to convert resource map to items")
+			resourceList.Result = &framework.Result{
+				Name: "set-namespace",
+				Items: []framework.Item{
+					{
+						Message:  err.Error(),
+						Severity: "error",
+					},
+				},
+			}
+			return resourceList.Result
 		}
 		return nil
 	})
 	cmd.Long = usage()
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func run(resourceList *framework.ResourceList) error {
+	var plugin *plugin = &KustomizePlugin
+	defaultConfig, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+
+	resmapFactory := newResMapFactory()
+	pluginHelpers := newPluginHelpers(resmapFactory)
+
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+	if err != nil {
+		return errors.Wrap(err, "failed to convert items to resource map")
+	}
+	dataField, err := getDataFromFunctionConfig(resourceList.FunctionConfig)
+	if err != nil {
+		return errors.Wrap(err, "failed to get data field from function config")
+	}
+	dataValue, err := yaml.Marshal(dataField)
+	if err != nil {
+		return errors.Wrap(err, "error when marshal data values")
+	}
+
+	err = plugin.Config(pluginHelpers, dataValue)
+	if err != nil {
+		return errors.Wrap(err, "failed to config plugin")
+	}
+	if len(plugin.FieldSpecs) == 0 {
+		plugin.FieldSpecs = defaultConfig
+	}
+	err = plugin.Transform(resMap)
+	if err != nil {
+		return errors.Wrap(err, "failed to run transformer")
+	}
+
+	resourceList.Items, err = resMap.ToRNodeSlice()
+	if err != nil {
+		return errors.Wrap(err, "failed to convert resource map to items")
+	}
+	return nil
 }
 
 func usage() string {
