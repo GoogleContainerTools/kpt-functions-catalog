@@ -13,7 +13,10 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
     />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   </head>
   <body>
@@ -25,7 +28,9 @@
         search: {
           maxAge: 43200000,
           placeholder: "Search",
-          paths: ["/*/latest/README.md"], // Manually specify index here.
+        },
+        alias: {
+          "/.*/sidebar.md": "/sidebar.md",
         },
         loadSidebar: "sidebar.md",
         auto2top: true,
@@ -40,44 +45,58 @@
           target: "h2, h3",
         },
         plugins: [
-          function(hook, vm) {
-            hook.beforeEach(function(html) {
-              // Add dropdown with latest.
-            }
-            )
-            hook.afterEach(async function(html, next) {
-              const functionName = vm.route.path.split('/')[1];
-              if (!functionName){
+          function (hook, vm) {
+            hook.afterEach(async function (html, next) {
+              const functionName = vm.route.path.split("/")[1];
+              if (!functionName) {
                 next(html);
                 return;
               }
 
               try {
-              const response = await window.Docsify
-              .get(`https://api.github.com/repos/etefera/kpt-functions-catalog/contents/examples/${functionName}?ref=site-demo`);
-              const directories = JSON.parse(response).filter(path => (path.name.match(/^v[0-9]/)) && path.type === "dir");
-              console.log("Directories:", directories);
-              const currentVersion = vm.route.path.split('/')[2].replace('v', "").replaceAll('_', '.');
-              let dropdown = `
+                const response = await window.Docsify.get(
+                  `https://api.github.com/repos/etefera/kpt-functions-catalog/contents/examples/${functionName}?ref=site-demo`
+                );
+                const directories = JSON.parse(response).filter(
+                  (path) => path.name.match(/^v[0-9]/) && path.type === "dir"
+                );
+                const currentVersion = vm.route.path
+                  .split("/")[2]
+                  .replace("v", "")
+                  .replaceAll("_", ".");
+                const semverSortedDirectories = directories
+                  .sort((a, b) =>
+                    compareVersions(
+                      a.name.replaceAll("_", "."),
+                      b.name.replaceAll("_", ".")
+                    )
+                  )
+                  .reverse();
+                let dropdown = `
               <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${currentVersion}
                 <span class="caret"></span></button>
-                <ol class="dropdown-menu">
-                <li><a href="/${functionName}/latest/">latest</a></li>`;
-              directories.forEach(dir => dropdown += `<li><a href="/${functionName}/${dir.name}/">${dir.name.replace('v', "").replaceAll('_', '.')}</a></li>`);
-              dropdown += `
+                <ol class="dropdown-menu">`;
+                semverSortedDirectories.forEach(
+                  (dir, ix) =>
+                    (dropdown += `<li><a href="/${functionName}/${
+                      dir.name
+                    }/">${dir.name.replace("v", "").replaceAll("_", ".")}${
+                      ix ? "" : " (latest)"
+                    }</a></li>`)
+                );
+                dropdown += `
                 </ol>
               </div>`;
-               html = dropdown+ html;
+                html = dropdown + html;
               } catch (err) {
                 console.error(err);
               }
 
               next(html);
-            }
-            )
-          }
-        ]
+            });
+          },
+        ],
       };
     </script>
     <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
@@ -87,7 +106,7 @@
     <script src="//cdn.jsdelivr.net/npm/prismjs@1.22/components/prism-yaml.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/prismjs@1.22/components/prism-go.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/prismjs@1.22/components/prism-typescript.min.js"></script>
-    <script src="//unpkg.com/docsify-plugin-toc"></script>
+    <script src="//cdn.jsdelivr.net/npm/compare-versions@3.6.0/index.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </body>
@@ -99,7 +118,6 @@
       --search-result-keyword-background: unset;
       --search-result-keyword-margin: unset;
       --search-result-keyword-font-weight: 800;
-      --sidebar-nav-link-font-weight: 600;
       --sidebar-background: #30638e;
       --sidebar-nav-link-color: rgba(255, 255, 255, 0.75);
       --sidebar-nav-link-color--active: white;
@@ -107,8 +125,16 @@
       --sidebar-toggle-offset-top: unset;
       --sidebar-width: 20rem;
     }
+    .body {
+      line-height: var(--base-line-height) !important;
+    }
+
     .sidebar {
       color: rgba(255, 255, 255, 0.75);
+      font-size: 16px;
+    }
+    .sidebar > h1 {
+      font-size: var(--sidebar-name-font-size);
     }
     .sidebar-toggle {
       bottom: 0;
