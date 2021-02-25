@@ -1,9 +1,9 @@
-diff --git a/functions/fn-config.yaml b/functions/fn-config.yaml
+diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
-index ba15eac..0000000
---- a/functions/fn-config.yaml
+index a981acf..0000000
+--- a/fn-config.yaml
 +++ /dev/null
-@@ -1,12 +0,0 @@
+@@ -1,21 +0,0 @@
 -apiVersion: v1
 -kind: ConfigMap
 -metadata:
@@ -14,10 +14,19 @@ index ba15eac..0000000
 -        image: gcr.io/kpt-fn/set-annotation:unstable
 -    config.kubernetes.io/local-config: 'true'
 -data:
--  configmanagement.gke.io/namespace-selector: sre-supported
--  fruit: apple
+-  annotations:
+-  - name: configmanagement.gke.io/namespace-selector
+-    value: sre-supported
+-  - fieldSpecs:
+-    - kind: MyResource
+-      group: dev.example.com
+-      version: v1
+-      create: true
+-      path: spec/selector/annotations
+-    name: fruit
+-    value: apple
 diff --git a/resources.yaml b/resources.yaml
-index 7a5cb40..2fd47cf 100644
+index bfeadb4..d726fed 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -2,6 +2,9 @@ apiVersion: v1
@@ -30,10 +39,15 @@ index 7a5cb40..2fd47cf 100644
  data:
    some-key: some-value
  ---
-@@ -9,3 +12,6 @@ apiVersion: v1
- kind: Namespace
+@@ -10,7 +13,11 @@ kind: MyResource
  metadata:
-   name: ns
+   name: the-service
+   namespace: the-namespace
 +  annotations:
 +    configmanagement.gke.io/namespace-selector: sre-supported
 +    fruit: apple
+ spec:
+   selector:
+     annotations:
+       foo: bar
++      fruit: apple

@@ -5,12 +5,7 @@ metadata:
 data:
   some-key: some-value
 ---
-apiVersion: dev.example.com/v1
-kind: MyResource
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: the-service
-  namespace: the-namespace
-spec:
-  selector:
-    annotations:
-      foo: bar
+  name: ns

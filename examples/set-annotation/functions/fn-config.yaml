@@ -8,14 +8,5 @@ metadata:
         image: gcr.io/kpt-fn/set-annotation:unstable
     config.kubernetes.io/local-config: 'true'
 data:
-  annotations:
-  - name: configmanagement.gke.io/namespace-selector
-    value: sre-supported
-  - fieldSpecs:
-    - kind: MyResource
-      group: dev.example.com
-      version: v1
-      create: true
-      path: spec/selector/annotations
-    name: fruit
-    value: apple
+  configmanagement.gke.io/namespace-selector: sre-supported
+  fruit: apple
