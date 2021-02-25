@@ -1,4 +1,4 @@
-# Helm Template - latest
+# Helm Template Version 11.0.1 (latest)
 
 The `helm-inflator` KRM config function generates a new kpt package from a
 local Helm chart. This example invokes the helm inflator function using

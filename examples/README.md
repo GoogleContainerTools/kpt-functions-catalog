@@ -4,7 +4,7 @@
 
 | Name            | Description |
 | --------------- | ----------- |
-| [Helm Inflator](/helm-inflator/latest/)| Render chart templates locally using helm template. |
+| [Helm Inflator](/helm-inflator/v11_0_1/)| Render chart templates locally using helm template. |
 | Set Annotation | N/A |
 | Set Label | N/A |
 | Set Namespace | Sets the namespace field of all configs passed in. |
