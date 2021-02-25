@@ -8,5 +8,14 @@ metadata:
         image: gcr.io/kpt-fn/set-label:unstable
     config.kubernetes.io/local-config: "true"
 data:
-  color: orange
-  fruit: apple
+  labels:
+  - name: color
+    value: orange
+  - fieldSpecs:
+    - kind: MyResource
+      group: dev.example.com
+      version: v1
+      create: true
+      path: spec/selector/labels
+    name: fruit
+    value: apple

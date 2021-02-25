@@ -232,6 +232,18 @@ func getLabels(fc interface{}) (setLabelSpecs, error) {
 	if err != nil {
 		return fcd, err
 	}
+	// check does data contains key-value pairs
+	var keyValueMap map[string]string
+	err = yaml.Unmarshal([]byte(b), &keyValueMap)
+	if err == nil {
+		// we got a simple key-value pair
+		for k, v := range keyValueMap {
+			fcd.Labels = append(fcd.Labels,
+				setLabelSpec{LabelName: k, LabelValue: v})
+		}
+		return fcd, nil
+	}
+
 	err = yaml.Unmarshal([]byte(b), &fcd)
 	if err != nil {
 		return fcd, err
