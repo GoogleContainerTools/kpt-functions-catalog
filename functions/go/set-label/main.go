@@ -56,50 +56,65 @@ func setLabel(spec setLabelSpec,
 
 //nolint
 func main() {
-	var plugin *plugin = &KustomizePlugin
-	tc, err := getDefaultConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	resmapFactory := newResMapFactory()
-
-	pluginHelpers := newPluginHelpers(resmapFactory)
-
 	resourceList := &framework.ResourceList{}
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
-		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+		err := run(resourceList)
 		if err != nil {
-			return fmt.Errorf("failed to convert items to resource map: %w", err)
-		}
-		labels, err := getLabels(resourceList.FunctionConfig)
-		if err != nil {
-			return fmt.Errorf("failed to get data.specs field from function config: %w", err)
-		}
-
-		for _, l := range labels.Labels {
-			err := setLabel(l, resMap, tc, pluginHelpers, plugin)
-			if err != nil {
-				return fmt.Errorf("failed to add label [%s: %s]: %w",
-					l.LabelName, l.LabelValue, err)
+			resourceList.Result = &framework.Result{
+				Name: "set-label",
+				Items: []framework.Item{
+					{
+						Message:  err.Error(),
+						Severity: framework.Error,
+					},
+				},
 			}
-		}
-
-		resourceList.Items, err = resMap.ToRNodeSlice()
-		if err != nil {
-			return fmt.Errorf("failed to convert resource map to items: %w", err)
+			return resourceList.Result
 		}
 		return nil
 	})
 
 	cmd.Long = usage()
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func run(resourceList *framework.ResourceList) error {
+	var plugin *plugin = &KustomizePlugin
+	tc, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+	resmapFactory := newResMapFactory()
+	pluginHelpers := newPluginHelpers(resmapFactory)
+
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+	if err != nil {
+		return fmt.Errorf("failed to convert items to resource map: %w", err)
+	}
+	labels, err := getLabels(resourceList.FunctionConfig)
+	if err != nil {
+		return fmt.Errorf("failed to get data.specs field from function config: %w", err)
+	}
+	if len(labels.Labels) == 0 {
+		return fmt.Errorf("input label list cannot be empty")
+	}
+	for _, l := range labels.Labels {
+		err := setLabel(l, resMap, tc, pluginHelpers, plugin)
+		if err != nil {
+			return fmt.Errorf("failed to add label [%s: %s]: %w",
+				l.LabelName, l.LabelValue, err)
+		}
+	}
+
+	resourceList.Items, err = resMap.ToRNodeSlice()
+	if err != nil {
+		return fmt.Errorf("failed to convert resource map to items: %w", err)
+	}
+	return nil
 }
 
 func usage() string {
