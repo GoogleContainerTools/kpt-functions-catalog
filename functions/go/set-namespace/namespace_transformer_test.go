@@ -22,7 +22,7 @@ func runNamespaceTransformerE(config, input string) (string, error) {
 		return "", err
 	}
 	if len(plugin.FieldSpecs) == 0 {
-		plugin.FieldSpecs = defaultConfig
+		plugin.FieldSpecs = defaultConfig.FieldSpecs
 	}
 	err = plugin.Transform(resMap)
 	if err != nil {
@@ -138,7 +138,7 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ns1
+  name: test
 ---
 apiVersion: v1
 kind: ServiceAccount

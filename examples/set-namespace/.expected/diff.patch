@@ -16,7 +16,7 @@ index f2e0be4..0000000
 -data:
 -  "namespace": "example-ns"
 diff --git a/resources.yaml b/resources.yaml
-index 1c43349..2460ffb 100644
+index 8859df8..8b3c21e 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -2,6 +2,7 @@ apiVersion: v1
@@ -36,3 +36,9 @@ index 1c43349..2460ffb 100644
  spec:
    ports:
    - name: etcd-server-ssl
+@@ -22,4 +23,4 @@ spec:
+ apiVersion: v1
+ kind: Namespace
+ metadata:
+-  name: old-name
++  name: example-ns

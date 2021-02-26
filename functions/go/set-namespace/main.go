@@ -6,12 +6,17 @@ import (
 
 	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
+	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/yaml"
 )
+
+type transformerConfig struct {
+	FieldSpecs types.FsSlice `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+}
 
 //nolint
 func main() {
@@ -71,7 +76,7 @@ func run(resourceList *framework.ResourceList) error {
 		return fmt.Errorf("namespace in the input config cannot be empty")
 	}
 	if len(plugin.FieldSpecs) == 0 {
-		plugin.FieldSpecs = defaultConfig
+		plugin.FieldSpecs = defaultConfig.FieldSpecs
 	}
 	err = plugin.Transform(resMap)
 	if err != nil {
@@ -164,11 +169,9 @@ them.
 }
 
 //nolint
-func getDefaultConfig() ([]types.FieldSpec, error) {
-	defaultConfigString := `
-- path: metadata/namespace
-  create: true`
-	var defaultConfig []types.FieldSpec
+func getDefaultConfig() (transformerConfig, error) {
+	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["namespace"]
+	var defaultConfig transformerConfig
 	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
 	return defaultConfig, err
 }

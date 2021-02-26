@@ -18,3 +18,8 @@ spec:
     port: 2379
   clusterIP: None
   publishNotReadyAddresses: true
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: old-name
