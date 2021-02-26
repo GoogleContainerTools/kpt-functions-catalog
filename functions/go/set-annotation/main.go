@@ -144,7 +144,7 @@ data:
   - name: color
     value: orange
 
-  To add 2 annotations 'color: orange' and 'fruit: apple' to all resources:
+To add 2 annotations 'color: orange' and 'fruit: apple' to all resources:
 
 apiVersion: v1
 kind: ConfigMap
@@ -156,6 +156,17 @@ annotations:
     value: orange
   - name: fruit
     value: apple
+
+A simple version of config can be used if you don't want to specify
+'fieldSpecs'.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  color: orange
+  fruit: apple
 
 You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will not only add or update the
