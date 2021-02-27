@@ -8,14 +8,14 @@ their own selectors.
 
 There 2 examples in this directory.
 
-- Simple function config format
-- Complete function config format
+- simple: An example for simple function config format
+- advanced: An example for advanced function config format
 
 Get the simple config example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-label/simple-config .
-kpt fn run simple-config --fn-path simple-config/functions
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-label/simple .
+kpt fn run simple --fn-path simple/functions
 ```
 
 ## Expected result
@@ -23,5 +23,5 @@ kpt fn run simple-config --fn-path simple-config/functions
 Check all resources have a label `color` whose value is `orange`:
 
 ```sh
-kpt cfg cat simple-config
+kpt cfg cat simple
 ```
