@@ -95,15 +95,8 @@ func run(resourceList *framework.ResourceList) error {
 func usage() string {
 	return `Update or add namespace.
 
-Configured using a ConfigMap with the following keys:
-
-namespace: Name of the namespace that will be set.
-fieldSpecs: A list of specification to select the resources and fields that 
-the namespace will be applied to.
-
-Example:
-
-To add a namespace 'color' to all resources:
+To add a namespace 'color' to all resources, configure the function
+with a simple ConfigMap like this:
 
 apiVersion: v1
 kind: ConfigMap
@@ -111,6 +104,20 @@ metadata:
   name: my-config
 data:
   namespace: color
+
+There is another advanced way to configure the function by a custom
+resource which can provide more flexibility than using ConfigMap.
+
+Example:
+
+apiVersion: kpt.dev/v1
+kind: SetNamespaceConfig
+metadata:
+  name: my-config
+namespace: color
+
+The values for 'apiVersion' and 'kind' must match the values in the
+example above.
 
 You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will use this field spec:
@@ -144,16 +151,15 @@ Example:
 
 To add a namespace 'color' to Deployment resource only:
 
-apiVersion: v1
-kind: ConfigMap
+apiVersion: kpt.dev/v1
+kind: SetNamespaceConfig
 metadata:
   name: my-config
-data:
-  namespace: color
-  fieldSpecs:
-    - path: metadata/namespace
-      kind: Deployment
-      create: true
+namespace: color
+fieldSpecs:
+- path: metadata/namespace
+  kind: Deployment
+  create: true
 
 For more information about fieldSpecs, please see 
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4
