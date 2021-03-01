@@ -1,7 +1,7 @@
-diff --git a/functions/fn-config.yaml b/functions/fn-config.yaml
+diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
 index 90ba8c0..0000000
---- a/functions/fn-config.yaml
+--- a/fn-config.yaml
 +++ /dev/null
 @@ -1,12 +0,0 @@
 -apiVersion: v1
