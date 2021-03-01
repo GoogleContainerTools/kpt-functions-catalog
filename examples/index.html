@@ -54,17 +54,17 @@
               }
 
               try {
-                const response = await window.Docsify.get(
+                const versionResponse = await window.Docsify.get(
                   `https://api.github.com/repos/etefera/kpt-functions-catalog/contents/examples/${functionName}?ref=site-demo`
                 );
-                const directories = JSON.parse(response).filter(
+                const versionDirectories = JSON.parse(versionResponse).filter(
                   (path) => path.name.match(/^v[0-9]/) && path.type === "dir"
                 );
-                const currentVersion = vm.route.path
-                  .split("/")[2]
+                const versionName = vm.route.path.split("/")[2];
+                const currentVersion = versionName
                   .replace("v", "")
                   .replaceAll("_", ".");
-                const semverSortedDirectories = directories
+                const semverSortedDirectories = versionDirectories
                   .sort((a, b) =>
                     compareVersions(
                       a.name.replaceAll("_", "."),
@@ -72,23 +72,49 @@
                     )
                   )
                   .reverse();
-                let dropdown = `
+
+                let versionDropdown = `
               <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${currentVersion}
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
                 semverSortedDirectories.forEach(
                   (dir, ix) =>
-                    (dropdown += `<li><a href="/${functionName}/${
+                    (versionDropdown += `<li><a href="/${functionName}/${
                       dir.name
                     }/">${dir.name.replace("v", "").replaceAll("_", ".")}${
                       ix ? "" : " (latest)"
                     }</a></li>`)
                 );
-                dropdown += `
+                versionDropdown += `
                 </ol>
               </div>`;
-                html = dropdown + html;
+
+                const examplesResponse = await window.Docsify.get(
+                  `https://api.github.com/repos/etefera/kpt-functions-catalog/contents/examples/${functionName}/${versionName}?ref=site-demo`
+                );
+                const examplesDirectories = JSON.parse(examplesResponse).filter(
+                  (path) => path.type === "dir"
+                );
+                let examplesDropdown = `
+              <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Examples
+                <span class="caret"></span></button>
+                <ol class="dropdown-menu">`;
+                examplesDirectories.forEach(
+                  (dir, _) =>
+                    (examplesDropdown += `<li><a href="/${functionName}/${versionName}/${dir.name}/">
+                      ${dir.name}</a></li>`)
+                );
+                examplesDropdown += `
+                </ol>
+              </div>`;
+                const dropdowns =
+                  `<div class="dropdown-container">` +
+                  versionDropdown +
+                  examplesDropdown +
+                  "</div>";
+                html = dropdowns + html;
               } catch (err) {
                 console.error(err);
               }
@@ -129,6 +155,12 @@
       line-height: var(--base-line-height) !important;
     }
 
+    .dropdown-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
     .sidebar {
       color: rgba(255, 255, 255, 0.75);
       font-size: 16px;
@@ -137,7 +169,7 @@
       font-size: var(--sidebar-name-font-size);
     }
     .sidebar-toggle {
-      bottom: 0;
+      display: none;
     }
 
     /* Right side table of contents */
