@@ -40,7 +40,7 @@ set -euo pipefail
 scripts_dir="$(dirname "$0")"
 # git-tag-parser.sh has been shell-checked separately.
 # shellcheck source=/dev/null
-source ${scripts_dir}/git-tag-parser.sh
+source "${scripts_dir}"/git-tag-parser.sh
 
 DEV_TAG=dev
 versions=$(get_versions "${TAG}")
