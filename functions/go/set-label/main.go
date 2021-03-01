@@ -140,7 +140,7 @@ data:
   - name: color
     value: orange
 
-  To add 2 labels 'color: orange' and 'fruit: apple' to all resources:
+To add 2 labels 'color: orange' and 'fruit: apple' to all resources:
 
 apiVersion: v1
 kind: ConfigMap
@@ -152,6 +152,17 @@ data:
     value: orange
   - name: fruit
     value: apple
+
+A simple version of config can be used if you don't want to specify
+'fieldSpecs'.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  color: orange
+  fruit: apple
 
 You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will not only add or update the
@@ -232,6 +243,18 @@ func getLabels(fc interface{}) (setLabelSpecs, error) {
 	if err != nil {
 		return fcd, err
 	}
+	// check does data contains key-value pairs
+	var keyValueMap map[string]string
+	err = yaml.Unmarshal([]byte(b), &keyValueMap)
+	if err == nil {
+		// we got a simple key-value pair
+		for k, v := range keyValueMap {
+			fcd.Labels = append(fcd.Labels,
+				setLabelSpec{LabelName: k, LabelValue: v})
+		}
+		return fcd, nil
+	}
+
 	err = yaml.Unmarshal([]byte(b), &fcd)
 	if err != nil {
 		return fcd, err
