@@ -15,7 +15,7 @@ Get the simple config example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-label/simple .
-kpt fn run simple --fn-path simple/functions
+kpt fn run simple
 ```
 
 ## Expected result
