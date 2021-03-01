@@ -1,9 +1,9 @@
 diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
-index 41b6894..0000000
+index 6dafce8..0000000
 --- a/fn-config.yaml
 +++ /dev/null
-@@ -1,10 +0,0 @@
+@@ -1,15 +0,0 @@
 -apiVersion: kpt.dev/v1
 -kind: SetNamespaceConfig
 -metadata:
@@ -14,30 +14,22 @@ index 41b6894..0000000
 -        image: gcr.io/kpt-fn/set-namespace:unstable
 -    config.kubernetes.io/local-config: 'true'
 -namespace: test
+-fieldSpecs:
+-- group: dev.example.com
+-  version: v1
+-  kind: MyResource
+-  path: spec/selector/namespace
 diff --git a/resources.yaml b/resources.yaml
-index 8859df8..f4202be 100644
+index 6267d90..9397139 100644
 --- a/resources.yaml
 +++ b/resources.yaml
-@@ -2,6 +2,7 @@ apiVersion: v1
- kind: ConfigMap
- metadata:
-   name: the-map
-+  namespace: test
- data:
-   some-key: some-value
- ---
-@@ -9,7 +10,7 @@ apiVersion: v1
- kind: Service
+@@ -2,7 +2,7 @@ apiVersion: dev.example.com/v1
+ kind: MyResource
  metadata:
    name: the-service
 -  namespace: the-namespace
 +  namespace: test
  spec:
-   ports:
-   - name: etcd-server-ssl
-@@ -22,4 +23,4 @@ spec:
- apiVersion: v1
- kind: Namespace
- metadata:
--  name: old-name
-+  name: test
+   selector:
+-    namespace: foo
++    namespace: test

@@ -8,3 +8,8 @@ metadata:
         image: gcr.io/kpt-fn/set-namespace:unstable
     config.kubernetes.io/local-config: 'true'
 namespace: test
+fieldSpecs:
+- group: dev.example.com
+  version: v1
+  kind: MyResource
+  path: spec/selector/namespace
