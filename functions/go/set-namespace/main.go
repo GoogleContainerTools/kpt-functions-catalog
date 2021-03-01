@@ -4,18 +4,30 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
+)
+
+const (
+	fnConfigGroup      = "kpt.dev"
+	fnConfigVersion    = "v1"
+	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
+	fnConfigKind       = "SetNamespaceConfig"
 )
 
 type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+}
+
+type setNamespaceConfig struct {
+	kyaml.ResourceMeta `json:",inline" yaml:",inline"`
+	plugin             `json:",inline" yaml:",inline"`
 }
 
 //nolint
@@ -53,24 +65,14 @@ func run(resourceList *framework.ResourceList) error {
 	}
 
 	resmapFactory := newResMapFactory()
-	pluginHelpers := newPluginHelpers(resmapFactory)
 
 	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
 	if err != nil {
-		return errors.Wrap(err, "failed to convert items to resource map")
+		return fmt.Errorf("failed to convert items to resource map: %w", err)
 	}
-	dataField, err := getDataFromFunctionConfig(resourceList.FunctionConfig)
+	err = configTransformer(resourceList.FunctionConfig, plugin)
 	if err != nil {
-		return errors.Wrap(err, "failed to get data field from function config")
-	}
-	dataValue, err := yaml.Marshal(dataField)
-	if err != nil {
-		return errors.Wrap(err, "error when marshal data values")
-	}
-
-	err = plugin.Config(pluginHelpers, dataValue)
-	if err != nil {
-		return errors.Wrap(err, "failed to config plugin")
+		return fmt.Errorf("failed to config plugin: %w", err)
 	}
 	if plugin.Namespace == "" {
 		return fmt.Errorf("namespace in the input config cannot be empty")
@@ -80,12 +82,12 @@ func run(resourceList *framework.ResourceList) error {
 	}
 	err = plugin.Transform(resMap)
 	if err != nil {
-		return errors.Wrap(err, "failed to run transformer")
+		return fmt.Errorf("failed to run transformer: %w", err)
 	}
 
 	resourceList.Items, err = resMap.ToRNodeSlice()
 	if err != nil {
-		return errors.Wrap(err, "failed to convert resource map to items")
+		return fmt.Errorf("failed to convert resource map to items: %w", err)
 	}
 	return nil
 }
@@ -188,10 +190,64 @@ func newResMapFactory() *resmap.Factory {
 }
 
 //nolint
-func getDataFromFunctionConfig(fc interface{}) (interface{}, error) {
+func configTransformer(fc interface{}, plugin *plugin) error {
 	f, ok := fc.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("function config %#v is not valid", fc)
+		return fmt.Errorf("function config %#v is not valid", fc)
 	}
-	return f["data"], nil
+	rn, err := kyaml.FromMap(f)
+	if err != nil {
+		return fmt.Errorf("failed to construct RNode from %#v: %w", f, err)
+	}
+	ok, err = isConfigMap(rn)
+	if err != nil {
+		return err
+	}
+	if ok {
+		// input config is a ConfigMap
+		data := rn.GetDataMap()
+		plugin.Namespace = data["namespace"]
+		return nil
+	}
+	ok, err = isCrdConfig(rn)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
+	}
+	// input config is a CRD
+	y, err := rn.String()
+	if err != nil {
+		return fmt.Errorf("cannot get YAML from RNode: %w", err)
+	}
+	config := setNamespaceConfig{}
+	err = yaml.Unmarshal([]byte(y), &config)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+	}
+	*plugin = config.plugin
+	return nil
+}
+
+func isConfigMap(rn *kyaml.RNode) (bool, error) {
+	meta, err := rn.GetMeta()
+	if err != nil {
+		return false, fmt.Errorf("failed to get metadata: %w", err)
+	}
+	if meta.APIVersion != "v1" || meta.Kind != "ConfigMap" {
+		return false, nil
+	}
+	return true, nil
+}
+
+func isCrdConfig(rn *kyaml.RNode) (bool, error) {
+	meta, err := rn.GetMeta()
+	if err != nil {
+		return false, fmt.Errorf("failed to get metadata: %w", err)
+	}
+	if meta.APIVersion != fnConfigAPIVersion || meta.Kind != fnConfigKind {
+		return false, nil
+	}
+	return true, nil
 }
