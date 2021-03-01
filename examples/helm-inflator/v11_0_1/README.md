@@ -1,5 +1,8 @@
 # Helm Template Version 11.0.1 (latest)
 
+<!--catalog:Name Helm Inflator-->
+<!--catalog:Description Render chart templates locally using helm template.-->
+<!--catalog:Type Mutator-->
 The `helm-inflator` KRM config function generates a new kpt package from a
 local Helm chart. This example invokes the helm inflator function using
 declarative configuration.
