@@ -18,7 +18,7 @@
 
 set -eo pipefail
 
-TAG=${TAG:-dev}
+TAG=${TAG:-unstable}
 SDK_REPO=https://github.com/GoogleContainerTools/kpt-functions-sdk
 export CATALOG_REPO=https://github.com/GoogleContainerTools/kpt-functions-catalog
 export CHARTS_SRC="charts/bitnami"

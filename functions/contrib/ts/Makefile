@@ -13,7 +13,7 @@
 # limitations under the License.
 SHELL=/bin/bash
 TAG ?= unstable
-GCR = gcr.io/kpt-fn
+GCR = gcr.io/kpt-fn-contrib
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -24,7 +24,9 @@ help: ## Print this help
 
 # Edit this list to contain all ts functions
 FUNCTIONS := \
-	kubeval
+	helm-inflator \
+	istioctl-analyze \
+	sops
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
@@ -51,7 +53,7 @@ test: $(FUNCTION_TESTS) ## Run unit tests for all functions
 $(FUNCTION_TESTS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -TEST,,$@) func-test
 
-build: $(FUNCTION_BUILDS) $(FUNCTION_BUILDS) ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
+build: $(FUNCTION_BUILDS) ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 
 .PHONY: $(FUNCTION_BUILDS)
 $(FUNCTION_BUILDS):
@@ -81,7 +83,7 @@ func-check-licenses:
 	cd $(CURRENT_FUNCTION) && npm run check-licenses
 
 func-build: func-test
-	../../scripts/ts-function-release.sh build curated
+	../../../scripts/ts-function-release.sh build contrib
 
 func-push:
-	../../scripts/ts-function-release.sh push curated
+	../../../scripts/ts-function-release.sh push contrib
