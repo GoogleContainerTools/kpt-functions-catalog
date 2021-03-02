@@ -185,11 +185,6 @@ func getDefaultConfig() (transformerConfig, error) {
 }
 
 //nolint
-func newPluginHelpers(resmapFactory *resmap.Factory) *resmap.PluginHelpers {
-	return resmap.NewPluginHelpers(nil, nil, resmapFactory)
-}
-
-//nolint
 func newResMapFactory() *resmap.Factory {
 	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
 	return resmap.NewFactory(resourceFactory, nil)
