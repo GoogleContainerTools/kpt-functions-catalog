@@ -42,19 +42,25 @@ scripts_dir="$(dirname "$0")"
 # shellcheck source=/dev/null
 source "${scripts_dir}"/git-tag-parser.sh
 
-DEV_TAG=dev
+UNSTABLE_TAG=unstable
 versions=$(get_versions "${TAG}")
 DEFAULT_GCR=${DEFAULT_GCR:-gcr.io/kpt-fn-contrib}
 GCR_REGISTRY=${GCR_REGISTRY:-${DEFAULT_GCR}}
 
-cd "${scripts_dir}"/../functions/go
+case "$2" in
+    contrib)
+        cd "${scripts_dir}/../functions/contrib/go"
+        ;;
+    curated)
+        cd "${scripts_dir}/../functions/go"
+esac
 
 case "$1" in
   build)
-    docker build -t "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${DEV_TAG}" -f "${CURRENT_FUNCTION}"/Dockerfile "${CURRENT_FUNCTION}"
+    docker build -t "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${UNSTABLE_TAG}" -f "${CURRENT_FUNCTION}"/Dockerfile "${CURRENT_FUNCTION}"
     for version in ${versions}; do
       echo tagging "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${version}"
-      docker tag "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${DEV_TAG}" "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${version}"
+      docker tag "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${UNSTABLE_TAG}" "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${version}"
     done
     ;;
   push)
