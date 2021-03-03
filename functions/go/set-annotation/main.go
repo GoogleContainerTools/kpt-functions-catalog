@@ -27,9 +27,83 @@ type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"commonAnnotations,omitempty" yaml:"commonAnnotations,omitempty"`
 }
 
-type setAnnotationConfig struct {
+type setAnnotationFunction struct {
 	kyaml.ResourceMeta `json:",inline" yaml:",inline"`
 	plugin             `json:",inline" yaml:",inline"`
+}
+
+func (f *setAnnotationFunction) Config(fnConfig interface{}) error {
+	configMap, ok := fnConfig.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("function config %#v is not valid", fnConfig)
+	}
+	rn, err := kyaml.FromMap(configMap)
+	if err != nil {
+		return fmt.Errorf("failed to construct RNode from %#v: %w", configMap, err)
+	}
+	switch {
+	case f.validGVK(rn, "v1", "ConfigMap"):
+		f.plugin.Annotations = rn.GetDataMap()
+	case f.validGVK(rn, fnConfigAPIVersion, fnConfigKind):
+		// input config is a CRD
+		y, err := rn.String()
+		if err != nil {
+			return fmt.Errorf("cannot get YAML from RNode: %w", err)
+		}
+		err = yaml.Unmarshal([]byte(y), &f.plugin)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+		}
+	default:
+		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
+	}
+
+	if len(f.plugin.Annotations) == 0 {
+		return fmt.Errorf("input annotation list cannot be empty")
+	}
+	tc, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+	// append default field specs
+	f.plugin.FieldSpecs = append(f.plugin.FieldSpecs, tc.FieldSpecs...)
+	return nil
+}
+
+func (f *setAnnotationFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error) {
+	resmapFactory := newResMapFactory()
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(items)
+	if err != nil {
+		return nil, err
+	}
+	err = f.plugin.Transform(resMap)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run transformer: %w", err)
+	}
+	return resMap.ToRNodeSlice()
+}
+
+func (f *setAnnotationFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bool {
+	meta, err := rn.GetMeta()
+	if err != nil {
+		return false
+	}
+	if meta.APIVersion != apiVersion || meta.Kind != kind {
+		return false
+	}
+	return true
+}
+
+func getDefaultConfig() (transformerConfig, error) {
+	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonannotations"]
+	var tc transformerConfig
+	err := yaml.Unmarshal([]byte(defaultConfigString), &tc)
+	return tc, err
+}
+
+func newResMapFactory() *resmap.Factory {
+	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
+	return resmap.NewFactory(resourceFactory, nil)
 }
 
 //nolint
@@ -61,34 +135,15 @@ func main() {
 }
 
 func run(resourceList *framework.ResourceList) error {
-	var plugin *plugin = &KustomizePlugin
-	tc, err := getDefaultConfig()
-	if err != nil {
-		return err
-	}
-	resmapFactory := newResMapFactory()
-
-	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
-	if err != nil {
-		return err
-	}
-	err = configTransformer(resourceList.FunctionConfig, plugin)
+	var fn setAnnotationFunction
+	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
 		return fmt.Errorf("failed to configure transformer: %w", err)
 	}
-	if len(plugin.Annotations) == 0 {
-		return fmt.Errorf("input annotation list cannot be empty")
-	}
-	// append default field specs
-	plugin.FieldSpecs = append(plugin.FieldSpecs, tc.FieldSpecs...)
-	err = plugin.Transform(resMap)
+
+	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
 		return fmt.Errorf("failed to run transformer: %w", err)
-	}
-
-	resourceList.Items, err = resMap.ToRNodeSlice()
-	if err != nil {
-		return err
 	}
 	return nil
 }
@@ -115,7 +170,6 @@ kind: ConfigMap
 metadata:
   name: my-config
 data:
-annotations:
   color: orange
   fruit: apple
 
@@ -161,81 +215,4 @@ Field spec has following fields:
 For more information about fieldSpecs, please see 
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-3
 `
-}
-
-func getDefaultConfig() (transformerConfig, error) {
-	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonannotations"]
-	var tc transformerConfig
-	err := yaml.Unmarshal([]byte(defaultConfigString), &tc)
-	return tc, err
-}
-
-func newResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
-	return resmap.NewFactory(resourceFactory, nil)
-}
-
-func configTransformer(fc interface{}, plugin *plugin) error {
-	f, ok := fc.(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("function config %#v is not valid", fc)
-	}
-	rn, err := kyaml.FromMap(f)
-	if err != nil {
-		return fmt.Errorf("failed to construct RNode from %#v: %w", f, err)
-	}
-	ok, err = isConfigMap(rn)
-	if err != nil {
-		return err
-	}
-	if ok {
-		// input config is a ConfigMap
-		data := rn.GetDataMap()
-		plugin.Annotations = make(map[string]string)
-		for k, v := range data {
-			plugin.Annotations[k] = v
-		}
-		return nil
-	}
-	ok, err = isCrdConfig(rn)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
-	}
-	// input config is a CRD
-	y, err := rn.String()
-	if err != nil {
-		return fmt.Errorf("cannot get YAML from RNode: %w", err)
-	}
-	config := setAnnotationConfig{}
-	err = yaml.Unmarshal([]byte(y), &config)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
-	}
-	*plugin = config.plugin
-	return nil
-}
-
-func isConfigMap(rn *kyaml.RNode) (bool, error) {
-	meta, err := rn.GetMeta()
-	if err != nil {
-		return false, fmt.Errorf("failed to get metadata: %w", err)
-	}
-	if meta.APIVersion != "v1" || meta.Kind != "ConfigMap" {
-		return false, nil
-	}
-	return true, nil
-}
-
-func isCrdConfig(rn *kyaml.RNode) (bool, error) {
-	meta, err := rn.GetMeta()
-	if err != nil {
-		return false, fmt.Errorf("failed to get metadata: %w", err)
-	}
-	if meta.APIVersion != fnConfigAPIVersion || meta.Kind != fnConfigKind {
-		return false, nil
-	}
-	return true, nil
 }
