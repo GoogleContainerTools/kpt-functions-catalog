@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
+	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
@@ -13,59 +14,80 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+type transformerConfig struct {
+	FieldSpecs types.FsSlice `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+}
+
 //nolint
 func main() {
-	var plugin *plugin = &KustomizePlugin
-	defaultConfig, err := getDefaultConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	resmapFactory := newResMapFactory()
-
-	pluginHelpers := newPluginHelpers(resmapFactory)
-
 	resourceList := &framework.ResourceList{}
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
-		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+		err := run(resourceList)
 		if err != nil {
-			return errors.Wrap(err, "failed to convert items to resource map")
-		}
-		dataField, err := getDataFromFunctionConfig(resourceList.FunctionConfig)
-		if err != nil {
-			return errors.Wrap(err, "failed to get data field from function config")
-		}
-		dataValue, err := yaml.Marshal(dataField)
-		if err != nil {
-			return errors.Wrap(err, "error when marshal data values")
-		}
-
-		err = plugin.Config(pluginHelpers, dataValue)
-		if err != nil {
-			return errors.Wrap(err, "failed to config plugin")
-		}
-		if len(plugin.FieldSpecs) == 0 {
-			plugin.FieldSpecs = defaultConfig
-		}
-		err = plugin.Transform(resMap)
-		if err != nil {
-			return errors.Wrap(err, "failed to run transformer")
-		}
-
-		resourceList.Items, err = resMap.ToRNodeSlice()
-		if err != nil {
-			return errors.Wrap(err, "failed to convert resource map to items")
+			resourceList.Result = &framework.Result{
+				Name: "set-namespace",
+				Items: []framework.Item{
+					{
+						Message:  err.Error(),
+						Severity: framework.Error,
+					},
+				},
+			}
+			return resourceList.Result
 		}
 		return nil
 	})
 	cmd.Long = usage()
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func run(resourceList *framework.ResourceList) error {
+	var plugin *plugin = &KustomizePlugin
+	defaultConfig, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+
+	resmapFactory := newResMapFactory()
+	pluginHelpers := newPluginHelpers(resmapFactory)
+
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+	if err != nil {
+		return errors.Wrap(err, "failed to convert items to resource map")
+	}
+	dataField, err := getDataFromFunctionConfig(resourceList.FunctionConfig)
+	if err != nil {
+		return errors.Wrap(err, "failed to get data field from function config")
+	}
+	dataValue, err := yaml.Marshal(dataField)
+	if err != nil {
+		return errors.Wrap(err, "error when marshal data values")
+	}
+
+	err = plugin.Config(pluginHelpers, dataValue)
+	if err != nil {
+		return errors.Wrap(err, "failed to config plugin")
+	}
+	if plugin.Namespace == "" {
+		return fmt.Errorf("namespace in the input config cannot be empty")
+	}
+	if len(plugin.FieldSpecs) == 0 {
+		plugin.FieldSpecs = defaultConfig.FieldSpecs
+	}
+	err = plugin.Transform(resMap)
+	if err != nil {
+		return errors.Wrap(err, "failed to run transformer")
+	}
+
+	resourceList.Items, err = resMap.ToRNodeSlice()
+	if err != nil {
+		return errors.Wrap(err, "failed to convert resource map to items")
+	}
+	return nil
 }
 
 func usage() string {
@@ -147,11 +169,9 @@ them.
 }
 
 //nolint
-func getDefaultConfig() ([]types.FieldSpec, error) {
-	defaultConfigString := `
-- path: metadata/namespace
-  create: true`
-	var defaultConfig []types.FieldSpec
+func getDefaultConfig() (transformerConfig, error) {
+	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["namespace"]
+	var defaultConfig transformerConfig
 	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
 	return defaultConfig, err
 }

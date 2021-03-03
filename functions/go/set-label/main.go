@@ -23,8 +23,8 @@ type setLabelSpecs struct {
 }
 
 type setLabelSpec struct {
-	LabelName  string            `json:"label_name,omitempty" yaml:"label_name,omitempty"`
-	LabelValue string            `json:"label_value,omitempty" yaml:"label_value,omitempty"`
+	LabelName  string            `json:"name,omitempty" yaml:"name,omitempty"`
+	LabelValue string            `json:"value,omitempty" yaml:"value,omitempty"`
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 }
 
@@ -34,7 +34,7 @@ func setLabel(spec setLabelSpec,
 	pluginHelpers *resmap.PluginHelpers,
 	plugin *plugin) error {
 	if spec.LabelName == "" || spec.LabelValue == "" {
-		return fmt.Errorf("label_name and label_value cannot be empty")
+		return fmt.Errorf("labels.name and labels.value cannot be empty")
 	}
 
 	err := plugin.Config(pluginHelpers, []byte{})
@@ -56,50 +56,65 @@ func setLabel(spec setLabelSpec,
 
 //nolint
 func main() {
-	var plugin *plugin = &KustomizePlugin
-	tc, err := getDefaultConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	resmapFactory := newResMapFactory()
-
-	pluginHelpers := newPluginHelpers(resmapFactory)
-
 	resourceList := &framework.ResourceList{}
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
-		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+		err := run(resourceList)
 		if err != nil {
-			return fmt.Errorf("failed to convert items to resource map: %w", err)
-		}
-		labels, err := getLabels(resourceList.FunctionConfig)
-		if err != nil {
-			return fmt.Errorf("failed to get data.specs field from function config: %w", err)
-		}
-
-		for _, l := range labels.Labels {
-			err := setLabel(l, resMap, tc, pluginHelpers, plugin)
-			if err != nil {
-				return fmt.Errorf("failed to add label [%s: %s]: %w",
-					l.LabelName, l.LabelValue, err)
+			resourceList.Result = &framework.Result{
+				Name: "set-label",
+				Items: []framework.Item{
+					{
+						Message:  err.Error(),
+						Severity: framework.Error,
+					},
+				},
 			}
-		}
-
-		resourceList.Items, err = resMap.ToRNodeSlice()
-		if err != nil {
-			return fmt.Errorf("failed to convert resource map to items: %w", err)
+			return resourceList.Result
 		}
 		return nil
 	})
 
 	cmd.Long = usage()
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func run(resourceList *framework.ResourceList) error {
+	var plugin *plugin = &KustomizePlugin
+	tc, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+	resmapFactory := newResMapFactory()
+	pluginHelpers := newPluginHelpers(resmapFactory)
+
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+	if err != nil {
+		return fmt.Errorf("failed to convert items to resource map: %w", err)
+	}
+	labels, err := getLabels(resourceList.FunctionConfig)
+	if err != nil {
+		return fmt.Errorf("failed to get data.specs field from function config: %w", err)
+	}
+	if len(labels.Labels) == 0 {
+		return fmt.Errorf("input label list cannot be empty")
+	}
+	for _, l := range labels.Labels {
+		err := setLabel(l, resMap, tc, pluginHelpers, plugin)
+		if err != nil {
+			return fmt.Errorf("failed to add label [%s: %s]: %w",
+				l.LabelName, l.LabelValue, err)
+		}
+	}
+
+	resourceList.Items, err = resMap.ToRNodeSlice()
+	if err != nil {
+		return fmt.Errorf("failed to convert resource map to items: %w", err)
+	}
+	return nil
 }
 
 func usage() string {
@@ -107,8 +122,8 @@ func usage() string {
 
 Configured using a ConfigMap with the following keys:
 
-label_name: Label name to add to resources.
-label_value: Label value to add to resources.
+labels.name: Label name to add to resources.
+labels.value: Label value to add to resources.
 
 These keys are in a list in path 'data.labels'.
 
@@ -122,10 +137,10 @@ metadata:
   name: my-config
 data:
   labels:
-  - label_name: color
-    label_value: orange
+  - name: color
+    value: orange
 
-  To add 2 labels 'color: orange' and 'fruit: apple' to all resources:
+To add 2 labels 'color: orange' and 'fruit: apple' to all resources:
 
 apiVersion: v1
 kind: ConfigMap
@@ -133,10 +148,21 @@ metadata:
   name: my-config
 data:
   labels:
-  - label_name: color
-    label_value: orange
-  - label_name: fruit
-    label_value: apple
+  - name: color
+    value: orange
+  - name: fruit
+    value: apple
+
+A simple version of config can be used if you don't want to specify
+'fieldSpecs'.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  color: orange
+  fruit: apple
 
 You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will not only add or update the
@@ -173,8 +199,8 @@ metadata:
   name: my-config
 data:
   labels:
-    - label_name: color
-      label_value: orange
+    - name: color
+      value: orange
       fieldSpecs:
       - path: data/selector
         kind: MyOwnKind
@@ -217,6 +243,18 @@ func getLabels(fc interface{}) (setLabelSpecs, error) {
 	if err != nil {
 		return fcd, err
 	}
+	// check does data contains key-value pairs
+	var keyValueMap map[string]string
+	err = yaml.Unmarshal([]byte(b), &keyValueMap)
+	if err == nil {
+		// we got a simple key-value pair
+		for k, v := range keyValueMap {
+			fcd.Labels = append(fcd.Labels,
+				setLabelSpec{LabelName: k, LabelValue: v})
+		}
+		return fcd, nil
+	}
+
 	err = yaml.Unmarshal([]byte(b), &fcd)
 	if err != nil {
 		return fcd, err

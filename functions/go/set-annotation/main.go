@@ -25,8 +25,8 @@ type setAnnotationSpecs struct {
 }
 
 type setAnnotationSpec struct {
-	AnnotationName  string            `json:"annotation_name,omitempty" yaml:"annotation_name,omitempty"`
-	AnnotationValue string            `json:"annotation_value,omitempty" yaml:"annotation_value,omitempty"`
+	AnnotationName  string            `json:"name,omitempty" yaml:"name,omitempty"`
+	AnnotationValue string            `json:"value,omitempty" yaml:"value,omitempty"`
 	FieldSpecs      []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 }
 
@@ -36,7 +36,7 @@ func setAnnotation(spec setAnnotationSpec,
 	pluginHelpers *resmap.PluginHelpers,
 	plugin *plugin) error {
 	if spec.AnnotationName == "" || spec.AnnotationValue == "" {
-		return fmt.Errorf("annotation_name and annotation_value cannot be empty")
+		return fmt.Errorf("annotations.name and annotations.value cannot be empty")
 	}
 
 	err := plugin.Config(pluginHelpers, []byte{})
@@ -58,49 +58,67 @@ func setAnnotation(spec setAnnotationSpec,
 
 //nolint
 func main() {
-	var plugin *plugin = &KustomizePlugin
-	tc, err := getDefaultConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	resmapFactory := newResMapFactory()
-
-	pluginHelpers := newPluginHelpers(resmapFactory)
 
 	resourceList := &framework.ResourceList{}
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
-		resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+		err := run(resourceList)
 		if err != nil {
-			return err
-		}
-		annotations, err := getAnnotations(resourceList.FunctionConfig)
-		if err != nil {
-			return fmt.Errorf("failed to get data.specs field from function config: %w", err)
-		}
-		for _, a := range annotations.Annotations {
-			err := setAnnotation(a, resMap, tc, pluginHelpers, plugin)
-			if err != nil {
-				return fmt.Errorf("failed to add annotation [%s: %s]: %w",
-					a.AnnotationName, a.AnnotationValue, err)
+			resourceList.Result = &framework.Result{
+				Name: "set-annotation",
+				Items: []framework.Item{
+					{
+						Message:  err.Error(),
+						Severity: framework.Error,
+					},
+				},
 			}
-		}
-
-		resourceList.Items, err = resMap.ToRNodeSlice()
-		if err != nil {
-			return err
+			return resourceList.Result
 		}
 		return nil
 	})
 
 	cmd.Long = usage()
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func run(resourceList *framework.ResourceList) error {
+	var plugin *plugin = &KustomizePlugin
+	tc, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+
+	resmapFactory := newResMapFactory()
+	pluginHelpers := newPluginHelpers(resmapFactory)
+
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+	if err != nil {
+		return err
+	}
+	annotations, err := getAnnotations(resourceList.FunctionConfig)
+	if err != nil {
+		return fmt.Errorf("failed to get data.specs field from function config: %w", err)
+	}
+	if len(annotations.Annotations) == 0 {
+		return fmt.Errorf("input annotation list cannot be empty")
+	}
+	for _, a := range annotations.Annotations {
+		err := setAnnotation(a, resMap, tc, pluginHelpers, plugin)
+		if err != nil {
+			return fmt.Errorf("failed to add annotation [%s: %s]: %w",
+				a.AnnotationName, a.AnnotationValue, err)
+		}
+	}
+
+	resourceList.Items, err = resMap.ToRNodeSlice()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func usage() string {
@@ -108,8 +126,8 @@ func usage() string {
 
 Configured using a ConfigMap with the following keys:
 
-annotation_name: Annotation name to add to resources.
-annotation_value: Annotation value to add to resources.
+annotations.name: Annotation name to add to resources.
+annotations.value: Annotation value to add to resources.
 
 These keys are in a list in path 'data.annotations'.
 
@@ -123,10 +141,10 @@ metadata:
   name: my-config
 data:
   annotations:
-  - annotation_name: color
-    annotation_value: orange
+  - name: color
+    value: orange
 
-  To add 2 annotations 'color: orange' and 'fruit: apple' to all resources:
+To add 2 annotations 'color: orange' and 'fruit: apple' to all resources:
 
 apiVersion: v1
 kind: ConfigMap
@@ -134,10 +152,21 @@ metadata:
   name: my-config
 data:
 annotations:
-  - annotation_name: color
-    annotation_value: orange
-  - annotation_name: fruit
-    annotation_value: apple
+  - name: color
+    value: orange
+  - name: fruit
+    value: apple
+
+A simple version of config can be used if you don't want to specify
+'fieldSpecs'.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  color: orange
+  fruit: apple
 
 You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will not only add or update the
@@ -174,8 +203,8 @@ metadata:
   name: my-config
 data:
   annotations:
-    - annotation_name: color
-      annotation_value: orange
+    - name: color
+      value: orange
       fieldSpecs:
       - path: data/selector
         kind: MyOwnKind
@@ -218,6 +247,18 @@ func getAnnotations(fc interface{}) (setAnnotationSpecs, error) {
 	if err != nil {
 		return fcd, err
 	}
+	// check does data contains key-value pairs
+	var keyValueMap map[string]string
+	err = yaml.Unmarshal([]byte(b), &keyValueMap)
+	if err == nil {
+		// we got a simple key-value pair
+		for k, v := range keyValueMap {
+			fcd.Annotations = append(fcd.Annotations,
+				setAnnotationSpec{AnnotationName: k, AnnotationValue: v})
+		}
+		return fcd, nil
+	}
+
 	err = yaml.Unmarshal([]byte(b), &fcd)
 	if err != nil {
 		return fcd, err

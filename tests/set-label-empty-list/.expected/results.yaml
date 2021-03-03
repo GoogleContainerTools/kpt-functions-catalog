@@ -1,0 +1,4 @@
+name: set-label
+items:
+- message: input label list cannot be empty
+  severity: error

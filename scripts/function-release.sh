@@ -31,7 +31,7 @@ fi
 scripts_dir="$(dirname "$0")"
 # git-tag-parser.sh has been shell-checked separately.
 # shellcheck source=/dev/null
-source ${scripts_dir}/git-tag-parser.sh
+source "${scripts_dir}"/git-tag-parser.sh
 
 fn_lang=$(parse_git_tag lang)
 fn_name=$(parse_git_tag name)

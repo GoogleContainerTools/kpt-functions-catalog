@@ -28,6 +28,7 @@ unit-test-go: ## Run unit tests for Go functions
 
 unit-test-ts: ## Run unit tests for TS functions
 	cd functions/ts && $(MAKE) test
+	cd functions/contrib/ts && $(MAKE) test
 
 e2e-test: ## Run all e2e tests
 	cd tests && $(MAKE) TAG=$(TAG) test
@@ -37,11 +38,14 @@ test: unit-test e2e-test ## Run all unit tests and e2e tests
 check-licenses:
 	cd functions/ts && $(MAKE) check-licenses
 	cd functions/go && $(MAKE) check-licenses
+	cd functions/contrib/ts && $(MAKE) check-licenses
 
 build: ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 	cd functions/go && $(MAKE) TAG=$(TAG) build
 	cd functions/ts && $(MAKE) TAG=$(TAG) build
+	cd functions/contrib/ts && $(MAKE) TAG=$(TAG) build
 
 push: ## Push images to registry. WARN: This operation should only be done in CI environment.
 	cd functions/go && $(MAKE) push
 	cd functions/ts && $(MAKE) push
+	cd functions/contrib/ts && $(MAKE) push

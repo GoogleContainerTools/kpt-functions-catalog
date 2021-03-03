@@ -1,0 +1,4 @@
+name: set-namespace
+items:
+- message: namespace in the input config cannot be empty
+  severity: error

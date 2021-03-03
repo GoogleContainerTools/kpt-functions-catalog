@@ -13,25 +13,23 @@
 # limitations under the License.
 SHELL=/bin/bash
 GOPATH := $(shell go env GOPATH)
-TAG ?= dev
-CURATED_GCR = gcr.io/kpt-fn
+TAG ?= unstable
+GCR = gcr.io/kpt-fn
 
 # Edit this list to contain all go functions
-CURATED_FUNCTIONS := \
+FUNCTIONS := \
 	set-label \
 	set-annotation \
 	set-namespace
-# Use functions/ts/Makefile as a reference to modify this file to support contrib functions.
-FUNCTIONS := $(CURATED_FUNCTIONS)
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
 
 FUNCTION_CHECKLICENSES := $(patsubst %,%-CHECKLICENSES,$(FUNCTIONS))
 # Targets to build functions
-CURATED_FUNCTION_BUILDS := $(patsubst %,%-CURATED-BUILD,$(CURATED_FUNCTIONS))
+FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
 # Targets to push images
-CURATED_FUNCTION_PUSH := $(patsubst %,%-CURATED-PUSH,$(CURATED_FUNCTIONS))
+FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
 # Current function name used by individual function targets
 CURRENT_FUNCTION ?= unknown
 
@@ -55,18 +53,18 @@ $(FUNCTION_TESTS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -TEST,,$@) func-test
 
 .PHONY: build
-build: $(CURATED_FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
+build: $(FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
 
-.PHONY: $(CURATED_FUNCTION_BUILDS)
-$(CURATED_FUNCTION_BUILDS):
-	$(MAKE) CURRENT_FUNCTION=$(subst -CURATED-BUILD,,$@) TAG=$(TAG) DEFAULT_GCR=$(CURATED_GCR) func-build
+.PHONY: $(FUNCTION_BUILDS)
+$(FUNCTION_BUILDS):
+	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) TAG=$(TAG) DEFAULT_GCR=$(GCR) func-build
 
 .PHONY: push
-push: $(CURATED_FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
+push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
 
-.PHONY: $(CURATED_FUNCTION_PUSH)
-$(CURATED_FUNCTION_PUSH):
-	$(MAKE) CURRENT_FUNCTION=$(subst -CURATED-PUSH,,$@) TAG=$(TAG) DEFAULT_GCR=$(CURATED_GCR) func-push
+.PHONY: $(FUNCTION_PUSH)
+$(FUNCTION_PUSH):
+	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) TAG=$(TAG) DEFAULT_GCR=$(GCR) func-push
 
 .PHONY: check-licenses
 check-licenses: install-go-licenses $(FUNCTION_CHECKLICENSES)
@@ -111,8 +109,8 @@ func-check-licenses: install-go-licenses
 
 func-build: func-verify
 	@echo Building image for $(CURRENT_FUNCTION)...
-	../../scripts/go-function-release.sh build
+	../../scripts/go-function-release.sh build curated
 
 func-push:
 	@echo Pushing image $(CURRENT_FUNCTION)...
-	../../scripts/go-function-release.sh push
+	../../scripts/go-function-release.sh push curated
