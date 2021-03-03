@@ -1,10 +1,10 @@
 diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
-index 0ac99d2..0000000
+index e1e92fc..0000000
 --- a/fn-config.yaml
 +++ /dev/null
 @@ -1,18 +0,0 @@
--apiVersion: kpt.dev/v1
+-apiVersion: kpt.dev/v1beta1
 -kind: SetAnnotationConfig
 -metadata:
 -  name: my-func-config

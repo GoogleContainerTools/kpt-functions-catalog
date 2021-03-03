@@ -1,4 +1,4 @@
 name: set-annotation
 items:
-- message: 'failed to configure transformer: input annotation list cannot be empty'
+- message: 'failed to configure function: input annotation list cannot be empty'
   severity: error

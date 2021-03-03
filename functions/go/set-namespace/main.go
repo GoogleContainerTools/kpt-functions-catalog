@@ -16,7 +16,7 @@ import (
 
 const (
 	fnConfigGroup      = "kpt.dev"
-	fnConfigVersion    = "v1"
+	fnConfigVersion    = "v1beta1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
 	fnConfigKind       = "SetNamespaceConfig"
 )
@@ -167,7 +167,7 @@ resource which can provide more flexibility than using ConfigMap.
 
 Example:
 
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1beta1
 kind: SetNamespaceConfig
 metadata:
   name: my-config
@@ -208,7 +208,7 @@ Example:
 
 To add a namespace 'color' to Deployment resource only:
 
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1beta1
 kind: SetNamespaceConfig
 metadata:
   name: my-config

@@ -1,4 +1,4 @@
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1beta1
 kind: SetAnnotationConfig
 metadata:
   name: my-func-config

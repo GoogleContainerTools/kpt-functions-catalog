@@ -18,7 +18,7 @@ import (
 
 const (
 	fnConfigGroup      = "kpt.dev"
-	fnConfigVersion    = "v1"
+	fnConfigVersion    = "v1beta1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
 	fnConfigKind       = "SetAnnotationConfig"
 )
@@ -185,7 +185,7 @@ Example:
 
 To add an annotation 'color: orange' to path 'data/selector' in MyOwnKind resource:
 
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1beta1
 kind: SetAnnotationConfig
 metadata:
   name: my-config
