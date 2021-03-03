@@ -98,7 +98,7 @@
                   `https://api.github.com/repos/GoogleContainerTools/kpt-functions-catalog/contents/examples/${functionType}/${functionName}/${versionName}`
                 );
                 const examplesDirectories = JSON.parse(examplesResponse).filter(
-                  (path) => path.type === "dir"
+                  (path) => path.type === "dir" && path.name[0] != '.'
                 );
                 let examplesDropdown = `
               <div class="dropdown">
