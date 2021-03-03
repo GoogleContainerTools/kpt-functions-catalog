@@ -14,6 +14,7 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -32,13 +33,19 @@ func main() {
 	source := os.Args[1]
 	dest := os.Args[2]
 
-	functions, err := getFunctions(source)
+	mutatorFunctions, err := getFunctions(filepath.Join(source, "mutators"), "Mutator")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
-	functions, err = parseFuncions(functions)
+	validatorFunctions, err := getFunctions(filepath.Join(source, "validators"), "Validator")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+
+	functions, err := parseFuncions(append(mutatorFunctions, validatorFunctions...))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
@@ -60,7 +67,7 @@ type function struct {
 	Type         string
 }
 
-func getFunctions(source string) ([]function, error) {
+func getFunctions(source string, functionType string) ([]function, error) {
 	functions := make([]function, 0)
 
 	// Reads in exampleDir/
@@ -79,23 +86,35 @@ func getFunctions(source string) ([]function, error) {
 				return functions, err
 			}
 
-			sort.Slice(paths, func(i, j int) bool {
-				firstVersion := semver.Canonical(strings.ReplaceAll(paths[i].Name(), "_", "."))
-				secondVersion := semver.Canonical(strings.ReplaceAll(paths[j].Name(), "_", "."))
-				// Sort directories by the ordering of the semantic versions they represent
-				return semver.Compare(firstVersion, secondVersion) > 0
-			})
-
 			if len(paths) > 0 {
-				potentialFunctionVersion := semver.Canonical(strings.ReplaceAll(paths[0].Name(), "_", "."))
-				if semver.IsValid(potentialFunctionVersion) {
+				if pathHasRelease(paths) {
+					sort.Slice(paths, func(i, j int) bool {
+						firstVersion := semver.Canonical(strings.ReplaceAll(paths[i].Name(), "_", "."))
+						secondVersion := semver.Canonical(strings.ReplaceAll(paths[j].Name(), "_", "."))
+						// Sort directories by the ordering of the semantic versions they represent
+						return semver.Compare(firstVersion, secondVersion) > 0
+					})
+					potentialFunctionVersion := semver.Canonical(strings.ReplaceAll(paths[0].Name(), "_", "."))
+					if semver.IsValid(potentialFunctionVersion) {
+						functions = append(functions,
+							function{
+								FunctionName: functionName,
+								Version:      potentialFunctionVersion,
+								Path:         filepath.Join(functionPath, paths[0].Name()),
+								Type:         functionType,
+							},
+						)
+					}
+				} else {
 					functions = append(functions,
 						function{
 							FunctionName: functionName,
-							Version:      potentialFunctionVersion,
-							Path:         filepath.Join(functionPath, paths[0].Name()),
+							Version:      "main",
+							Path:         functionPath,
+							Type:         functionType,
 						},
 					)
+
 				}
 			}
 		}
@@ -107,9 +126,21 @@ func getFunctions(source string) ([]function, error) {
 var (
 	// Capture content within a tag like <!--catalog:[Name|Description|Type] (Content)-->
 	tags = regexp.MustCompile(`<!--catalog:(Name|Description|Type)\s+?([\s\S]*?)-->`)
+	// Match start of a version such as v1.9.1
+	semverPrefix = regexp.MustCompile(`v\d`)
 )
 
+func pathHasRelease(paths []fs.DirEntry) bool {
+	for _, path := range paths {
+		if semverPrefix.FindStringSubmatch(path.Name()) != nil {
+			return true
+		}
+	}
+	return false
+}
+
 func parseFuncions(functions []function) ([]function, error) {
+
 	for i := range functions {
 		b, err := ioutil.ReadFile(filepath.Join(functions[i].Path, "README.md"))
 		if err != nil {

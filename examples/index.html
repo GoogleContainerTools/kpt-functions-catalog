@@ -47,7 +47,8 @@
         plugins: [
           function (hook, vm) {
             hook.afterEach(async function (html, next) {
-              const functionName = vm.route.path.split("/")[1];
+              const functionType = vm.route.path.split("/")[1];
+              const functionName = vm.route.path.split("/")[2];
               if (!functionName) {
                 next(html);
                 return;
@@ -55,43 +56,46 @@
 
               try {
                 const versionResponse = await window.Docsify.get(
-                  `https://api.github.com/repos/etefera/kpt-functions-catalog/contents/examples/${functionName}?ref=site-demo`
+                  `https://api.github.com/repos/GoogleContainerTools/kpt-functions-catalog/contents/examples/${functionType}/${functionName}`
                 );
                 const versionDirectories = JSON.parse(versionResponse).filter(
                   (path) => path.name.match(/^v[0-9]/) && path.type === "dir"
                 );
-                const versionName = vm.route.path.split("/")[2];
-                const currentVersion = versionName
-                  .replace("v", "")
-                  .replaceAll("_", ".");
-                const semverSortedDirectories = versionDirectories
-                  .sort((a, b) =>
-                    compareVersions(
-                      a.name.replaceAll("_", "."),
-                      b.name.replaceAll("_", ".")
+                let versionDropdown = "";
+                const versionName = vm.route.path.split("/")[3];
+                if (versionDirectories.length > 0) {
+                  const currentVersion = versionName
+                    .replace("v", "")
+                    .replaceAll("_", ".");
+                  const semverSortedDirectories = versionDirectories
+                    .sort((a, b) =>
+                      compareVersions(
+                        a.name.replaceAll("_", "."),
+                        b.name.replaceAll("_", ".")
+                      )
                     )
-                  )
-                  .reverse();
+                    .reverse();
 
-                let versionDropdown = `
+                  versionDropdown += `
               <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${currentVersion}
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
-                semverSortedDirectories.forEach(
-                  (dir, ix) =>
-                    (versionDropdown += `<li><a href="/${functionName}/${
-                      dir.name
-                    }/">${dir.name.replace("v", "").replaceAll("_", ".")}${
-                      ix ? "" : " (latest)"
-                    }</a></li>`)
-                );
-                versionDropdown += `
+                  semverSortedDirectories.forEach(
+                    (dir, ix) =>
+                      (versionDropdown += `<li><a href="/${functionName}/${
+                        dir.name
+                      }/">${dir.name.replace("v", "").replaceAll("_", ".")}${
+                        ix ? "" : " (latest)"
+                      }</a></li>`)
+                  );
+                  versionDropdown += `
                 </ol>
               </div>`;
+                }
 
                 const examplesResponse = await window.Docsify.get(
-                  `https://api.github.com/repos/etefera/kpt-functions-catalog/contents/examples/${functionName}/${versionName}?ref=site-demo`
+                  `https://api.github.com/repos/GoogleContainerTools/kpt-functions-catalog/contents/examples/${functionType}/${functionName}/${versionName}`
                 );
                 const examplesDirectories = JSON.parse(examplesResponse).filter(
                   (path) => path.type === "dir"
@@ -103,7 +107,9 @@
                 <ol class="dropdown-menu">`;
                 examplesDirectories.forEach(
                   (dir, _) =>
-                    (examplesDropdown += `<li><a href="/${functionName}/${versionName}/${dir.name}/">
+                    (examplesDropdown += `<li><a href="/${functionType}/${functionName}/${
+                      versionName ? `${versionName}/` : ""
+                    }${dir.name}/">
                       ${dir.name}</a></li>`)
                 );
                 examplesDropdown += `
