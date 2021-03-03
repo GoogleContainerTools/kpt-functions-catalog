@@ -1,5 +1,8 @@
 # Set Label
 
+<!--catalog:Name Set Label-->
+<!--catalog:Description Manipulate the `metadata.labels` field on resources.-->
+
 The `set-label` KRM config function adds or replaces the
 `metadata.labels` field on all resources except when users specify
 their own selectors.

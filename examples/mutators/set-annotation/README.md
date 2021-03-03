@@ -1,5 +1,8 @@
 # Set Annotation
 
+<!--catalog:Name Set Annotation-->
+<!--catalog:Description Add annotations to resources.-->
+
 The `set-annotation` KRM config function adds an annotation to resources.
 
 ## Function invocation

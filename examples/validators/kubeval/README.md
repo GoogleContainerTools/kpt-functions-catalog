@@ -1,5 +1,8 @@
 # Kubeval
 
+<!--catalog:Name Kubeval-->
+<!--catalog:Description Validate Kubernetes resources.-->
+
 The `kubeval` KRM config function validates Kubernetes resources using kubeval.
 Learn more on the [kubeval website].
 

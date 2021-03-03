@@ -1,5 +1,8 @@
 # Set Namespace
 
+<!--catalog:Name Set Namespace-->
+<!--catalog:Description Manipulate the `metadata.namespace` field on resources.-->
+
 The `set-namespace` KRM config function adds or replaces the
 `metadata.namespace` field on all resources except for [those known to be
 cluster-scoped].
