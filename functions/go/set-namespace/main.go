@@ -25,9 +25,87 @@ type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 }
 
-type setNamespaceConfig struct {
+type setNamespaceFunction struct {
 	kyaml.ResourceMeta `json:",inline" yaml:",inline"`
 	plugin             `json:",inline" yaml:",inline"`
+}
+
+func (f *setNamespaceFunction) Config(fnConfig interface{}) error {
+	configMap, ok := fnConfig.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("function config %#v is not valid", fnConfig)
+	}
+	rn, err := kyaml.FromMap(configMap)
+	if err != nil {
+		return fmt.Errorf("failed to construct RNode from %#v: %w", configMap, err)
+	}
+	switch {
+	case f.validGVK(rn, "v1", "ConfigMap"):
+		f.plugin.Namespace = rn.GetDataMap()["namespace"]
+	case f.validGVK(rn, fnConfigAPIVersion, fnConfigKind):
+		// input config is a CRD
+		y, err := rn.String()
+		if err != nil {
+			return fmt.Errorf("cannot get YAML from RNode: %w", err)
+		}
+		err = yaml.Unmarshal([]byte(y), &f.plugin)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+		}
+	default:
+		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
+	}
+
+	if f.plugin.Namespace == "" {
+		return fmt.Errorf("input namespace cannot be empty")
+	}
+	tc, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+	// set default field specs
+	if len(f.plugin.FieldSpecs) == 0 {
+		f.plugin.FieldSpecs = tc.FieldSpecs
+	}
+	return nil
+}
+
+func (f *setNamespaceFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error) {
+	resmapFactory := newResMapFactory()
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(items)
+	if err != nil {
+		return nil, err
+	}
+	err = f.plugin.Transform(resMap)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run transformer: %w", err)
+	}
+	return resMap.ToRNodeSlice()
+}
+
+func (f *setNamespaceFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bool {
+	meta, err := rn.GetMeta()
+	if err != nil {
+		return false
+	}
+	if meta.APIVersion != apiVersion || meta.Kind != kind {
+		return false
+	}
+	return true
+}
+
+//nolint
+func getDefaultConfig() (transformerConfig, error) {
+	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["namespace"]
+	var defaultConfig transformerConfig
+	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
+	return defaultConfig, err
+}
+
+//nolint
+func newResMapFactory() *resmap.Factory {
+	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
+	return resmap.NewFactory(resourceFactory, nil)
 }
 
 //nolint
@@ -58,36 +136,15 @@ func main() {
 }
 
 func run(resourceList *framework.ResourceList) error {
-	var plugin *plugin = &KustomizePlugin
-	defaultConfig, err := getDefaultConfig()
+	var fn setNamespaceFunction
+	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to configure function: %w", err)
 	}
 
-	resmapFactory := newResMapFactory()
-
-	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
-		return fmt.Errorf("failed to convert items to resource map: %w", err)
-	}
-	err = configTransformer(resourceList.FunctionConfig, plugin)
-	if err != nil {
-		return fmt.Errorf("failed to config plugin: %w", err)
-	}
-	if plugin.Namespace == "" {
-		return fmt.Errorf("namespace in the input config cannot be empty")
-	}
-	if len(plugin.FieldSpecs) == 0 {
-		plugin.FieldSpecs = defaultConfig.FieldSpecs
-	}
-	err = plugin.Transform(resMap)
-	if err != nil {
-		return fmt.Errorf("failed to run transformer: %w", err)
-	}
-
-	resourceList.Items, err = resMap.ToRNodeSlice()
-	if err != nil {
-		return fmt.Errorf("failed to convert resource map to items: %w", err)
+		return fmt.Errorf("failed to run function: %w", err)
 	}
 	return nil
 }
@@ -174,81 +231,4 @@ and 'ClusterRoleBinding' will be handled implicitly by this function. If you hav
 references to namespaces in you CRDs, use the field spec described above to update
 them.
 `
-}
-
-//nolint
-func getDefaultConfig() (transformerConfig, error) {
-	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["namespace"]
-	var defaultConfig transformerConfig
-	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
-	return defaultConfig, err
-}
-
-//nolint
-func newResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
-	return resmap.NewFactory(resourceFactory, nil)
-}
-
-//nolint
-func configTransformer(fc interface{}, plugin *plugin) error {
-	f, ok := fc.(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("function config %#v is not valid", fc)
-	}
-	rn, err := kyaml.FromMap(f)
-	if err != nil {
-		return fmt.Errorf("failed to construct RNode from %#v: %w", f, err)
-	}
-	ok, err = isConfigMap(rn)
-	if err != nil {
-		return err
-	}
-	if ok {
-		// input config is a ConfigMap
-		data := rn.GetDataMap()
-		plugin.Namespace = data["namespace"]
-		return nil
-	}
-	ok, err = isCrdConfig(rn)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
-	}
-	// input config is a CRD
-	y, err := rn.String()
-	if err != nil {
-		return fmt.Errorf("cannot get YAML from RNode: %w", err)
-	}
-	config := setNamespaceConfig{}
-	err = yaml.Unmarshal([]byte(y), &config)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
-	}
-	*plugin = config.plugin
-	return nil
-}
-
-func isConfigMap(rn *kyaml.RNode) (bool, error) {
-	meta, err := rn.GetMeta()
-	if err != nil {
-		return false, fmt.Errorf("failed to get metadata: %w", err)
-	}
-	if meta.APIVersion != "v1" || meta.Kind != "ConfigMap" {
-		return false, nil
-	}
-	return true, nil
-}
-
-func isCrdConfig(rn *kyaml.RNode) (bool, error) {
-	meta, err := rn.GetMeta()
-	if err != nil {
-		return false, fmt.Errorf("failed to get metadata: %w", err)
-	}
-	if meta.APIVersion != fnConfigAPIVersion || meta.Kind != fnConfigKind {
-		return false, nil
-	}
-	return true, nil
 }

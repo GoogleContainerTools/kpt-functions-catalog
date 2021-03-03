@@ -1,4 +1,4 @@
 name: set-namespace
 items:
-- message: namespace in the input config cannot be empty
+- message: 'failed to configure function: input namespace cannot be empty'
   severity: error
