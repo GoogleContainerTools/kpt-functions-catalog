@@ -138,12 +138,12 @@ func run(resourceList *framework.ResourceList) error {
 	var fn setAnnotationFunction
 	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		return fmt.Errorf("failed to configure transformer: %w", err)
+		return fmt.Errorf("failed to configure function: %w", err)
 	}
 
 	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
-		return fmt.Errorf("failed to run transformer: %w", err)
+		return fmt.Errorf("failed to run function: %w", err)
 	}
 	return nil
 }
