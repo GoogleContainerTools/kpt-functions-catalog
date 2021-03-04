@@ -64,9 +64,7 @@ func (f *setNamespaceFunction) Config(fnConfig interface{}) error {
 		return err
 	}
 	// set default field specs
-	if len(f.plugin.FieldSpecs) == 0 {
-		f.plugin.FieldSpecs = tc.FieldSpecs
-	}
+	f.plugin.FieldSpecs = append(f.plugin.FieldSpecs, tc.FieldSpecs...)
 	return nil
 }
 
@@ -191,7 +189,17 @@ it's not. Currently this function is using API version 1.19.1.
 For more information about API schema used in this function, please take a look at
 https://github.com/kubernetes-sigs/kustomize/tree/master/kyaml/openapi
 
-Field spec has following fields:
+To support your own CRDs you will need to add more items to fieldSpecs list.
+
+In addition to simple updating the 'metadata/namespace' fields for resources, it's
+also possible that references to namespace names exist in some resources. In this
+case, these references will also need to be updated at the same time. In Kubernetes
+native resources, the references to namespace in 'subject' fields in 'RoleBinding'
+and 'ClusterRoleBinding' will be handled implicitly by this function. If you have
+references to namespaces in you CRDs, use the field spec described above to update
+them.
+
+Fieldspec has following fields:
 
 - group: Select the resources by API version group. Will select all groups
 	if omitted.
@@ -206,7 +214,7 @@ Field spec has following fields:
 
 Example:
 
-To add a namespace 'color' to Deployment resource only:
+To add a namespace 'color' to 'spec/selector/namespace' in 'MyCRD' resource:
 
 apiVersion: kpt.dev/v1beta1
 kind: SetNamespaceConfig
@@ -214,21 +222,13 @@ metadata:
   name: my-config
 namespace: color
 fieldSpecs:
-- path: metadata/namespace
-  kind: Deployment
+- path: spec/selector/namespace
+  kind: MyCRD
+  version: v1
+  group: example.com
   create: true
 
 For more information about fieldSpecs, please see 
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4
-
-To support your own CRDs you will need to add more items to fieldSpecs list.
-
-In addition to simple updating the 'metadata/namespace' fields for resources, it's
-also possible that references to namespace names exist in some resources. In this
-case, these references will also need to be updated at the same time. In Kubernetes
-native resources, the references to namespace in 'subject' fields in 'RoleBinding'
-and 'ClusterRoleBinding' will be handled implicitly by this function. If you have
-references to namespaces in you CRDs, use the field spec described above to update
-them.
 `
 }
