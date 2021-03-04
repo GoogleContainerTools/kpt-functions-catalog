@@ -1,0 +1,16 @@
+apiVersion: kpt.dev/v1beta1
+kind: SetAnnotationConfig
+metadata:
+  name: my-func-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/set-annotation:unstable
+    config.kubernetes.io/local-config: 'true'
+annotations: {}
+fieldSpecs:
+- kind: MyResource
+  group: dev.example.com
+  version: v1
+  create: true
+  path: spec/selector/annotations

@@ -1,0 +1,16 @@
+apiVersion: kpt.dev/v1beta1
+kind: SetLabelConfig
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/set-label:unstable
+    config.kubernetes.io/local-config: "true"
+fieldSpecs:
+- kind: MyResource
+  group: dev.example.com
+  version: v1
+  create: true
+  path: spec/selector/labels
+labels: {}

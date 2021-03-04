@@ -25,5 +25,3 @@ Check all resources have `metadata.namespace` set to `example-ns`:
 ```sh
 kpt cfg cat simple
 ```
-
-[those known to be cluster-scoped]: https://github.com/kubernetes-sigs/kustomize/blob/007a5327d7b553d9a8451749fb8b6c9d1de3e482/kyaml/yaml/types.go#L119
