@@ -1,0 +1,60 @@
+diff --git a/fn-config.yaml b/fn-config.yaml
+deleted file mode 100644
+index 6c6bd6e..0000000
+--- a/fn-config.yaml
++++ /dev/null
+@@ -1,16 +0,0 @@
+-apiVersion: kpt.dev/v1beta1
+-kind: SetNamespaceConfig
+-metadata:
+-  name: my-config
+-  annotations:
+-    config.k8s.io/function: |
+-      container:
+-        image: gcr.io/kpt-fn/set-namespace:unstable
+-    config.kubernetes.io/local-config: 'true'
+-namespace: test
+-fieldSpecs:
+-- group: dev.example.com
+-  version: v1
+-  kind: MyResource
+-  path: spec/selector/namespace
+-  create: true
+diff --git a/resources.yaml b/resources.yaml
+index afb745f..cbf534c 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,6 +2,7 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: the-map
++  namespace: test
+ data:
+   some-key: some-value
+ ---
+@@ -9,7 +10,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: the-service
+-  namespace: the-namespace
++  namespace: test
+ spec:
+   ports:
+   - name: etcd-server-ssl
+@@ -22,12 +23,13 @@ spec:
+ apiVersion: v1
+ kind: Namespace
+ metadata:
+-  name: old-name
++  name: test
+ ---
+ apiVersion: dev.example.com/v1
+ kind: MyResource
+ metadata:
+   name: the-service
+-  namespace: the-namespace
++  namespace: test
+ spec:
+-  selector: {}
++  selector:
++    namespace: test

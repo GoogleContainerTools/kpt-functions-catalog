@@ -4,18 +4,106 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
+)
+
+const (
+	fnConfigGroup      = "kpt.dev"
+	fnConfigVersion    = "v1beta1"
+	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
+	fnConfigKind       = "SetNamespaceConfig"
 )
 
 type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+}
+
+type setNamespaceFunction struct {
+	kyaml.ResourceMeta `json:",inline" yaml:",inline"`
+	plugin             `json:",inline" yaml:",inline"`
+}
+
+func (f *setNamespaceFunction) Config(fnConfig interface{}) error {
+	configMap, ok := fnConfig.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("function config %#v is not valid", fnConfig)
+	}
+	rn, err := kyaml.FromMap(configMap)
+	if err != nil {
+		return fmt.Errorf("failed to construct RNode from %#v: %w", configMap, err)
+	}
+	switch {
+	case f.validGVK(rn, "v1", "ConfigMap"):
+		f.plugin.Namespace = rn.GetDataMap()["namespace"]
+	case f.validGVK(rn, fnConfigAPIVersion, fnConfigKind):
+		// input config is a CRD
+		y, err := rn.String()
+		if err != nil {
+			return fmt.Errorf("cannot get YAML from RNode: %w", err)
+		}
+		err = yaml.Unmarshal([]byte(y), &f.plugin)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+		}
+	default:
+		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
+	}
+
+	if f.plugin.Namespace == "" {
+		return fmt.Errorf("input namespace cannot be empty")
+	}
+	tc, err := getDefaultConfig()
+	if err != nil {
+		return err
+	}
+	// set default field specs
+	f.plugin.FieldSpecs = append(f.plugin.FieldSpecs, tc.FieldSpecs...)
+	return nil
+}
+
+func (f *setNamespaceFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error) {
+	resmapFactory := newResMapFactory()
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(items)
+	if err != nil {
+		return nil, err
+	}
+	err = f.plugin.Transform(resMap)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run transformer: %w", err)
+	}
+	return resMap.ToRNodeSlice()
+}
+
+func (f *setNamespaceFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bool {
+	meta, err := rn.GetMeta()
+	if err != nil {
+		return false
+	}
+	if meta.APIVersion != apiVersion || meta.Kind != kind {
+		return false
+	}
+	return true
+}
+
+//nolint
+func getDefaultConfig() (transformerConfig, error) {
+	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["namespace"]
+	var defaultConfig transformerConfig
+	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
+	return defaultConfig, err
+}
+
+//nolint
+func newResMapFactory() *resmap.Factory {
+	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
+	return resmap.NewFactory(resourceFactory, nil)
 }
 
 //nolint
@@ -46,46 +134,15 @@ func main() {
 }
 
 func run(resourceList *framework.ResourceList) error {
-	var plugin *plugin = &KustomizePlugin
-	defaultConfig, err := getDefaultConfig()
+	var fn setNamespaceFunction
+	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to configure function: %w", err)
 	}
 
-	resmapFactory := newResMapFactory()
-	pluginHelpers := newPluginHelpers(resmapFactory)
-
-	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
+	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
-		return errors.Wrap(err, "failed to convert items to resource map")
-	}
-	dataField, err := getDataFromFunctionConfig(resourceList.FunctionConfig)
-	if err != nil {
-		return errors.Wrap(err, "failed to get data field from function config")
-	}
-	dataValue, err := yaml.Marshal(dataField)
-	if err != nil {
-		return errors.Wrap(err, "error when marshal data values")
-	}
-
-	err = plugin.Config(pluginHelpers, dataValue)
-	if err != nil {
-		return errors.Wrap(err, "failed to config plugin")
-	}
-	if plugin.Namespace == "" {
-		return fmt.Errorf("namespace in the input config cannot be empty")
-	}
-	if len(plugin.FieldSpecs) == 0 {
-		plugin.FieldSpecs = defaultConfig.FieldSpecs
-	}
-	err = plugin.Transform(resMap)
-	if err != nil {
-		return errors.Wrap(err, "failed to run transformer")
-	}
-
-	resourceList.Items, err = resMap.ToRNodeSlice()
-	if err != nil {
-		return errors.Wrap(err, "failed to convert resource map to items")
+		return fmt.Errorf("failed to run function: %w", err)
 	}
 	return nil
 }
@@ -93,15 +150,8 @@ func run(resourceList *framework.ResourceList) error {
 func usage() string {
 	return `Update or add namespace.
 
-Configured using a ConfigMap with the following keys:
-
-namespace: Name of the namespace that will be set.
-fieldSpecs: A list of specification to select the resources and fields that 
-the namespace will be applied to.
-
-Example:
-
-To add a namespace 'color' to all resources:
+To add a namespace 'color' to all resources, configure the function
+with a simple ConfigMap like this:
 
 apiVersion: v1
 kind: ConfigMap
@@ -109,6 +159,20 @@ metadata:
   name: my-config
 data:
   namespace: color
+
+There is another advanced way to configure the function by a custom
+resource which can provide more flexibility than using ConfigMap.
+
+Example:
+
+apiVersion: kpt.dev/v1beta1
+kind: SetNamespaceConfig
+metadata:
+  name: my-config
+namespace: color
+
+The values for 'apiVersion' and 'kind' must match the values in the
+example above.
 
 You can use key 'fieldSpecs' to specify the resource selector you
 want to use. By default, the function will use this field spec:
@@ -125,7 +189,17 @@ it's not. Currently this function is using API version 1.19.1.
 For more information about API schema used in this function, please take a look at
 https://github.com/kubernetes-sigs/kustomize/tree/master/kyaml/openapi
 
-Field spec has following fields:
+To support your own CRDs you will need to add more items to fieldSpecs list.
+
+In addition to simple updating the 'metadata/namespace' fields for resources, it's
+also possible that references to namespace names exist in some resources. In this
+case, these references will also need to be updated at the same time. In Kubernetes
+native resources, the references to namespace in 'subject' fields in 'RoleBinding'
+and 'ClusterRoleBinding' will be handled implicitly by this function. If you have
+references to namespaces in you CRDs, use the field spec described above to update
+them.
+
+Fieldspec has following fields:
 
 - group: Select the resources by API version group. Will select all groups
 	if omitted.
@@ -140,58 +214,21 @@ Field spec has following fields:
 
 Example:
 
-To add a namespace 'color' to Deployment resource only:
+To add a namespace 'color' to 'spec/selector/namespace' in 'MyCRD' resource:
 
-apiVersion: v1
-kind: ConfigMap
+apiVersion: kpt.dev/v1beta1
+kind: SetNamespaceConfig
 metadata:
   name: my-config
-data:
-  namespace: color
-  fieldSpecs:
-    - path: metadata/namespace
-      kind: Deployment
-      create: true
+namespace: color
+fieldSpecs:
+- path: spec/selector/namespace
+  kind: MyCRD
+  version: v1
+  group: example.com
+  create: true
 
 For more information about fieldSpecs, please see 
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4
-
-To support your own CRDs you will need to add more items to fieldSpecs list.
-
-In addition to simple updating the 'metadata/namespace' fields for resources, it's
-also possible that references to namespace names exist in some resources. In this
-case, these references will also need to be updated at the same time. In Kubernetes
-native resources, the references to namespace in 'subject' fields in 'RoleBinding'
-and 'ClusterRoleBinding' will be handled implicitly by this function. If you have
-references to namespaces in you CRDs, use the field spec described above to update
-them.
 `
-}
-
-//nolint
-func getDefaultConfig() (transformerConfig, error) {
-	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["namespace"]
-	var defaultConfig transformerConfig
-	err := yaml.Unmarshal([]byte(defaultConfigString), &defaultConfig)
-	return defaultConfig, err
-}
-
-//nolint
-func newPluginHelpers(resmapFactory *resmap.Factory) *resmap.PluginHelpers {
-	return resmap.NewPluginHelpers(nil, nil, resmapFactory)
-}
-
-//nolint
-func newResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
-	return resmap.NewFactory(resourceFactory, nil)
-}
-
-//nolint
-func getDataFromFunctionConfig(fc interface{}) (interface{}, error) {
-	f, ok := fc.(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("function config %#v is not valid", fc)
-	}
-	return f["data"], nil
 }
