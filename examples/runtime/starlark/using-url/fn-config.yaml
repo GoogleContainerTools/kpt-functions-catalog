@@ -1,0 +1,13 @@
+apiVersion: kpt.dev/v1beta1
+kind: StarlarkFunction
+metadata:
+  name: my-star-fn
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/starlark:unstable
+        network: true
+source:
+  url: https://raw.githubusercontent.com/mengqiy/starlark-function-test/main/helloworld.star
+keyValues:
+  foo: baz

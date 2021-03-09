@@ -1,0 +1,45 @@
+diff --git a/fn-config.yaml b/fn-config.yaml
+deleted file mode 100644
+index 97bd39e..0000000
+--- a/fn-config.yaml
++++ /dev/null
+@@ -1,20 +0,0 @@
+-apiVersion: kpt.dev/v1beta1
+-kind: StarlarkFunction
+-metadata:
+-  name: my-star-fn
+-  annotations:
+-    config.k8s.io/function: |
+-      container:
+-        image: gcr.io/kpt-fn/starlark:unstable
+-source:
+-  inline: |
+-    # set the namespace on each resource
+-    def run(r, ns_value):
+-      for resource in r:
+-        # mutate the resource
+-        resource["metadata"]["namespace"] = ns_value
+-    # get the value to add
+-    ns_value = ctx.resource_list["functionConfig"]["keyValues"]["foo"]
+-    run(ctx.resource_list["items"], ns_value)
+-keyValues:
+-  foo: baz
+diff --git a/resources.yaml b/resources.yaml
+index 280e700..9c20805 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,6 +2,7 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: my-cm
++  namespace: baz
+ data:
+   some-key: some-value
+ ---
+@@ -9,5 +10,6 @@ apiVersion: foo.com/v1
+ kind: Bar
+ metadata:
+   name: my-bar
++  namespace: baz
+ spec:
+   featureA: true

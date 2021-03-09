@@ -1,0 +1,20 @@
+apiVersion: kpt.dev/v1beta1
+kind: StarlarkFunction
+metadata:
+  name: my-star-fn
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/starlark:unstable
+source:
+  inline: |
+    # set the namespace on each resource
+    def run(r, ns_value):
+      for resource in r:
+        # mutate the resource
+        resource["metadata"]["namespace"] = ns_value
+    # get the value to add
+    ns_value = ctx.resource_list["functionConfig"]["keyValues"]["foo"]
+    run(ctx.resource_list["items"], ns_value)
+keyValues:
+  foo: baz
