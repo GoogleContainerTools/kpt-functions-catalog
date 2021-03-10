@@ -1,0 +1,4 @@
+name: starlark
+items:
+- message: source must not be empty
+  severity: error

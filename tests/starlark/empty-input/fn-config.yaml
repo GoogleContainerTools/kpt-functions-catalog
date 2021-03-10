@@ -1,4 +1,4 @@
-apiVersion: kpt.dev/v1beta1
+apiVersion: fn.kpt.dev/v1beta1
 kind: StarlarkFunction
 metadata:
   name: my-star-fn
@@ -6,7 +6,4 @@ metadata:
     config.k8s.io/function: |
       container:
         image: gcr.io/kpt-fn/starlark:unstable
-source:
-  path: /starlark/helloworld.star
-keyValues:
-  foo: baz
+source: ""

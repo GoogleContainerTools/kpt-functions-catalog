@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	fnConfigGroup      = "kpt.dev"
+	fnConfigGroup      = "fn.kpt.dev"
 	fnConfigVersion    = "v1beta1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
 	fnConfigKind       = "StarlarkFunction"
@@ -18,20 +18,10 @@ const (
 
 type StarlarkFunction struct {
 	yaml.ResourceMeta `json:",inline" yaml:",inline"`
-	// Source is a required field for providing a starlark script.
-	Source Source `json:"source" yaml:"source"`
+	// Source is a required field for providing a starlark script inline.
+	Source string `json:"source" yaml:"source"`
 	// KeyValues is a convenient way to pass in arbitrary key value pairs.
-	KeyValues map[string]string `json:"keyValues,omitempty" yaml:"keyValues,omitempty"`
-}
-
-// Source contains an untagged union, only one field can be set.
-type Source struct {
-	// Inline is a starlark script in string format.
-	Inline string `json:"inline,omitempty" yaml:"inline,omitempty"`
-	// Path is the path to a starlark script.
-	Path string `json:"path,omitempty" yaml:"path,omitempty"`
-	// URL is the url of a remote starlark script.
-	URL string `json:"url,omitempty" yaml:"url,omitempty"`
+	Data map[string]string `json:"data,omitempty" yaml:"data,omitempty"`
 }
 
 func (sf *StarlarkFunction) Validate() error {
@@ -46,10 +36,8 @@ func (sf *StarlarkFunction) Validate() error {
 		return fmt.Errorf("name is required in starlark function config")
 	}
 
-	if (sf.Source.Inline != "" && sf.Source.Path != "") ||
-		(sf.Source.Path != "" && sf.Source.URL != "") ||
-		(sf.Source.Inline != "" && sf.Source.URL != "") {
-		return fmt.Errorf("only one of inline, path and url can be set")
+	if sf.Source == "" {
+		return fmt.Errorf("source must not be empty")
 	}
 	return nil
 }
@@ -67,9 +55,7 @@ func (sf *StarlarkFunction) Transform(rl *framework.ResourceList) error {
 
 	starFltr := &starlark.Filter{
 		Name:    sf.Name,
-		Program: sf.Source.Inline,
-		Path:    sf.Source.Path,
-		URL:     sf.Source.URL,
+		Program: sf.Source,
 		FunctionFilter: runtimeutil.FunctionFilter{
 			FunctionConfig: fc,
 		},

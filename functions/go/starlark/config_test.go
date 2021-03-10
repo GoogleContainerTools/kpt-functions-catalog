@@ -12,60 +12,36 @@ func TestStarlarkFunctionConfig(t *testing.T) {
 		expectErrMsg string
 	}{
 		{
-			config: `apiVersion: kpt.dev/v1beta1
+			config: `apiVersion: fn.kpt.dev/v1beta1
 kind: StarlarkFunction
 metadata:
   name: my-star-fn
   namespace: foo
-  labels:
-    foo: bar
-source:
-  path: path/to/starlark/script
+source: |
+  def run(r, ns_value):
+    for resource in r:
+      resource["metadata"]["namespace"] = ns_value
+  run(ctx.resource_list["items"], "baz")
 `,
 		},
 		{
-			config: `apiVersion: kpt.dev/v1beta1
+			config: `apiVersion: fn.kpt.dev/v1beta1
 kind: StarlarkFunction
-source:
-  path: path/to/starlark/script
+source: |
+  def run(r, ns_value):
+    for resource in r:
+      resource["metadata"]["namespace"] = ns_value
+  run(ctx.resource_list["items"], "baz")
 `,
 			expectErrMsg: "name is required in starlark function config",
 		},
 		{
-			config: `apiVersion: kpt.dev/v1beta1
+			config: `apiVersion: fn.kpt.dev/v1beta1
 kind: StarlarkFunction
 metadata:
   name: my-star-fn
-source:
-  path: path/to/starlark/script
-  url: https://example.com/foo.star
 `,
-			expectErrMsg: "only one of inline, path and url can be set",
-		},
-		{
-			config: `apiVersion: kpt.dev/v1beta1
-kind: StarlarkFunction
-metadata:
-  name: my-star-fn
-source:
-  inline: |
-    for resource in ctx.resource_list["items"]:
-      resource["metadata"]["namespace"] = "helloworld"
-  url: https://example.com/foo.star`,
-			expectErrMsg: "only one of inline, path and url can be set",
-		},
-		{
-			config: `apiVersion: kpt.dev/v1beta1
-kind: StarlarkFunction
-metadata:
-  name: my-star-fn
-source:
-  inline: |
-    for resource in ctx.resource_list["items"]:
-      resource["metadata"]["namespace"] = "helloworld"
-  path: path/to/starlark/script
-`,
-			expectErrMsg: "only one of inline, path and url can be set",
+			expectErrMsg: "source must not be empty",
 		},
 	}
 	for _, tc := range testcases {
