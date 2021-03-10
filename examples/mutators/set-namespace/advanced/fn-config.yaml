@@ -7,7 +7,7 @@ metadata:
       container:
         image: gcr.io/kpt-fn/set-namespace:unstable
     config.kubernetes.io/local-config: 'true'
-namespace: test
+namespace: example-ns
 fieldSpecs:
 - group: dev.example.com
   version: v1

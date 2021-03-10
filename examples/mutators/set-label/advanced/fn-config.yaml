@@ -14,4 +14,5 @@ fieldSpecs:
   create: true
   path: spec/selector/labels
 labels:
+  color: orange
   fruit: apple
