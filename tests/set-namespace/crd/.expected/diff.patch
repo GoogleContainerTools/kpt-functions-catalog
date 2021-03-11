@@ -1,10 +1,10 @@
 diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
-index 140286c..0000000
+index 310dea9..0000000
 --- a/fn-config.yaml
 +++ /dev/null
 @@ -1,15 +0,0 @@
--apiVersion: kpt.dev/v1beta1
+-apiVersion: fn.kpt.dev/v1alpha1
 -kind: SetNamespaceConfig
 -metadata:
 -  name: my-config

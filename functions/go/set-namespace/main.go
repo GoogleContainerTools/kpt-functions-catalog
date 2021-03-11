@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	fnConfigGroup      = "kpt.dev"
-	fnConfigVersion    = "v1beta1"
+	fnConfigGroup      = "fn.kpt.dev"
+	fnConfigVersion    = "v1alpha1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
 	fnConfigKind       = "SetNamespaceConfig"
 )
@@ -165,7 +165,7 @@ resource which can provide more flexibility than using ConfigMap.
 
 Example:
 
-apiVersion: kpt.dev/v1beta1
+apiVersion: fn.kpt.dev/v1alpha1
 kind: SetNamespaceConfig
 metadata:
   name: my-config
@@ -216,7 +216,7 @@ Example:
 
 To add a namespace 'color' to 'spec/selector/namespace' in 'MyCRD' resource:
 
-apiVersion: kpt.dev/v1beta1
+apiVersion: fn.kpt.dev/v1alpha1
 kind: SetNamespaceConfig
 metadata:
   name: my-config

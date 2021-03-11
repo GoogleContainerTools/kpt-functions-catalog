@@ -1,10 +1,10 @@
 diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
-index 1f0f220..0000000
+index c64ef92..0000000
 --- a/fn-config.yaml
 +++ /dev/null
 @@ -1,17 +0,0 @@
--apiVersion: kpt.dev/v1beta1
+-apiVersion: fn.kpt.dev/v1alpha1
 -kind: SetLabelConfig
 -metadata:
 -  name: my-config
