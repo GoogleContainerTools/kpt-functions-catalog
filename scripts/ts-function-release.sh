@@ -55,10 +55,7 @@ case "$2" in
         cd "${scripts_dir}/../functions/ts/${CURRENT_FUNCTION}"
 esac
 
-# This make it work for npm 6.*.*
 # https://github.com/GoogleContainerTools/kpt/issues/1394
-sed -i.bak "s|gcr.io/kpt-functions|${GCR_REGISTRY}|g" package.json
-
 # This make it work for npm 7.0.0+
 export npm_package_kpt_docker_repo_base="${GCR_REGISTRY}"
 
@@ -80,6 +77,3 @@ case "$1" in
     echo "Usage: $0 {build|push}"
     exit 1
 esac
-
-# Change it back
-sed -i.bak "s|${GCR_REGISTRY}|gcr.io/kpt-functions|g" package.json
