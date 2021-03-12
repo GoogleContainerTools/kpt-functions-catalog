@@ -11,15 +11,15 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: SetLabelConfig
 metadata:
   ...
+labels:
+  color: orange
+  fruit: apple
 fieldSpecs:
   - kind: MyResource
     group: dev.example.com
     version: v1
     create: true
     path: spec/selector/labels
-labels:
-  color: orange
-  fruit: apple
 ```
 
 The desired labels is provided using `labels` field. We have a CRD with group
