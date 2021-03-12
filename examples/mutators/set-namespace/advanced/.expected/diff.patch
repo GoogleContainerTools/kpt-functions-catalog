@@ -1,6 +1,6 @@
 diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
-index 73f10f4..0000000
+index 9bb4cbf..0000000
 --- a/fn-config.yaml
 +++ /dev/null
 @@ -1,16 +0,0 @@
@@ -13,7 +13,7 @@ index 73f10f4..0000000
 -      container:
 -        image: gcr.io/kpt-fn/set-namespace:unstable
 -    config.kubernetes.io/local-config: 'true'
--namespace: test
+-namespace: example-ns
 -fieldSpecs:
 -- group: dev.example.com
 -  version: v1
@@ -21,14 +21,14 @@ index 73f10f4..0000000
 -  path: spec/selector/namespace
 -  create: true
 diff --git a/resources.yaml b/resources.yaml
-index afb745f..cbf534c 100644
+index afb745f..5b81bdf 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -2,6 +2,7 @@ apiVersion: v1
  kind: ConfigMap
  metadata:
    name: the-map
-+  namespace: test
++  namespace: example-ns
  data:
    some-key: some-value
  ---
@@ -37,7 +37,7 @@ index afb745f..cbf534c 100644
  metadata:
    name: the-service
 -  namespace: the-namespace
-+  namespace: test
++  namespace: example-ns
  spec:
    ports:
    - name: etcd-server-ssl
@@ -46,15 +46,15 @@ index afb745f..cbf534c 100644
  kind: Namespace
  metadata:
 -  name: old-name
-+  name: test
++  name: example-ns
  ---
  apiVersion: dev.example.com/v1
  kind: MyResource
  metadata:
    name: the-service
 -  namespace: the-namespace
-+  namespace: test
++  namespace: example-ns
  spec:
 -  selector: {}
 +  selector:
-+    namespace: test
++    namespace: example-ns
