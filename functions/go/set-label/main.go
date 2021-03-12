@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	fnConfigGroup      = "kpt.dev"
-	fnConfigVersion    = "v1beta1"
+	fnConfigGroup      = "fn.kpt.dev"
+	fnConfigVersion    = "v1alpha1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
 	fnConfigKind       = "SetLabelConfig"
 )
@@ -183,7 +183,7 @@ Example:
 
 To add a label 'color: orange' to path 'data/selector' in MyOwnKind resource:
 
-apiVersion: kpt.dev/v1beta1
+apiVersion: fn.kpt.dev/v1alpha1
 kind: SetLabelConfig
 metadata:
   name: my-config
