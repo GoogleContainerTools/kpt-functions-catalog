@@ -1,17 +1,12 @@
-# Set Namespace Advanced Example
+# set-namespace: Advanced Example
 
 The `set-namespace` function adds or replaces the `.metadata.namespace` field on
 all resources except for those known to be cluster-scoped.
 
-In this example, we use `SetNamespaceConfig` to configure the function. The
-desired namespace is provided using `.data.namespace` field.
-
-We also specify `fieldSpecs` for our CRD with group as `dev.example.com`,
-version as `v1` and kind as `MyResource`. The namespace will also be added to
-`.spec.selector.namespace`.
+We use the following `SetNamespaceConfig` to configure the function.
 
 ```yaml
-apiVersion: kpt.dev/v1beta1
+apiVersion: fn.kpt.dev/v1alpha1
 kind: SetNamespaceConfig
 metadata:
   ...
@@ -23,6 +18,11 @@ fieldSpecs:
     path: spec/selector/namespace
     create: true
 ```
+
+The desired namespace is provided using `.data.namespace` field. We have a CRD
+with group `dev.example.com`, version `v1` and kind `MyResource`. We want the
+namespace to be set in field `.spec.selector.annotations` as well. We specify it
+in field `fieldSpecs`.
 
 ## Function invocation
 

@@ -1,11 +1,10 @@
-# Set Label Simple Example
+# set-label: Simple Example
 
 The `set-label` function adds or updates labels in the `.metadata.labels` field
 and other fields that has the same meaning as a label on all resources. You can
 find more details about these fields in the help text of the function.
 
-In this example, we use ConfigMap to configure the function. The desired
-labels are provided as key-value pairs using `data` field.
+We use the following ConfigMap to configure the function.
 
 ```yaml
 apiVersion: v1
@@ -16,6 +15,8 @@ data:
   color: orange
   fruit: apple
 ```
+
+The desired labels are provided as key-value pairs using `data` field.
 
 ## Function invocation
 

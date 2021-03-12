@@ -1,10 +1,9 @@
-# Set Namespace Simple Example
+# set-namespace: Simple Example
 
 The `set-namespace` function adds or replaces the `.metadata.namespace` field on
 all resources except for those known to be cluster-scoped.
 
-In this example, we use ConfigMap to configure the function. The desired
-namespace is provided using `.data.namespace` field.
+We use the following ConfigMap to configure the function.
 
 ```yaml
 apiVersion: v1
@@ -14,6 +13,8 @@ metadata:
 data:
   namespace: example-ns
 ```
+
+The desired namespace is provided using `.data.namespace` field.
 
 ## Function invocation
 

@@ -1,18 +1,13 @@
-# Set Label Advanced Example
+# set-label: Advanced Example
 
 The `set-label` function adds or updates labels in the `.metadata.labels` field
 and other fields that has the same meaning as a label on all resources. You can
 find more details about these fields in the help text of the function.
 
-In this example, we use SetLabelConfig to configure the function. The desired
-labels is provided using `labels` field.
-
-We also specify `fieldSpecs` for our CRD with group as `dev.example.com`,
-version as `v1` and kind as `MyResource`. The labels will also be added to
-`.spec.selector.labels`.
+We use the following `SetLabelConfig` to configure the function.
 
 ```yaml
-apiVersion: kpt.dev/v1beta1
+apiVersion: fn.kpt.dev/v1alpha1
 kind: SetLabelConfig
 metadata:
   ...
@@ -26,6 +21,11 @@ labels:
   color: orange
   fruit: apple
 ```
+
+The desired labels is provided using `labels` field. We have a CRD with group
+`dev.example.com`, version `v1` and kind `MyResource`. We want the labels to be
+added to field `.spec.selector.labels` as well. We specify it in field
+`fieldSpecs`.
 
 ## Function invocation
 

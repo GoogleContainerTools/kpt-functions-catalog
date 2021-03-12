@@ -1,9 +1,8 @@
-# Set Annotation Simple Example
+# set-annotation: Simple Example
 
 The `set-annotation` function adds annotations to KRM resources.
 
-In this example, we use ConfigMap to configure the function. The desired
-annotations are provided as key-value pairs using `data` field.
+We use the following ConfigMap to configure the function.
 
 ```yaml
 apiVersion: v1
@@ -11,9 +10,11 @@ kind: ConfigMap
 metadata:
   ...
 data:
-  configmanagement.gke.io/namespace-selector: sre-supported
+  color: orange
   fruit: apple
 ```
+
+The desired annotations are provided as key-value pairs using `data` field.
 
 ## Function invocation
 
