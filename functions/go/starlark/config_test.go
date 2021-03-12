@@ -33,7 +33,7 @@ source: |
       resource["metadata"]["namespace"] = ns_value
   run(ctx.resource_list["items"], "baz")
 `,
-			expectErrMsg: "name is required in starlark function config",
+			expectErrMsg: "`metadata.name` must be set in starlark function config",
 		},
 		{
 			config: `apiVersion: fn.kpt.dev/v1beta1
@@ -41,7 +41,7 @@ kind: StarlarkFunction
 metadata:
   name: my-star-fn
 `,
-			expectErrMsg: "source must not be empty",
+			expectErrMsg: "`source` must not be empty",
 		},
 	}
 	for _, tc := range testcases {

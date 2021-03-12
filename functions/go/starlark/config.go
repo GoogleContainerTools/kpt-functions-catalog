@@ -26,18 +26,18 @@ type StarlarkFunction struct {
 
 func (sf *StarlarkFunction) Validate() error {
 	if sf.APIVersion != fnConfigAPIVersion {
-		return fmt.Errorf("apiVersion is expected to be: %v", fnConfigAPIVersion)
+		return fmt.Errorf("`apiVersion` must be: %v", fnConfigAPIVersion)
 	}
 	if sf.Kind != fnConfigKind {
-		return fmt.Errorf("kind is expected to be: %v", fnConfigKind)
+		return fmt.Errorf("`kind` must be: %v", fnConfigKind)
 	}
 
 	if sf.ObjectMeta.Name == "" {
-		return fmt.Errorf("name is required in starlark function config")
+		return fmt.Errorf("`metadata.name` must be set in starlark function config")
 	}
 
 	if sf.Source == "" {
-		return fmt.Errorf("source must not be empty")
+		return fmt.Errorf("`source` must not be empty")
 	}
 	return nil
 }
