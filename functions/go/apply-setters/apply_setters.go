@@ -45,10 +45,23 @@ func (as ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 // checks if the value node is of sequence node type
 // if yes to both, resolves the setter value for the setter name in the line comment
 // replaces the existing sequence node with the new values provided by user
+
+/*
+e.g. for input of Mapping node
+environments: # kpt-set: ${env}
+- dev
+- stage
+
+and for input ApplySetters [name: env, value: "[stage, prod]"]
+
+The yaml node is transformed to
+environments: # kpt-set: ${env}
+- stage
+- prod
+*/
 func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
 	return object.VisitFields(func(node *yaml.MapNode) error {
-		if node == nil || node.Key == nil || node.Key.YNode() == nil ||
-			node.Value == nil || node.Value.YNode() == nil {
+		if node.IsNilOrEmpty() {
 			return nil
 		}
 		// the aim of this method is to apply-setter for sequence nodes
@@ -98,10 +111,29 @@ func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
 // checks if the line comment of input scalar node has prefix SetterCommentIdentifier
 // resolves the setter values for the setter name in the comment
 // replaces the existing value of the scalar node with the new value
+
+/*
+e.g.for input of scalar node '1 # kpt-set: ${replicas}' in the yaml node
+apiVersion: v1
+...
+  replicas: 1 # kpt-set: ${replicas}
+and for input ApplySetters [name: replicas, value: 2]
+
+The yaml node is transformed to
+apiVersion: v1
+...
+  replicas: 2 # kpt-set: ${replicas}
+*/
 func (as *ApplySetters) visitScalar(object *yaml.RNode) error {
-	if object == nil || object.YNode() == nil {
+	if object.IsNilOrEmpty() {
 		return nil
 	}
+
+	if object.YNode().Kind != yaml.ScalarNode {
+		// return if it is not a scalar node
+		return nil
+	}
+
 	// perform a direct set of the field if it matches
 	setterPattern := extractSetterPattern(object)
 	if setterPattern == "" {

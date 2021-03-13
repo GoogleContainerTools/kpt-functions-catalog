@@ -35,21 +35,41 @@ func main() {
 func usage() string {
 	return `Apply setter values to resource fields with setter references.
 
-Configured using a ConfigMap with key-value pairs in 'data' field in
-'ConfigMap' resource. Example:
-
 Example:
 
-To apply a setter 'project_id: my-project' to all resources:
+Here is an example resource config to start with
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 1 # kpt-set: ${replicas}
+
+Use ConfigMap to configure the 'apply-setters' function. The desired setter values 
+are provided as key-value pairs using data field where key is the name of the 
+setter(as seen in the reference comments) and value is the new desired value for 
+the tagged field
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: my-config
 data:
-  projectId: my-project
+  replicas: '3'
 
-Values to array setters must be sequence nodes wrapped into strings
+Invoking apply-setters function would apply the changes to resource configs
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 3 # kpt-set: ${replicas}
+
+
+Values to array setters must be array nodes wrapped into strings. Here is the
+example config to apply array setters.
 
 apiVersion: v1
 kind: ConfigMap

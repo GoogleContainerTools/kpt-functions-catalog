@@ -26,7 +26,7 @@ func acceptImpl(v visitor, object *yaml.RNode) error {
 	switch object.YNode().Kind {
 	case yaml.DocumentNode:
 		// Traverse the child of the document
-		return accept(v, yaml.NewRNode(object.YNode()))
+		return accept(v, object)
 	case yaml.MappingNode:
 		if err := v.visitMapping(object); err != nil {
 			return err
