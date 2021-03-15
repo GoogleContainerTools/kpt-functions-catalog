@@ -30,7 +30,7 @@ specify it in field `fieldSpecs`.
 Get the example config and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/mutators/set-annotation/advanced .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/mutators/set-annotation/advanced@go/set-annotation/v0.1.0 .
 kpt fn run advanced
 ```
 
