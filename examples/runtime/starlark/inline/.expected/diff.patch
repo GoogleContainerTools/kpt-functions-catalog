@@ -1,13 +1,13 @@
 diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
-index c7aebd3..0000000
+index 09d24f0..0000000
 --- a/fn-config.yaml
 +++ /dev/null
-@@ -1,19 +0,0 @@
--apiVersion: fn.kpt.dev/v1beta1
--kind: StarlarkFunction
+@@ -1,15 +0,0 @@
+-apiVersion: fn.kpt.dev/v1alpha1
+-kind: StarlarkRun
 -metadata:
--  name: my-star-fn
+-  name: set-namespace-to-prod
 -  annotations:
 -    config.k8s.io/function: |
 -      container:
@@ -18,20 +18,16 @@ index c7aebd3..0000000
 -    for resource in r:
 -      # mutate the resource
 -      resource["metadata"]["namespace"] = ns_value
--  # get the value to add
--  ns_value = ctx.resource_list["functionConfig"]["data"]["foo"]
--  run(ctx.resource_list["items"], ns_value)
--data:
--  foo: baz
+-  run(ctx.resource_list["items"], "prod")
 diff --git a/resources.yaml b/resources.yaml
-index 280e700..9c20805 100644
+index 280e700..42255a0 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -2,6 +2,7 @@ apiVersion: v1
  kind: ConfigMap
  metadata:
    name: my-cm
-+  namespace: baz
++  namespace: prod
  data:
    some-key: some-value
  ---
@@ -39,6 +35,6 @@ index 280e700..9c20805 100644
  kind: Bar
  metadata:
    name: my-bar
-+  namespace: baz
++  namespace: prod
  spec:
    featureA: true

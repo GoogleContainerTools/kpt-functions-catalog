@@ -11,20 +11,18 @@ import (
 
 const (
 	fnConfigGroup      = "fn.kpt.dev"
-	fnConfigVersion    = "v1beta1"
+	fnConfigVersion    = "v1alpha1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
-	fnConfigKind       = "StarlarkFunction"
+	fnConfigKind       = "StarlarkRun"
 )
 
-type StarlarkFunction struct {
+type StarlarkRun struct {
 	yaml.ResourceMeta `json:",inline" yaml:",inline"`
 	// Source is a required field for providing a starlark script inline.
 	Source string `json:"source" yaml:"source"`
-	// KeyValues is a convenient way to pass in arbitrary key value pairs.
-	Data map[string]string `json:"data,omitempty" yaml:"data,omitempty"`
 }
 
-func (sf *StarlarkFunction) Validate() error {
+func (sf *StarlarkRun) Validate() error {
 	if sf.APIVersion != fnConfigAPIVersion {
 		return fmt.Errorf("`apiVersion` must be: %v", fnConfigAPIVersion)
 	}
@@ -42,7 +40,7 @@ func (sf *StarlarkFunction) Validate() error {
 	return nil
 }
 
-func (sf *StarlarkFunction) Transform(rl *framework.ResourceList) error {
+func (sf *StarlarkRun) Transform(rl *framework.ResourceList) error {
 	err := sf.filterStarlarkFunctionKind(rl)
 	if err != nil {
 		return err
@@ -64,7 +62,7 @@ func (sf *StarlarkFunction) Transform(rl *framework.ResourceList) error {
 	return err
 }
 
-func (sf *StarlarkFunction) filterStarlarkFunctionKind(rl *framework.ResourceList) error {
+func (sf *StarlarkRun) filterStarlarkFunctionKind(rl *framework.ResourceList) error {
 	var updated []*yaml.RNode
 	for i, item := range rl.Items {
 		rm, err := item.GetMeta()
@@ -80,7 +78,7 @@ func (sf *StarlarkFunction) filterStarlarkFunctionKind(rl *framework.ResourceLis
 	return nil
 }
 
-func (sf *StarlarkFunction) toRNode() (*yaml.RNode, error) {
+func (sf *StarlarkRun) toRNode() (*yaml.RNode, error) {
 	y, err := yaml.Marshal(sf)
 	if err != nil {
 		return nil, err

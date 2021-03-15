@@ -1,7 +1,7 @@
-apiVersion: fn.kpt.dev/v1beta1
-kind: StarlarkFunction
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
 metadata:
-  name: my-star-fn
+  name: set-namespace-to-prod
   annotations:
     config.k8s.io/function: |
       container:
@@ -12,8 +12,4 @@ source: |
     for resource in r:
       # mutate the resource
       resource["metadata"]["namespace"] = ns_value
-  # get the value to add
-  ns_value = ctx.resource_list["functionConfig"]["data"]["foo"]
-  run(ctx.resource_list["items"], ns_value)
-data:
-  foo: baz
+  run(ctx.resource_list["items"], "prod")

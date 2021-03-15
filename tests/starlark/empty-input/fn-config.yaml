@@ -1,5 +1,5 @@
-apiVersion: fn.kpt.dev/v1beta1
-kind: StarlarkFunction
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
 metadata:
   name: my-star-fn
   annotations:

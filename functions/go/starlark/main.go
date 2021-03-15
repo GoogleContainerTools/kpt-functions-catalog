@@ -11,8 +11,8 @@ const (
 
 You can specify your starlark script inline under field source like this:
 
-apiVersion: fn.kpt.dev/v1beta1
-kind: StarlarkFunction
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
 metadata:
   name: my-star-fn
 source: |
@@ -33,7 +33,7 @@ in the starlark script like above.
 )
 
 func main() {
-	sf := &StarlarkFunction{}
+	sf := &StarlarkRun{}
 	resourceList := &framework.ResourceList{
 		FunctionConfig: sf,
 	}

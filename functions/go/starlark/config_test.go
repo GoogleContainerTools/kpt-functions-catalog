@@ -12,8 +12,8 @@ func TestStarlarkFunctionConfig(t *testing.T) {
 		expectErrMsg string
 	}{
 		{
-			config: `apiVersion: fn.kpt.dev/v1beta1
-kind: StarlarkFunction
+			config: `apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
 metadata:
   name: my-star-fn
   namespace: foo
@@ -25,8 +25,8 @@ source: |
 `,
 		},
 		{
-			config: `apiVersion: fn.kpt.dev/v1beta1
-kind: StarlarkFunction
+			config: `apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
 source: |
   def run(r, ns_value):
     for resource in r:
@@ -36,8 +36,8 @@ source: |
 			expectErrMsg: "`metadata.name` must be set in starlark function config",
 		},
 		{
-			config: `apiVersion: fn.kpt.dev/v1beta1
-kind: StarlarkFunction
+			config: `apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
 metadata:
   name: my-star-fn
 `,
@@ -45,7 +45,7 @@ metadata:
 		},
 	}
 	for _, tc := range testcases {
-		var sf StarlarkFunction
+		var sf StarlarkRun
 		if err := yaml.Unmarshal([]byte(tc.config), &sf); err != nil {
 			t.Errorf("unexpcted error: %v", err)
 			continue

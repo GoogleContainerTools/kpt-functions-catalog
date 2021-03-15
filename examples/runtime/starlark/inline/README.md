@@ -1,13 +1,15 @@
-# Starlark Inline Example
+# starlark: Inline Example
 
-In this example, we are going to demonstrate how to execute a starlark script
-in starlark function against the input KRM resources to update or validate them.
+## Overview
 
-The starlark script is provided inline in the function configuration like below:
+In this example, we are going to demonstrate how to use the starlark function
+with an inline starlark script as function configuration.
+
+We are going to use the following function configuration:
 
 ```
-apiVersion: fn.kpt.dev/v1beta1
-kind: StarlarkFunction
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
 metadata:
   ...
 source: |
@@ -16,14 +18,12 @@ source: |
     for resource in r:
       # mutate the resource
       resource["metadata"]["namespace"] = ns_value
-  # get the value to add
-  ns_value = ctx.resource_list["functionConfig"]["data"]["foo"]
-  run(ctx.resource_list["items"], ns_value)
-data:
-  foo: baz
+  run(ctx.resource_list["items"], "prod")
 ```
 
-This script updates namespace for all resources.
+The starlark script is embedded in the `source` field. This script read the
+input KRM resources from `ctx.resource_list` and sets the `.metadata.namespace`
+to `prod` for all resources.
 
 ## Function invocation
 
@@ -36,7 +36,7 @@ kpt fn run inline
 
 ## Expected result
 
-Check the `.metadata.namespace` field has been set to `baz` for every resource.
+Check the `.metadata.namespace` field has been set to `prod` for every resource.
 
 ```sh
 kpt cfg cat inline
