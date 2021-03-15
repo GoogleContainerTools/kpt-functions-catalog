@@ -40,24 +40,25 @@ func (as ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	return nodes, nil
 }
 
-// visitMapping takes input mapping node, and performs following steps
-// checks if the key node of the input mapping node has line comment with SetterCommentIdentifier
-// checks if the value node is of sequence node type
-// if yes to both, resolves the setter value for the setter name in the line comment
-// replaces the existing sequence node with the new values provided by user
-
 /*
+visitMapping takes input mapping node, and performs following steps
+checks if the key node of the input mapping node has line comment with SetterCommentIdentifier
+checks if the value node is of sequence node type
+if yes to both, resolves the setter value for the setter name in the line comment
+replaces the existing sequence node with the new values provided by user
+
 e.g. for input of Mapping node
+
 environments: # kpt-set: ${env}
 - dev
 - stage
 
-and for input ApplySetters [name: env, value: "[stage, prod]"]
+For input ApplySetters [name: env, value: "[stage, prod]"], qthe yaml node is transformed to
 
-The yaml node is transformed to
 environments: # kpt-set: ${env}
 - stage
 - prod
+
 */
 func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
 	return object.VisitFields(func(node *yaml.MapNode) error {
@@ -84,7 +85,7 @@ func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
 		// since this setter pattern is found on sequence node, make sure that it is
 		// not interpolation of setters, it should be simple setter e.g. ${environments}
 		if !validArraySetterPattern(setterPattern) {
-			return errors.Errorf("setter interpolation is not allowed for arrays: %q", setterPattern)
+			return errors.Errorf("invalid setter pattern for array node: %q", setterPattern)
 		}
 
 		// get the setter value for the setter name in the comment
@@ -107,22 +108,25 @@ func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
 	})
 }
 
-// visitScalar accepts the input scalar node and performs following steps,
-// checks if the line comment of input scalar node has prefix SetterCommentIdentifier
-// resolves the setter values for the setter name in the comment
-// replaces the existing value of the scalar node with the new value
-
 /*
-e.g.for input of scalar node '1 # kpt-set: ${replicas}' in the yaml node
-apiVersion: v1
-...
-  replicas: 1 # kpt-set: ${replicas}
-and for input ApplySetters [name: replicas, value: 2]
+visitScalar accepts the input scalar node and performs following steps,
+checks if the line comment of input scalar node has prefix SetterCommentIdentifier
+resolves the setter values for the setter name in the comment
+replaces the existing value of the scalar node with the new value
 
-The yaml node is transformed to
+e.g.for input of scalar node 'nginx:1.7.1 # kpt-set: ${image}:${tag}' in the yaml node
+
 apiVersion: v1
 ...
-  replicas: 2 # kpt-set: ${replicas}
+  image: nginx:1.7.1 # kpt-set: ${image}:${tag}
+
+and for input ApplySetters [[name: image, value: ubuntu], [name: tag, value: 1.8.0]]
+The yaml node is transformed to
+
+apiVersion: v1
+...
+  image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
+
 */
 func (as *ApplySetters) visitScalar(object *yaml.RNode) error {
 	if object.IsNilOrEmpty() {

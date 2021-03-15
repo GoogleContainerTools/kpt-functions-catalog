@@ -283,7 +283,7 @@ spec:
   - nginx
   - ubuntu
 `,
-			errMsg: `setter interpolation is not allowed for arrays: "${images}:${tag}"`,
+			errMsg: `invalid setter pattern for array node: "${images}:${tag}"`,
 		},
 	}
 	for i := range tests {
