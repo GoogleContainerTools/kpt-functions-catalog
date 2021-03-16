@@ -1,4 +1,4 @@
-# starlark: Inline Example
+# starlark: Simple Example
 
 ## Overview
 
@@ -13,12 +13,12 @@ kind: StarlarkRun
 metadata:
   ...
 source: |
-  # set the namespace on each resource
-  def run(r, ns_value):
-    for resource in r:
+  # set the namespace on all resources
+  def setnamespace(resources, namespace):
+    for resource in resources:
       # mutate the resource
-      resource["metadata"]["namespace"] = ns_value
-  run(ctx.resource_list["items"], "prod")
+      resource["metadata"]["namespace"] = namespace
+  setnamespace(ctx.resource_list["items"], "prod")
 ```
 
 The starlark script is embedded in the `source` field. This script read the
@@ -39,5 +39,5 @@ kpt fn run simple
 Check the `.metadata.namespace` field has been set to `prod` for every resource.
 
 ```sh
-kpt cfg cat inline
+kpt cfg cat simple
 ```
