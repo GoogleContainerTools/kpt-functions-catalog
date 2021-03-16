@@ -30,8 +30,8 @@ to `prod` for all resources.
 Get the config example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/runtime/starlark/inline .
-kpt fn run inline
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/runtime/starlark/simple .
+kpt fn run simple
 ```
 
 ## Expected result

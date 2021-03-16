@@ -7,9 +7,9 @@ metadata:
       container:
         image: gcr.io/kpt-fn/starlark:unstable
 source: |
-  # set the namespace on each resource
-  def run(r, ns_value):
-    for resource in r:
+  # set the namespace on all resources
+  def setnamespace(resources, namespace):
+    for resource in resources:
       # mutate the resource
-      resource["metadata"]["namespace"] = ns_value
-  run(ctx.resource_list["items"], "prod")
+      resource["metadata"]["namespace"] = namespace
+  setnamespace(ctx.resource_list["items"], "prod")
