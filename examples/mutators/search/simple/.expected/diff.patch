@@ -1,0 +1,11 @@
+diff --git a/resources.yaml b/resources.yaml
+index 7481208..1055c0f 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -1,5 +1,5 @@
+ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+-  name: the-deployment
++  name: my-deployment
+   namespace: my-space
