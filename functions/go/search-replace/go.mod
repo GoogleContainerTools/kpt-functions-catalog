@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace
 
 go 1.15
 
