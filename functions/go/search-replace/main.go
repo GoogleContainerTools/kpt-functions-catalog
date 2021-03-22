@@ -14,7 +14,7 @@ func main() {
 	resourceList.FunctionConfig = map[string]interface{}{}
 	cmd := framework.Command(resourceList, func() error {
 		resourceList.Result = &framework.Result{
-			Name: "search",
+			Name: "search-replace",
 		}
 		items, err := run(resourceList)
 		if err != nil {
@@ -34,7 +34,7 @@ func main() {
 
 // run resolves the function params and runs the function on resources
 func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
-	sr, err := getSearchParams(resourceList.FunctionConfig)
+	sr, err := getSearchReplaceParams(resourceList.FunctionConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +50,8 @@ func usage() string {
 	return `` // TODO: pmarupaka add usage docs
 }
 
-// getSearchParams retrieve the search parameters from input config
-func getSearchParams(fc interface{}) (SearchReplace, error) {
+// getSearchReplaceParams retrieve the search parameters from input config
+func getSearchReplaceParams(fc interface{}) (SearchReplace, error) {
 	var fcd SearchReplace
 	f, ok := fc.(map[string]interface{})
 	if !ok {
@@ -111,7 +111,7 @@ func searchResultsToItems(sr SearchReplace) []framework.Item {
 func getErrorItem(errMsg string) []framework.Item {
 	return []framework.Item{
 		{
-			Message:  fmt.Sprintf("failed to perform search operation: %q", errMsg),
+			Message:  fmt.Sprintf("failed to perform search-replace operation: %q", errMsg),
 			Severity: framework.Error,
 		},
 	}

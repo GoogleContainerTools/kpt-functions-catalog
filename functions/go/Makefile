@@ -23,7 +23,7 @@ FUNCTIONS := \
 	set-namespace \
 	starlark \
 	apply-setters \
-	search
+	search-replace
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))

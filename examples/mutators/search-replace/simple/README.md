@@ -1,4 +1,4 @@
-# search: Simple Example
+# search-replace: Simple Example
 
 The `search-replace` function performs search and optionally replace fields
 across all resources.
