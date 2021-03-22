@@ -47,57 +47,7 @@ func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
 	return searchResultsToItems(sr), nil
 }
 func usage() string {
-	return `Search and optionally replace fields across all resources.
-
-Search matchers are provided with 'by-' prefix. When multiple matchers
-are provided they are AND’ed together. 'put-' matchers are mutually exclusive.
-
-Here are the list of matchers:
-
-by-value
-Match by value of a field.
-
-by-value-regex
-Match by Regex for the value of a field. The syntax of the regular expressions
-accepted is the same general syntax used by Go, Perl, Python, and other languages.
-More precisely, it is the syntax accepted by RE2 and described at
-https://golang.org/s/re2syntax. With the exception that it matches the entire
-value of the field by default without requiring start (^) and end ($) characters.
-
-by-path
-Match by path expression of a field. Path expressions are used to deeply navigate
-and match particular yaml nodes. Please note that the path expressions are not
-regular expressions.
-
-put-value
-Set or update the value of the matching fields. Input can be a pattern for which
-the numbered capture groups are resolved using --by-value-regex input.
-
-put-comment
-Set or update the line comment for matching fields. Input can be a pattern for
-which the numbered capture groups are resolved using --by-value-regex input.
-
-To search and replace field value to all resources:
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  by-value: nginx
-  put-value: ubuntu
-
-To put the setter pattern as a line comment for matching fields:
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  by-value: my-project-id-foo
-  put-value: 'kpt-set: ${project-id}-foo'
-
-`
+	return `` // TODO: pmarupaka add usage docs
 }
 
 // getSearchParams retrieve the search parameters from input config
