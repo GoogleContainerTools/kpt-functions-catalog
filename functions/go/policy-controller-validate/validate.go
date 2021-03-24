@@ -12,19 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package gatekeeper
+package main
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
 
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/framework/constants"
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/framework/io"
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/framework/types"
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/functions/util"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1beta1"
 	opaclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
@@ -35,13 +31,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+// SourcePathAnnotation is the path to the configuration file containing the object.
+const SourcePathAnnotation = "config.kubernetes.io/path"
+
 var scheme = runtime.NewScheme()
 
 func init() {
-	io.Register(v1beta1.SchemeGroupVersion.WithKind("ConstraintTemplate"), func() types.KubernetesObject {
-		return &v1beta1.ConstraintTemplate{}
-	})
-	err := v1beta1.AddToSchemes.AddToScheme(scheme)
+	err := v1beta1.SchemeBuilder.AddToScheme(scheme)
 	if err != nil {
 		panic(err)
 	}
@@ -53,13 +49,12 @@ func createClient() (*opaclient.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return backend.NewClient(opaclient.Targets(&target.K8sValidationTarget{}))
 }
 
-func gatherTemplates(configs *types.Configs) ([]*templates.ConstraintTemplate, error) {
+func gatherTemplates(objects []runtime.Object) ([]*templates.ConstraintTemplate, error) {
 	var templs []*templates.ConstraintTemplate
-	for _, obj := range *configs {
+	for _, obj := range objects {
 		ct, isConstraintTemplate := obj.(*v1beta1.ConstraintTemplate)
 		if !isConstraintTemplate {
 			continue
@@ -73,12 +68,12 @@ func gatherTemplates(configs *types.Configs) ([]*templates.ConstraintTemplate, e
 	return templs, nil
 }
 
-func gatherConstraints(configs *types.Configs) ([]types.KubernetesObject, error) {
-	var cstrs []types.KubernetesObject
-	for _, obj := range *configs {
-		gvk := obj.GroupVersionKind()
+func gatherConstraints(objects []runtime.Object) ([]*unstructured.Unstructured, error) {
+	var cstrs []*unstructured.Unstructured
+	for _, obj := range objects {
+		gvk := obj.GetObjectKind().GroupVersionKind()
 		if gvk.Group == "constraints.gatekeeper.sh" {
-			cstrs = append(cstrs, obj)
+			cstrs = append(cstrs, obj.(*unstructured.Unstructured))
 		}
 	}
 	return cstrs, nil
@@ -86,12 +81,12 @@ func gatherConstraints(configs *types.Configs) ([]types.KubernetesObject, error)
 
 // Validate makes sure the configs passed to it comply with any Constraints and
 // Constraint Templates present in the list of configs
-func Validate(configs *types.Configs) error {
+func Validate(objects []runtime.Object) error {
 	client, err := createClient()
 	if err != nil {
 		return err
 	}
-	tmpls, err := gatherTemplates(configs)
+	tmpls, err := gatherTemplates(objects)
 	if err != nil {
 		return err
 	}
@@ -101,33 +96,18 @@ func Validate(configs *types.Configs) error {
 			return err
 		}
 	}
-	cstrs, err := gatherConstraints(configs)
+	cstrs, err := gatherConstraints(objects)
 	if err != nil {
 		return err
 	}
 	for _, c := range cstrs {
-		u, err2 := util.ToUnstructured(c)
-		if err2 != nil {
-			return err2
-		}
-		if _, err2 = client.AddConstraint(ctx, u); err2 != nil {
-			return err2
+		if _, err = client.AddConstraint(ctx, c); err != nil {
+			return err
 		}
 	}
 
-	for _, o := range *configs {
-		jsn, err2 := json.Marshal(o)
-		if err2 != nil {
-			return err2
-		}
-
-		u := unstructured.Unstructured{}
-		err = u.UnmarshalJSON(jsn)
-		if err != nil {
-			return err
-		}
-
-		if _, err = client.AddData(ctx, u); err != nil {
+	for _, obj := range objects {
+		if _, err = client.AddData(ctx, obj); err != nil {
 			return err
 		}
 	}
@@ -151,7 +131,7 @@ func parseResults(results []*opatypes.Result) error {
 			return fmt.Errorf("could not cast to unstructured: %+v", r.Resource)
 		}
 		name := u.GetName()
-		path, found := u.GetAnnotations()[constants.SourcePathAnnotation]
+		path, found := u.GetAnnotations()[SourcePathAnnotation]
 		if !found {
 			path = "?"
 		}
@@ -166,7 +146,5 @@ func parseResults(results []*opatypes.Result) error {
 	for i, m := range msgs {
 		sb.WriteString(fmt.Sprintf("[%d] %s\n\n", i+1, m))
 	}
-	return types.NewConfigError(sb.String())
+	return errors.New(sb.String())
 }
-
-var _ types.ConfigFunc = Validate

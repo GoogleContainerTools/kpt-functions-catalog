@@ -1,0 +1,12 @@
+name: policy-controller-validate
+items:
+- message: |+
+    Found 1 violations:
+
+    [1] The following banned keys are being used in the config map: {"private_key"}
+
+    name: "super-secret"
+    path: resources.yaml
+    violatedConstraint: no-secrets-in-configmap
+
+  severity: error
