@@ -28,6 +28,8 @@ FUNCTIONS := \
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
+# Targets for generating all functions docs
+FUNCTION_GENERATE_DOCS := $(patsubst %,%-GENERATE,$(FUNCTIONS))
 
 FUNCTION_CHECKLICENSES := $(patsubst %,%-CHECKLICENSES,$(FUNCTIONS))
 # Targets to build functions
@@ -55,6 +57,15 @@ test: $(FUNCTION_TESTS) ## Run unit tests for all functions
 .PHONY: $(FUNCTION_TESTS)
 $(FUNCTION_TESTS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -TEST,,$@) func-test
+
+generate: install-mdtogo generate-docs
+
+.PHONY: generate-docs
+generate-docs: $(FUNCTION_GENERATE_DOCS) ## Generate docs for all functions
+
+.PHONY: $(FUNCTION_GENERATE_DOCS)
+$(FUNCTION_GENERATE_DOCS):
+	$(MAKE) CURRENT_FUNCTION=$(subst -GENERATE,,$@) func-generate
 
 .PHONY: build
 build: $(FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
@@ -85,9 +96,12 @@ else
 GO_LICENSES=$(shell which go-licenses)
 endif
 
+install-mdtogo:
+	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo
+
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
-	func-build func-push func-verify func-check-licenses
+	func-build func-push func-verify func-check-licenses func-generate
 func-verify: func-fix func-vet func-fmt func-test func-lint func-check-licenses
 
 func-fix:
@@ -119,8 +133,6 @@ func-push:
 	@echo Pushing image $(CURRENT_FUNCTION)...
 	../../scripts/go-function-release.sh push curated
 
-generate:
-	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo
-	$(GOBIN)/mdtogo search-replace search-replace/generated --license=none --strategy=cmdDocs
-	$(GOBIN)/mdtogo apply-setters apply-setters/generated --license=none --strategy=cmdDocs
+func-generate:
+	$(GOBIN)/mdtogo $(CURRENT_FUNCTION) $(CURRENT_FUNCTION)/generated --license=none --strategy=cmdDocs
 
