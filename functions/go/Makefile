@@ -15,6 +15,7 @@ SHELL=/bin/bash
 GOPATH := $(shell go env GOPATH)
 TAG ?= unstable
 GCR = gcr.io/kpt-fn
+GOBIN := $(shell go env GOPATH)/bin
 
 # Edit this list to contain all go functions
 FUNCTIONS := \
@@ -117,3 +118,8 @@ func-build: func-verify
 func-push:
 	@echo Pushing image $(CURRENT_FUNCTION)...
 	../../scripts/go-function-release.sh push curated
+
+generate:
+	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo
+	$(GOBIN)/mdtogo search-replace search-replace/generated --license=none --strategy=cmdDocs
+
