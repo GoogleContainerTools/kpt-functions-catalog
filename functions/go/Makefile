@@ -122,4 +122,5 @@ func-push:
 generate:
 	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo
 	$(GOBIN)/mdtogo search-replace search-replace/generated --license=none --strategy=cmdDocs
+	$(GOBIN)/mdtogo apply-setters apply-setters/generated --license=none --strategy=cmdDocs
 
