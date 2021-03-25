@@ -21,7 +21,7 @@ are provided they are AND’ed together. `put-` matchers are mutually exclusive.
 <!--mdtogo:Long-->
 
 ```
-kpt fn eval search-replace:VERSION [DIR] -- [matcher_name=matcher_value]
+kpt fn eval gcr.io/kpt-fns/search-replace:VERSION [DIR] -- [matcher_name=matcher_value]
 ```
 
 #### Matchers
@@ -59,32 +59,32 @@ which the numbered capture groups are resolved using --by-value-regex input.
 
 ```sh
 # Matches fields with value "3":
-$ kpt fn eval search-replace:unstable -- by-value=3
+$ kpt fn eval gcr.io/kpt-fns/search-replace:unstable -- by-value=3
 ```
 
 ```sh
 # Matches fields with value prefixed by "nginx-":
-$ kpt fn eval search-replace:unstable -- by-value-regex='ngnix-.*'
+$ kpt fn eval gcr.io/kpt-fns/search-replace:unstable -- by-value-regex='ngnix-.*'
 ```
 
 ```sh
 # Matches field with path "spec.namespaces" set to "bookstore":
-$ kpt fn eval search-replace:unstable -- by-path='metadata.namespace' by-value='bookstore'
+$ kpt fn eval gcr.io/kpt-fns/search-replace:unstable -- by-path='metadata.namespace' by-value='bookstore'
 ```
 
 ```sh
 # Matches fields with name "containerPort" arbitrarily deep in "spec" that have value of 80:
-$ kpt fn eval search-replace:unstable -- by-path='spec.**.containerPort' by-value=80
+$ kpt fn eval gcr.io/kpt-fns/search-replace:unstable -- by-path='spec.**.containerPort' by-value=80
 ```
 
 ```sh
 # Set namespaces for all resources to "bookstore", even namespace is not set on a resource:
-$ kpt fn eval search-replace:unstable -- by-path='metadata.namespace' put-value='bookstore'
+$ kpt fn eval gcr.io/kpt-fns/search-replace:unstable -- by-path='metadata.namespace' put-value='bookstore'
 ```
 
 ```
 # Search and Set multiple values using regex numbered capture groups
-$ kpt fn eval search-replace:unstable -- by-value-regex='something-(.*)' put-value='my-project-id-${1}'
+$ kpt fn eval gcr.io/kpt-fns/search-replace:unstable -- by-value-regex='something-(.*)' put-value='my-project-id-${1}'
 metadata:
   name: something-foo
   namespace: something-bar
@@ -96,12 +96,12 @@ metadata:
 
 ```sh
 # Put the setter pattern as a line comment for matching fields.
-$ kpt fn eval search-replace:unstable -- by-value='my-project-id-foo' put-comment='kpt-set: ${project-id}-foo'
+$ kpt fn eval gcr.io/kpt-fns/search-replace:unstable -- by-value='my-project-id-foo' put-comment='kpt-set: ${project-id}-foo'
 metadata:
   name: my-project-id-foo # kpt-set: ${project-id}-foo
 
 # Setter pattern comments can be added to multiple values matching a regex numbered capture groups
-$ kpt fn eval search-replace:unstable -- by-value-regex='my-project-id-(.*)' put-comment='kpt-set: ${project-id}-${1}'
+$ kpt fn eval gcr.io/kpt-fns/search-replace:unstable -- by-value-regex='my-project-id-(.*)' put-comment='kpt-set: ${project-id}-${1}'
 metadata:
   name: my-project-id-foo # kpt-set: ${project-id}-foo
   namespace: my-project-id-bar # kpt-set: ${project-id}-bar
