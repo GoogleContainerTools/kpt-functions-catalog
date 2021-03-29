@@ -65,7 +65,7 @@ generate-docs: $(FUNCTION_GENERATE_DOCS) ## Generate docs for all functions
 
 .PHONY: $(FUNCTION_GENERATE_DOCS)
 $(FUNCTION_GENERATE_DOCS):
-	$(MAKE) CURRENT_FUNCTION=$(subst -GENERATE,,$@) func-generate
+	$(MAKE) CURRENT_FUNCTION=$(subst -GENERATE,,$@) docs-generate
 
 .PHONY: build
 build: $(FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
@@ -101,7 +101,7 @@ install-mdtogo:
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
-	func-build func-push func-verify func-check-licenses func-generate
+	func-build func-push func-verify func-check-licenses docs-generate
 func-verify: func-fix func-vet func-fmt func-test func-lint func-check-licenses
 
 func-fix:
@@ -133,6 +133,6 @@ func-push:
 	@echo Pushing image $(CURRENT_FUNCTION)...
 	../../scripts/go-function-release.sh push curated
 
-func-generate:
+docs-generate:
 	$(GOBIN)/mdtogo $(CURRENT_FUNCTION) $(CURRENT_FUNCTION)/generated --license=none --strategy=cmdDocs
 

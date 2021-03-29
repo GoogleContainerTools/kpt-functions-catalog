@@ -26,7 +26,7 @@ kpt fn eval gcr.io/kpt-fns/search-replace:VERSION [DIR] -- [matcher_name=matcher
 
 #### Matchers
 
-```sh
+```
 by-value
 Match by value of a field.
 
