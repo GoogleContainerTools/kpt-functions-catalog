@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -25,7 +26,10 @@ func main() {
 		return nil
 	})
 
-	cmd.Long = usage()
+	cmd.Short = generated.SearchReplaceShort
+	cmd.Long = generated.SearchReplaceLong
+	cmd.Example = generated.SearchReplaceExamples
+
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -45,9 +49,6 @@ func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
 	}
 
 	return searchResultsToItems(sr), nil
-}
-func usage() string {
-	return `` // TODO: pmarupaka add usage docs
 }
 
 // getSearchReplaceParams retrieve the search parameters from input config
