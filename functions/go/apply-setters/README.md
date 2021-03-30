@@ -30,7 +30,7 @@ metadata:
   name: my-pkg
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fns/apply-setters:unstable
+    - image: gcr.io/kpt-fn/apply-setters:unstable
       configMap:
         setter_name1: setter-value1
         setter_name2: setter-value2
@@ -46,7 +46,7 @@ Alternatively, this function can be invoked imperatively on the package by passi
 inputs as key-value pairs.
 
 ```
-kpt fn eval gcr.io/kpt-fns/apply-setters:VERSION [PKG_PATH] -- [setter_name=setter_value]
+kpt fn eval --image gcr.io/kpt-fn/apply-setters:VERSION [PKG_PATH] -- [setter_name=setter_value]
 ```
 
 <!--mdtogo-->
@@ -77,7 +77,7 @@ metadata:
   name: my-pkg
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fns/apply-setters:unstable
+    - image: gcr.io/kpt-fn/apply-setters:unstable
       configMap:
         image: ubuntu
         replicas: 3
@@ -92,7 +92,7 @@ kpt fn render
 Alternatively, values can be rendered imperatively
 
 ```
-kpt fn eval gcr.io/kpt-fns/apply-setters:unstable -- 'replicas=3'
+kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'replicas=3'
 ```
 
 Rendered resource looks like the following:
@@ -133,7 +133,7 @@ metadata:
   name: my-pkg
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fns/apply-setters:unstable
+    - image: gcr.io/kpt-fn/apply-setters:unstable
       configMap:
         env: |
           - prod
@@ -149,7 +149,7 @@ kpt fn render
 Alternatively, values can be rendered imperatively
 
 ```
-kpt fn eval gcr.io/kpt-fns/apply-setters:unstable -- 'env=[prod, dev]'
+kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'env=[prod, dev]'
 ```
 
 Rendered resource looks like the following:

@@ -18,7 +18,7 @@ can be declared next to setter names.
     name: my-pkg
   pipeline:
     mutators:
-      - image: gcr.io/kpt-fns/apply-setters:unstable
+      - image: gcr.io/kpt-fn/apply-setters:unstable
         configMap:
           setter_name1: setter-value1
           setter_name2: setter-value2
@@ -30,7 +30,7 @@ The declared values for setters are rendered by invoking the following command:
 Alternatively, this function can be invoked imperatively on the package by passing the
 inputs as key-value pairs.
 
-  kpt fn eval gcr.io/kpt-fns/apply-setters:VERSION [PKG_PATH] -- [setter_name=setter_value]
+  kpt fn eval --image gcr.io/kpt-fn/apply-setters:VERSION [PKG_PATH] -- [setter_name=setter_value]
 `
 var ApplySettersExamples = `
 Setting scalar values:
@@ -52,7 +52,7 @@ Discover the names of setters in the Kptfile and declare desired values.
     name: my-pkg
   pipeline:
     mutators:
-      - image: gcr.io/kpt-fns/apply-setters:unstable
+      - image: gcr.io/kpt-fn/apply-setters:unstable
         configMap:
           image: ubuntu
           replicas: 3
@@ -63,7 +63,7 @@ Render the declared values by invoking:
 
 Alternatively, values can be rendered imperatively
 
-  kpt fn eval gcr.io/kpt-fns/apply-setters:unstable -- 'replicas=3'
+  kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'replicas=3'
 
 Rendered resource looks like the following:
 
@@ -98,7 +98,7 @@ Declare the desired array values, wrapped into string.
     name: my-pkg
   pipeline:
     mutators:
-      - image: gcr.io/kpt-fns/apply-setters:unstable
+      - image: gcr.io/kpt-fn/apply-setters:unstable
         configMap:
           env: |
             - prod
@@ -110,7 +110,7 @@ Render the declared values by invoking:
 
 Alternatively, values can be rendered imperatively
 
-  kpt fn eval gcr.io/kpt-fns/apply-setters:unstable -- 'env=[prod, dev]'
+  kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'env=[prod, dev]'
 
 Rendered resource looks like the following:
 
