@@ -1,4 +1,0 @@
-name: set-annotation
-items:
-- message: input annotation list cannot be empty
-  severity: error

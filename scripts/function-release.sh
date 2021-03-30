@@ -37,14 +37,22 @@ fn_lang=$(parse_git_tag lang)
 fn_name=$(parse_git_tag name)
 fn_ver=$(parse_git_tag version)
 
-cd "${scripts_dir}"/../functions/"${fn_lang}"
+if [ -d "${scripts_dir}/../functions/${fn_lang}/${fn_name}" ]; then
+  cd "${scripts_dir}/../functions/${fn_lang}"
+  DEFAULT_GCR=gcr.io/kpt-fn
+fi
+
+if [ -d "${scripts_dir}/../functions/contrib/${fn_lang}/${fn_name}" ]; then
+  cd "${scripts_dir}/../functions/contrib/${fn_lang}"
+  DEFAULT_GCR=gcr.io/kpt-fn-contrib
+fi
 
 case "$1" in
   build)
-    CURRENT_FUNCTION="${fn_name}" TAG="${fn_ver}" make func-build
+    CURRENT_FUNCTION="${fn_name}" TAG="${fn_ver}" DEFAULT_GCR="$DEFAULT_GCR" make func-build
     ;;
   push)
-    CURRENT_FUNCTION="${fn_name}" TAG="${fn_ver}" make func-push
+    CURRENT_FUNCTION="${fn_name}" TAG="${fn_ver}" DEFAULT_GCR="$DEFAULT_GCR" make func-push
     ;;
   *)
     echo "Usage: $0 {build|push}"

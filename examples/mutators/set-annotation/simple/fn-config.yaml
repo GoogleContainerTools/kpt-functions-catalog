@@ -8,5 +8,5 @@ metadata:
         image: gcr.io/kpt-fn/set-annotation:unstable
     config.kubernetes.io/local-config: 'true'
 data:
-  configmanagement.gke.io/namespace-selector: sre-supported
+  color: orange
   fruit: apple

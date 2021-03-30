@@ -20,7 +20,10 @@ GCR = gcr.io/kpt-fn
 FUNCTIONS := \
 	set-label \
 	set-annotation \
-	set-namespace
+	set-namespace \
+	starlark \
+	apply-setters \
+	search-replace
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))

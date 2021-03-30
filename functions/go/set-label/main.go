@@ -14,44 +14,94 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+const (
+	fnConfigGroup      = "fn.kpt.dev"
+	fnConfigVersion    = "v1alpha1"
+	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
+	fnConfigKind       = "SetLabelConfig"
+)
+
 type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"commonLabels,omitempty" yaml:"commonLabels,omitempty"`
 }
 
-type setLabelSpecs struct {
-	Labels []setLabelSpec `json:"labels,omitempty" yaml:"labels,omitempty"`
+type setLabelFunction struct {
+	kyaml.ResourceMeta `json:",inline" yaml:",inline"`
+	plugin             `json:",inline" yaml:",inline"`
 }
 
-type setLabelSpec struct {
-	LabelName  string            `json:"name,omitempty" yaml:"name,omitempty"`
-	LabelValue string            `json:"value,omitempty" yaml:"value,omitempty"`
-	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
-}
-
-func setLabel(spec setLabelSpec,
-	resMap resmap.ResMap,
-	tc transformerConfig,
-	pluginHelpers *resmap.PluginHelpers,
-	plugin *plugin) error {
-	if spec.LabelName == "" || spec.LabelValue == "" {
-		return fmt.Errorf("labels.name and labels.value cannot be empty")
+func (f *setLabelFunction) Config(fnConfig interface{}) error {
+	configMap, ok := fnConfig.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("function config %#v is not valid", fnConfig)
+	}
+	rn, err := kyaml.FromMap(configMap)
+	if err != nil {
+		return fmt.Errorf("failed to construct RNode from %#v: %w", configMap, err)
+	}
+	switch {
+	case f.validGVK(rn, "v1", "ConfigMap"):
+		f.plugin.Labels = rn.GetDataMap()
+	case f.validGVK(rn, fnConfigAPIVersion, fnConfigKind):
+		// input config is a CRD
+		y, err := rn.String()
+		if err != nil {
+			return fmt.Errorf("cannot get YAML from RNode: %w", err)
+		}
+		err = yaml.Unmarshal([]byte(y), &f.plugin)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+		}
+	default:
+		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
 	}
 
-	err := plugin.Config(pluginHelpers, []byte{})
+	if len(f.plugin.Labels) == 0 {
+		return fmt.Errorf("input label list cannot be empty")
+	}
+	tc, err := getDefaultConfig()
 	if err != nil {
-		return fmt.Errorf("failed to config plugin: %w", err)
+		return err
 	}
 	// append default field specs
-	plugin.FieldSpecs = append(spec.FieldSpecs, tc.FieldSpecs...)
-	// set label key and value
-	plugin.Labels = make(map[string]string)
-	plugin.Labels[spec.LabelName] = spec.LabelValue
-
-	err = plugin.Transform(resMap)
-	if err != nil {
-		return fmt.Errorf("failed to run transformer: %w", err)
-	}
+	f.plugin.FieldSpecs = append(f.plugin.FieldSpecs, tc.FieldSpecs...)
 	return nil
+}
+
+func (f *setLabelFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error) {
+	resmapFactory := newResMapFactory()
+	resMap, err := resmapFactory.NewResMapFromRNodeSlice(items)
+	if err != nil {
+		return nil, err
+	}
+	err = f.plugin.Transform(resMap)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run transformer: %w", err)
+	}
+	return resMap.ToRNodeSlice()
+}
+
+func (f *setLabelFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bool {
+	meta, err := rn.GetMeta()
+	if err != nil {
+		return false
+	}
+	if meta.APIVersion != apiVersion || meta.Kind != kind {
+		return false
+	}
+	return true
+}
+
+func getDefaultConfig() (transformerConfig, error) {
+	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonlabels"]
+	var tc transformerConfig
+	err := yaml.Unmarshal([]byte(defaultConfigString), &tc)
+	return tc, err
+}
+
+func newResMapFactory() *resmap.Factory {
+	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
+	return resmap.NewFactory(resourceFactory, nil)
 }
 
 //nolint
@@ -83,36 +133,15 @@ func main() {
 }
 
 func run(resourceList *framework.ResourceList) error {
-	var plugin *plugin = &KustomizePlugin
-	tc, err := getDefaultConfig()
+	var fn setLabelFunction
+	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		return err
-	}
-	resmapFactory := newResMapFactory()
-	pluginHelpers := newPluginHelpers(resmapFactory)
-
-	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
-	if err != nil {
-		return fmt.Errorf("failed to convert items to resource map: %w", err)
-	}
-	labels, err := getLabels(resourceList.FunctionConfig)
-	if err != nil {
-		return fmt.Errorf("failed to get data.specs field from function config: %w", err)
-	}
-	if len(labels.Labels) == 0 {
-		return fmt.Errorf("input label list cannot be empty")
-	}
-	for _, l := range labels.Labels {
-		err := setLabel(l, resMap, tc, pluginHelpers, plugin)
-		if err != nil {
-			return fmt.Errorf("failed to add label [%s: %s]: %w",
-				l.LabelName, l.LabelValue, err)
-		}
+		return fmt.Errorf("failed to configure function: %w", err)
 	}
 
-	resourceList.Items, err = resMap.ToRNodeSlice()
+	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
-		return fmt.Errorf("failed to convert resource map to items: %w", err)
+		return fmt.Errorf("failed to run function: %w", err)
 	}
 	return nil
 }
@@ -120,14 +149,8 @@ func run(resourceList *framework.ResourceList) error {
 func usage() string {
 	return `Add a list of labels to all resources.
 
-Configured using a ConfigMap with the following keys:
-
-labels.name: Label name to add to resources.
-labels.value: Label value to add to resources.
-
-These keys are in a list in path 'data.labels'.
-
-Example:
+Configured using a ConfigMap with key-value pairs in 'data' field in
+'ConfigMap' resource. Example:
 
 To add a label 'color: orange' to all resources:
 
@@ -136,25 +159,9 @@ kind: ConfigMap
 metadata:
   name: my-config
 data:
-  labels:
-  - name: color
-    value: orange
+  color: orange
 
 To add 2 labels 'color: orange' and 'fruit: apple' to all resources:
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  labels:
-  - name: color
-    value: orange
-  - name: fruit
-    value: apple
-
-A simple version of config can be used if you don't want to specify
-'fieldSpecs'.
 
 apiVersion: v1
 kind: ConfigMap
@@ -169,6 +176,23 @@ want to use. By default, the function will not only add or update the
 labels in 'metadata/labels' but also a bunch of different places where
 have references to the labels. These field specs are defined in
 https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/commonlabels.go#L6
+
+You need to use a custom resource to specify additional information.
+
+Example:
+
+To add a label 'color: orange' to path 'data/selector' in MyOwnKind resource:
+
+apiVersion: fn.kpt.dev/v1alpha1
+kind: SetLabelConfig
+metadata:
+  name: my-config
+labels:
+  color: orange
+fieldSpecs:
+- path: data/selector
+  kind: MyOwnKind
+  create: true
 
 To support your own CRDs you will need to add more items to fieldSpecs list.
 Your own specs will be used with the default ones.
@@ -188,76 +212,5 @@ Field spec has following fields:
 
 For more information about fieldSpecs, please see 
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-3
-
-Example:
-
-To add a label 'color: orange' to path 'data/selector' in MyOwnKind resource:
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  labels:
-    - name: color
-      value: orange
-      fieldSpecs:
-      - path: data/selector
-        kind: MyOwnKind
-        create: true
 `
-}
-
-func getDefaultConfig() (transformerConfig, error) {
-	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonlabels"]
-	var tc transformerConfig
-	err := yaml.Unmarshal([]byte(defaultConfigString), &tc)
-	return tc, err
-}
-
-func newPluginHelpers(resmapFactory *resmap.Factory) *resmap.PluginHelpers {
-	return resmap.NewPluginHelpers(nil, nil, resmapFactory)
-}
-
-func newResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
-	return resmap.NewFactory(resourceFactory, nil)
-}
-
-func getLabels(fc interface{}) (setLabelSpecs, error) {
-	var fcd setLabelSpecs
-	f, ok := fc.(map[string]interface{})
-	if !ok {
-		return fcd, fmt.Errorf("function config %#v is not valid", fc)
-	}
-	rn, err := kyaml.FromMap(f)
-	if err != nil {
-		return fcd, fmt.Errorf("failed to parse from function config: %w", err)
-	}
-	specsNode, err := rn.Pipe(kyaml.Lookup("data"))
-	if err != nil {
-		return fcd, err
-	}
-
-	b, err := specsNode.String()
-	if err != nil {
-		return fcd, err
-	}
-	// check does data contains key-value pairs
-	var keyValueMap map[string]string
-	err = yaml.Unmarshal([]byte(b), &keyValueMap)
-	if err == nil {
-		// we got a simple key-value pair
-		for k, v := range keyValueMap {
-			fcd.Labels = append(fcd.Labels,
-				setLabelSpec{LabelName: k, LabelValue: v})
-		}
-		return fcd, nil
-	}
-
-	err = yaml.Unmarshal([]byte(b), &fcd)
-	if err != nil {
-		return fcd, err
-	}
-	return fcd, nil
 }
