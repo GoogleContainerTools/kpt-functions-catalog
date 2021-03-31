@@ -55,7 +55,10 @@ func main() {
 		}
 
 		err := Validate(objects)
-		if err != nil {
+		if result, ok := err.(*framework.Result); ok {
+			resourceList.Result = result
+			return result
+		} else if err != nil {
 			resourceList.Result = &framework.Result{
 				Name: "policy-controller-validate",
 				Items: []framework.Item{

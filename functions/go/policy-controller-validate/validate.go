@@ -16,10 +16,8 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"sort"
-	"strings"
+	"strconv"
 
 	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1beta1"
 	opaclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
@@ -29,10 +27,10 @@ import (
 	"github.com/open-policy-agent/gatekeeper/pkg/target"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
+	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
-
-// SourcePathAnnotation is the path to the configuration file containing the object.
-const SourcePathAnnotation = "config.kubernetes.io/path"
 
 var scheme = runtime.NewScheme()
 
@@ -124,27 +122,50 @@ func Validate(objects []runtime.Object) error {
 }
 
 func parseResults(results []*opatypes.Result) error {
-	var msgs []string
+	out := &framework.Result{
+		Items: []framework.Item{},
+	}
+
 	for _, r := range results {
 		u, ok := r.Resource.(*unstructured.Unstructured)
 		if !ok {
 			return fmt.Errorf("could not cast to unstructured: %+v", r.Resource)
 		}
-		name := u.GetName()
-		path, found := u.GetAnnotations()[SourcePathAnnotation]
-		if !found {
-			path = "?"
+
+		item := framework.Item{
+			Message:  fmt.Sprintf("%s\nviolatedConstraint: %s", r.Msg, r.Constraint.GetName()),
+			Severity: framework.Error,
+			ResourceRef: yaml.ResourceMeta{
+				TypeMeta: yaml.TypeMeta{
+					APIVersion: u.GetAPIVersion(),
+					Kind:       u.GetKind(),
+				},
+				ObjectMeta: yaml.ObjectMeta{
+					NameMeta: yaml.NameMeta{
+						Name:      u.GetName(),
+						Namespace: u.GetNamespace(),
+					},
+				},
+			},
 		}
-		constraintName := r.Constraint.GetName()
-		msgs = append(msgs, fmt.Sprintf("%s\n\nname: %q\npath: %s\nviolatedConstraint: %s", r.Msg, name, path, constraintName))
+
+		path, foundPath := u.GetAnnotations()[kioutil.PathAnnotation]
+		index, foundIndex := u.GetAnnotations()[kioutil.IndexAnnotation]
+		if foundPath {
+			item.File = framework.File{
+				Path: path,
+			}
+			if foundIndex {
+				idx, err := strconv.Atoi(index)
+				if err != nil {
+					return err
+				}
+				item.File.Index = idx
+			}
+		}
+
+		out.Items = append(out.Items, item)
 	}
 
-	sort.Strings(msgs)
-
-	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("Found %d violations:\n\n", len(results)))
-	for i, m := range msgs {
-		sb.WriteString(fmt.Sprintf("[%d] %s\n\n", i+1, m))
-	}
-	return errors.New(sb.String())
+	return out
 }
