@@ -30,8 +30,12 @@ documented.
 
 <!--mdtogo:Examples-->
 
-Add a link to the web page of the examples. Examples should be added in the
-`examples` directory.
+For functions in the catalog, it's recommended to add examples to the `examples`
+directory and add a link to the web page of the examples.
+
+If you don't plan to add your function in this catalog, you can choose to
+1) host your examples as packages in a different place and add a link here (recommended)
+2) have your examples here.
 
 [//]: <> (Note: The content between `<!--mdtogo:Examples-->` and the following
 `<!--mdtogo-->` will be used as the examples for the command.)
