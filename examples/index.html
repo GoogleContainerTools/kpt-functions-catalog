@@ -55,25 +55,19 @@
               }
 
               try {
-                const versionResponse = await window.Docsify.get(
-                  `https://api.github.com/repos/GoogleContainerTools/kpt-functions-catalog/contents/examples/${functionType}/${functionName}`
+                const catalogResponse = await window.Docsify.get(
+                  `/catalog.json`
                 );
-                const versionDirectories = JSON.parse(versionResponse).filter(
-                  (path) => path.name.match(/^v[0-9]/) && path.type === "dir"
-                );
+                const catalog = JSON.parse(catalogResponse);
+                console.log(catalog);
+                const versions = catalog[functionName];
                 let versionDropdown = "";
+
                 const versionName = vm.route.path.split("/")[3];
-                if (versionDirectories.length > 0) {
-                  const currentVersion = versionName
-                    .replace("v", "")
-                    .replaceAll("_", ".");
-                  const semverSortedDirectories = versionDirectories
-                    .sort((a, b) =>
-                      compareVersions(
-                        a.name.replaceAll("_", "."),
-                        b.name.replaceAll("_", ".")
-                      )
-                    )
+                const currentVersion = versionName.replace("v", "");
+                if (versions) {
+                  const sortedSemvers = Object.keys(versions)
+                    .sort((a, b) => compareVersions(a, b))
                     .reverse();
 
                   versionDropdown += `
@@ -81,36 +75,29 @@
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${currentVersion}
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
-                  semverSortedDirectories.forEach(
-                    (dir, ix) =>
-                      (versionDropdown += `<li><a href="/${functionName}/${
-                        dir.name
-                      }/">${dir.name.replace("v", "").replaceAll("_", ".")}${
-                        ix ? "" : " (latest)"
-                      }</a></li>`)
+                  sortedSemvers.forEach(
+                    (ver, ix) =>
+                      (versionDropdown += `<li><a href="/${functionType}/${functionName}/${ver}/">${ver.replace(
+                        "v",
+                        ""
+                      )}${ix ? "" : " (latest)"}</a></li>`)
                   );
                   versionDropdown += `
                 </ol>
               </div>`;
                 }
 
-                const examplesResponse = await window.Docsify.get(
-                  `https://api.github.com/repos/GoogleContainerTools/kpt-functions-catalog/contents/examples/${functionType}/${functionName}/${versionName}`
-                );
-                const examplesDirectories = JSON.parse(examplesResponse).filter(
-                  (path) => path.type === "dir" && path.name[0] != '.'
-                );
                 let examplesDropdown = `
               <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Examples
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
-                examplesDirectories.forEach(
-                  (dir, _) =>
+                versions[versionName].forEach(
+                  (ver, _) =>
                     (examplesDropdown += `<li><a href="/${functionType}/${functionName}/${
                       versionName ? `${versionName}/` : ""
-                    }${dir.name}/">
-                      ${dir.name}</a></li>`)
+                    }${ver.split("/").reverse()[0]}/">
+                      ${ver.split("/").reverse()[0]}</a></li>`)
                 );
                 examplesDropdown += `
                 </ol>
@@ -176,17 +163,6 @@
     }
     .sidebar-toggle {
       display: none;
-    }
-
-    /* Right side table of contents */
-    aside.toc-nav {
-      z-index: 19;
-    }
-    .page_toc div.active {
-      border-color: black;
-    }
-    .page_toc div[class^="lv"] a span {
-      color: black !important;
     }
   </style>
 </html>
