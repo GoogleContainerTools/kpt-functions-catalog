@@ -16,7 +16,8 @@ Explain what this function does in one or two sentences.
 
 <!--mdtogo:Long-->
 
-Explain the function config and behavior for this function in detail. If the
+Explain the function config and behavior for this function in detail. Explain
+how to use the function in both declarative and imperative flows. If the
 function supports both ConfigMap and CRD as function config, both should be
 documented.
 
@@ -29,8 +30,8 @@ documented.
 
 <!--mdtogo:Examples-->
 
-Use examples to demonstrate how to use this function in different scenarios.
-Each example should have input, exact command to run and output.
+Add a link to the web page of the examples. Examples should be added in the
+`examples` directory.
 
 [//]: <> (Note: The content between `<!--mdtogo:Examples-->` and the following
 `<!--mdtogo-->` will be used as the examples for the command.)
