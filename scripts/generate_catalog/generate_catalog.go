@@ -179,7 +179,7 @@ func assignFunctionDescriptions(functions []function) ([]function, error) {
 			}
 
 			if versionIndex == 0 {
-				functions[i].Description = firstLine
+				functions[i].Description = strings.Trim(firstLine, "\n")
 			}
 
 			// Write the entire documentation output to the appropriate version's directory.
@@ -199,7 +199,7 @@ func writeIndex(functions []function, source string, dest string) error {
 	mutators := []string{"## Mutators", "", "| Name | Description |", "| ---- | ----------- |"}
 	validators := []string{"## Validators", "", "| Name | Description |", "| ---- | ----------- |"}
 	for _, f := range functions {
-		functionEntry := fmt.Sprintf("| [%v](%v/) | %v |", f.FunctionName, strings.Replace(f.Path, source, "/", 1), f.Description)
+		functionEntry := fmt.Sprintf("| [%v](%v/) | %v |", f.FunctionName, strings.Replace(f.Path, source, "", 1), f.Description)
 
 		switch f.Type {
 		case "Mutator":
