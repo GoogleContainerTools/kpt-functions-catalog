@@ -17,7 +17,7 @@ package main
 import (
 	"os"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/policy-controller-validate/generated"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gatekeeper-validate/generated"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -60,7 +60,7 @@ func main() {
 			return result
 		} else if err != nil {
 			resourceList.Result = &framework.Result{
-				Name: "policy-controller-validate",
+				Name: "gatekeeper-validate",
 				Items: []framework.Item{
 					{
 						Message:  err.Error(),

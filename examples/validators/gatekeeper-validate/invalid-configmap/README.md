@@ -1,4 +1,4 @@
-# policy-controller-validate: invalid configmap
+# gatekeeper-validate: invalid configmap
 
 ## Overview
 
@@ -13,7 +13,7 @@ The constraint disallows `private_key` to be used as a key in the config map.
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/validators/policy-controller-validate/invalid-configmap .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/validators/gatekeeper-validate/invalid-configmap .
 ```
 
 Create a directory for storing the structured output.

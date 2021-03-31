@@ -24,7 +24,7 @@ FUNCTIONS := \
 	starlark \
 	apply-setters \
 	search-replace \
-	policy-controller-validate
+	gatekeeper-validate
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))

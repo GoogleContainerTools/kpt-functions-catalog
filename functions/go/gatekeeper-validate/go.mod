@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/policy-controller-validate
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gatekeeper-validate
 
 go 1.15
 

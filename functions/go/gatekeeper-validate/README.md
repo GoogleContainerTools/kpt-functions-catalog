@@ -1,4 +1,4 @@
-# policy-controller-validate
+# gatekeeper-validate
 
 ### Overview
 
