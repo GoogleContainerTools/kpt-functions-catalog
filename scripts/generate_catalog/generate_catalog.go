@@ -46,11 +46,6 @@ func main() {
 	source := os.Args[1]
 	dest := os.Args[2]
 
-	// Once all the functions are merged in
-	// Key functions by MajorMinor version
-	// For each key in a function:
-	// get the Max value and run `kpt fn doc --image=grc.io/kpt-fn/{fn-name}:{semver}`, writing to each value's fn name
-
 	mutatorFunctions, err := getFunctions(filepath.Join(source, "mutators"), "Mutator")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -68,7 +63,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println(functions)
 
 	err = writeIndex(functions, source, dest)
 
