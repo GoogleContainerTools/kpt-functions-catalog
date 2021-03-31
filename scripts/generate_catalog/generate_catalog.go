@@ -24,10 +24,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -44,6 +46,11 @@ func main() {
 	source := os.Args[1]
 	dest := os.Args[2]
 
+	// Once all the functions are merged in
+	// Key functions by MajorMinor version
+	// For each key in a function:
+	// get the Max value and run `kpt fn doc --image=grc.io/kpt-fn/{fn-name}:{semver}`, writing to each value's fn name
+
 	mutatorFunctions, err := getFunctions(filepath.Join(source, "mutators"), "Mutator")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -56,13 +63,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	functions, err := parseFuncions(append(mutatorFunctions, validatorFunctions...))
+	functions, err := assignFunctionDescriptions(append(mutatorFunctions, validatorFunctions...))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
+	fmt.Println(functions)
 
-	err = write(functions, source, dest)
+	err = writeIndex(functions, source, dest)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -71,11 +79,11 @@ func main() {
 }
 
 type function struct {
-	FunctionName string
-	Version      string
-	Path         string
-	Desciption   string
-	Type         string
+	FunctionName     string
+	VersionToPatches map[string][]string
+	Path             string
+	Description      string
+	Type             string
 }
 
 func getFunctions(source string, functionType string) ([]function, error) {
@@ -100,43 +108,28 @@ func getFunctions(source string, functionType string) ([]function, error) {
 			if len(paths) > 0 {
 				if pathHasRelease(paths) {
 					sort.Slice(paths, func(i, j int) bool {
-						firstVersion := semver.Canonical(strings.ReplaceAll(paths[i].Name(), "_", "."))
-						secondVersion := semver.Canonical(strings.ReplaceAll(paths[j].Name(), "_", "."))
 						// Sort directories by the ordering of the semantic versions they represent
-						return semver.Compare(firstVersion, secondVersion) > 0
+						return semver.Compare(paths[i].Name(), paths[j].Name()) > 0
 					})
-					potentialFunctionVersion := semver.Canonical(strings.ReplaceAll(paths[0].Name(), "_", "."))
-					if semver.IsValid(potentialFunctionVersion) {
+					versions := keyPatchVersionsByMinor(paths)
+					if versions != nil {
 						functions = append(functions,
 							function{
-								FunctionName: functionName,
-								Version:      potentialFunctionVersion,
-								Path:         filepath.Join(functionPath, paths[0].Name()),
-								Type:         functionType,
+								FunctionName:     functionName,
+								VersionToPatches: versions,
+								Path:             filepath.Join(functionPath, paths[0].Name()),
+								Type:             functionType,
 							},
 						)
 					}
-				} else {
-					functions = append(functions,
-						function{
-							FunctionName: functionName,
-							Version:      "main",
-							Path:         functionPath,
-							Type:         functionType,
-						},
-					)
-
 				}
 			}
 		}
 	}
-
 	return functions, nil
 }
 
 var (
-	// Capture content within a tag like <!--catalog:[Name|Description|Type] (Content)-->
-	tags = regexp.MustCompile(`<!--catalog:(Name|Description|Type)\s+?([\s\S]*?)-->`)
 	// Match start of a version such as v1.9.1
 	semverPrefix = regexp.MustCompile(`v\d`)
 )
@@ -150,37 +143,69 @@ func pathHasRelease(paths []fs.DirEntry) bool {
 	return false
 }
 
-func parseFuncions(functions []function) ([]function, error) {
+func keyPatchVersionsByMinor(paths []fs.DirEntry) map[string][]string {
+	m := make(map[string][]string)
+	for _, path := range paths {
+		if semver.IsValid(path.Name()) {
+			m[semver.MajorMinor(path.Name())] = append(m[semver.MajorMinor(path.Name())], path.Name())
+		}
+	}
+	return m
+}
 
+func assignFunctionDescriptions(functions []function) ([]function, error) {
 	for i := range functions {
-		b, err := ioutil.ReadFile(filepath.Join(functions[i].Path, "README.md"))
-		if err != nil {
-			return functions, err
+
+		minorVersions := make([]string, 0)
+		for minorVersion := range functions[i].VersionToPatches {
+			minorVersions = append(minorVersions, minorVersion)
 		}
 
-		markdown := string(b)
-		matches := tags.FindAllStringSubmatch(markdown, 3)
+		// Sort minor versions in descending order
+		sort.Slice(minorVersions, func(i, j int) bool {
+			return semver.Compare(minorVersions[i], minorVersions[j]) > 0
+		})
 
-		for _, match := range matches {
-			switch match[1] {
-			case "Name":
-				functions[i].FunctionName = strings.TrimSpace(match[2])
-			case "Description":
-				functions[i].Desciption = strings.TrimSpace(match[2])
-			case "Type":
-				functions[i].Type = strings.Title(strings.TrimSpace(match[2]))
+		for versionIndex, version := range minorVersions {
+			imagePath := fmt.Sprintf("--image=gcr.io/kpt-fn/%v:%v", functions[i].FunctionName, version)
+
+			// Use `kpt fn doc` to obtain documentation on the function
+			var buf bytes.Buffer
+			cmd := exec.Command("kpt", "fn", "doc", imagePath)
+			cmd.Stdout = &buf
+			err := cmd.Run()
+			if err != nil {
+				return functions, err
+			}
+
+			// The first line of the most recent documentation is the description of the function
+			firstLine, err := buf.ReadString('\n')
+			if err != nil {
+				return functions, err
+			}
+
+			if versionIndex == 0 {
+				functions[i].Description = firstLine
+			}
+
+			// Write the entire documentation output to the appropriate version's directory.
+			for _, patchVersion := range functions[i].VersionToPatches[version] {
+				versionDocumentationPath := filepath.Join(filepath.Dir(functions[i].Path), patchVersion, "README.md")
+				err := ioutil.WriteFile(versionDocumentationPath, []byte(firstLine+buf.String()), 0600)
+				if err != nil {
+					return functions, err
+				}
 			}
 		}
-
 	}
 	return functions, nil
 }
 
-func write(functions []function, source string, dest string) error {
+func writeIndex(functions []function, source string, dest string) error {
 	mutators := []string{"## Mutators", "", "| Name | Description |", "| ---- | ----------- |"}
 	validators := []string{"## Validators", "", "| Name | Description |", "| ---- | ----------- |"}
 	for _, f := range functions {
-		functionEntry := fmt.Sprintf("| [%v](%v/) | %v |", f.FunctionName, strings.Replace(f.Path, source, "/", 1), f.Desciption)
+		functionEntry := fmt.Sprintf("| [%v](%v/) | %v |", f.FunctionName, strings.Replace(f.Path, source, "/", 1), f.Description)
 
 		switch f.Type {
 		case "Mutator":
