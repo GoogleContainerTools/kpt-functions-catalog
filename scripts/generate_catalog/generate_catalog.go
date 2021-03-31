@@ -25,6 +25,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"io/ioutil"
@@ -58,14 +59,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	functions, err := assignFunctionDescriptions(append(mutatorFunctions, validatorFunctions...))
+	functions, err := generateFunctionDescriptions(append(mutatorFunctions, validatorFunctions...))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
-	err = writeIndex(functions, source, dest)
+	err = writeFunctionIndex(functions, source, dest)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
 
+	err = writeExampleIndex(functions, source, dest)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
@@ -74,10 +80,15 @@ func main() {
 
 type function struct {
 	FunctionName     string
-	VersionToPatches map[string][]string
+	VersionToPatches map[string][]patch
 	Path             string
 	Description      string
 	Type             string
+}
+
+type patch struct {
+	Version  string
+	Examples []string
 }
 
 func getFunctions(source string, functionType string) ([]function, error) {
@@ -105,7 +116,11 @@ func getFunctions(source string, functionType string) ([]function, error) {
 						// Sort directories by the ordering of the semantic versions they represent
 						return semver.Compare(paths[i].Name(), paths[j].Name()) > 0
 					})
-					versions := keyPatchVersionsByMinor(paths)
+					versions, err := keyPatchVersionsByMinor(paths, functionPath)
+					if err != nil {
+						return functions, err
+					}
+
 					if versions != nil {
 						functions = append(functions,
 							function{
@@ -137,17 +152,33 @@ func pathHasRelease(paths []fs.DirEntry) bool {
 	return false
 }
 
-func keyPatchVersionsByMinor(paths []fs.DirEntry) map[string][]string {
-	m := make(map[string][]string)
+func keyPatchVersionsByMinor(paths []fs.DirEntry, parent string) (map[string][]patch, error) {
+	m := make(map[string][]patch)
 	for _, path := range paths {
 		if semver.IsValid(path.Name()) {
-			m[semver.MajorMinor(path.Name())] = append(m[semver.MajorMinor(path.Name())], path.Name())
+			p := patch{
+				Version: path.Name(),
+			}
+
+			versionPath := filepath.Join(parent, path.Name())
+			examplePaths, err := os.ReadDir(versionPath)
+			if err != nil {
+				return m, err
+			}
+
+			for _, ep := range examplePaths {
+				if ep.IsDir() {
+					p.Examples = append(p.Examples, filepath.Join(versionPath, ep.Name()))
+				}
+			}
+
+			m[semver.MajorMinor(path.Name())] = append(m[semver.MajorMinor(path.Name())], p)
 		}
 	}
-	return m
+	return m, nil
 }
 
-func assignFunctionDescriptions(functions []function) ([]function, error) {
+func generateFunctionDescriptions(functions []function) ([]function, error) {
 	for i := range functions {
 
 		minorVersions := make([]string, 0)
@@ -184,7 +215,7 @@ func assignFunctionDescriptions(functions []function) ([]function, error) {
 
 			// Write the entire documentation output to the appropriate version's directory.
 			for _, patchVersion := range functions[i].VersionToPatches[version] {
-				versionDocumentationPath := filepath.Join(filepath.Dir(functions[i].Path), patchVersion, "README.md")
+				versionDocumentationPath := filepath.Join(filepath.Dir(functions[i].Path), patchVersion.Version, "README.md")
 				err := ioutil.WriteFile(versionDocumentationPath, []byte(firstLine+buf.String()), 0600)
 				if err != nil {
 					return functions, err
@@ -195,7 +226,7 @@ func assignFunctionDescriptions(functions []function) ([]function, error) {
 	return functions, nil
 }
 
-func writeIndex(functions []function, source string, dest string) error {
+func writeFunctionIndex(functions []function, source string, dest string) error {
 	mutators := []string{"## Mutators", "", "| Name | Description |", "| ---- | ----------- |"}
 	validators := []string{"## Validators", "", "| Name | Description |", "| ---- | ----------- |"}
 	for _, f := range functions {
@@ -217,4 +248,33 @@ func writeIndex(functions []function, source string, dest string) error {
 	o := strings.Join(out, "\n")
 	err := ioutil.WriteFile(filepath.Join(dest, "README.md"), []byte(o), 0600)
 	return err
+}
+
+func writeExampleIndex(functions []function, source string, dest string) error {
+	// Key a function's version's examples by the function's name -> version
+	functionVersionMap := make(map[string]map[string][]string)
+	for _, f := range functions {
+		functionVersionMap[f.FunctionName] = getExamplePaths(f.VersionToPatches, source)
+	}
+
+	funcJson, err := json.Marshal(functionVersionMap)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(dest, "catalog.json"), funcJson, 0600)
+	return err
+}
+
+func getExamplePaths(patchMap map[string][]patch, source string) map[string][]string {
+	examplePaths := make(map[string][]string)
+	for _, patches := range patchMap {
+		for _, p := range patches {
+			for _, e := range p.Examples {
+				examplePaths[p.Version] = append(examplePaths[p.Version], strings.Replace(e, source, "", 1))
+			}
+		}
+	}
+
+	return examplePaths
 }
