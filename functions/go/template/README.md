@@ -16,10 +16,11 @@ Explain what this function does in one or two sentences.
 
 <!--mdtogo:Long-->
 
-Explain the function config and behavior for this function in detail. Explain
-how to use the function in both declarative and imperative flows. If the
+Explain the function config and behavior for this function in detail. If the
 function supports both ConfigMap and CRD as function config, both should be
 documented.
+
+It is recommended to not shown kpt CLI or Kptfile here.
 
 [//]: <> (Note: The content between `<!--mdtogo:Long-->` and the following
 `<!--mdtogo-->` will be used as the long description for the command.)
