@@ -1,0 +1,14 @@
+image: gcr.io/kpt-fn/kubeval
+description: Validates configuration using kubeval.
+categories:
+  - validator
+imageTags:
+  - unstable
+docPath: README.md
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/ts/kubeval
+examplePackageURLs:
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval/simple
+emails:
+  - donnyxia@google.com
+  - mengqiy@google.com
+license: Apache-2.0
