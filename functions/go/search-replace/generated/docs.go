@@ -5,7 +5,12 @@ package generated
 
 var SearchReplaceShort = `Search and optionally replace fields across all resources.`
 var SearchReplaceLong = `
-  kpt fn eval [DIR] --image gcr.io/kpt-fn/search-replace:VERSION -- [matcher_name=matcher_value]
+One of the most basic and simplest customization techniques is Search and Replace.
+The user fetches a package of resources, searches all the files for fields matching
+a criteria, and replaces their values.
+
+Search matchers are provided with ` + "`" + `by-` + "`" + ` prefix. When multiple matchers
+are provided they are AND’ed together. ` + "`" + `put-` + "`" + ` matchers are mutually exclusive.
 
 Matchers:
 
@@ -31,43 +36,26 @@ Matchers:
   put-comment
   Set or update the line comment for matching fields. Input can be a pattern for
   which the numbered capture groups are resolved using --by-value-regex input.
-`
-var SearchReplaceExamples = `
-  # Matches fields with value "3":
-  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value=3
 
-  # Matches fields with value prefixed by "nginx-":
-  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='ngnix-.*'
+We use ConfigMap to configure the ` + "`" + `search-replace` + "`" + ` function. The inputs are
+provided as key-value pairs using ` + "`" + `data` + "`" + ` field.
 
-  # Matches field with path "spec.namespaces" set to "bookstore":
-  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-path='metadata.namespace' by-value='bookstore'
-
-  # Matches fields with name "containerPort" arbitrarily deep in "spec" that have value of 80:
-  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-path='spec.**.containerPort' by-value=80
-
-  # Set namespaces for all resources to "bookstore", even namespace is not set on a resource:
-  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-path='metadata.namespace' put-value='bookstore'
-
-  # Search and Set multiple values using regex numbered capture groups
-  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='something-(.*)' put-value='my-project-id-${1}'
+  apiVersion: v1
+  kind: ConfigMap
   metadata:
-    name: something-foo
-    namespace: something-bar
-  ...
-  metadata:
-    name: my-project-id-foo
-    namespace: my-project-id-bar
+    name: search-replace-fn-config
+  data:
+    by-path: metadata.name
+    by-value: the-deployment
+    put-value: my-deployment
 
-  # Put the setter pattern as a line comment for matching fields.
-  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value='my-project-id-foo' put-comment='kpt-set: ${project-id}-foo'
-  metadata:
-    name: my-project-id-foo # kpt-set: ${project-id}-foo
-  
-  # Setter pattern comments can be added to multiple values matching a regex numbered capture groups
-  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='my-project-id-(.*)' put-comment='kpt-set: ${project-id}-${1}'
-  metadata:
-    name: my-project-id-foo # kpt-set: ${project-id}-foo
-    namespace: my-project-id-bar # kpt-set: ${project-id}-bar
+The function can be invoked using:
+
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config /path/to/fn-config.yaml
+
+Alternatively, data can be passed as key-value pairs in the CLI
+
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'by-path=metadata.name' 'put-value=the-deployment'
 
 Supported Path expressions:
 
@@ -125,4 +113,41 @@ Supported Path expressions:
       d: blarh
     - c: thing2 # MATCHES
       f: thingamabob
+`
+var SearchReplaceExamples = `
+  # Matches fields with value "3":
+  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value=3
+
+  # Matches fields with value prefixed by "nginx-":
+  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='ngnix-.*'
+
+  # Matches field with path "spec.namespaces" set to "bookstore":
+  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-path='metadata.namespace' by-value='bookstore'
+
+  # Matches fields with name "containerPort" arbitrarily deep in "spec" that have value of 80:
+  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-path='spec.**.containerPort' by-value=80
+
+  # Set namespaces for all resources to "bookstore", even namespace is not set on a resource:
+  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-path='metadata.namespace' put-value='bookstore'
+
+  # Search and Set multiple values using regex numbered capture groups
+  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='something-(.*)' put-value='my-project-id-${1}'
+  metadata:
+    name: something-foo
+    namespace: something-bar
+  ...
+  metadata:
+    name: my-project-id-foo
+    namespace: my-project-id-bar
+
+  # Put the setter pattern as a line comment for matching fields.
+  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value='my-project-id-foo' put-comment='kpt-set: ${project-id}-foo'
+  metadata:
+    name: my-project-id-foo # kpt-set: ${project-id}-foo
+  
+  # Setter pattern comments can be added to multiple values matching a regex numbered capture groups
+  $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='my-project-id-(.*)' put-comment='kpt-set: ${project-id}-${1}'
+  metadata:
+    name: my-project-id-foo # kpt-set: ${project-id}-foo
+    namespace: my-project-id-bar # kpt-set: ${project-id}-bar
 `

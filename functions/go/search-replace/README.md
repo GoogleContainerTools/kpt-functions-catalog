@@ -8,21 +8,19 @@ Search and optionally replace fields across all resources.
 
 <!--mdtogo-->
 
-There is a spectrum of configuration customization techniques as described in
-[this document]. One of the most basic and simplest to understand is
-Search and Replace: The user fetches a package of configuration, searches all
-the files for fields matching a criteria, and replaces their values.
-
-Search matchers are provided with `by-` prefix. When multiple matchers
-are provided they are AND’ed together. `put-` matchers are mutually exclusive.
-
 ### Synopsis
+
+There is a spectrum of configuration customization techniques as described in
+[this document].
 
 <!--mdtogo:Long-->
 
-```
-kpt fn eval [DIR] --image gcr.io/kpt-fn/search-replace:VERSION -- [matcher_name=matcher_value]
-```
+One of the most basic and simplest customization techniques is Search and Replace.
+The user fetches a package of resources, searches all the files for fields matching
+a criteria, and replaces their values.
+
+Search matchers are provided with `by-` prefix. When multiple matchers
+are provided they are AND’ed together. `put-` matchers are mutually exclusive.
 
 #### Matchers
 
@@ -49,6 +47,99 @@ the numbered capture groups are resolved using --by-value-regex input.
 put-comment
 Set or update the line comment for matching fields. Input can be a pattern for
 which the numbered capture groups are resolved using --by-value-regex input.
+```
+
+We use ConfigMap to configure the `search-replace` function. The inputs are
+provided as key-value pairs using `data` field.
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: search-replace-fn-config
+data:
+  by-path: metadata.name
+  by-value: the-deployment
+  put-value: my-deployment
+```
+
+The function can be invoked using:
+
+```
+$ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config /path/to/fn-config.yaml
+```
+
+Alternatively, data can be passed as key-value pairs in the CLI
+
+```
+$ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'by-path=metadata.name' 'put-value=the-deployment'
+```
+
+Supported Path expressions:
+
+```yaml
+a.b.c
+
+a:
+  b:
+    c: thing # MATCHES
+```
+
+```yaml
+a.*.c
+
+a:
+  b1:
+    c: thing # MATCHES
+    d: whatever
+  b2:
+    c: thing # MATCHES
+    f: something irrelevant
+```
+
+```yaml
+a.**.c
+
+a:
+  b1:
+    c: thing1 # MATCHES
+    d: cat
+  b2:
+    c: thing2 # MATCHES
+    d: dog
+  b3:
+    d:
+    - f:
+        c: thing3 # MATCHES
+        d: beep
+    - f:
+        g:
+          c: thing4 # MATCHES
+          d: boop
+    - d: mooo
+```
+
+```yaml
+a.b[1].c
+
+a:
+  b:
+  - c: thing0
+  - c: thing1 # MATCHES
+  - c: thing2
+```
+
+```yaml
+a.b[*].c
+
+a:
+  b:
+  - c: thing0 # MATCHES
+    d: what..ever
+  - c: thing1 # MATCHES
+    d: blarh
+  - c: thing2 # MATCHES
+    f: thingamabob
 ```
 
 <!--mdtogo-->
@@ -105,73 +196,6 @@ $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='m
 metadata:
   name: my-project-id-foo # kpt-set: ${project-id}-foo
   namespace: my-project-id-bar # kpt-set: ${project-id}-bar
-```
-
-Supported Path expressions:
-
-```sh
-a.b.c
-
-a:
-  b:
-    c: thing # MATCHES
-```
-
-```sh
-a.*.c
-
-a:
-  b1:
-    c: thing # MATCHES
-    d: whatever
-  b2:
-    c: thing # MATCHES
-    f: something irrelevant
-```
-
-```sh
-a.**.c
-
-a:
-  b1:
-    c: thing1 # MATCHES
-    d: cat
-  b2:
-    c: thing2 # MATCHES
-    d: dog
-  b3:
-    d:
-    - f:
-        c: thing3 # MATCHES
-        d: beep
-    - f:
-        g:
-          c: thing4 # MATCHES
-          d: boop
-    - d: mooo
-```
-
-```sh
-a.b[1].c
-
-a:
-  b:
-  - c: thing0
-  - c: thing1 # MATCHES
-  - c: thing2
-```
-
-```sh
-a.b[*].c
-
-a:
-  b:
-  - c: thing0 # MATCHES
-    d: what..ever
-  - c: thing1 # MATCHES
-    d: blarh
-  - c: thing2 # MATCHES
-    f: thingamabob
 ```
 
 <!--mdtogo-->

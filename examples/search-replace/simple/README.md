@@ -23,7 +23,8 @@ We use the following ConfigMap to provide input matchers to the function.
 ```yaml
 apiVersion: v1
 kind: ConfigMap
-metadata: ...
+metadata:
+...
 data:
   by-path: metadata.name
   by-value: the-deployment
@@ -54,5 +55,5 @@ kpt fn run simple
 Check the value of deployment `the-deloyment` is changed to `my-deloyment`.
 
 ```sh
-kpt cfg cat simple
+$ kpt cfg cat simple/
 ```

@@ -6,31 +6,21 @@ package generated
 var ApplySettersShort = `Apply setter values on resource fields. Setters serve as parameters for template-free
 setting of field values.`
 var ApplySettersLong = `
-Package publishers declare setters in the package, consumers can set their values
-either declaratively or imperatively.
+Setters are a safer alternative to other substitution techniques which do not
+have the context of the structured data. Setters may be invoked to modify the
+package resources using ` + "`" + `apply-setters` + "`" + ` function to set desired values.
 
-Setter names can be discovered in the pipeline section of Kptfile, and the values
-can be declared next to setter names.
+We use ConfigMap to configure the ` + "`" + `apply-setters` + "`" + ` function. The desired setter
+values are provided as key-value pairs using ` + "`" + `data` + "`" + ` field where key is the name of the
+setter and value is the new desired value for the setter.
 
-  apiVersion: v1alpha2
-  kind: Kptfile
+  apiVersion: v1
+  kind: ConfigMap
   metadata:
-    name: my-pkg
-  pipeline:
-    mutators:
-      - image: gcr.io/kpt-fn/apply-setters:unstable
-        configMap:
-          setter_name1: setter-value1
-          setter_name2: setter-value2
-
-The declared values for setters are rendered by invoking the following command:
-
-  kpt fn render [PKG_PATH]
-
-Alternatively, this function can be invoked imperatively on the package by passing the
-inputs as key-value pairs.
-
-  kpt fn eval --image gcr.io/kpt-fn/apply-setters:VERSION [PKG_PATH] -- [setter_name=setter_value]
+    name: my-func-config
+  data:
+    setter_name1: setter_value1
+    setter_name2: setter_value2
 `
 var ApplySettersExamples = `
 Setting scalar values:
@@ -44,26 +34,23 @@ Let's start with the input resource in a package
   spec:
     replicas: 1 # kpt-set: ${replicas}
 
-Discover the names of setters in the Kptfile and declare desired values.
+Discover the names of setters in the function config file and declare desired values.
 
-  apiVersion: v1alpha2
-  kind: Kptfile
+  apiVersion: v1
+  kind: ConfigMap
   metadata:
-    name: my-pkg
-  pipeline:
-    mutators:
-      - image: gcr.io/kpt-fn/apply-setters:unstable
-        configMap:
-          image: ubuntu
-          replicas: 3
+    name: apply-setters-fn-config
+  data:
+    image: ubuntu
+    replicas: "3"
 
 Render the declared values by invoking:
 
-  kpt fn render
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
 
-Alternatively, values can be rendered imperatively
+Alternatively, setter values can be passed as key-value pairs in the CLI
 
-  kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'replicas=3'
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'image=ubuntu' 'replicas=3'
 
 Rendered resource looks like the following:
 
@@ -92,25 +79,18 @@ Let's start with the input resource
 
 Declare the desired array values, wrapped into string.
 
-  apiVersion: v1alpha2
-  kind: Kptfile
+  apiVersion: v1
+  kind: ConfigMap
   metadata:
-    name: my-pkg
-  pipeline:
-    mutators:
-      - image: gcr.io/kpt-fn/apply-setters:unstable
-        configMap:
-          env: |
-            - prod
-            - dev
+    name: apply-setters-fn-config
+  data:
+    env: |
+      - prod
+      - dev
 
 Render the declared values by invoking:
 
-  kpt fn render
-
-Alternatively, values can be rendered imperatively
-
-  kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'env=[prod, dev]'
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
 
 Rendered resource looks like the following:
 
