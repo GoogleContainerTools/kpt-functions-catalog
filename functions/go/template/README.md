@@ -16,11 +16,10 @@ Explain what this function does in one or two sentences.
 
 <!--mdtogo:Long-->
 
-Explain the function config and behavior for this function in detail. If the
-function supports both ConfigMap and CRD as function config, both should be
-documented.
+Explain the function config and behavior for this function in detail.
 
-It is recommended to not shown kpt CLI or Kptfile here.
+To decouple the function orchestrator (i.e. kpt) from the function, it's
+recommended to not show the kpt CLI or custom resources like the Kptfile.
 
 [//]: <> (Note: The content between `<!--mdtogo:Long-->` and the following
 `<!--mdtogo-->` will be used as the long description for the command.)
@@ -31,12 +30,10 @@ It is recommended to not shown kpt CLI or Kptfile here.
 
 <!--mdtogo:Examples-->
 
-For functions in the catalog, it's recommended to add examples to the `examples`
-directory and add a link to the web page of the examples.
+Omit this ection if you are poviding complete example kpt packages which
+are linked from the catalog site.
 
-If you don't plan to add your function in this catalog, you can choose to
-1) host your examples as packages in a different place and add a link here (recommended)
-2) have your examples here.
+Otherwise, provide inline examples in this section.
 
 [//]: <> (Note: The content between `<!--mdtogo:Examples-->` and the following
 `<!--mdtogo-->` will be used as the examples for the command.)
