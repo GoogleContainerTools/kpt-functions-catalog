@@ -15,33 +15,33 @@ spec:
                 items:
                   type: string
   targets:
-    - target: admission.k8s.gatekeeper.sh
-      rego: |-
-        package ban_keys
+  - rego: |-
+      package ban_keys
 
-        violation[{"msg": sprintf("%v", [val])}] {
-          keys = {key | input.review.object.data[key]}
-          banned = {key | input.parameters.keys[_] = key}
-          overlap = keys & banned
-          count(overlap) > 0
-          val := sprintf("The following banned keys are being used in the config map: %v", [overlap])
-        }
+      violation[{"msg": sprintf("%v", [val])}] {
+        keys = {key | input.review.object.data[key]}
+        banned = {key | input.parameters.keys[_] = key}
+        overlap = keys & banned
+        count(overlap) > 0
+        val := sprintf("The following banned keys are being used in the config map: %v", [overlap])
+      }
+    target: admission.k8s.gatekeeper.sh
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sBannedConfigMapKeysV1
 metadata:
   name: no-secrets-in-configmap
 spec:
-  enforcementAction: deny
+  enforcementAction: dryrun
   match:
     kinds:
-      - apiGroups:
-          - ''
-        kinds:
-          - ConfigMap
+    - apiGroups:
+      - ''
+      kinds:
+      - ConfigMap
   parameters:
     keys:
-      - private_key
+    - private_key
 ---
 apiVersion: v1
 kind: ConfigMap

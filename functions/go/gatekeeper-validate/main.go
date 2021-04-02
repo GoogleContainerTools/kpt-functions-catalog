@@ -54,11 +54,15 @@ func main() {
 			objects = append(objects, obj)
 		}
 
-		err := Validate(objects)
-		if result, ok := err.(*framework.Result); ok {
+		result, err := Validate(objects)
+		switch {
+		case result != nil && err != nil:
 			resourceList.Result = result
-			return result
-		} else if err != nil {
+			return err
+		case result != nil && err == nil:
+			resourceList.Result = result
+			return nil
+		case result == nil && err != nil:
 			resourceList.Result = &framework.Result{
 				Name: "gatekeeper-validate",
 				Items: []framework.Item{
@@ -70,8 +74,9 @@ func main() {
 			}
 			resourceList.FunctionConfig = nil
 			return resourceList.Result
+		default:
+			return nil
 		}
-		return nil
 	})
 	cmd.Short = generated.PolicyControllerValidateShort
 	cmd.Long = generated.PolicyControllerValidateLong

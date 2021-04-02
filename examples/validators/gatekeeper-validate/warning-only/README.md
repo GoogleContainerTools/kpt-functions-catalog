@@ -1,25 +1,25 @@
-# gatekeeper-validate: invalid configmap
+# gatekeeper-validate: warning only
 
 ## Overview
 
-This example demonstrates how to validate config maps using a constraint.
+This example is very similar to the invalid configmap example. The major
+difference is that the violations are warnings instead of errors.
 
-There are 3 resources: a ConstraintTemplate, a K8sBannedConfigMapKeysV1 and a
-ConfigMap.
-The constraint disallows using `private_key` as a key in the ConfigMap.
+In the constraint, we use `enforcementAction: warn` instead of
+`enforcementAction: deny`.
 
 ## Function invocation
 
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/validators/gatekeeper-validate/invalid-configmap .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/validators/gatekeeper-validate/warnning-only .
 ```
 
 Create a directory for storing the structured output.
 
 ```shell
-$ cd invalid-configmap
+$ cd warnning-only
 $ mkdir results
 ```
 
@@ -31,14 +31,8 @@ $ kpt fn run --results-dir=results .
 
 ## Expected result
 
-You should see the following output:
-
-```
-The following banned keys are being used in the config map: {"private_key"}
-violatedConstraint: no-secrets-in-configmaperror: exit status 1
-```
-
-Let's take a look at the structured output:
+You won't any failure. But if you look at the structured output, you can find a
+warning about the constraint violation.
 
 ```shell
 $ cat results/results-0.yaml 
@@ -46,7 +40,7 @@ items:
 - message: |-
     The following banned keys are being used in the config map: {"private_key"}
     violatedConstraint: no-secrets-in-configmap
-  severity: error
+  severity: warning
   resourceRef:
     apiVersion: v1
     kind: ConfigMap
@@ -66,7 +60,7 @@ You can find:
 
 To pass validation, let's replace the key `private_key` in the ConfigMap in
 `resources.yaml` with something else e.g. `public_key`.
-Rerun the command. It will succeed (no output).
+Rerun the command. It will no longer have the warning.
 
 ## Function Reference
 

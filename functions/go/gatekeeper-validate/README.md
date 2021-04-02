@@ -15,7 +15,7 @@ Validate the KRM resources using the policy controller.
 You can use the policy controller to validate KRM resources. To learn more about
 the policy controller, see: https://cloud.google.com/anthos-config-management/docs/concepts/policy-controller.
 
-The function ensures the constraint policies are enforced on KRM resources.
+The function evaluates constraint policies against KRM resources.
 The function takes 3 types of resources from the input resource list:
 
 - constraint templates
@@ -34,8 +34,10 @@ https://cloud.google.com/anthos-config-management/docs/how-to/creating-constrain
 
 ### Examples
 
+<!-- TODO: update the following link to web page -->
+
 <!--mdtogo:Examples-->
 
-TODO: link to the examples
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/validators/gatekeeper-validate/
 
 <!--mdtogo-->

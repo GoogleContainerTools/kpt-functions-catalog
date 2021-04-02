@@ -25,6 +25,7 @@ import (
 	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
 	opatypes "github.com/open-policy-agent/frameworks/constraint/pkg/types"
 	"github.com/open-policy-agent/gatekeeper/pkg/target"
+	opautil "github.com/open-policy-agent/gatekeeper/pkg/util"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
@@ -79,62 +80,62 @@ func gatherConstraints(objects []runtime.Object) ([]*unstructured.Unstructured, 
 
 // Validate makes sure the configs passed to it comply with any Constraints and
 // Constraint Templates present in the list of configs
-func Validate(objects []runtime.Object) error {
+func Validate(objects []runtime.Object) (*framework.Result, error) {
 	client, err := createClient()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	tmpls, err := gatherTemplates(objects)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	ctx := context.Background()
 	for _, t := range tmpls {
 		if _, err = client.AddTemplate(ctx, t); err != nil {
-			return err
+			return nil, err
 		}
 	}
 	cstrs, err := gatherConstraints(objects)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for _, c := range cstrs {
 		if _, err = client.AddConstraint(ctx, c); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	for _, obj := range objects {
 		if _, err = client.AddData(ctx, obj); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	resps, err := client.Audit(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	results := resps.Results()
 	if len(results) > 0 {
 		return parseResults(results)
 	}
-	return nil
+	return nil, nil
 }
 
-func parseResults(results []*opatypes.Result) error {
+func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 	out := &framework.Result{
 		Items: []framework.Item{},
 	}
 
+	foundError := false
 	for _, r := range results {
 		u, ok := r.Resource.(*unstructured.Unstructured)
 		if !ok {
-			return fmt.Errorf("could not cast to unstructured: %+v", r.Resource)
+			return nil, fmt.Errorf("could not cast to unstructured: %+v", r.Resource)
 		}
 
 		item := framework.Item{
-			Message:  fmt.Sprintf("%s\nviolatedConstraint: %s", r.Msg, r.Constraint.GetName()),
-			Severity: framework.Error,
+			Message: fmt.Sprintf("%s\nviolatedConstraint: %s", r.Msg, r.Constraint.GetName()),
 			ResourceRef: yaml.ResourceMeta{
 				TypeMeta: yaml.TypeMeta{
 					APIVersion: u.GetAPIVersion(),
@@ -149,6 +150,18 @@ func parseResults(results []*opatypes.Result) error {
 			},
 		}
 
+		switch r.EnforcementAction {
+		case string(opautil.Dryrun):
+			item.Severity = framework.Info
+		// TODO(mengqiy): Warn start to be available in gatekeeper v3.4.0-rc1, we should upgrade to it when v3.4.0 is released.
+		// https://github.com/open-policy-agent/gatekeeper/blob/f1eda8f381aaaf7fc12db1782d41498b57431a5d/pkg/util/enforcement_action.go#L14
+		case "warn":
+			item.Severity = framework.Warning
+		default:
+			item.Severity = framework.Error
+			foundError = true
+		}
+
 		path, foundPath := u.GetAnnotations()[kioutil.PathAnnotation]
 		index, foundIndex := u.GetAnnotations()[kioutil.IndexAnnotation]
 		if foundPath {
@@ -158,7 +171,7 @@ func parseResults(results []*opatypes.Result) error {
 			if foundIndex {
 				idx, err := strconv.Atoi(index)
 				if err != nil {
-					return err
+					return nil, err
 				}
 				item.File.Index = idx
 			}
@@ -167,5 +180,9 @@ func parseResults(results []*opatypes.Result) error {
 		out.Items = append(out.Items, item)
 	}
 
-	return out
+	if foundError {
+		return out, out
+	} else {
+		return out, nil
+	}
 }

@@ -1,0 +1,14 @@
+items:
+- message: |-
+    The following banned keys are being used in the config map: {"private_key"}
+    violatedConstraint: no-secrets-in-configmap
+  severity: info
+  resourceRef:
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: super-secret
+      namespace: default
+  file:
+    path: resources.yaml
+    index: 2
