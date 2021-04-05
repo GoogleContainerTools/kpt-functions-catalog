@@ -54,38 +54,36 @@ func main() {
 			objects = append(objects, obj)
 		}
 
-		err := Validate(objects)
-		if err == nil {
-			return nil
-		}
-
-		if result, ok := err.(*framework.Result); ok {
-			resourceList.Result = result
-			if resultContainsError(result) {
-				return result
-			}
-			return nil
-		}
-
-		resourceList.Result = &framework.Result{
-			Items: []framework.Item{
-				{
-					Message:  err.Error(),
-					Severity: framework.Error,
+		result, err := Validate(objects)
+		// When err is not nil, result should be nil.
+		if err != nil {
+			result = &framework.Result{
+				Items: []framework.Item{
+					{
+						Message:  err.Error(),
+						Severity: framework.Error,
+					},
 				},
-			},
+			}
 		}
-		return resourceList.Result
+		resourceList.Result = result
+		if resultContainsError(result) {
+			return result
+		}
+		return nil
 	})
-	cmd.Short = generated.PolicyControllerValidateShort
-	cmd.Long = generated.PolicyControllerValidateLong
-	cmd.Example = generated.PolicyControllerValidateExamples
+	cmd.Short = generated.GatekeeperValidateShort
+	cmd.Long = generated.GatekeeperValidateLong
+	cmd.Example = generated.GatekeeperValidateExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
 func resultContainsError(result *framework.Result) bool {
+	if result == nil {
+		return false
+	}
 	for _, item := range result.Items {
 		if item.Severity == framework.Error {
 			return true
