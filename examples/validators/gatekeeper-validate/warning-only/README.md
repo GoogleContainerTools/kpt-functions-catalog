@@ -38,7 +38,7 @@ warning about the constraint violation.
 $ cat results/results-0.yaml 
 items:
 - message: |-
-    The following banned keys are being used in the config map: {"private_key"}
+    The following banned keys are being used in the ConfigMap map: {"private_key"}
     violatedConstraint: no-secrets-in-configmap
   severity: warning
   resourceRef:
@@ -62,6 +62,7 @@ To pass validation, let's replace the key `private_key` in the ConfigMap in
 `resources.yaml` with something else e.g. `public_key`.
 Rerun the command. It will no longer have the warning.
 
-## Function Reference
+## Function Reference Doc
 
-TODO: add the link
+TODO: replace the following with the link to the reference doc when our site is live.
+https://github.com/GoogleContainerTools/kpt-functions-catalog/blob/master/functions/go/gatekeeper-validate/README.md

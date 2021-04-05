@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Validate the KRM resources using the policy controller.
+Validate the KRM resources using [Gatekeeper] constraints.
 
 <!--mdtogo-->
 
@@ -12,8 +12,8 @@ Validate the KRM resources using the policy controller.
 
 <!--mdtogo:Long-->
 
-You can use the policy controller to validate KRM resources. To learn more about
-the policy controller, see: https://cloud.google.com/anthos-config-management/docs/concepts/policy-controller.
+You can use Gatekeeper to validate KRM resources. To learn more about how to use
+the Gatekeeper project, see: https://open-policy-agent.github.io/gatekeeper/website/docs/howto.
 
 The function evaluates constraint policies against KRM resources.
 The function takes 3 types of resources from the input resource list:
@@ -41,3 +41,5 @@ https://cloud.google.com/anthos-config-management/docs/how-to/creating-constrain
 https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/validators/gatekeeper-validate/
 
 <!--mdtogo-->
+
+[Gatekeeper]:https://github.com/open-policy-agent/gatekeeper

@@ -80,49 +80,49 @@ func gatherConstraints(objects []runtime.Object) ([]*unstructured.Unstructured, 
 
 // Validate makes sure the configs passed to it comply with any Constraints and
 // Constraint Templates present in the list of configs
-func Validate(objects []runtime.Object) (*framework.Result, error) {
+func Validate(objects []runtime.Object) error {
 	client, err := createClient()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	tmpls, err := gatherTemplates(objects)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	ctx := context.Background()
 	for _, t := range tmpls {
 		if _, err = client.AddTemplate(ctx, t); err != nil {
-			return nil, err
+			return err
 		}
 	}
 	cstrs, err := gatherConstraints(objects)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	for _, c := range cstrs {
 		if _, err = client.AddConstraint(ctx, c); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	for _, obj := range objects {
 		if _, err = client.AddData(ctx, obj); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	resps, err := client.Audit(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	results := resps.Results()
 	if len(results) > 0 {
 		return parseResults(results)
 	}
-	return nil, nil
+	return nil
 }
 
-func parseResults(results []*opatypes.Result) (*framework.Result, error) {
+func parseResults(results []*opatypes.Result) error {
 	out := &framework.Result{
 		Items: []framework.Item{},
 	}
@@ -131,7 +131,7 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 	for _, r := range results {
 		u, ok := r.Resource.(*unstructured.Unstructured)
 		if !ok {
-			return nil, fmt.Errorf("could not cast to unstructured: %+v", r.Resource)
+			return fmt.Errorf("could not cast to unstructured: %+v", r.Resource)
 		}
 
 		item := framework.Item{
@@ -171,7 +171,7 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 			if foundIndex {
 				idx, err := strconv.Atoi(index)
 				if err != nil {
-					return nil, err
+					return err
 				}
 				item.File.Index = idx
 			}
@@ -181,8 +181,8 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 	}
 
 	if foundError {
-		return out, out
+		return out
 	} else {
-		return out, nil
+		return nil
 	}
 }

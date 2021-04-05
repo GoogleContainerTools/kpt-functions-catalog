@@ -23,7 +23,7 @@ spec:
         banned = {key | input.parameters.keys[_] = key}
         overlap = keys & banned
         count(overlap) > 0
-        val := sprintf("The following banned keys are being used in the config map: %v", [overlap])
+        val := sprintf("The following banned keys are being used in the ConfigMap: %v", [overlap])
       }
     target: admission.k8s.gatekeeper.sh
 ---

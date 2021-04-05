@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example demonstrates how to validate config maps using a constraint.
+This example demonstrates how to validate ConfigMaps using a constraint.
 
 There are 3 resources: a ConstraintTemplate, a K8sBannedConfigMapKeysV1 and a
 ConfigMap.
@@ -34,7 +34,7 @@ $ kpt fn run --results-dir=results .
 You should see the following output:
 
 ```
-The following banned keys are being used in the config map: {"private_key"}
+The following banned keys are being used in the ConfigMap: {"private_key"}
 violatedConstraint: no-secrets-in-configmaperror: exit status 1
 ```
 
@@ -44,7 +44,7 @@ Let's take a look at the structured output:
 $ cat results/results-0.yaml 
 items:
 - message: |-
-    The following banned keys are being used in the config map: {"private_key"}
+    The following banned keys are being used in the ConfigMap: {"private_key"}
     violatedConstraint: no-secrets-in-configmap
   severity: error
   resourceRef:
@@ -68,6 +68,7 @@ To pass validation, let's replace the key `private_key` in the ConfigMap in
 `resources.yaml` with something else e.g. `public_key`.
 Rerun the command. It will succeed (no output).
 
-## Function Reference
+## Function Reference Doc
 
-TODO: add the link
+TODO: replace the following with the link to the reference doc when our site is live.
+https://github.com/GoogleContainerTools/kpt-functions-catalog/blob/master/functions/go/gatekeeper-validate/README.md

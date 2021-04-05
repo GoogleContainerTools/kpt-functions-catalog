@@ -1,6 +1,6 @@
 items:
 - message: |-
-    The following banned keys are being used in the config map: {"private_key"}
+    The following banned keys are being used in the ConfigMap: {"private_key"}
     violatedConstraint: no-secrets-in-configmap
   severity: error
   resourceRef:

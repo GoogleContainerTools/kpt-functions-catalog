@@ -54,29 +54,28 @@ func main() {
 			objects = append(objects, obj)
 		}
 
-		result, err := Validate(objects)
-		switch {
-		case result != nil && err != nil:
-			resourceList.Result = result
-			return err
-		case result != nil && err == nil:
-			resourceList.Result = result
-			return nil
-		case result == nil && err != nil:
-			resourceList.Result = &framework.Result{
-				Name: "gatekeeper-validate",
-				Items: []framework.Item{
-					{
-						Message:  err.Error(),
-						Severity: framework.Error,
-					},
-				},
-			}
-			resourceList.FunctionConfig = nil
-			return resourceList.Result
-		default:
+		err := Validate(objects)
+		if err == nil {
 			return nil
 		}
+
+		if result, ok := err.(*framework.Result); ok {
+			resourceList.Result = result
+			if resultContainsError(result) {
+				return result
+			}
+			return nil
+		}
+
+		resourceList.Result = &framework.Result{
+			Items: []framework.Item{
+				{
+					Message:  err.Error(),
+					Severity: framework.Error,
+				},
+			},
+		}
+		return resourceList.Result
 	})
 	cmd.Short = generated.PolicyControllerValidateShort
 	cmd.Long = generated.PolicyControllerValidateLong
@@ -84,4 +83,13 @@ func main() {
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func resultContainsError(result *framework.Result) bool {
+	for _, item := range result.Items {
+		if item.Severity == framework.Error {
+			return true
+		}
+	}
+	return false
 }

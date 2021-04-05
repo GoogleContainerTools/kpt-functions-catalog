@@ -24,7 +24,7 @@ spec:
           banned = {key | input.parameters.keys[_] = key}
           overlap = keys & banned
           count(overlap) > 0
-          val := sprintf("The following banned keys are being used in the config map: %v", [overlap])
+          val := sprintf("The following banned keys are being used in the ConfigMap: %v", [overlap])
         }
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
@@ -32,7 +32,6 @@ kind: K8sBannedConfigMapKeysV1
 metadata:
   name: no-secrets-in-configmap
 spec:
-  enforcementAction: deny
   match:
     kinds:
       - apiGroups:
