@@ -24,7 +24,8 @@ FUNCTIONS := \
 	set-namespace \
 	starlark \
 	apply-setters \
-	search-replace
+	search-replace \
+	gatekeeper-validate
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
