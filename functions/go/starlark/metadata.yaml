@@ -1,14 +1,11 @@
 image: gcr.io/kpt-fn/starlark
 description: Execute a starlark script to mutate or validate resources.
-categories:
+tags:
   - mutator
   - validator
-imageTags:
-  - unstable
-docPath: README.md
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/starlark
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/starlark/simple
 emails:
   - donnyxia@google.com
   - mengqiy@google.com
