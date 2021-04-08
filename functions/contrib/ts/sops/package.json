@@ -33,7 +33,7 @@
     "@types/node": "^14.14.16",
     "@types/rw": "file:@types/rw",
     "create-kpt-functions": "^0.17.0",
-    "jasmine": "^3.6.3",
+    "jasmine": "^3.7.0",
     "license-checker": "^25.0.1",
     "prettier": "2.2.1",
     "tslint": "^6.1.3",
