@@ -68,5 +68,5 @@ For more information about fieldSpecs, please see
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-3
 `
 var SetAnnotationExamples = `
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotation/
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-annotation/v0.1/examples/set-annotation/
 `

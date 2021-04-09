@@ -2,10 +2,10 @@ image: gcr.io/kpt-fn/set-annotation
 description: Add a list of annotations to all resources.
 tags:
   - mutator
-sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/set-annotation
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-annotation/v0.1/functions/go/set-annotation
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotation/simple
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotation/advanced
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-annotation/v0.1/examples/set-annotation/simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-annotation/v0.1/examples/set-annotation/advanced
 emails:
   - donnyxia@google.com
   - mengqiy@google.com
