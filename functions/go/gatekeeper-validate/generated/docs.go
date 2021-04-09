@@ -24,5 +24,5 @@ and
 https://cloud.google.com/anthos-config-management/docs/how-to/creating-constraints.
 `
 var GatekeeperValidateExamples = `
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/validators/gatekeeper-validate/
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/gatekeeper-validate/
 `

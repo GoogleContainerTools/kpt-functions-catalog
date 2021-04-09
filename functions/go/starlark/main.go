@@ -4,32 +4,8 @@ import (
 	"os"
 
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
-)
 
-const (
-	helpText = `Run a starlark script to update or validate resources.
-
-You can specify your starlark script inline under field source like this:
-
-apiVersion: fn.kpt.dev/v1alpha1
-kind: StarlarkRun
-metadata:
-  name: my-star-fn
-source: |
-  # set the namespace on each resource
-  def run(r, ns_value):
-    for resource in r:
-	  # mutate the resource
-	  resource["metadata"]["namespace"] = ns_value
-  # get the value to add
-  ns_value = ctx.resource_list["functionConfig"]["data"]["foo"]
-  run(ctx.resource_list["items"], ns_value)
-data:
-  foo: baz
-
-You can specify optional key-value pairs in 'data' field and then reference them
-in the starlark script like above.
-`
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/starlark/generated"
 )
 
 func main() {
@@ -63,7 +39,9 @@ func main() {
 		}
 		return nil
 	})
-	cmd.Long = helpText
+	cmd.Short = generated.StarlarkShort
+	cmd.Long = generated.StarlarkLong
+	cmd.Example = generated.StarlarkExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

@@ -38,7 +38,7 @@ https://cloud.google.com/anthos-config-management/docs/how-to/creating-constrain
 
 <!--mdtogo:Examples-->
 
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/validators/gatekeeper-validate/
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/gatekeeper-validate/
 
 <!--mdtogo-->
 
