@@ -1,0 +1,20 @@
+diff --git a/resources.yaml b/resources.yaml
+index c0c871e..cd75f56 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -1,7 +1,7 @@
+ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+-  name: the-map # kpt-set: ${name}
++  name: my-new-map # kpt-set: ${name}
+ data:
+   some-key: some-value
+ ---
+@@ -10,5 +10,5 @@ kind: MyKind
+ metadata:
+   name: ns
+ environments: # kpt-set: ${env}
+-- dev
++- prod
+ - stage

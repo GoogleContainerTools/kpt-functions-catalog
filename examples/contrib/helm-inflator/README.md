@@ -10,7 +10,7 @@ Get this example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/helm-inflator .
-kpt fn run helm-inflator/local-configs --mount type=bind,src=$(pwd)/helm-inflator/helloworld-chart,dst=/source
+kpt fn run --as-current-user helm-inflator/local-configs --mount type=bind,src=$(pwd)/helm-inflator/helloworld-chart,dst=/source
 ```
 
 ## Expected result
@@ -29,7 +29,7 @@ helm-inflator/local-configs
 To view changes without writing them into a file, a dry run can be performed as follows:
 
 ```sh
-kpt fn run helm-inflator/local-configs --mount type=bind,src=$(pwd)/helm-inflator/helloworld-chart,dst=/source --dry-run
+kpt fn run --as-current-user helm-inflator/local-configs --mount type=bind,src=$(pwd)/helm-inflator/helloworld-chart,dst=/source --dry-run
 ```
 
 The expected output should match the following:
