@@ -21,7 +21,7 @@ The desired namespace is provided using `.data.namespace` field.
 Get the config example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/mutators/set-namespace/simple@go/set-namespace/v0.1.1 .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/simple@set-namespace/v0.1 .
 kpt fn run simple
 ```
 
