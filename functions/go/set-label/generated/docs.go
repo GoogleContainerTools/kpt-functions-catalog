@@ -69,5 +69,5 @@ For more information about fieldSpecs, please see
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-3
 `
 var SetLabelExamples = `
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-label/
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-label/v0.1/examples/set-label/
 `

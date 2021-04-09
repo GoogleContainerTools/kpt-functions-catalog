@@ -5,7 +5,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: gcr.io/kpt-fn/set-label:v0.1.1
+        image: gcr.io/kpt-fn/set-label:v0.1
     config.kubernetes.io/local-config: "true"
 labels:
   color: orange

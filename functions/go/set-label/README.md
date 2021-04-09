@@ -89,6 +89,6 @@ https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#argument
 
 <!--mdtogo:Examples-->
 
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-label/
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-label/v0.1/examples/set-label/
 
 <!--mdtogo-->
