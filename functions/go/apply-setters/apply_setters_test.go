@@ -96,8 +96,8 @@ spec:
   template:
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+        - name: nginx
+          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -108,8 +108,8 @@ spec:
   template:
     spec:
       containers:
-      - name: nginx
-        image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
+        - name: nginx
+          image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
 `,
 		},
 		{
@@ -127,8 +127,8 @@ spec:
   template:
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.7.9 # kpt-set: ${image}:${tag}`,
+        - name: nginx
+          image: nginx:1.7.9 # kpt-set: ${image}:${tag}`,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -138,8 +138,8 @@ spec:
   template:
     spec:
       containers:
-      - name: nginx
-        image: ubuntu:1.7.9 # kpt-set: ${image}:${tag}
+        - name: nginx
+          image: ubuntu:1.7.9 # kpt-set: ${image}:${tag}
 `,
 		},
 		{
@@ -157,8 +157,8 @@ spec:
   template:
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+        - name: nginx
+          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
  `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -169,8 +169,8 @@ spec:
   template:
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+        - name: nginx
+          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
 		},
 		{
@@ -188,8 +188,8 @@ spec:
   template:
     spec:
       containers:
-      - image: irrelevant_value # kpt-set: ${image}:${tag}
-        name: nginx
+        - image: irrelevant_value # kpt-set: ${image}:${tag}
+          name: nginx
  `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -200,8 +200,8 @@ spec:
   template:
     spec:
       containers:
-      - image: irrelevant_value # kpt-set: ${image}:${tag}
-        name: nginx
+        - image: irrelevant_value # kpt-set: ${image}:${tag}
+          name: nginx
  `,
 			errMsg: `values for setters [${tag}] must be provided`,
 		},
@@ -219,8 +219,8 @@ metadata:
   name: nginx-deployment
 spec:
   images: # kpt-set: ${images}
-  - nginx
-  - ubuntu
+    - nginx
+    - ubuntu
  `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -228,8 +228,8 @@ metadata:
   name: nginx-deployment
 spec:
   images: # kpt-set: ${images}
-  - ubuntu
-  - hbase
+    - ubuntu
+    - hbase
 `,
 		},
 		{
@@ -244,8 +244,8 @@ metadata:
   name: nginx-deployment
 spec:
   images: # kpt-set: ${images}
-  - nginx
-  - ubuntu
+    - nginx
+    - ubuntu
 `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -253,8 +253,8 @@ metadata:
   name: nginx-deployment
 spec:
   images: # kpt-set: ${images}
-  - nginx
-  - ubuntu
+    - nginx
+    - ubuntu
 `,
 			errMsg: `input to array setter must be an array of values`,
 		},
@@ -271,8 +271,8 @@ metadata:
   name: nginx-deployment
 spec:
   images: # kpt-set: ${images}:${tag}
-  - nginx
-  - ubuntu
+    - nginx
+    - ubuntu
 `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -280,8 +280,8 @@ metadata:
   name: nginx-deployment
 spec:
   images: # kpt-set: ${images}:${tag}
-  - nginx
-  - ubuntu
+    - nginx
+    - ubuntu
 `,
 			errMsg: `invalid setter pattern for array node: "${images}:${tag}"`,
 		},
