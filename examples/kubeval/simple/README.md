@@ -12,7 +12,7 @@ This example invokes the kubeval function against Kubernetes v1.18.0.
 
 Get this example and try it out by running the following commands:
 
-<!-- TODO: https://github.com/GoogleContainerTools/kpt/issues/983 -->
+<!-- TODO: no --network. See: https://github.com/GoogleContainerTools/kpt/issues/1621 -->
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval .

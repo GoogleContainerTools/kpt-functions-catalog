@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/apply-setters/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -25,62 +26,14 @@ func main() {
 		return nil
 	})
 
-	cmd.Long = usage()
+	cmd.Short = generated.ApplySettersShort
+	cmd.Long = generated.ApplySettersLong
+	cmd.Example = generated.ApplySettersExamples
+
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func usage() string {
-	return `Apply setter values to resource fields with setter references.
-
-Example:
-
-Here is an example resource config to start with
-
-apiVersion: v1
-kind: Deployment
-metadata:
-  name: my-deployment
-spec:
-  replicas: 1 # kpt-set: ${replicas}
-
-Use ConfigMap to configure the 'apply-setters' function. The desired setter values 
-are provided as key-value pairs using data field where key is the name of the 
-setter(as seen in the reference comments) and value is the new desired value for 
-the tagged field
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  replicas: '3'
-
-Invoking apply-setters function would apply the changes to resource configs
-
-apiVersion: v1
-kind: Deployment
-metadata:
-  name: my-deployment
-spec:
-  replicas: 3 # kpt-set: ${replicas}
-
-
-Values to array setters must be array nodes wrapped into strings. Here is the
-example config to apply array setters.
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  projectId: my-project
-  environments: |
-    - dev
-    - staging
-`
 }
 
 // getSetters retrieve the setters from input config
