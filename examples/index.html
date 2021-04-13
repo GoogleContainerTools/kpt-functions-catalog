@@ -47,8 +47,7 @@
         plugins: [
           function (hook, vm) {
             hook.afterEach(async function (html, next) {
-              const functionType = vm.route.path.split("/")[1];
-              const functionName = vm.route.path.split("/")[2];
+              const functionName = vm.route.path.split("/")[1];
               if (!functionName) {
                 next(html);
                 return;
@@ -59,45 +58,41 @@
                   `/catalog.json`
                 );
                 const catalog = JSON.parse(catalogResponse);
-                console.log(catalog);
                 const versions = catalog[functionName];
                 let versionDropdown = "";
 
-                const versionName = vm.route.path.split("/")[3];
-                const currentVersion = versionName.replace("v", "");
-                if (versions) {
-                  const sortedSemvers = Object.keys(versions)
-                    .sort((a, b) => compareVersions(a, b))
-                    .reverse();
-
-                  versionDropdown += `
+                const versionName = vm.route.path.split("/")[2];
+                const currentVersion = versionName.replaceAll("v", "");
+                const sortedSemvers = Object.keys(versions)
+                  .sort((a, b) => compareVersions(a, b))
+                  .reverse();
+                versionDropdown += `
               <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${currentVersion}
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
-                  sortedSemvers.forEach(
-                    (ver, ix) =>
-                      (versionDropdown += `<li><a href="/${functionType}/${functionName}/${ver}/">${ver.replace(
-                        "v",
-                        ""
-                      )}${ix ? "" : " (latest)"}</a></li>`)
-                  );
-                  versionDropdown += `
+                sortedSemvers.forEach(
+                  (ver, ix) =>
+                    (versionDropdown += `<li><a href="/${functionName}/${ver}/">${ver.replace(
+                      "v",
+                      ""
+                    )}${ix ? "" : " (latest)"}</a></li>`)
+                );
+                versionDropdown += `
                 </ol>
               </div>`;
-                }
 
+                const examples = catalog[functionName][versionName];
+                const exampleNames = Object.keys(examples).sort();
                 let examplesDropdown = `
               <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Examples
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
-                versions[versionName].forEach(
-                  (ver, _) =>
-                    (examplesDropdown += `<li><a href="/${functionType}/${functionName}/${
-                      versionName ? `${versionName}/` : ""
-                    }${ver.split("/").reverse()[0]}/">
-                      ${ver.split("/").reverse()[0]}</a></li>`)
+                exampleNames.forEach(
+                  (ex, _) =>
+                    (examplesDropdown += `<li><a href="${examples[ex].LocalExamplePath}/">
+                      ${ex}</a></li>`)
                 );
                 examplesDropdown += `
                 </ol>

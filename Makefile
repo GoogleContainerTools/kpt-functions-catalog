@@ -51,6 +51,6 @@ push: ## Push images to registry. WARN: This operation should only be done in CI
 	cd functions/contrib/ts && $(MAKE) push
 
 site-generate: ## Collect function branches and generate a catalog of their examples and documentation using kpt next.
-	git branch -a | grep -E "/.+/v" | xargs -I{} git --work-tree=. checkout {} -- examples/
-	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt@next
-	(cd scripts/generate_catalog/ && go run . ../../examples ../../examples)
+	rm -rf ./examples/*/
+	# GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt@next
+	(cd scripts/generate_catalog/ && go run . ../.. ../../examples)

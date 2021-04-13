@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// Usage: generate_catalog SOURCE_MD_DIR/ DEST_GO_DIR/
+// Usage: generate_catalog SRC_REPO_DIR/ DEST_MD_DIR/
 //
-// The command will create a README.md file under DEST_GO_DIR/ containing tables
-// of functions separated by function type.
-// <!--mdtogo:<VARIABLE_NAME>
-// ..some content..
-// -->
-//
-// <VARIABLE_NAME> must be Name, Type or Description.
+// The command will create a README.md file under DEST_MD_DIR/ containing tables
+// of functions separated by function type. Source files for the catalog will
+// also appear in DEST_MD_DIR/
 package main
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -37,33 +32,32 @@ import (
 	"strings"
 
 	"golang.org/x/mod/semver"
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Fprintf(os.Stderr, "Usage: generate-catalog SOURCE_MD_DIR/ DEST_GO_DIR/\n")
+		fmt.Fprintf(os.Stderr, "Usage: generate-catalog SRC_REPO_DIR/ DEST_MD_DIR/\n")
 		os.Exit(1)
 	}
-	source := os.Args[1]
-	dest := os.Args[2]
-
-	mutatorFunctions, err := getFunctions(filepath.Join(source, "mutators"), "Mutator")
+	source, err := filepath.Abs(os.Args[1])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+	dest, err := filepath.Abs(os.Args[2])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
-	validatorFunctions, err := getFunctions(filepath.Join(source, "validators"), "Validator")
+	branches, err := getBranches()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
-	functions, err := generateFunctionDescriptions(append(mutatorFunctions, validatorFunctions...))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(1)
-	}
+	functions := getFunctions(branches, source, dest)
 
 	err = writeFunctionIndex(functions, source, dest)
 	if err != nil {
@@ -79,182 +73,238 @@ func main() {
 }
 
 type function struct {
-	FunctionName     string
-	VersionToPatches map[string][]patch
-	Path             string
-	Description      string
-	Type             string
+	FunctionName      string
+	VersionToExamples map[string]map[string]example
+	LatestVersion     string
+	Path              string
+	Description       string
+	Tags              string
 }
 
-type patch struct {
-	Version  string
-	Examples []string
+type example struct {
+	LocalExamplePath  string
+	RemoteExamplePath string
 }
 
-func getFunctions(source string, functionType string) ([]function, error) {
-	functions := make([]function, 0)
-
-	// Reads in exampleDir/
-	dirs, err := os.ReadDir(source)
-	if err != nil {
-		return functions, err
-	}
-
-	for _, dir := range dirs {
-		if dir.IsDir() {
-			functionName := dir.Name()
-			functionPath := filepath.Join(source, dir.Name())
-			// Reads in paths like exampleDir/helm-inflator
-			paths, err := os.ReadDir(functionPath)
-			if err != nil {
-				return functions, err
-			}
-
-			if len(paths) > 0 {
-				if pathHasRelease(paths) {
-					sort.Slice(paths, func(i, j int) bool {
-						// Sort directories by the ordering of the semantic versions they represent
-						return semver.Compare(paths[i].Name(), paths[j].Name()) > 0
-					})
-					versions, err := keyPatchVersionsByMinor(paths, functionPath)
-					if err != nil {
-						return functions, err
-					}
-
-					if versions != nil {
-						functions = append(functions,
-							function{
-								FunctionName:     functionName,
-								VersionToPatches: versions,
-								Path:             filepath.Join(functionPath, paths[0].Name()),
-								Type:             functionType,
-							},
-						)
-					}
-				}
-			}
-		}
-	}
-	return functions, nil
+type metadata struct {
+	Image              string
+	Description        string
+	Tags               []string
+	SourceUrl          string   `yaml:"sourceURL"`
+	ExamplePackageUrls []string `yaml:"examplePackageURLs"`
 }
 
 var (
 	// Match start of a version such as v1.9.1
-	semverPrefix = regexp.MustCompile(`v\d`)
+	semverPrefix      = regexp.MustCompile(`v\d`)
+	functionDirPrefix = regexp.MustCompile(`.+/functions/`)
+	exampleDirPrefix  = regexp.MustCompile(`.+/examples/`)
 )
 
-func pathHasRelease(paths []fs.DirEntry) bool {
-	for _, path := range paths {
-		if semverPrefix.FindStringSubmatch(path.Name()) != nil {
-			return true
+func getBranches() ([]string, error) {
+	verBranches := make([]string, 0)
+
+	var buf bytes.Buffer
+	cmd := exec.Command("git", "branch", "-a")
+	cmd.Stdout = &buf
+	err := cmd.Run()
+	if err != nil {
+		return verBranches, err
+	}
+
+	for _, branch := range strings.Split(buf.String(), "\n") {
+		segments := strings.Split(branch, "/")
+		if semverPrefix.MatchString(segments[len(segments)-1]) {
+			verBranches = append(verBranches, strings.TrimSpace(branch))
 		}
 	}
-	return false
+	return verBranches, err
 }
 
-func keyPatchVersionsByMinor(paths []fs.DirEntry, parent string) (map[string][]patch, error) {
-	m := make(map[string][]patch)
-	for _, path := range paths {
-		if semver.IsValid(path.Name()) {
-			p := patch{
-				Version: path.Name(),
-			}
-
-			versionPath := filepath.Join(parent, path.Name())
-			examplePaths, err := os.ReadDir(versionPath)
-			if err != nil {
-				return m, err
-			}
-
-			for _, ep := range examplePaths {
-				if ep.IsDir() {
-					p.Examples = append(p.Examples, filepath.Join(versionPath, ep.Name()))
-				}
-			}
-
-			m[semver.MajorMinor(path.Name())] = append(m[semver.MajorMinor(path.Name())], p)
+func getFunctions(branches []string, source string, dest string) []function {
+	functions := make(map[string]function)
+	for _, b := range branches {
+		segments := strings.Split(b, "/")
+		funcName := segments[len(segments)-2]
+		minorVersion := segments[len(segments)-1]
+		funcDest := filepath.Join(dest, funcName)
+		versionDest := filepath.Join(funcDest, minorVersion)
+		relativeFuncPath, err := getRelativeFunctionPath(source, funcName)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
 		}
+
+		err = copyExamples(b, funcName, funcDest, versionDest)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+
+		err = copyReadme(b, funcName, relativeFuncPath, versionDest)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+
+		f := functions[funcName]
+		f.FunctionName = funcName
+		if f.VersionToExamples == nil {
+			f.VersionToExamples = make(map[string]map[string]example)
+		}
+		metadataPath := strings.TrimSpace(fmt.Sprintf("%v:%v", b, filepath.Join(relativeFuncPath, "metadata.yaml")))
+		f, err = parseMetadata(f, metadataPath, minorVersion, versionDest)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+		functions[funcName] = f
 	}
-	return m, nil
+
+	flattenedFunctions := make([]function, 0)
+	for _, f := range functions {
+		flattenedFunctions = append(flattenedFunctions, f)
+	}
+	sort.Slice(flattenedFunctions, func(i int, j int) bool {
+		return flattenedFunctions[i].FunctionName < flattenedFunctions[j].FunctionName
+	})
+	return flattenedFunctions
 }
 
-func generateFunctionDescriptions(functions []function) ([]function, error) {
-	for i := range functions {
+func copyExamples(b string, funcName string, funcDest string, versionDest string) error {
+	exampleSource := fmt.Sprintf("examples/%v", funcName)
 
-		minorVersions := make([]string, 0)
-		for minorVersion := range functions[i].VersionToPatches {
-			minorVersions = append(minorVersions, minorVersion)
-		}
-
-		// Sort minor versions in descending order
-		sort.Slice(minorVersions, func(i, j int) bool {
-			return semver.Compare(minorVersions[i], minorVersions[j]) > 0
-		})
-
-		for versionIndex, version := range minorVersions {
-			imagePath := fmt.Sprintf("--image=gcr.io/kpt-fn/%v:%v", functions[i].FunctionName, version)
-
-			// Use `kpt fn doc` to obtain documentation on the function
-			var buf bytes.Buffer
-			cmd := exec.Command("kpt", "fn", "doc", imagePath)
-			cmd.Stdout = &buf
-			err := cmd.Run()
-			if err != nil {
-				return functions, err
-			}
-
-			// The first line of the most recent documentation is the description of the function
-			firstLine, err := buf.ReadString('\n')
-			if err != nil {
-				return functions, err
-			}
-
-			if versionIndex == 0 {
-				functions[i].Description = strings.Trim(firstLine, "\n")
-			}
-
-			// Write the entire documentation output to the appropriate version's directory.
-			for _, patchVersion := range functions[i].VersionToPatches[version] {
-				versionDocumentationPath := filepath.Join(filepath.Dir(functions[i].Path), patchVersion.Version, "README.md")
-				err := ioutil.WriteFile(versionDocumentationPath, []byte(firstLine+buf.String()), 0600)
-				if err != nil {
-					return functions, err
-				}
-			}
-		}
+	// Prepare destination for versioned examples.
+	err := os.MkdirAll(funcDest, 0744)
+	if err != nil {
+		return err
 	}
-	return functions, nil
+
+	// Copy examples for the function's version to a temporary directory.
+	tempDir, err := os.MkdirTemp("", "examples")
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", exampleSource)
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	// Move example content to the site's example directory.
+	err = os.Rename(filepath.Join(tempDir, "examples", funcName), versionDest)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func copyReadme(b string, funcName string, relativeFuncPath string, versionDest string) error {
+	// Copy README for the function's version to the example directory.
+	tempDir, err := os.MkdirTemp("", "functions")
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", filepath.Join(relativeFuncPath, "README.md"))
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	// Find the README in the example directory.
+	m, err := filepath.Glob(filepath.Join(tempDir, "functions", "*", funcName, "README.md"))
+	if err != nil {
+		return err
+	}
+
+	// Move the README to the destination directory.
+	err = os.Rename(m[0], filepath.Join(versionDest, "README.md"))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func parseMetadata(f function, metadataPath string, version string, versionDest string) (function, error) {
+	var buf bytes.Buffer
+	// Get the content of metadata.yaml from the appropriate release branch.
+	cmd := exec.Command("git", "show", metadataPath)
+	cmd.Stdout = &buf
+	err := cmd.Run()
+	if err != nil {
+		return f, err
+	}
+
+	var md metadata
+	yaml.Unmarshal(buf.Bytes(), &md)
+
+	// Add examples to version map.
+	if f.VersionToExamples[version] == nil {
+		f.VersionToExamples[version] = make(map[string]example)
+	}
+	e := f.VersionToExamples[version]
+	for _, exUrl := range md.ExamplePackageUrls {
+		exUrlSegments := strings.Split(exUrl, "/")
+		exName := exUrlSegments[len(exUrlSegments)-1]
+		ex := example{RemoteExamplePath: exUrl, LocalExamplePath: filepath.Join(versionDest, exName)}
+
+		e[exName] = ex
+	}
+	f.VersionToExamples[version] = e
+	if semver.Compare(f.LatestVersion, version) == 1 {
+		return f, nil
+	}
+
+	// If this is the latest version,
+	// update latest version, default path, description and rags.
+	f.LatestVersion = version
+	f.Path = versionDest
+	f.Description = md.Description
+	sort.Sort(sort.StringSlice(md.Tags))
+	f.Tags = strings.Join(md.Tags, ",")
+
+	return f, nil
+}
+
+func getRelativeFunctionPath(source string, funcName string) (string, error) {
+	// Find the directory for the function's source.
+	m, err := filepath.Glob(filepath.Join(source, "functions", "*", funcName))
+	if err != nil {
+		return "", err
+	}
+
+	return functionDirPrefix.ReplaceAllString(m[0], "functions/"), nil
 }
 
 func writeFunctionIndex(functions []function, source string, dest string) error {
-	mutators := []string{"## Mutators", "", "| Name | Description |", "| ---- | ----------- |"}
-	validators := []string{"## Validators", "", "| Name | Description |", "| ---- | ----------- |"}
+	out := []string{"# KPT Function Catalog", "", "| Name | Description | Tags |", "| ---- | ----------- | ---- |"}
 	for _, f := range functions {
-		functionEntry := fmt.Sprintf("| [%v](%v/) | %v |", f.FunctionName, strings.Replace(f.Path, source, "", 1), f.Description)
-
-		switch f.Type {
-		case "Mutator":
-			mutators = append(mutators, functionEntry)
-		case "Validator":
-			validators = append(validators, functionEntry)
-
-		}
+		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.FunctionName, strings.Replace(f.Path, filepath.Join(source, "examples"), "", 1), f.Description, f.Tags)
+		out = append(out, functionEntry)
 	}
 
-	out := append([]string{"# KPT Function Catalog", ""}, mutators...)
-	out = append(out, "")
-	out = append(out, validators...)
-
 	o := strings.Join(out, "\n")
-	err := ioutil.WriteFile(filepath.Join(dest, "README.md"), []byte(o), 0600)
+	err := ioutil.WriteFile(filepath.Join(dest, "README.md"), []byte(o), 0744)
 	return err
 }
 
 func writeExampleIndex(functions []function, source string, dest string) error {
 	// Key a function's version's examples by the function's name -> version
-	functionVersionMap := make(map[string]map[string][]string)
+	functionVersionMap := make(map[string]map[string]map[string]example)
 	for _, f := range functions {
-		functionVersionMap[f.FunctionName] = getExamplePaths(f.VersionToPatches, source)
+		vToE := make(map[string]map[string]example)
+		for v, examples := range f.VersionToExamples {
+			exampleToPaths := make(map[string]example)
+			for exName, ex := range examples {
+				e := ex
+				e.LocalExamplePath = strings.Replace(ex.LocalExamplePath, filepath.Join(source, "examples"), "", 1)
+				exampleToPaths[exName] = e
+			}
+			vToE[v] = exampleToPaths
+		}
+		functionVersionMap[f.FunctionName] = vToE
 	}
 
 	funcJson, err := json.Marshal(functionVersionMap)
@@ -264,17 +314,4 @@ func writeExampleIndex(functions []function, source string, dest string) error {
 
 	err = ioutil.WriteFile(filepath.Join(dest, "catalog.json"), funcJson, 0600)
 	return err
-}
-
-func getExamplePaths(patchMap map[string][]patch, source string) map[string][]string {
-	examplePaths := make(map[string][]string)
-	for _, patches := range patchMap {
-		for _, p := range patches {
-			for _, e := range p.Examples {
-				examplePaths[p.Version] = append(examplePaths[p.Version], strings.Replace(e, source, "", 1))
-			}
-		}
-	}
-
-	return examplePaths
 }

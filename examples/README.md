@@ -1,15 +1,7 @@
 # KPT Function Catalog
 
-## Mutators
-
-| Name | Description |
-| ---- | ----------- |
-| [Set Annotation](/mutators/set-annotation/) | Add annotations to resources. |
-| [Set Label](/mutators/set-label/) | Manipulate the `metadata.labels` field on resources. |
-| [Set Namespace](/mutators/set-namespace/) | Manipulate the `metadata.namespace` field on resources. |
-
-## Validators
-
-| Name | Description |
-| ---- | ----------- |
-| [Kubeval](/validators/kubeval/) | Validate Kubernetes resources. |
+| Name | Description | Tags |
+| ---- | ----------- | ---- |
+| [set-annotation](/set-annotation/v0.1/) | Add a list of annotations to all resources. | mutator |
+| [set-label](/set-label/v0.1/) | Add a list of labels to all resources. | mutator |
+| [set-namespace](/set-namespace/v0.1/) | Update or add namespace. | mutator |
