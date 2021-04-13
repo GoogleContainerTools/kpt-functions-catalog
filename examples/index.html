@@ -102,6 +102,25 @@
                   versionDropdown +
                   examplesDropdown +
                   "</div>";
+
+                const ghElement = document
+                  .getElementsByClassName("github-corner")
+                  .item(0);
+                const currentEx = vm.route.path.split("/")[3];
+                // Change the GH icon to point to the current example if it exists.
+                if (currentEx) {
+                  ghElement.href = examples[currentEx].RemoteExamplePath;
+                } 
+                // If not on an example, change the GH icon to point to the current version if it exists.
+                else if (versionName) {
+                  const exampleSuffix = /examples\/.+/;
+                  ghElement.href = examples[exampleNames[0]].RemoteExamplePath.replace(exampleSuffix, "");
+                }
+                // On every other page, point to the main catalog repo. 
+                else {
+                  ghElement.href = window.$docsify.corner.url;
+                }
+
                 html = dropdowns + html;
               } catch (err) {
                 console.error(err);
