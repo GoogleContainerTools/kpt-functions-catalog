@@ -13,7 +13,7 @@ The constraint disallows using `private_key` as a key in the ConfigMap.
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/validators/gatekeeper-validate/invalid-configmap .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-validate/invalid-configmap .
 ```
 
 Create a directory for storing the structured output.
