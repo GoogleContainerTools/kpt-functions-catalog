@@ -1,0 +1,48 @@
+diff --git a/fn-config.yaml b/fn-config.yaml
+deleted file mode 100644
+index d94a08d..0000000
+--- a/fn-config.yaml
++++ /dev/null
+@@ -1,11 +0,0 @@
+-apiVersion: v1
+-kind: ConfigMap
+-metadata:
+-  name: my-config
+-  annotations:
+-    config.k8s.io/function: |
+-      container:
+-        image: gcr.io/kpt-fn/ensure-name-segment:unstable
+-    config.kubernetes.io/local-config: 'true'
+-data:
+-  prepend: prod-
+diff --git a/resources.yaml b/resources.yaml
+index df7fdf7..db12c67 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -1,7 +1,7 @@
+ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+-  name: the-map
++  name: prod-the-map
+   namespace: the-namespace
+ data:
+   some-key: some-value
+@@ -9,7 +9,7 @@ data:
+ apiVersion: v1
+ kind: Pod
+ metadata:
+-  name: the-pod
++  name: prod-the-pod
+   namespace: the-namespace
+ spec:
+   containers:
+@@ -23,7 +23,7 @@ spec:
+     - name: SOME_KEY
+       valueFrom:
+         configMapKeyRef:
+-          name: the-map
++          name: prod-the-map
+           key: some-key
+ ---
+ apiVersion: v1

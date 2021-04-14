@@ -1,0 +1,62 @@
+diff --git a/fn-config.yaml b/fn-config.yaml
+deleted file mode 100644
+index b886728..0000000
+--- a/fn-config.yaml
++++ /dev/null
+@@ -1,16 +0,0 @@
+-apiVersion: fn.kpt.dev/v1alpha1
+-kind: EnsureNameSegment
+-metadata:
+-  name: my-config
+-  annotations:
+-    config.k8s.io/function: |
+-      container:
+-        image: gcr.io/kpt-fn/ensure-name-segment:unstable
+-    config.kubernetes.io/local-config: 'true'
+-segment: prod-
+-actionOnNotFound: prepend
+-fieldSpecs:
+-- group: dev.example.com
+-  version: v1
+-  kind: MyResource
+-  path: spec/name
+diff --git a/resources.yaml b/resources.yaml
+index 9e83cfa..7f688d6 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -1,14 +1,14 @@
+ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+-  name: the-map
++  name: prod-the-map
+ data:
+   some-key: some-value
+ ---
+ apiVersion: v1
+ kind: Pod
+ metadata:
+-  name: the-pod
++  name: prod-the-pod
+   namespace: the-namespace
+ spec:
+   containers:
+@@ -28,7 +28,7 @@ spec:
+ apiVersion: v1
+ kind: Service
+ metadata:
+-  name: the-service
++  name: prod-the-service
+   namespace: the-namespace
+ spec:
+   ports:
+@@ -47,7 +47,7 @@ metadata:
+ apiVersion: dev.example.com/v1
+ kind: MyResource
+ metadata:
+-  name: the-cr
++  name: prod-the-cr
+   namespace: the-namespace
+ spec:
+-  name: foo
++  name: prod-foo
