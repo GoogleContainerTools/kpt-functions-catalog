@@ -1,18 +1,18 @@
-# ensure-name-segment: Advanced Example
+# ensure-name-substring: Advanced Example
 
-In this example, we use function `ensure-name-segment` to ensure every resource
-name and the field declared in the field specs contain the desired name segment.
-We prepend the segment if it doesn't exist.
+In this example, we use the function `ensure-name-substring` to ensure every
+resource name and the field declared in the field specs contain the desired name
+substring. We prepend the substring if it doesn't exist.
 
 We use the following CustomResource to configure the function.
 
 ```yaml
 apiVersion: fn.kpt.dev/v1alpha1
-kind: EnsureNameSegment
+kind: EnsureNameSubstring
 metadata:
   ...
-segment: prod-
-actionOnNotFound: prepend
+substring: prod-
+editMode: prepend
 fieldSpecs:
   - group: dev.example.com
     version: v1
@@ -28,7 +28,7 @@ The function will not only update field `.metadata.name` but also field
 Get the config example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-segment/advanced .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/advanced .
 kpt fn run advanced
 ```
 

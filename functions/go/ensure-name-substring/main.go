@@ -11,8 +11,8 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/yaml"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-name-prefix/generated"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-name-prefix/nameref"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/ensure-name-substring/generated"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/ensure-name-substring/nameref"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func run() error {
 		return err
 	}
 
-	ens := &EnsureNameSegment{}
+	ens := &EnsureNameSubstring{}
 	resourceList := &framework.ResourceList{
 		FunctionConfig: ens,
 	}
@@ -49,7 +49,7 @@ func run() error {
 			return fmt.Errorf("failed validation: %w", err)
 		}
 		if err = ens.Transform(resMap); err != nil {
-			return fmt.Errorf("failed to transform name segment: %w", err)
+			return fmt.Errorf("failed to transform name substring: %w", err)
 		}
 		// update name back reference
 		err = nameref.FixNameBackReference(resMap)
@@ -66,9 +66,9 @@ func run() error {
 		return nil
 	})
 
-	cmd.Short = generated.EnsureNameSegmentShort
-	cmd.Long = generated.EnsureNameSegmentLong
-	cmd.Example = generated.EnsureNameSegmentExamples
+	cmd.Short = generated.EnsureNameSubstringShort
+	cmd.Long = generated.EnsureNameSubstringLong
+	cmd.Example = generated.EnsureNameSubstringExamples
 	return cmd.Execute()
 }
 

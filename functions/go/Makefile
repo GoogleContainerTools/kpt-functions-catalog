@@ -26,7 +26,7 @@ FUNCTIONS := \
 	apply-setters \
 	search-replace \
 	gatekeeper-validate \
-	ensure-name-segment
+	ensure-name-substring
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))

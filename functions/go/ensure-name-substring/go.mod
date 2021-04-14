@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-name-prefix
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/ensure-name-substring
 
 go 1.15
 

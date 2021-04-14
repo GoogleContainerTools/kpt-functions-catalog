@@ -1,6 +1,6 @@
 diff --git a/fn-config.yaml b/fn-config.yaml
 deleted file mode 100644
-index d94a08d..0000000
+index 22a9533..0000000
 --- a/fn-config.yaml
 +++ /dev/null
 @@ -1,11 +0,0 @@
@@ -11,7 +11,7 @@ index d94a08d..0000000
 -  annotations:
 -    config.k8s.io/function: |
 -      container:
--        image: gcr.io/kpt-fn/ensure-name-segment:unstable
+-        image: gcr.io/kpt-fn/ensure-name-substring:unstable
 -    config.kubernetes.io/local-config: 'true'
 -data:
 -  prepend: prod-

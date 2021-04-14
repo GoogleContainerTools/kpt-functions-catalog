@@ -1,10 +1,10 @@
-# ensure-name-segment
+# ensure-name-substring
 
 ### Overview
 
 <!--mdtogo:Short-->
 
-Ensure a name segment is part of the name.
+Ensure a name substring is part of the name.
 
 <!--mdtogo-->
 
@@ -12,18 +12,22 @@ Ensure a name segment is part of the name.
 
 <!--mdtogo:Long-->
 
-If the desired name segment is already part of the name, it takes no actions.
-Otherwise, it prepends or appends the name segment.
+If the desired name substring is already part of the name, it takes no actions.
+Otherwise, it prepends or appends the name substring.
+
+Note: If the original name of a resource happens to contain the desired
+substring, the desired substring will not be added again. Users need to ensure
+the name collisions don't happen.
 
 To configure it using a ConfigMap, only one key-value pair is allowed in `data`
 field. The key must be one of `prepend` and `append`, and the value is the
-desired name segment. 
+desired name substring. 
 
 ```yaml
-prepend|append: Desired name segment
+prepend|append: Desired name substring
 ```
 
-For example: To ensure a name segment `dev-` exists in all resources and
+For example: To ensure a name substring `dev-` exists in all resources and
 prepends it if not found.
 
 ```yaml
@@ -69,11 +73,11 @@ For example, to ensure `dev-` also exists `spec/name` in `MyOwnResource`:
 
 ```yaml
 apiVersion: v1
-kind: EnsureNameSegment
+kind: EnsureNameSubstring
 metadata:
   name: my-config
-segment: dev-
-actionOnNotFound: prepend
+substring: dev-
+editMode: prepend
 fieldSpecs:
 - path: spec/name
   kind: MyOwnResource
@@ -87,6 +91,6 @@ fieldSpecs:
 
 <!--mdtogo:Examples-->
 
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/ensure-name-segment/
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/ensure-name-substring/
 
 <!--mdtogo-->

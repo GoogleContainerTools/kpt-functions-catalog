@@ -19,41 +19,41 @@ const (
 	fnConfigGroup      = "fn.kpt.dev"
 	fnConfigVersion    = "v1alpha1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
-	fnConfigKind       = "EnsureNameSegment"
+	fnConfigKind       = "EnsureNameSubstring"
 )
 
-type EnsureNameSegment struct {
+type EnsureNameSubstring struct {
 	yaml.ResourceMeta `json:",inline" yaml:",inline"`
-	// Segment is the desired name segment.
-	Segment string `json:"segment" yaml:"segment"`
-	// ActionOnNotFound controls the desired action when the desired segment is not found in the name.
+	// Substring is the desired name substring.
+	Substring string `json:"substring" yaml:"substring"`
+	// EditMode controls the desired action when the desired substring is not found in the name.
 	// If not specified, prepend will be the default.
-	ActionOnNotFound ActionMode `json:"actionOnNotFound,omitempty" yaml:"actionOnNotFound,omitempty"`
+	EditMode EditMode `json:"editMode,omitempty" yaml:"editMode,omitempty"`
 
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 }
 
-type ActionMode string
+type EditMode string
 
 const (
-	Prepend ActionMode = "prepend"
-	Append  ActionMode = "append"
+	Prepend EditMode = "prepend"
+	Append  EditMode = "append"
 )
 
-func (ens *EnsureNameSegment) Defaults() {
-	if ens.ActionOnNotFound == "" {
-		ens.ActionOnNotFound = Prepend
+func (ens *EnsureNameSubstring) Defaults() {
+	if ens.EditMode == "" {
+		ens.EditMode = Prepend
 	}
 }
 
-func (ens *EnsureNameSegment) Validate() error {
-	if len(ens.Segment) == 0 {
-		return fmt.Errorf("segment must not be empty")
+func (ens *EnsureNameSubstring) Validate() error {
+	if len(ens.Substring) == 0 {
+		return fmt.Errorf("substring must not be empty")
 	}
 	return nil
 }
 
-func (ens *EnsureNameSegment) Transform(m resmap.ResMap) error {
+func (ens *EnsureNameSubstring) Transform(m resmap.ResMap) error {
 	for _, r := range m.Resources() {
 		if shouldSkip(r.OrgId()) {
 			continue
@@ -67,13 +67,13 @@ func (ens *EnsureNameSegment) Transform(m resmap.ResMap) error {
 				continue
 			}
 
-			// Idempotency check: if the segment is already part of the name, we
+			// Idempotency check: if the substring is already part of the name, we
 			// don't need to do anything.
-			contain, err := resourceContainsSegment(r, ens.Segment, fs)
+			hasSubstring, err := resourceContainsSubstring(r, ens.Substring, fs)
 			if err != nil {
 				return err
 			}
-			if contain {
+			if hasSubstring {
 				continue
 			}
 
@@ -81,20 +81,20 @@ func (ens *EnsureNameSegment) Transform(m resmap.ResMap) error {
 				// If we are changing "metadata/name", we tracks the original
 				// name and the prefix or suffix being added.
 				r.StorePreviousId()
-				if ens.ActionOnNotFound == Prepend {
-					r.AddNamePrefix(ens.Segment)
-				} else if ens.ActionOnNotFound == Append {
-					r.AddNameSuffix(ens.Segment)
+				if ens.EditMode == Prepend {
+					r.AddNamePrefix(ens.Substring)
+				} else if ens.EditMode == Append {
+					r.AddNameSuffix(ens.Substring)
 				}
 			}
 
 			fltr := prefixsuffix.Filter{
 				FieldSpec: fs,
 			}
-			if ens.ActionOnNotFound == Prepend {
-				fltr.Prefix = ens.Segment
-			} else if ens.ActionOnNotFound == Append {
-				fltr.Suffix = ens.Segment
+			if ens.EditMode == Prepend {
+				fltr.Prefix = ens.Substring
+			} else if ens.EditMode == Append {
+				fltr.Suffix = ens.Substring
 			}
 			err = r.ApplyFilter(fltr)
 			if err != nil {
@@ -105,9 +105,9 @@ func (ens *EnsureNameSegment) Transform(m resmap.ResMap) error {
 	return nil
 }
 
-var _ yaml.Unmarshaler = &EnsureNameSegment{}
+var _ yaml.Unmarshaler = &EnsureNameSubstring{}
 
-func (ens *EnsureNameSegment) UnmarshalYAML(value *yaml.Node) error {
+func (ens *EnsureNameSubstring) UnmarshalYAML(value *yaml.Node) error {
 	rn := yaml.NewRNode(value)
 	meta, err := rn.GetValidatedMetadata()
 	if err != nil {
@@ -124,7 +124,7 @@ func (ens *EnsureNameSegment) UnmarshalYAML(value *yaml.Node) error {
 		if err = k8syaml.Unmarshal([]byte(s), &cm); err != nil {
 			return err
 		}
-		if err = configMapToEnsureNameSegment(&cm, ens); err != nil {
+		if err = configMapToEnsureNameSubstring(&cm, ens); err != nil {
 			return err
 		}
 	case meta.APIVersion == fnConfigAPIVersion && meta.Kind == fnConfigKind:
@@ -140,20 +140,20 @@ func (ens *EnsureNameSegment) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-func configMapToEnsureNameSegment(cm *corev1.ConfigMap, ens *EnsureNameSegment) error {
+func configMapToEnsureNameSubstring(cm *corev1.ConfigMap, ens *EnsureNameSubstring) error {
 	if len(cm.Data) != 1 {
 		return fmt.Errorf("only 1 entry is allowed in the ConfigMap, but got: %d", len(cm.Data))
 	}
 	for k, v := range cm.Data {
 		switch k {
 		case string(Prepend):
-			ens.ActionOnNotFound = Prepend
+			ens.EditMode = Prepend
 		case string(Append):
-			ens.ActionOnNotFound = Append
+			ens.EditMode = Append
 		default:
-			return fmt.Errorf("actionOnNotFound")
+			return fmt.Errorf("editMode")
 		}
-		ens.Segment = v
+		ens.Substring = v
 	}
 	return nil
 }
@@ -179,11 +179,11 @@ func isNameChange(fs *types.FieldSpec) bool {
 	return fs.Path == "metadata/name"
 }
 
-func resourceContainsSegment(r *resource.Resource, segment string, fs types.FieldSpec) (bool, error) {
+func resourceContainsSubstring(r *resource.Resource, substring string, fs types.FieldSpec) (bool, error) {
 	if isNameChange(&fs) {
-		// Idempotency check: if the segment is already part of the name, we
+		// Idempotency check: if the substring is already part of the name, we
 		// don't need to do anything.
-		return strings.Contains(r.GetName(), segment), nil
+		return strings.Contains(r.GetName(), substring), nil
 	}
 
 	rn, err := yaml.FromMap(r.Map())
@@ -199,5 +199,5 @@ func resourceContainsSegment(r *resource.Resource, segment string, fs types.Fiel
 	if err != nil {
 		return false, err
 	}
-	return strings.Contains(valStr, segment), nil
+	return strings.Contains(valStr, substring), nil
 }
