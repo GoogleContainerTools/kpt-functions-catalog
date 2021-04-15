@@ -1,5 +1,9 @@
 # ensure-name-substring: Advanced Example
 
+Note: This is an alpha function, and we are actively seeking feedback on the
+function config syntax and behavior. If you have suggestion or feedback, please
+file an issue [here](https://github.com/GoogleContainerTools/kpt/issues/new/choose).
+
 In this example, we use the function `ensure-name-substring` to ensure every
 resource name and the field declared in the field specs contain the desired name
 substring. We prepend the substring if it doesn't exist.

@@ -12,6 +12,10 @@ Ensure a name substring is part of the name.
 
 <!--mdtogo:Long-->
 
+Note: This is an alpha function, and we are actively seeking feedback on the
+function config syntax and behavior. If you have suggestion or feedback, please
+file an issue [here](https://github.com/GoogleContainerTools/kpt/issues/new/choose).
+
 If the desired name substring is already part of the name, it takes no actions.
 Otherwise, it prepends or appends the name substring.
 
