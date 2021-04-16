@@ -25,7 +25,8 @@ FUNCTIONS := \
 	starlark \
 	apply-setters \
 	search-replace \
-	gatekeeper-validate
+	gatekeeper-validate \
+	ensure-name-substring
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
