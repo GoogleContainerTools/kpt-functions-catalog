@@ -62,7 +62,6 @@ func (ens *EnsureNameSubstring) Transform(m resmap.ResMap) error {
 		// current default configuration contains
 		// only one entry: "metadata/name" with no GVK
 		for _, fs := range ens.FieldSpecs {
-			// TODO: this is redundant to filter (but needed for now)
 			if !id.IsSelected(&fs.Gvk) {
 				continue
 			}
@@ -151,7 +150,7 @@ func configMapToEnsureNameSubstring(cm *corev1.ConfigMap, ens *EnsureNameSubstri
 		case string(Append):
 			ens.EditMode = Append
 		default:
-			return fmt.Errorf("editMode")
+			return fmt.Errorf("unknown editMode: %v, only %v and %v are allowed", k, Prepend, Append)
 		}
 		ens.Substring = v
 	}
@@ -188,16 +187,16 @@ func resourceContainsSubstring(r *resource.Resource, substring string, fs types.
 
 	rn, err := yaml.FromMap(r.Map())
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("unable to check if the substring exsits in %v: %w", r.OrgId().String(), err)
 	}
 	pathElements := strings.Split(fs.Path, "/")
 	val, err := rn.Pipe(yaml.Lookup(pathElements...))
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("unable to lookup path %v in %v: %w", fs.Path, r.OrgId().String(), err)
 	}
 	valStr, err := val.String()
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("unable to check if the substring exsits in %v: %w", r.OrgId().String(), err)
 	}
 	return strings.Contains(valStr, substring), nil
 }
