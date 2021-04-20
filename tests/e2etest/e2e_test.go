@@ -41,7 +41,7 @@ func TestE2E(t *testing.T) {
 }
 
 // runTests will scan test cases in 'path' and run all the
-// tests in it. It returns an error if any of the tests fqails.
+// tests in it. It returns an error if any of the tests fails.
 func runTests(t *testing.T, path string) {
 	cases, err := runner.ScanTestCases(path)
 	if err != nil {
