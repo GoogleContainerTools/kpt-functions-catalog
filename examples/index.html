@@ -114,7 +114,7 @@
                 // If not on an example, change the GH icon to point to the current version if it exists.
                 else if (versionName) {
                   const exampleSuffix = /examples\/.+/;
-                  ghElement.href = examples[exampleNames[0]].RemoteExamplePath.replace(exampleSuffix, "");
+                  ghElement.href = examples[exampleNames[0]].RemoteSourcePath;
                 }
                 // On every other page, point to the main catalog repo. 
                 else {

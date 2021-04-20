@@ -84,6 +84,7 @@ type function struct {
 type example struct {
 	LocalExamplePath  string
 	RemoteExamplePath string
+	RemoteSourcePath  string
 }
 
 type metadata struct {
@@ -248,8 +249,11 @@ func parseMetadata(f function, metadataPath string, version string, versionDest 
 	for _, exUrl := range md.ExamplePackageUrls {
 		exUrlSegments := strings.Split(exUrl, "/")
 		exName := exUrlSegments[len(exUrlSegments)-1]
-		ex := example{RemoteExamplePath: exUrl, LocalExamplePath: filepath.Join(versionDest, exName)}
-
+		ex := example{
+			RemoteSourcePath:  md.SourceUrl,
+			RemoteExamplePath: exUrl,
+			LocalExamplePath:  filepath.Join(versionDest, exName),
+		}
 		e[exName] = ex
 	}
 	f.VersionToExamples[version] = e
