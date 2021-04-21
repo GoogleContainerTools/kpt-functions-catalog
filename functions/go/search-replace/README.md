@@ -173,7 +173,7 @@ $ kpt fn run --image gcr.io/kpt-fn/search-replace:unstable -- by-path='spec.**.c
 $ kpt fn run --image gcr.io/kpt-fn/search-replace:unstable -- by-path='metadata.namespace' put-value='bookstore'
 ```
 
-```
+```sh
 # Search and Set multiple values using regex numbered capture groups
 $ kpt fn run --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='something-(.*)' put-value='my-project-id-${1}'
 metadata:
