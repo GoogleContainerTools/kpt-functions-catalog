@@ -23,7 +23,8 @@ We use the following ConfigMap to provide input matchers to the function.
 ```yaml
 apiVersion: v1
 kind: ConfigMap
-metadata: ...
+metadata:
+...
 data:
   by-path: metadata.name
   by-value: the-deployment
@@ -45,7 +46,7 @@ metadata:
 Get the config example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search/simple .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/simple .
 kpt fn run simple
 ```
 
@@ -54,5 +55,5 @@ kpt fn run simple
 Check the value of deployment `the-deloyment` is changed to `my-deloyment`.
 
 ```sh
-kpt cfg cat simple
+$ kpt cfg cat simple/
 ```

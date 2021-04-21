@@ -1,6 +1,6 @@
 # apply-setters: Simple Example
 
-Setters provide a solution for template-free setting of field values. The 
+Setters provide a solution for template-free setting of field values. The
 `apply-setters` KRM config function applies setter values to resource fields
 with setter references.
 
@@ -19,8 +19,8 @@ kind: MyKind
 metadata:
   name: ns
 environments: # kpt-set: ${env}
-- dev
-- stage
+  - dev
+  - stage
 ```
 
 We use ConfigMap to configure the `apply-setters` function. The desired
@@ -32,7 +32,7 @@ desired value for the tagged field.
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  ...
+  name: apply-setters-fn-config
 data:
   name: my-new-map
   env: |
@@ -40,7 +40,7 @@ data:
     - stage
 ```
 
-Invoking `apply-setters` function would apply the changes to resource configs 
+Invoking `apply-setters` function would apply the changes to resource configs
 
 ```yaml
 apiVersion: v1
@@ -55,8 +55,8 @@ kind: MyKind
 metadata:
   name: ns
 environments: # kpt-set: ${env}
-- prod
-- stage
+  - prod
+  - stage
 ```
 
 ## Function invocation
@@ -74,5 +74,5 @@ Check the value of setter `name` is set to `my-new-map`.
 Check the value of setter `env` is set to array value `[prod, stage]`.
 
 ```sh
-kpt cfg cat simple
+$ kpt cfg cat simple/
 ```
