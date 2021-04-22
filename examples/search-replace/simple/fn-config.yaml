@@ -6,7 +6,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-        image: gcr.io/kpt-fn/search-replace:unstable
+        image: gcr.io/kpt-fn/search-replace:v0.1
 data:
   by-path: metadata.name
   by-value: the-deployment
