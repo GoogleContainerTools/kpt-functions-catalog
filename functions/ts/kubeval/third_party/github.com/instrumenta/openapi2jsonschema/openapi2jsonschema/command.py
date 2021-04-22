@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import json
-import yaml
 import urllib
 import os
 import sys
@@ -76,7 +75,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict, a
     info("Parsing schema")
     # Note that JSON is valid YAML, so we can use the YAML parser whether
     # the schema is stored in JSON or YAML
-    data = yaml.load(response.read(), Loader=yaml.SafeLoader)
+    data = json.loads(response.read())
 
     if "swagger" in data:
         version = data["swagger"]
