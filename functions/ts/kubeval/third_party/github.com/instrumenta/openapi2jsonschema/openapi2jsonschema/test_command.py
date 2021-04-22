@@ -2,7 +2,7 @@ import os
 import pytest  # type: ignore
 from click.testing import CliRunner
 
-from openapi2jsonschema.command import default
+from command import default
 
 FIXTURE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../fixtures")
 

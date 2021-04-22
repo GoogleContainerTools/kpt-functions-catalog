@@ -2,10 +2,14 @@ import {
   Configs,
   KubernetesObject,
   kubernetesObjectResult,
+  generalResult,
   Result,
 } from 'kpt-functions';
-import { ChildProcess, spawn } from 'child_process';
+import { ChildProcess, spawn, spawnSync } from 'child_process';
 import { Writable } from 'stream';
+
+const DEFAULT_SCHEMA_LOCATION = '/tmp';
+const DEFAULT_OPENAPI_LOCATION = '/home/node/openapi.json';
 
 const SCHEMA_LOCATION = 'schema_location';
 const ADDITIONAL_SCHEMA_LOCATIONS = 'additional_schema_locations';
@@ -38,6 +42,13 @@ export async function kubeval(configs: Configs): Promise<void> {
   const strict = JSON.parse(configs.getFunctionConfigValue(STRICT) || 'false');
 
   const results: Result[] = [];
+
+  // Convert openapi to json schema if neither schema_location nor
+  // additional_schema_locations is provided.
+  if (!schemaLocation && additionalSchemaLocations.length === 0) {
+    await runOpenapi2jsonschema(configs, results);
+  }
+
   const args = buildKubevalArgs(
     schemaLocation,
     additionalSchemaLocations,
@@ -51,6 +62,48 @@ export async function kubeval(configs: Configs): Promise<void> {
   }
 
   configs.addResults(...results);
+}
+
+async function runOpenapi2jsonschema(
+  configs: Configs,
+  results: Result[]
+): Promise<void> {
+  const apiVersionKindSet = new Set();
+  for (const object of configs.getAll()) {
+    const avk = object.apiVersion + ',' + object.kind;
+    if (!apiVersionKindSet.has(avk)) {
+      apiVersionKindSet.add(avk);
+    }
+  }
+  if (apiVersionKindSet.size > 0) {
+    const openapi2jsonschemaArgs = [
+      '--kubernetes',
+      '--expanded',
+      '--stand-alone',
+      '-o',
+      DEFAULT_SCHEMA_LOCATION + '/master-standalone',
+      '--apiversionkind',
+      Array.from(apiVersionKindSet).join(';'),
+      DEFAULT_OPENAPI_LOCATION,
+    ];
+    const openapi2jsonschemaProcess = spawnSync(
+      'openapi2jsonschema',
+      openapi2jsonschemaArgs,
+      {
+        encoding: 'utf-8',
+        stdio: [process.stdin, 'pipe', 'pipe'],
+      }
+    );
+    if (openapi2jsonschemaProcess.status !== 0) {
+      const result = generalResult(
+        String(openapi2jsonschemaProcess.stdout) +
+          String(openapi2jsonschemaProcess.stderr),
+        'error',
+        undefined
+      );
+      results.push(result);
+    }
+  }
 }
 
 async function runKubeval(
@@ -116,16 +169,21 @@ function buildKubevalArgs(
     args.push(schemaLocation);
   }
 
-  if (additionalSchemaLocations) {
+  if (additionalSchemaLocations.length > 0) {
     args.push('--additional-schema-locations');
     args.push(additionalSchemaLocations.join(','));
+  }
+
+  if (!schemaLocation && additionalSchemaLocations.length === 0) {
+    args.push('--schema-location');
+    args.push('file://' + DEFAULT_SCHEMA_LOCATION);
   }
 
   if (ignoreMissingSchemas) {
     args.push('--ignore-missing-schemas');
   }
 
-  if (skipKinds) {
+  if (skipKinds.length > 0) {
     args.push('--skip-kinds');
     args.push(skipKinds.join(','));
   }
@@ -157,9 +215,11 @@ function readStdoutToString(childProcess: ChildProcess): Promise<string> {
 kubeval.usage = `
 Validates configuration using kubeval.
 
+If neither ${SCHEMA_LOCATION} nor ${ADDITIONAL_SCHEMA_LOCATIONS} is provided, we
+will use the baked-in schemas. Otherwise, we will try to download the schemas.
+
 Configured using a ConfigMap with the following keys, all of which are optional:
-${SCHEMA_LOCATION}: The base URL used to download schemas.  If not specified,
-  the default location at https://kubernetesjsonschema.dev/ will be used.
+${SCHEMA_LOCATION}: The base URL used to download schemas.
 ${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to download
   schemas.  These URLs will be used if the URL specified by ${SCHEMA_LOCATION}
   did not have the required schema.  By default, there are no secondary URLs,
