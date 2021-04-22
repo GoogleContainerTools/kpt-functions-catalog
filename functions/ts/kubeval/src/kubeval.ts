@@ -46,7 +46,7 @@ export async function kubeval(configs: Configs): Promise<void> {
   // Convert openapi to json schema if neither schema_location nor
   // additional_schema_locations is provided.
   if (!schemaLocation && additionalSchemaLocations.length === 0) {
-    await runOpenapi2jsonschema(configs, results);
+    await runOpenapi2jsonschema(configs, strict, results);
   }
 
   const args = buildKubevalArgs(
@@ -66,6 +66,7 @@ export async function kubeval(configs: Configs): Promise<void> {
 
 async function runOpenapi2jsonschema(
   configs: Configs,
+  strict: boolean,
   results: Result[]
 ): Promise<void> {
   const apiVersionKindSet = new Set();
@@ -80,12 +81,23 @@ async function runOpenapi2jsonschema(
       '--kubernetes',
       '--expanded',
       '--stand-alone',
-      '-o',
-      DEFAULT_SCHEMA_LOCATION + '/master-standalone',
       '--apiversionkind',
       Array.from(apiVersionKindSet).join(';'),
-      DEFAULT_OPENAPI_LOCATION,
     ];
+    if (strict) {
+      openapi2jsonschemaArgs.push('--strict');
+      openapi2jsonschemaArgs.push(
+        '-o',
+        DEFAULT_SCHEMA_LOCATION + '/master-standalone-strict'
+      );
+    } else {
+      openapi2jsonschemaArgs.push(
+        '-o',
+        DEFAULT_SCHEMA_LOCATION + '/master-standalone'
+      );
+    }
+    openapi2jsonschemaArgs.push(DEFAULT_OPENAPI_LOCATION);
+
     const openapi2jsonschemaProcess = spawnSync(
       'openapi2jsonschema',
       openapi2jsonschemaArgs,
