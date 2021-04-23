@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Format resources using openapi schema.
+Format resources
 
 <!--mdtogo-->
 
