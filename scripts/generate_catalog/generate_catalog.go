@@ -14,9 +14,9 @@
 //
 // Usage: generate_catalog SRC_REPO_DIR/ DEST_MD_DIR/
 //
-// The command will create a README.md file under DEST_MD_DIR/ containing tables
-// of functions separated by function type. Source files for the catalog will
-// also appear in DEST_MD_DIR/
+// The command will create a README.md file under DEST_MD_DIR/ containing a table
+// of collected functions. Source files for the catalog will also appear in
+// DEST_MD_DIR/
 package main
 
 import (
@@ -97,9 +97,9 @@ type metadata struct {
 
 var (
 	// Match start of a version such as v1.9.1
-	semverPrefix      = regexp.MustCompile(`v\d`)
-	functionDirPrefix = regexp.MustCompile(`.+/functions/`)
-	exampleDirPrefix  = regexp.MustCompile(`.+/examples/`)
+	branchSemverPrefix = regexp.MustCompile(`[-\w]*\/(v\d*\.\d*)`)
+	functionDirPrefix  = regexp.MustCompile(`.+/functions/`)
+	exampleDirPrefix   = regexp.MustCompile(`.+/examples/`)
 )
 
 func getBranches() ([]string, error) {
@@ -114,8 +114,7 @@ func getBranches() ([]string, error) {
 	}
 
 	for _, branch := range strings.Split(buf.String(), "\n") {
-		segments := strings.Split(branch, "/")
-		if semverPrefix.MatchString(segments[len(segments)-1]) {
+		if branchSemverPrefix.MatchString(branch) {
 			verBranches = append(verBranches, strings.TrimSpace(branch))
 		}
 	}
