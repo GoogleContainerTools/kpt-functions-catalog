@@ -6,6 +6,5 @@ sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/ma
 examplePackageURLs:
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/apply-setters/simple
 emails:
-  - mengqiy@google.com
-  - pmarupaka@google.com
+  - kpt-team@google.com
 license: Apache-2.0
