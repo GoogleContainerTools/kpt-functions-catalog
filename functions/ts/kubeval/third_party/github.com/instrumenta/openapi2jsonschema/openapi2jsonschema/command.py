@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import json
-import yaml
 import urllib
 import os
 import sys
@@ -9,15 +8,15 @@ import sys
 from jsonref import JsonRef  # type: ignore
 import click
 
-from openapi2jsonschema.log import info, debug, error
-from openapi2jsonschema.util import (
+from log import info, debug, error
+from util import (
     additional_properties,
     replace_int_or_string,
     allow_null_optional_fields,
     change_dict_values,
     append_no_duplicates,
 )
-from openapi2jsonschema.errors import UnsupportedError
+from errors import UnsupportedError
 
 
 @click.command()
@@ -48,11 +47,22 @@ from openapi2jsonschema.errors import UnsupportedError
     is_flag=True,
     help="Prohibits properties not in the schema (additionalProperties: false)",
 )
+@click.option(
+    "--apiversionkind",
+    metavar="apiVersion1,kind1;apiVersion2,kind2",
+    help="the target resources",
+)
 @click.argument("schema", metavar="SCHEMA_URL")
-def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict):
+def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict, apiversionkind):
     """
     Converts a valid OpenAPI specification into a set of JSON Schema files
     """
+    apiVersionKindSet = set()
+    avkList = apiversionkind.strip("'\"").split(";")
+    for avk in avkList:
+        elements = avk.split(",")
+        apiVersionKindSet.add((elements[0], elements[1].lower()))
+
     info("Downloading schema")
     if sys.version_info < (3, 0):
         response = urllib.urlopen(schema)
@@ -65,7 +75,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict):
     info("Parsing schema")
     # Note that JSON is valid YAML, so we can use the YAML parser whether
     # the schema is stored in JSON or YAML
-    data = yaml.load(response.read(), Loader=yaml.SafeLoader)
+    data = json.loads(response.read())
 
     if "swagger" in data:
         version = data["swagger"]
@@ -96,7 +106,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict):
                     type_def = definitions[type_name]
                     if "x-kubernetes-group-version-kind" in type_def:
                         for kube_ext in type_def["x-kubernetes-group-version-kind"]:
-                            if expanded and "apiVersion" in type_def["properties"]:
+                            if expanded and "properties" in type_def and "apiVersion" in type_def["properties"]:
                                 api_version = (
                                     kube_ext["group"] + "/" +
                                     kube_ext["version"]
@@ -108,7 +118,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict):
                                     "enum",
                                     api_version,
                                 )
-                            if "kind" in type_def["properties"]:
+                            if "properties" in type_def and "kind" in type_def["properties"]:
                                 kind = kube_ext["kind"]
                                 append_no_duplicates(
                                     type_def["properties"]["kind"], "enum", kind
@@ -131,6 +141,9 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict):
         if kubernetes:
             group = title.split(".")[-3].lower()
             api_version = title.split(".")[-2].lower()
+        tup = (group + "/" + api_version if group and group != "core" else api_version, kind)
+        if tup not in apiVersionKindSet:
+            continue
         specification = components[title]
         specification["$schema"] = "http://json-schema.org/schema#"
         specification.setdefault("type", "object")
@@ -183,7 +196,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict):
             specification = updated
 
             if stand_alone:
-                base = "file://%s/%s/" % (os.getcwd(), output)
+                base = "file://%s/" % (os.path.realpath(output))
                 specification = JsonRef.replace_refs(
                     specification, base_uri=base)
 
