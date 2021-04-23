@@ -29,7 +29,7 @@ FROM node:14.15-alpine3.12
 
 RUN apk add --update --no-cache python3 py3-pip && ln -sf python3 /usr/bin/python
 RUN pip install pyyaml jsonref click
-COPY forked/github.com/instrumenta/openapi2jsonschema/*.py /openapi2jsonschema/
+COPY third_party/github.com/instrumenta/openapi2jsonschema/openapi2jsonschema/*.py /openapi2jsonschema/
 RUN chmod +x /openapi2jsonschema/command.py && ln -s /openapi2jsonschema/command.py /usr/bin/openapi2jsonschema
 
 # Run as non-root user as a best-practices:
@@ -42,6 +42,6 @@ COPY --from=builder /home/node/app /home/node/app
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY openapi.json /home/node/
 
-ENV PATH /usr/local/bin:$PATH
+ENV LOG_TO_STDERR=true
 
 ENTRYPOINT ["node", "/home/node/app/dist/kubeval_run.js"]

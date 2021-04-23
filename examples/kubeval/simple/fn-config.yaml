@@ -7,3 +7,5 @@ metadata:
       container:
         image: gcr.io/kpt-fn/kubeval:unstable
     config.kubernetes.io/local-config: 'true'
+data:
+  strict: 'true'

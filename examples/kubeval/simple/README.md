@@ -20,12 +20,15 @@ kpt fn run kubeval
 This should give the following output:
 
 ```sh
+[ERROR] Additional property templates is not allowed in object 'v1/ReplicationController//bob' in file resources.yaml in field templates
 [ERROR] Invalid type. Expected: [integer,null], given: string in object 'v1/ReplicationController//bob' in file resources.yaml in field spec.replicas
 error: exit status 1
 ```
 
-In the `resources.yaml` file, replace the value of `spec.replicas`
-with an integer to pass validation and rerun the command. This will return
-success (no output).
+There are validation error in the `resources.yaml` file, to fix them:
+- replace the value of `spec.replicas` with an integer
+- change `templates` to `template`
+
+Rerun the command, and it will return success (no output).
 
 [kubeval website]: https://www.kubeval.com/
