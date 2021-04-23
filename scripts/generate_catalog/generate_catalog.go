@@ -230,7 +230,7 @@ func copyReadme(b string, funcName string, relativeFuncPath string, versionDest 
 func parseMetadata(f function, metadataPath string, version string, versionDest string) (function, error) {
 	var buf bytes.Buffer
 	// Get the content of metadata.yaml from the appropriate release branch.
-	cmd := exec.Command("git", "show", metadataPath)
+	cmd := exec.Command("git", "cat-file", "blob", metadataPath)
 	cmd.Stdout = &buf
 	err := cmd.Run()
 	if err != nil {
