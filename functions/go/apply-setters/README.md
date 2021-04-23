@@ -65,13 +65,13 @@ data:
 Render the declared values by invoking:
 
 ```sh
-$ kpt fn run --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
+$ kpt fn run . --image gcr.io/kpt-fn/apply-setters:v0.1 --fn-config ./apply-setters-fn-config
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```sh
-$ kpt fn run --image gcr.io/kpt-fn/apply-setters:unstable -- 'image=ubuntu' 'replicas=3'
+$ kpt fn run . --image gcr.io/kpt-fn/apply-setters:v0.1 -- 'image=ubuntu' 'replicas=3'
 ```
 
 Rendered resource looks like the following:
@@ -119,7 +119,7 @@ data:
 Render the declared values by invoking:
 
 ```
-$ kpt fn run --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
+$ kpt fn run . --image gcr.io/kpt-fn/apply-setters:v0.1 --fn-config ./apply-setters-fn-config
 ```
 
 Rendered resource looks like the following:
