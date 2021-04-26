@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - master
+      - '*/v[0-9]+.[0-9]+'
   schedule:
     - cron:  '0 17 * * *'
 
@@ -49,7 +50,6 @@ jobs:
       GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
       GO111MODULE: on
     steps:
-    - uses: actions/checkout@v2
     - name: Set up Go 1.15
       uses: actions/setup-go@v1
       with:
@@ -67,8 +67,24 @@ jobs:
         cd functions/go
         make check-licenses
 
+  verify-ci:
+    runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
+      GO111MODULE: on
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up python 3
+      uses: actions/setup-python@v2
+    - name: Install libs
+      run: |
+        pip install pyyaml
+    - name: Check metadata files
+      run: |
+        make check-metadata
+
   e2e-ci:
-    needs: [ts-unit-test-ci, go-unit-test-ci]
+    needs: [ts-unit-test-ci, go-unit-test-ci, verify-ci]
     strategy:
       matrix:
         platform: [ubuntu-latest]
