@@ -1,8 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+
+	//	"strings"
+
+	//"io/ioutil"
+	//"net/http"
 	"os"
+	"os/exec"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/generated"
 	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
@@ -98,26 +108,8 @@ func (f *setLabelFunction) Config(rn *kyaml.RNode) error {
 }
 
 func (f *setLabelFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error) {
-	for _, r := range items {
-		meta, _ := r.GetMeta()
-		if meta.APIVersion == "kpt.dev/v1" && meta.Kind == "OpenAPI" {
-			openapi.SuppressBuiltInSchemaUse()
-			schema, err := r.Pipe(kyaml.Lookup("data"))
-			if err != nil {
-				return nil, fmt.Errorf("could not configure OpenAPI schema")
-			}
-			str, err := schema.String()
-			if err != nil {
-				return nil, err
-			}
-			json, err := yaml.YAMLToJSON([]byte(str))
-			if err != nil {
-				return nil, err
-			}
-			if err = openapi.AddSchema(json); err != nil {
-				return nil, err
-			}
-		}
+	if err := configureOpenAPI(); err != nil {
+		return nil, err
 	}
 
 	var result []*kyaml.RNode
@@ -130,6 +122,40 @@ func (f *setLabelFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error) {
 		result = append(result, r)
 	}
 	return result, nil
+}
+
+func configureOpenAPI() error {
+	openapi.SuppressBuiltInSchemaUse()
+
+	cmd := exec.Command("sh", "-c", "ip route show | awk '/default/ {print $3}'")
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("received error; error: %w, stdout: %s, stderr: %s", err.Error(), stdout.String(), stderr.String())
+	}
+
+
+	hostMachineIp := strings.TrimSpace(stdout.String())
+
+	resp, err := http.Get("http://" + hostMachineIp + ":8080/OpenAPI")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	schema, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if err = openapi.AddSchema(schema); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (f *setLabelFunction) updateNode(node *kyaml.RNode, rs *openapi.ResourceSchema) error {
@@ -191,11 +217,53 @@ func (f *setLabelFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bo
 	return true
 }
 
+<<<<<<< HEAD:functions/go/set-labels/main.go
 func getDefaultConfig() (transformerConfig, error) {
 	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonlabels"]
 	var tc transformerConfig
 	err := yaml.Unmarshal([]byte(defaultConfigString), &tc)
 	return tc, err
+=======
+//nolint
+func main() {
+	fmt.Println("hello")
+	resp, _ := http.Get("http://" +  "192.168.65.1:8080/OpenAPI")
+
+	defer resp.Body.Close()
+
+	schema, _ := ioutil.ReadAll(resp.Body)
+
+	fmt.Println(string(schema))
+	return
+
+
+	resourceList := &framework.ResourceList{}
+	resourceList.FunctionConfig = map[string]interface{}{}
+
+	cmd := framework.Command(resourceList, func() error {
+		err := run(resourceList)
+		if err != nil {
+			resourceList.Result = &framework.Result{
+				Name: "set-label",
+				Items: []framework.Item{
+					{
+						Message:  err.Error(),
+						Severity: framework.Error,
+					},
+				},
+			}
+			return resourceList.Result
+		}
+		return nil
+	})
+
+	cmd.Short = generated.SetLabelShort
+	cmd.Long = generated.SetLabelLong
+	cmd.Example = generated.SetLabelExamples
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+>>>>>>> 86e8e51 (trying to curl host server):functions/go/set-label/main.go
 }
 
 
