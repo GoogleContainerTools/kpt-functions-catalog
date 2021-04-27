@@ -51,7 +51,7 @@ jobs:
       GO111MODULE: on
     steps:
     - name: Set up Go 1.15
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v2
       with:
         go-version: 1.15
       id: go
@@ -80,12 +80,13 @@ jobs:
       run: |
         pip install pyyaml
     - name: Set up Go 1.15
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v2
       with:
         go-version: 1.15
     - name: Install mdrip
       run: |
-        go get github.com/monopole/mdrip
+        go get github.com/russross/blackfriday/v2@v2.0.1
+        go get github.com/monopole/mdrip@v1.0.2
     - name: Verify docs
       run: |
         make verify-docs
