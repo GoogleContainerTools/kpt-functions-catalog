@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fmt
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/format
 
 go 1.15
 

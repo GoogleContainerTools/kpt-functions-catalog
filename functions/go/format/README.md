@@ -1,10 +1,10 @@
-# fmt
+# format
 
 ### Overview
 
 <!--mdtogo:Short-->
 
-Format resources
+Format resources in a directory.
 
 <!--mdtogo-->
 
@@ -12,9 +12,9 @@ Format resources
 
 <!--mdtogo:Long-->
 
-Format formats the field ordering in YAML configuration files. Field ordering
-roughly follows the ordering defined in the source Kubernetes resource definitions
-(i.e. go structures), falling back on lexicographical sorting for unrecognized fields.
+`format` function formats the field ordering in YAML configuration files. Field ordering
+roughly follows the ordering defined in the source Kubernetes resource definitions, 
+falling back on lexicographical sorting for unrecognized fields.
 
 <!--mdtogo-->
 
@@ -24,7 +24,7 @@ roughly follows the ordering defined in the source Kubernetes resource definitio
 
 #### Format a package
 
-Let's start with the input resource in a package
+Let's start with the input resource in a package.
 
 ```yaml
 apiVersion: apps/v1
@@ -44,7 +44,7 @@ spec:
               name: http
 ```
 
-Format the package
+Invoke the `format` function on the package.
 
 ```sh
 $ kpt fn run . --image gcr.io/kpt-fn/fmt:v0.1

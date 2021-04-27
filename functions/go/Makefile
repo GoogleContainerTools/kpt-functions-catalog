@@ -22,11 +22,14 @@ FUNCTIONS := \
 	apply-setters \
 	enforce-gatekeeper \
 	ensure-name-substring \
+<<<<<<< HEAD
 	search-replace \
 	set-annotations \
 	set-labels \
 	set-namespace \
 	starlark \
+=======
+>>>>>>> 91771bd (Suggested changes 1)
 	format
 
 # Targets for running all function tests

@@ -1,11 +1,11 @@
 image: gcr.io/kpt-fn/fmt
-description: Format resources
+description: Format resources in a directory.
 tags:
   - mutator
+  - formatter
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/fmt
 examplePackageURLs:
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/fmt/simple
 emails:
-  - mengqiy@google.com
-  - pmarupaka@google.com
+  - kpt-team@google.com
 license: Apache-2.0

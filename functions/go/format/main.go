@@ -5,7 +5,7 @@ import (
 	"os"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fmt/generated"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/format/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 )
 
@@ -24,9 +24,9 @@ func main() {
 		return nil
 	})
 
-	cmd.Short = generated.FmtShort
-	cmd.Long = generated.FmtLong
-	cmd.Example = generated.FmtExamples
+	cmd.Short = generated.FormatShort
+	cmd.Long = generated.FormatLong
+	cmd.Example = generated.FormatExamples
 
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
