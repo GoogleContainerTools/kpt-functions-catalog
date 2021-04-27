@@ -54,3 +54,7 @@ site-generate: ## Collect function branches and generate a catalog of their exam
 	rm -rf ./examples/*/
 	# GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt@next
 	(cd scripts/generate_catalog/ && go run . ../.. ../../examples)
+
+site-run: ## Run the site locally.
+	make site-generate
+	./scripts/run-site.sh
