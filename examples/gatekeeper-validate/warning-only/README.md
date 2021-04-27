@@ -12,8 +12,9 @@ In the constraint, we use `enforcementAction: warn` instead of
 
 Get the package:
 
+<!-- @getPkg @test -->
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-validate/warnning-only .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-validate/warning-only .
 ```
 
 Create a directory for storing the structured output.

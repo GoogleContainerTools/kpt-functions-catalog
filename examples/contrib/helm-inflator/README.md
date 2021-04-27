@@ -9,7 +9,7 @@ declarative configuration.
 Get this example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/helm-inflator .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/helm-inflator .
 kpt fn run --as-current-user helm-inflator/local-configs --mount type=bind,src=$(pwd)/helm-inflator/helloworld-chart,dst=/source
 ```
 

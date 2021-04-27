@@ -63,6 +63,7 @@ environments: # kpt-set: ${env}
 
 Get the config example and try it out by running the following commands:
 
+<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters/simple .
 kpt fn run simple

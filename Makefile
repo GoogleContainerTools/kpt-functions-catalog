@@ -40,6 +40,10 @@ check-licenses:
 	cd functions/go && $(MAKE) check-licenses
 	cd functions/contrib/ts && $(MAKE) check-licenses
 
+verify-docs:
+	GO111MODULE=on go get github.com/monopole/mdrip
+	scripts/verify-docs.py
+
 build: ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 	cd functions/go && $(MAKE) TAG=$(TAG) build
 	cd functions/ts && $(MAKE) TAG=$(TAG) build

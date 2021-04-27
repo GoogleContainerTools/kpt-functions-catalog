@@ -10,7 +10,7 @@ declarative configuration.
 Get this example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/istioctl-analyze .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/istioctl-analyze .
 kpt fn run istioctl-analyze
 ```
 

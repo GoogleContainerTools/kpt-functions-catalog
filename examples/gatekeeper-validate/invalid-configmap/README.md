@@ -12,6 +12,7 @@ The constraint disallows using `private_key` as a key in the ConfigMap.
 
 Get the package:
 
+<!-- @getPkg @test -->
 ```shell
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-validate/invalid-configmap .
 ```
