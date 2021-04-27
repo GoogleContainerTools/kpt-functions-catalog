@@ -181,7 +181,7 @@ func copyExamples(b string, funcName string, funcDest string, versionDest string
 	}
 
 	// Copy examples for the function's version to a temporary directory.
-	tempDir, err := os.MkdirTemp("", "examples")
+	tempDir, err := ioutil.TempDir("", "examples")
 	if err != nil {
 		return err
 	}
@@ -202,7 +202,7 @@ func copyExamples(b string, funcName string, funcDest string, versionDest string
 
 func copyReadme(b string, funcName string, relativeFuncPath string, versionDest string) error {
 	// Copy README for the function's version to the example directory.
-	tempDir, err := os.MkdirTemp("", "functions")
+	tempDir, err := ioutil.TempDir("", "functions")
 	if err != nil {
 		return err
 	}
