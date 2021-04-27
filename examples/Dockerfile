@@ -1,3 +1,4 @@
+# Host an nginx server with the contents of the function catalog site to emulate the live environment.
 FROM nginx:1.18.0-alpine
 COPY . /usr/share/nginx/html
 COPY site_check.conf /etc/nginx/conf.d/configfile.template
