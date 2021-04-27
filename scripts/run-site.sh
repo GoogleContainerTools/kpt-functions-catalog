@@ -20,5 +20,5 @@ chmod -R o+rx examples/
 # Terminate running kpt-function-catalog docker containers and rebuild.
 docker stop "$(docker ps -q --filter ancestor=kpt-function-catalog:latest)" || docker build examples/ -t kpt-function-catalog:latest
 # Mount the site directory as the default content for the docker container.
-docker run -v $(pwd)/examples:/usr/share/nginx/html -p 3001:80 -d kpt-function-catalog:latest
+docker run -v "$(pwd)"/examples:/usr/share/nginx/html -p 3001:80 -d kpt-function-catalog:latest
 echo "Serving docs at http://127.0.0.1:3001"
