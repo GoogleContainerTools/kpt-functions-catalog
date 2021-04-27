@@ -58,3 +58,7 @@ site-generate: ## Collect function branches and generate a catalog of their exam
 site-run: ## Run the site locally.
 	make site-generate
 	./scripts/run-site.sh
+
+site-check: ## Test site for broken catalog links.
+	make site-run
+	./scripts/check-site.sh
