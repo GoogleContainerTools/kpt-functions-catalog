@@ -10,9 +10,10 @@ v1.19.8 schema.
 
 Get this example and try it out by running the following commands:
 
+<!-- @getAndRunPkg @test -->
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval .
-kpt fn run kubeval
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval/simple .
+kpt fn run simple
 ```
 
 ## Expected Results

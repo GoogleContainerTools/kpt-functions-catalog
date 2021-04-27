@@ -79,9 +79,16 @@ jobs:
     - name: Install libs
       run: |
         pip install pyyaml
-    - name: Check metadata files
+    - name: Set up Go 1.15
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.15
+    - name: Install mdrip
       run: |
-        make check-metadata
+        go get github.com/monopole/mdrip
+    - name: Verify docs
+      run: |
+        make verify-docs
 
   e2e-ci:
     needs: [ts-unit-test-ci, go-unit-test-ci, verify-ci]
