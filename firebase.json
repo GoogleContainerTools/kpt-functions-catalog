@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "site": "kpt-dev-catalog",
+    "public": "examples",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
