@@ -16,12 +16,12 @@
 set -o pipefail
 
 npm i
-cd examples
+cd examples || exit
 echo "Starting check."
-# Find all potential entrypoint READMEs while stripping out themes directory until it's removed
+# Find all potential entrypoint READMEs
 # Convert them to valid URLs
 # Check each link for Docsify 404s
-find . -name README.md -printf "%P\n" | sed "s/README.md//" \
+find . -name README.md -printf "%P\n" | grep -v node_modules | sed "s/README.md//"  \
     | sed "s/^/http:\/\/localhost:3001\//" \
-    | xargs -n1 sh -c '! (npx href-checker $0 --bad-content="404 - Not found" --silent --no-off-site -c=15 | grep .) || exit 255' 
+    | xargs -I {} -n1 sh -c "! (npx href-checker {} --bad-content=\"404 - Not found\" --silent --no-off-site -c=15 | grep .) || exit 255" 
 echo "Success."

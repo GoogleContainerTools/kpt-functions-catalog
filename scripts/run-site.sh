@@ -18,7 +18,7 @@ setfacl -Rd -m o::rx examples/ 2> /dev/null || chmod -R +a "everyone allow read,
 # Set read/execute permissions for existing site files.
 chmod -R o+rx examples/
 # Terminate running kpt-function-catalog docker containers and rebuild.
-docker stop $(docker ps -q --filter ancestor=kpt-function-catalog:latest) || docker build examples/ -t kpt-function-catalog:latest
+docker stop "$(docker ps -q --filter ancestor=kpt-function-catalog:latest)" || docker build examples/ -t kpt-function-catalog:latest
 # Mount the site directory as the default content for the docker container.
-docker run -v `pwd`/examples:/usr/share/nginx/html -p 3001:80 -d kpt-function-catalog:latest
+docker run -v $(pwd)/examples:/usr/share/nginx/html -p 3001:80 -d kpt-function-catalog:latest
 echo "Serving docs at http://127.0.0.1:3001"
