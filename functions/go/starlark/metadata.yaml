@@ -3,9 +3,9 @@ description: Execute a starlark script to mutate or validate resources.
 tags:
   - mutator
   - validator
-sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/starlark
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/starlark/v0.1/functions/go/starlark
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/starlark/simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/starlark/v0.1/examples/starlark/simple
 emails:
   - kpt-team@google.com
 license: Apache-2.0
