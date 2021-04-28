@@ -33,7 +33,7 @@ Get the config example and try it out by running the following commands:
 
 <!-- @getAndRunPkg @test -->
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/advanced .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/advanced@ensure-name-substring/v0.1 .
 kpt fn run advanced
 ```
 

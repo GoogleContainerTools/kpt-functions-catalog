@@ -95,6 +95,6 @@ fieldSpecs:
 
 <!--mdtogo:Examples-->
 
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/ensure-name-substring/
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/ensure-name-substring/v0.1/examples/ensure-name-substring/
 
 <!--mdtogo-->
