@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn-contrib/inflate-helm-chart:unstable
+        network: true
+    config.kubernetes.io/local-config: 'true'
+data:
+  name: nginx-test
+  chart: bitnami/nginx
+  chart-repo: bitnami
+  chart-repo-url: 'https://charts.bitnami.com/bitnami'
+  chart-version: 8.4.0

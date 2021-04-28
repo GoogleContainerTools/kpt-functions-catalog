@@ -23,6 +23,7 @@ data:
 
 Get the config example and try it out by running the following commands:
 
+<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/suffix .
 kpt fn run suffix

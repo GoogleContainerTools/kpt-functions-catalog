@@ -19,14 +19,14 @@ GOBIN := $(shell go env GOPATH)/bin
 
 # Edit this list to contain all go functions
 FUNCTIONS := \
-	set-label \
-	set-annotation \
-	set-namespace \
-	starlark \
 	apply-setters \
+	enforce-gatekeeper \
+	ensure-name-substring \
 	search-replace \
-	gatekeeper-validate \
-	ensure-name-substring
+	set-annotations \
+	set-labels \
+	set-namespace \
+	starlark
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))

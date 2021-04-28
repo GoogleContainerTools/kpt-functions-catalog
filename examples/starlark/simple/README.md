@@ -29,8 +29,9 @@ to `prod` for all resources.
 
 Get the config example and try it out by running the following commands:
 
+<!-- @getAndRunPkg @test -->
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/runtime/starlark/simple .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple .
 kpt fn run simple
 ```
 
