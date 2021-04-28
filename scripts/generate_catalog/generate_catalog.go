@@ -264,7 +264,7 @@ func parseMetadata(f function, metadataPath string, version string, versionDest 
 	f.LatestVersion = version
 	f.Path = versionDest
 	f.Description = md.Description
-	sort.Sort(sort.StringSlice(md.Tags))
+	sort.Strings(md.Tags)
 	f.Tags = strings.Join(md.Tags, ",")
 
 	return f, nil
@@ -272,9 +272,13 @@ func parseMetadata(f function, metadataPath string, version string, versionDest 
 
 func getRelativeFunctionPath(source string, funcName string) (string, error) {
 	// Find the directory for the function's source.
-	m, err := filepath.Glob(filepath.Join(source, "functions", "*", funcName))
+	sourcePattern := filepath.Join(source, "functions", "*", funcName)
+	m, err := filepath.Glob(sourcePattern)
 	if err != nil {
 		return "", err
+	}
+	if m == nil {
+		return "", fmt.Errorf("Could not find a function with the following pattern: %v", sourcePattern)
 	}
 
 	return functionDirPrefix.ReplaceAllString(m[0], "functions/"), nil
