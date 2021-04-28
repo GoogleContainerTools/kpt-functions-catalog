@@ -12,7 +12,7 @@ falling back on lexicographical sorting for unrecognized fields.
 var FormatExamples = `
 Format a package:
 
-Let's start with the input resource in a package
+Let's start with the input resource in a package.
 
   apiVersion: apps/v1
   kind: Deployment
@@ -30,9 +30,9 @@ Let's start with the input resource in a package
               - containerPort: 80
                 name: http
 
-Format the package
+Invoke the ` + "`" + `format` + "`" + ` function on the package.
 
-  $ kpt fn run . --image gcr.io/kpt-fn/fmt:v0.1
+  $ kpt fn run . --image gcr.io/kpt-fn/format:v0.1
 
 Formatted resource looks like the following:
 

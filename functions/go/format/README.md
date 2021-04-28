@@ -47,7 +47,7 @@ spec:
 Invoke the `format` function on the package.
 
 ```sh
-$ kpt fn run . --image gcr.io/kpt-fn/fmt:v0.1
+$ kpt fn run . --image gcr.io/kpt-fn/format:v0.1
 ```
 
 Formatted resource looks like the following:
