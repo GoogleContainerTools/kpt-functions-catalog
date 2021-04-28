@@ -93,6 +93,7 @@ type metadata struct {
 	Tags               []string
 	SourceUrl          string   `yaml:"sourceURL"`
 	ExamplePackageUrls []string `yaml:"examplePackageURLs"`
+	Hidden             bool
 }
 
 var (
@@ -135,6 +136,17 @@ func getFunctions(branches []string, source string, dest string) []function {
 			os.Exit(1)
 		}
 
+		// Functions with the hidden field enabled should not be processed.
+		metadataPath := strings.TrimSpace(fmt.Sprintf("%v:%v", b, filepath.Join(relativeFuncPath, "metadata.yaml")))
+		md, err := getMetadata(metadataPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+		if md.Hidden {
+			continue
+		}
+
 		err = copyExamples(b, funcName, funcDest, versionDest)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -152,13 +164,8 @@ func getFunctions(branches []string, source string, dest string) []function {
 		if f.VersionToExamples == nil {
 			f.VersionToExamples = make(map[string]map[string]example)
 		}
-		metadataPath := strings.TrimSpace(fmt.Sprintf("%v:%v", b, filepath.Join(relativeFuncPath, "metadata.yaml")))
-		f, err = parseMetadata(f, metadataPath, minorVersion, versionDest)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
-			os.Exit(1)
-		}
-		functions[funcName] = f
+
+		functions[funcName] = parseMetadata(f, md, minorVersion, versionDest)
 	}
 
 	flattenedFunctions := make([]function, 0)
@@ -227,18 +234,22 @@ func copyReadme(b string, funcName string, relativeFuncPath string, versionDest 
 	return nil
 }
 
-func parseMetadata(f function, metadataPath string, version string, versionDest string) (function, error) {
+func getMetadata(metadataPath string) (metadata, error) {
 	var buf bytes.Buffer
+	var md metadata
 	// Get the content of metadata.yaml from the appropriate release branch.
 	cmd := exec.Command("git", "cat-file", "blob", metadataPath)
 	cmd.Stdout = &buf
 	err := cmd.Run()
 	if err != nil {
-		return f, err
+		return md, err
 	}
 
-	var md metadata
 	yaml.Unmarshal(buf.Bytes(), &md)
+	return md, nil
+}
+
+func parseMetadata(f function, md metadata, version string, versionDest string) function {
 
 	// Add examples to version map.
 	if f.VersionToExamples[version] == nil {
@@ -257,7 +268,7 @@ func parseMetadata(f function, metadataPath string, version string, versionDest 
 	}
 	f.VersionToExamples[version] = e
 	if semver.Compare(f.LatestVersion, version) == 1 {
-		return f, nil
+		return f
 	}
 
 	// If this is the latest version,
@@ -268,7 +279,7 @@ func parseMetadata(f function, metadataPath string, version string, versionDest 
 	sort.Sort(sort.StringSlice(md.Tags))
 	f.Tags = strings.Join(md.Tags, ",")
 
-	return f, nil
+	return f
 }
 
 func getRelativeFunctionPath(source string, funcName string) (string, error) {
