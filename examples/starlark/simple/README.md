@@ -31,7 +31,7 @@ Get the config example and try it out by running the following commands:
 
 <!-- @getAndRunPkg @test -->
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple@starlark/v0.1 .
 kpt fn run simple
 ```
 

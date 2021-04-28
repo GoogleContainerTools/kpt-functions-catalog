@@ -36,6 +36,6 @@ source: |
 
 <!--mdtogo:Examples-->
 
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/starlark/
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/starlark/v0.1/examples/starlark/
 
 <!--mdtogo-->
