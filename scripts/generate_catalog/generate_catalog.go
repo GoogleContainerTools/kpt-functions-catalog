@@ -58,7 +58,6 @@ func main() {
 	}
 
 	functions := getFunctions(branches, source, dest)
-
 	err = writeFunctionIndex(functions, source, dest)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -215,7 +214,7 @@ func copyReadme(b string, funcName string, relativeFuncPath string, versionDest 
 	cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", filepath.Join(relativeFuncPath, "README.md"))
 	err = cmd.Run()
 	if err != nil {
-		return err
+		return fmt.Errorf("Error running %v: %v", cmd, err)
 	}
 
 	// Find the README in the example directory.
