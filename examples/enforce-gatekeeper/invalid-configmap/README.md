@@ -14,7 +14,7 @@ Get the package:
 
 <!-- @getPkg @test -->
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enforce-gatekeeper/invalid-configmap .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enforce-gatekeeper/invalid-configmap@enforce-gatekeeper/v0.1 .
 ```
 
 Create a directory for storing the structured output.
@@ -72,4 +72,4 @@ Rerun the command. It will succeed (no output).
 ## Function Reference Doc
 
 TODO: replace the following with the link to the reference doc when our site is live.
-https://github.com/GoogleContainerTools/kpt-functions-catalog/blob/master/functions/go/enforce-gatekeeper/README.md
+https://github.com/GoogleContainerTools/kpt-functions-catalog/blob/enforce-gatekeeper/v0.1/functions/go/enforce-gatekeeper/README.md
