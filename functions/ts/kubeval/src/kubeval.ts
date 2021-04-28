@@ -225,21 +225,29 @@ function readStdoutToString(childProcess: ChildProcess): Promise<string> {
 }
 
 kubeval.usage = `
-Validates configuration using kubeval.
+Validate KRM resources using kubeval.
+
+kubeval allows you to validate KRM resources against their [json schemas].
+
+The json schemas can be provided via schema_location and
+additional_schema_locations. If neither schema_location nor
+additional_schema_locations is provided, we will convert the baked-in OpenAPI
+document to json schemas and use them.
 
 If neither ${SCHEMA_LOCATION} nor ${ADDITIONAL_SCHEMA_LOCATIONS} is provided, we
 will use the baked-in schemas. Otherwise, we will try to download the schemas.
 
-Configured using a ConfigMap with the following keys, all of which are optional:
+This function can be configured using a ConfigMap with the following keys, all
+of which are optional:
 ${SCHEMA_LOCATION}: The base URL used to download schemas.
 ${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to download
   schemas.  These URLs will be used if the URL specified by ${SCHEMA_LOCATION}
   did not have the required schema.  By default, there are no secondary URLs,
   and only the primary base URL will be used.
-${IGNORE_MISSING_SCHEMAS}: Skip validation for resource definitions without a
-  schema.  If omitted, a default value of false will be assumed.
+${IGNORE_MISSING_SCHEMAS}: Skip validation for resources without a schema.  If
+  omitted, a default value of false will be assumed.
 ${SKIP_KINDS}: Comma-separated list of case-sensitive kinds to skip when
   validating against schemas.  If omitted, no kinds will be skipped.
-${STRICT}: Disallow additional properties not in schema.  If omitted, a default
-  value of false will be assumed.
+${STRICT}: Disallow additional properties that are not in the schemas.  If
+  omitted, a default value of false will be assumed.
 `;
