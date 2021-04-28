@@ -1,7 +1,7 @@
 {
   "hosting": {
     "site": "kpt-functions-catalog",
-    "public": "examples",
+    "public": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
