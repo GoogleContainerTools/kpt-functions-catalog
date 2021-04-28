@@ -154,11 +154,9 @@ def validate_metadata(metadata, branch, path, fn, examples_list):
 
 
 def main():
-    branch_ref = os.getenv('GITHUB_REF')
-    ref_prefix = 'refs/heads/'
-    branch_name = 'master'
-    if branch_ref is not None and branch_ref.startswith(ref_prefix):
-        branch_name = branch_ref[len(ref_prefix):]
+    branch_name = os.getenv('GITHUB_BASE_REF')
+    if branch_name is None or len(branch_name) == 0:
+        branch_name = 'master'
 
     if branch_name == 'master':
         validate_master_branch()
