@@ -99,7 +99,6 @@ var (
 	// Match start of a version such as v1.9.1
 	branchSemverPrefix = regexp.MustCompile(`[-\w]*\/(v\d*\.\d*)`)
 	functionDirPrefix  = regexp.MustCompile(`.+/functions/`)
-	exampleDirPrefix   = regexp.MustCompile(`.+/examples/`)
 )
 
 func getBranches() ([]string, error) {
@@ -284,7 +283,7 @@ func getRelativeFunctionPath(source string, funcName string) (string, error) {
 func writeFunctionIndex(functions []function, source string, dest string) error {
 	out := []string{"# KPT Function Catalog", "", "| Name | Description | Tags |", "| ---- | ----------- | ---- |"}
 	for _, f := range functions {
-		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.FunctionName, strings.Replace(f.Path, filepath.Join(source, "examples"), "", 1), f.Description, f.Tags)
+		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.FunctionName, strings.Replace(f.Path, filepath.Join(source, "site"), "", 1), f.Description, f.Tags)
 		out = append(out, functionEntry)
 	}
 
@@ -302,7 +301,7 @@ func writeExampleIndex(functions []function, source string, dest string) error {
 			exampleToPaths := make(map[string]example)
 			for exName, ex := range examples {
 				e := ex
-				e.LocalExamplePath = strings.Replace(ex.LocalExamplePath, filepath.Join(source, "examples"), "", 1)
+				e.LocalExamplePath = strings.Replace(ex.LocalExamplePath, filepath.Join(source, "site"), "", 1)
 				exampleToPaths[exName] = e
 			}
 			vToE[v] = exampleToPaths

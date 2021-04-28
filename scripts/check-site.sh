@@ -15,8 +15,8 @@
 
 set -o pipefail
 
+cd site || exit
 npm i
-cd examples || exit
 echo "Starting check."
 # Find all potential entrypoint READMEs
 # Convert them to valid URLs

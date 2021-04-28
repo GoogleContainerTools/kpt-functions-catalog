@@ -18,6 +18,7 @@ on:
     paths:
       - "functions/**"
       - "examples/**"
+      - "site/**"
 jobs:
   build:
     runs-on: ubuntu-latest
