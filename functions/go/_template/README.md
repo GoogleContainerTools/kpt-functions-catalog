@@ -17,6 +17,9 @@ Explain what this function does in one or two sentences.
 <!--mdtogo:Long-->
 
 Explain the function config and behavior for this function in detail.
+For each field in the function config, specify:
+ - An example value
+ - Whether it is required
 
 To decouple the function orchestrator (i.e. kpt) from the function, it's
 recommended to not show the kpt CLI or custom resources like the Kptfile.
