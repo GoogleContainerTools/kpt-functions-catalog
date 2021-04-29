@@ -13,6 +13,10 @@ The json schemas can be provided via `schema_location` and
 `additional_schema_locations` is provided, we will convert the baked-in OpenAPI
 document to json schemas and use them.
 
+Note: `kpt fn render` allow neither network access nor volume mount. That means
+you need to use the baked-in OpenAPI schema when using this function in
+`kpt fn render`.
+
 This function can be configured using a ConfigMap with the following keys, all
 of which are optional:
 
