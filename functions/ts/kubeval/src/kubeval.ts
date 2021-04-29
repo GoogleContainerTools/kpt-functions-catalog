@@ -232,21 +232,36 @@ The function configuration must be a ConfigMap.
 The following keys can be used in the data field of the ConfigMap, and all of
 them are optional:
 
-${SCHEMA_LOCATION}: The base URL used to download the json schemas.
-${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to download
-  the json schemas.  These URLs will be used if the URL specified by
-  ${SCHEMA_LOCATION} did not have the required schema.
-${IGNORE_MISSING_SCHEMAS}: Skip validation for resources without a schema.  If
-  omitted, a default value of false will be assumed.
+${SCHEMA_LOCATION}: The base URL used to fetch the json schemas. The default is
+  empty. This feature only works with imperative runs, since declarative runs
+  allow neither network access nor volume mount.
+${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to fetch the
+  json schemas.  These URLs will be used if the URL specified by
+  ${SCHEMA_LOCATION} did not have the required schema.  The default is empty.
+  This feature only works with imperative runs.
+${IGNORE_MISSING_SCHEMAS}: Skip validation for resources without a schema. The
+  default is false.
 ${SKIP_KINDS}: Comma-separated list of case-sensitive kinds to skip when
-  validating against schemas.  If omitted, no kinds will be skipped.
-${STRICT}: Disallow additional properties that are not in the schemas.  If
-  omitted, a default value of false will be assumed.
-  
+  validating against schemas. The default is empty.
+${STRICT}: Disallow additional properties that are not in the schemas. The
+  default is false.
+
+The following is an example function configuration:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-func-config
+data:
+  schema_location: "https://kubernetesjsonschema.dev"
+  additional_schema_locations: "https://example.com,file:///abs/path/to/your/schema/directory"
+  ignore_missing_schemas: "false"
+  skip_kinds: "DaemonSet,MyCRD"
+  strict: "true"
+
 If neither ${SCHEMA_LOCATION} nor ${ADDITIONAL_SCHEMA_LOCATIONS} is provided, we
 will convert the baked-in OpenAPI document to json schemas and use them.
-
-Note: kpt fn render allow neither network access nor volume mount. That means
-you need to use the baked-in OpenAPI schema when using this function in
-kpt fn render.
+The baked-in OpenAPI document is from a GKE cluster with version v1.19.8. The
+OpenAPI document contains kubernetes built-in types and some GCP CRDs (e.g.
+BackendConfig), but it currently doesn't contain Config Connector CRDs.
 `;
