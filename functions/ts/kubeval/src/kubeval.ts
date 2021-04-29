@@ -225,33 +225,28 @@ function readStdoutToString(childProcess: ChildProcess): Promise<string> {
 }
 
 kubeval.usage = `
-Validate KRM resources using kubeval.
+Use kubeval to validate KRM resources against their json schemas.
 
-kubeval allows you to validate KRM resources against their [json schemas].
+The function configuration must be a ConfigMap.
 
-The json schemas can be provided via schema_location and
-additional_schema_locations. If neither schema_location nor
-additional_schema_locations is provided, we will convert the baked-in OpenAPI
-document to json schemas and use them.
+The following keys can be used in the data field of the ConfigMap, and all of
+them are optional:
 
-Note: kpt fn render allow neither network access nor volume mount. That means
-you need to use the baked-in OpenAPI schema when using this function in
-kpt fn render.
-
-If neither ${SCHEMA_LOCATION} nor ${ADDITIONAL_SCHEMA_LOCATIONS} is provided, we
-will use the baked-in schemas. Otherwise, we will try to download the schemas.
-
-This function can be configured using a ConfigMap with the following keys, all
-of which are optional:
-${SCHEMA_LOCATION}: The base URL used to download schemas.
+${SCHEMA_LOCATION}: The base URL used to download the json schemas.
 ${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to download
-  schemas.  These URLs will be used if the URL specified by ${SCHEMA_LOCATION}
-  did not have the required schema.  By default, there are no secondary URLs,
-  and only the primary base URL will be used.
+  the json schemas.  These URLs will be used if the URL specified by
+  ${SCHEMA_LOCATION} did not have the required schema.
 ${IGNORE_MISSING_SCHEMAS}: Skip validation for resources without a schema.  If
   omitted, a default value of false will be assumed.
 ${SKIP_KINDS}: Comma-separated list of case-sensitive kinds to skip when
   validating against schemas.  If omitted, no kinds will be skipped.
 ${STRICT}: Disallow additional properties that are not in the schemas.  If
   omitted, a default value of false will be assumed.
+  
+If neither ${SCHEMA_LOCATION} nor ${ADDITIONAL_SCHEMA_LOCATIONS} is provided, we
+will convert the baked-in OpenAPI document to json schemas and use them.
+
+Note: kpt fn render allow neither network access nor volume mount. That means
+you need to use the baked-in OpenAPI schema when using this function in
+kpt fn render.
 `;
