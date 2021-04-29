@@ -19,7 +19,7 @@ Explain what this function does in one or two sentences.
 Explain the function config and behavior for this function in detail.
 For each field in the function config, specify:
  - An example value
- - Whether it is required
+ - Whether it is optional, and if so, the default value
 
 To decouple the function orchestrator (i.e. kpt) from the function, it's
 recommended to not show the kpt CLI or custom resources like the Kptfile.
