@@ -66,13 +66,13 @@ data:
 The function can be invoked using:
 
 ```
-$ kpt fn run . --image gcr.io/kpt-fn/apply-setters:v0.1 --fn-config /path/to/fn-config.yaml
+$ kpt fn run . --image gcr.io/kpt-fn/search-replace:v0.1 --fn-config /path/to/fn-config.yaml
 ```
 
 Alternatively, data can be passed as key-value pairs in the CLI
 
 ```
-$ kpt fn run . --image gcr.io/kpt-fn/apply-setters:v0.1 -- 'by-path=metadata.name' 'put-value=the-deployment'
+$ kpt fn run . --image gcr.io/kpt-fn/search-replace:v0.1 -- 'by-path=metadata.name' 'put-value=the-deployment'
 ```
 
 Supported Path expressions:
