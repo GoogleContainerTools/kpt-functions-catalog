@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -274,4 +274,11 @@ func unresolvedSetters(pattern string) []string {
 func clean(input string) string {
 	input = strings.TrimSpace(input)
 	return strings.TrimSuffix(strings.TrimPrefix(input, "${"), "}")
+}
+
+// Decode decodes the input yaml node into Set struct
+func Decode(rn *yaml.RNode, fcd *ApplySetters) {
+	for k, v := range rn.GetDataMap() {
+		fcd.Setters = append(fcd.Setters, Setter{Name: k, Value: v})
+	}
 }

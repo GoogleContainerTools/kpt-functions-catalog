@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"

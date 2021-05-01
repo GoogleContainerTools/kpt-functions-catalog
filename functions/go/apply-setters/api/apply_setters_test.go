@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"io/ioutil"
@@ -310,10 +310,7 @@ spec:
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
-			err = decode(node, s)
-			if !assert.NoError(t, err) {
-				t.FailNow()
-			}
+			Decode(node, s)
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
