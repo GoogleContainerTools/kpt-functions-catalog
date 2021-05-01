@@ -285,6 +285,41 @@ spec:
 `,
 			errMsg: `invalid setter pattern for array node: "${images}:${tag}"`,
 		},
+		{
+			name: "setter type handling",
+			config: `
+data:
+  foo: false
+  bar: 20
+  baz: 21.22
+`,
+			input: `apiVersion: apps/v1
+kind: MyKind
+metadata:
+  annotations:
+    foo1: "true" # kpt-set: ${foo}
+    foo2: hello # kpt-set: ${foo}
+    bar: "10" # kpt-set: ${bar}
+    baz: "11.12" # kpt-set: ${baz}
+    bor: true-10-11.12 # kpt-set: ${foo}-${bar}-${baz}
+spec:
+  replicas1: "two" # kpt-set: ${bar}
+  replicas2: two # kpt-set: ${bar}
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: MyKind
+metadata:
+  annotations:
+    foo1: "false" # kpt-set: ${foo}
+    foo2: false # kpt-set: ${foo}
+    bar: "20" # kpt-set: ${bar}
+    baz: "21.22" # kpt-set: ${baz}
+    bor: false-20-21.22 # kpt-set: ${foo}-${bar}-${baz}
+spec:
+  replicas1: "20" # kpt-set: ${bar}
+  replicas2: 20 # kpt-set: ${bar}
+`,
+		},
 	}
 	for i := range tests {
 		test := tests[i]
