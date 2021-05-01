@@ -1,4 +1,4 @@
-package api
+package applysetters
 
 import (
 	"fmt"
@@ -9,6 +9,8 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
+
+const SetterCommentIdentifier = "# kpt-set: "
 
 var _ kio.Filter = ApplySetters{}
 
@@ -26,8 +28,6 @@ type Setter struct {
 	// Value is the input value for setter
 	Value string `json:"value,omitempty" yaml:"value,omitempty"`
 }
-
-const SetterCommentIdentifier = "# kpt-set: "
 
 // Filter implements Set as a yaml.Filter
 func (as ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
@@ -225,6 +225,11 @@ func currentSetterValues(pattern, value string) map[string]string {
 		if i == 0 {
 			// first value is just entire value, so skip it
 			continue
+		}
+		if setterValues[i] == "" {
+			// if any of the value is unresolved return empty map
+			// and expect users to provide all values
+			return make(map[string]string)
 		}
 		res[setterNames[i]] = setterValues[i]
 	}

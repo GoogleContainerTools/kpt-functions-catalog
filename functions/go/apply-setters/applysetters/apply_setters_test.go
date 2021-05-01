@@ -1,4 +1,4 @@
-package api
+package applysetters
 
 import (
 	"io/ioutil"
@@ -380,6 +380,18 @@ var resolvePatternCases = []patternTest{
 		name:     "setter values from pattern unresolved",
 		value:    "foo-dev-bar-us-east-1-baz",
 		pattern:  `${image}:${tag}`,
+		expected: map[string]string{},
+	},
+	{
+		name:     "setter values from pattern unresolved 2",
+		value:    "nginx:1.2",
+		pattern:  `${image}${tag}`,
+		expected: map[string]string{},
+	},
+	{
+		name:     "setter values from pattern unresolved 3",
+		value:    "my-project/nginx:1.2",
+		pattern:  `${project-id}/${image}${tag}`,
 		expected: map[string]string{},
 	},
 }

@@ -1,4 +1,4 @@
-package api
+package applysetters
 
 import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
