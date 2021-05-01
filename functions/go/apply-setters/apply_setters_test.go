@@ -303,22 +303,40 @@ metadata:
     baz: "11.12" # kpt-set: ${baz}
     bor: true-10-11.12 # kpt-set: ${foo}-${bar}-${baz}
 spec:
-  replicas1: "two" # kpt-set: ${bar}
-  replicas2: two # kpt-set: ${bar}
+  replicas: 10 # kpt-set: ${bar}
 `,
 			expectedResources: `apiVersion: apps/v1
 kind: MyKind
 metadata:
   annotations:
     foo1: "false" # kpt-set: ${foo}
-    foo2: false # kpt-set: ${foo}
+    foo2: "false" # kpt-set: ${foo}
     bar: "20" # kpt-set: ${bar}
     baz: "21.22" # kpt-set: ${baz}
     bor: false-20-21.22 # kpt-set: ${foo}-${bar}-${baz}
 spec:
-  replicas1: "20" # kpt-set: ${bar}
-  replicas2: 20 # kpt-set: ${bar}
+  replicas: 20 # kpt-set: ${bar}
 `,
+		},
+		{
+			name: "error for incorrect input type",
+			config: `
+data:
+  replicas: two
+`,
+			input: `apiVersion: apps/v1
+kind: MyKind
+metadata:
+spec:
+  replicas: 10 # kpt-set: ${replicas}
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: MyKind
+metadata:
+spec:
+  replicas: 10 # kpt-set: ${replicas}
+`,
+			errMsg: `input value "two" doesn't conform to node type "int"`,
 		},
 	}
 	for i := range tests {

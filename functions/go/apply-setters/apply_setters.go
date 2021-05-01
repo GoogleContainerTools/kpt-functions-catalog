@@ -177,8 +177,12 @@ func (as *ApplySetters) visitScalar(object *yaml.RNode) error {
 		return errors.Errorf("values for setters %v must be provided", urs)
 	}
 
+	// validate new value against node type
+	if err := validateType(object.YNode().Tag, setterPattern); err != nil {
+		return err
+	}
+
 	object.YNode().Value = setterPattern
-	object.YNode().Tag = yaml.NodeTagEmpty
 	return nil
 }
 
@@ -274,4 +278,21 @@ func unresolvedSetters(pattern string) []string {
 func clean(input string) string {
 	input = strings.TrimSpace(input)
 	return strings.TrimSuffix(strings.TrimPrefix(input, "${"), "}")
+}
+
+// validateType checks if the input value conforms to the yamlTag
+func validateType(yamlTag, value string) error {
+	node := yaml.NewScalarRNode("")
+	node.YNode().Tag = yamlTag
+	node.YNode().Value = value
+	s, err := node.String()
+	if err != nil {
+		return errors.Errorf("failed to validate the input type: %q", err.Error())
+	}
+	// yaml encoder adds the yamlTag as prefix if the value doesn't conform to yamlTag/type
+	// make sure there is no yamlTag prefix to serialized node
+	if strings.HasPrefix(s, yamlTag) {
+		return errors.Errorf("input value %q doesn't conform to node type %q", value, strings.TrimPrefix(yamlTag, "!!"))
+	}
+	return nil
 }
