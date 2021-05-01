@@ -1,4 +1,4 @@
-package api
+package searchreplace
 
 var searchReplaceCases = []test{
 	{

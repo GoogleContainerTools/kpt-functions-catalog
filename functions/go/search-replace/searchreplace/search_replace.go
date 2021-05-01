@@ -1,4 +1,4 @@
-package api
+package searchreplace
 
 import (
 	"fmt"
@@ -384,7 +384,7 @@ func validateMatcherNames(m map[string]string) error {
 	matcherSet.Insert(matchers()...)
 	for key := range m {
 		if !matcherSet.Has(key) {
-			return errors.Errorf("invalid matcher %q, must be one of %q", key, matchers)
+			return errors.Errorf("invalid matcher %q, must be one of %q", key, matchers())
 		}
 	}
 	return nil

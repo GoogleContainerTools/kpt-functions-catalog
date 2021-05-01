@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/api"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/searchreplace"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
@@ -53,8 +53,8 @@ func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
 }
 
 // getSearchReplaceParams retrieve the search parameters from input config
-func getSearchReplaceParams(fc interface{}) (api.SearchReplace, error) {
-	var fcd api.SearchReplace
+func getSearchReplaceParams(fc interface{}) (searchreplace.SearchReplace, error) {
+	var fcd searchreplace.SearchReplace
 	f, ok := fc.(map[string]interface{})
 	if !ok {
 		return fcd, fmt.Errorf("function config %#v is not valid", fc)
@@ -64,7 +64,7 @@ func getSearchReplaceParams(fc interface{}) (api.SearchReplace, error) {
 		return fcd, fmt.Errorf("failed to parse input from function config: %w", err)
 	}
 
-	if err := api.Decode(rn, &fcd); err != nil {
+	if err := searchreplace.Decode(rn, &fcd); err != nil {
 		return fcd, err
 	}
 	return fcd, nil
@@ -72,7 +72,7 @@ func getSearchReplaceParams(fc interface{}) (api.SearchReplace, error) {
 
 // searchResultsToItems converts the Search and Replace results to
 // equivalent items([]framework.Item)
-func searchResultsToItems(sr api.SearchReplace) []framework.Item {
+func searchResultsToItems(sr searchreplace.SearchReplace) []framework.Item {
 	var items []framework.Item
 	for _, res := range sr.Results {
 
