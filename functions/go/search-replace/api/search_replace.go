@@ -11,7 +11,19 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-const PathDelimiter = "."
+const (
+	ByValue       = "by-value"
+	ByValueRegex  = "by-value-regex"
+	ByPath        = "by-path"
+	PutValue      = "put-value"
+	PutComment    = "put-comment"
+	PathDelimiter = "."
+)
+
+// matchers returns the list of supported matchers
+func matchers() []string {
+	return []string{ByValue, ByValueRegex, ByPath, PutValue, PutComment}
+}
 
 // SearchReplace struct holds the input parameters and results for
 // Search and Replace operations on resource configs
@@ -358,33 +370,24 @@ func Decode(rn *yaml.RNode, fcd *SearchReplace) error {
 	if err := validateMatcherNames(dm); err != nil {
 		return err
 	}
-	fcd.ByPath = getValue(dm, ByPath)
-	fcd.ByValue = getValue(dm, ByValue)
-	fcd.ByValueRegex = getValue(dm, ByValueRegex)
-	fcd.PutValue = getValue(dm, PutValue)
-	fcd.PutComment = getValue(dm, PutComment)
+	fcd.ByPath = dm[ByPath]
+	fcd.ByValue = dm[ByValue]
+	fcd.ByValueRegex = dm[ByValueRegex]
+	fcd.PutValue = dm[PutValue]
+	fcd.PutComment = dm[PutComment]
 	return nil
 }
 
 // validateMatcherNames validates the input matcher names
 func validateMatcherNames(m map[string]string) error {
 	matcherSet := sets.String{}
-	matcherSet.Insert(matchers...)
+	matcherSet.Insert(matchers()...)
 	for key := range m {
 		if !matcherSet.Has(key) {
 			return errors.Errorf("invalid matcher %q, must be one of %q", key, matchers)
 		}
 	}
 	return nil
-}
-
-// getValue returns the value for 'key' in map 'm'
-// returns empty string if 'key' doesn't exist in 'm'
-func getValue(m map[string]string, key string) string {
-	if val, ok := m[key]; ok {
-		return val
-	}
-	return ""
 }
 
 // validateMatchers validates the input matchers in SearchReplace struct
@@ -398,13 +401,3 @@ func (sr *SearchReplace) validateMatchers() error {
 	}
 	return nil
 }
-
-const (
-	ByValue      = "by-value"
-	ByValueRegex = "by-value-regex"
-	ByPath       = "by-path"
-	PutValue     = "put-value"
-	PutComment   = "put-comment"
-)
-
-var matchers = []string{ByValue, ByValueRegex, ByPath, PutValue, PutComment}
