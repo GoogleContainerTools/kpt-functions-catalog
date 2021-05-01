@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="Description" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      window.$docsify = {
+        name: "kpt",
+        nameLink: "https://kpt.dev/",
+        search: {
+          maxAge: 43200000,
+          placeholder: "Search",
+        },
+        alias: {
+          "/.*/sidebar.md": "/sidebar.md",
+        },
+        loadSidebar: "sidebar.md",
+        auto2top: true,
+        repo: "true",
+        corner: {
+          url: "https://github.com/GoogleContainerTools/kpt-functions-catalog",
+          icon: "github",
+        },
+        routerMode: "history",
+        toc: {
+          tocMaxLevel: 5,
+          target: "h2, h3",
+        },
+        plugins: [
+          function (hook, vm) {
+            hook.afterEach(async function (html, next) {
+              const functionName = vm.route.path.split("/")[1];
+              if (!functionName) {
+                next(html);
+                return;
+              }
+
+              try {
+                const catalogResponse = await window.Docsify.get(
+                  `/catalog.json`
+                );
+                const catalog = JSON.parse(catalogResponse);
+                const versions = catalog[functionName];
+                let versionDropdown = "";
+
+                const versionName = vm.route.path.split("/")[2];
+                const currentVersion = versionName.replaceAll("v", "");
+                const sortedSemvers = Object.keys(versions)
+                  .sort((a, b) => compareVersions(a, b))
+                  .reverse();
+                versionDropdown += `
+              <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${currentVersion}
+                <span class="caret"></span></button>
+                <ol class="dropdown-menu">`;
+                sortedSemvers.forEach(
+                  (ver, ix) =>
+                    (versionDropdown += `<li><a href="/${functionName}/${ver}/">${ver.replace(
+                      "v",
+                      ""
+                    )}${ix ? "" : " (latest)"}</a></li>`)
+                );
+                versionDropdown += `
+                </ol>
+              </div>`;
+
+                const examples = catalog[functionName][versionName];
+                const exampleNames = Object.keys(examples).sort();
+                let examplesDropdown = `
+              <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Examples
+                <span class="caret"></span></button>
+                <ol class="dropdown-menu">`;
+                exampleNames.forEach(
+                  (ex, _) =>
+                    (examplesDropdown += `<li><a href="${examples[ex].LocalExamplePath}/">
+                      ${ex}</a></li>`)
+                );
+                examplesDropdown += `
+                </ol>
+              </div>`;
+                const dropdowns =
+                  `<div class="dropdown-container">` +
+                  versionDropdown +
+                  examplesDropdown +
+                  "</div>";
+
+                const ghElement = document
+                  .getElementsByClassName("github-corner")
+                  .item(0);
+                const currentEx = vm.route.path.split("/")[3];
+                // Change the GH icon to point to the current example if it exists.
+                if (currentEx) {
+                  ghElement.href = examples[currentEx].RemoteExamplePath;
+                } 
+                // If not on an example, change the GH icon to point to the current version if it exists.
+                else if (versionName) {
+                  const exampleSuffix = /examples\/.+/;
+                  ghElement.href = examples[exampleNames[0]].RemoteSourcePath;
+                }
+                // On every other page, point to the main catalog repo. 
+                else {
+                  ghElement.href = window.$docsify.corner.url;
+                }
+
+                html = dropdowns + html;
+              } catch (err) {
+                console.error(err);
+              }
+
+              next(html);
+            });
+          },
+        ],
+      };
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify-corner/dist/docsify-corner.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/prismjs@1.22/components/prism-yaml.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/prismjs@1.22/components/prism-go.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/prismjs@1.22/components/prism-typescript.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/compare-versions@3.6.0/index.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </body>
+  <style>
+    :root {
+      --content-max-width: 60em;
+      --search-input-color: black;
+      --search-result-heading-color: white;
+      --search-result-keyword-background: unset;
+      --search-result-keyword-margin: unset;
+      --search-result-keyword-font-weight: 800;
+      --sidebar-background: #30638e;
+      --sidebar-nav-link-color: rgba(255, 255, 255, 0.75);
+      --sidebar-nav-link-color--active: white;
+      --sidebar-name-color: white;
+      --sidebar-toggle-offset-top: unset;
+      --sidebar-width: 20rem;
+    }
+    .body {
+      line-height: var(--base-line-height) !important;
+    }
+
+    .dropdown-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .sidebar {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 16px;
+    }
+    .sidebar > h1 {
+      font-size: var(--sidebar-name-font-size);
+    }
+    .sidebar-toggle {
+      display: none;
+    }
+  </style>
+</html>
