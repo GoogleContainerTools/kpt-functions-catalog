@@ -1,0 +1,10 @@
+scratch
+dist
+.eggs
+__pycache__
+.pyc
+.swp
+.mypy_cache
+.coverage
+*.egg-info
+schemas
