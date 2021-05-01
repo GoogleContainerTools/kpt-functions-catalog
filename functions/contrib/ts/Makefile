@@ -24,8 +24,8 @@ help: ## Print this help
 
 # Edit this list to contain all ts functions
 FUNCTIONS := \
-	helm-inflator \
-	istioctl-analyze \
+	inflate-helm-chart \
+	analyze-istio \
 	sops
 
 # Targets for running all function tests

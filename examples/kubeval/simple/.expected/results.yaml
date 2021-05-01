@@ -1,3 +1,14 @@
+- message: Additional property templates is not allowed
+  severity: error
+  resourceRef:
+    apiVersion: v1
+    kind: ReplicationController
+    namespace: ''
+    name: bob
+  file:
+    path: resources.yaml
+  field:
+    path: templates
 - message: 'Invalid type. Expected: [integer,null], given: string'
   severity: error
   resourceRef:

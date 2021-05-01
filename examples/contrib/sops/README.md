@@ -30,7 +30,7 @@ Get this example and try it out by running the following commands:
 
 ```sh
 # download sops kpt-function example
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/sops .
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/sops .
 # copy example key from sops project
 curl -fsSL -o sops/key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
 # run the function
