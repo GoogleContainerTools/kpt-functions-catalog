@@ -1,0 +1,4 @@
+name: set-labels
+items:
+- message: 'failed to configure function: input label list cannot be empty'
+  severity: error

@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - master
+      - '*/v[0-9]+.[0-9]+'
   schedule:
     - cron:  '0 17 * * *'
 
@@ -49,9 +50,8 @@ jobs:
       GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
       GO111MODULE: on
     steps:
-    - uses: actions/checkout@v2
     - name: Set up Go 1.15
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v2
       with:
         go-version: 1.15
       id: go
@@ -67,8 +67,32 @@ jobs:
         cd functions/go
         make check-licenses
 
+  verify-ci:
+    runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
+      GO111MODULE: on
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up python 3
+      uses: actions/setup-python@v2
+    - name: Install libs
+      run: |
+        pip install pyyaml
+    - name: Set up Go 1.15
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+    - name: Install mdrip
+      run: |
+        go get github.com/russross/blackfriday/v2@v2.0.1
+        go get github.com/monopole/mdrip@v1.0.2
+    - name: Verify docs
+      run: |
+        make verify-docs
+
   e2e-ci:
-    needs: [ts-unit-test-ci, go-unit-test-ci]
+    needs: [ts-unit-test-ci, go-unit-test-ci, verify-ci]
     strategy:
       matrix:
         platform: [ubuntu-latest]
