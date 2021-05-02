@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Format resources in a directory.
+Format the field ordering in resources.
 
 <!--mdtogo-->
 
