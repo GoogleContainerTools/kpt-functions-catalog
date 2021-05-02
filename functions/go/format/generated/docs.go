@@ -5,8 +5,8 @@ package generated
 
 var FormatShort = `Format resources in a directory.`
 var FormatLong = `
-` + "`" + `format` + "`" + ` function formats the field ordering in YAML configuration files. Field ordering
-roughly follows the ordering defined in the source Kubernetes resource definitions, 
+The ` + "`" + `format` + "`" + ` function formats the field ordering in YAML configuration files. Field
+ordering follows the ordering defined in the source Kubernetes resource definitions,
 falling back on lexicographical sorting for unrecognized fields.
 `
 var FormatExamples = `
