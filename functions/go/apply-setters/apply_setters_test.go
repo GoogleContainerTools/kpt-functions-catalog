@@ -453,3 +453,111 @@ func TestCurrentSetterValues(t *testing.T) {
 		}
 	}
 }
+
+type typeTest struct {
+	name    string
+	yamlTag string
+	value   string
+	isError bool
+}
+
+var validateTypeCases = []typeTest{
+	{
+		name:    "string can't be bool",
+		value:   "foo",
+		yamlTag: kyaml.NodeTagBool,
+		isError: true,
+	},
+	{
+		name:    "string can't be float",
+		value:   "foo",
+		yamlTag: kyaml.NodeTagFloat,
+		isError: true,
+	},
+	{
+		name:    "string can't be int",
+		value:   "foo",
+		yamlTag: kyaml.NodeTagInt,
+		isError: true,
+	},
+	{
+		name:    "string can't be sequence",
+		value:   "foo",
+		yamlTag: kyaml.NodeTagSeq,
+		isError: true,
+	},
+	{
+		name:    "string can't be map",
+		value:   "foo",
+		yamlTag: kyaml.NodeTagMap,
+		isError: true,
+	},
+	{
+		name:    "bool can't be int",
+		value:   "true",
+		yamlTag: kyaml.NodeTagInt,
+		isError: true,
+	},
+	{
+		name:    "int can't be float",
+		value:   "10",
+		yamlTag: kyaml.NodeTagFloat,
+		isError: true,
+	},
+	{
+		name:    "float can't be int",
+		value:   "10.1",
+		yamlTag: kyaml.NodeTagInt,
+		isError: true,
+	},
+	{
+		name:    "bool can be string",
+		value:   "true",
+		yamlTag: kyaml.NodeTagString,
+		isError: false,
+	},
+	{
+		name:    "float can be string",
+		value:   "1.22",
+		yamlTag: kyaml.NodeTagString,
+		isError: false,
+	},
+	{
+		name:    "int can be string",
+		value:   "1",
+		yamlTag: kyaml.NodeTagString,
+		isError: false,
+	},
+	{
+		name:    "sequence can be string",
+		value:   "[foo, bar]",
+		yamlTag: kyaml.NodeTagString,
+		isError: false,
+	},
+	{
+		name:    "map can be string",
+		value:   "a: b",
+		yamlTag: kyaml.NodeTagString,
+		isError: false,
+	},
+}
+
+func TestValidateType(t *testing.T) {
+	for _, tests := range [][]typeTest{validateTypeCases} {
+		for i := range tests {
+			test := tests[i]
+			t.Run(test.name, func(t *testing.T) {
+				err := validateType(test.yamlTag, test.value)
+				if test.isError {
+					if !assert.Error(t, err) {
+						t.FailNow()
+					}
+				} else {
+					if !assert.NoError(t, err) {
+						t.FailNow()
+					}
+				}
+			})
+		}
+	}
+}
