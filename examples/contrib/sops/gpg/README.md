@@ -5,13 +5,13 @@ that must contain the private key(s) needed to decrypt yamls and public key(s) t
 encrypt yamls. If you have a file with keys it's possible to run:
 
 ```sh
-kpt fn run --env SOPS_IMPORT_PGP="$(cat <file with exported key>.asc)" <folder>
+SOPS_IMPORT_PGP="$(cat <file with exported key>.asc)" kpt fn run <folder>
 ```
 
 or if your keys are already in stored in `gpg`-storage, it's possible to run:
 
 ```sh
-kpt fn run --env SOPS_IMPORT_PGP="$(gpg --armor --export-secret-keys)" <folder>
+SOPS_IMPORT_PGP="$(gpg --armor --export-secret-keys)" kpt fn run <folder>
 ```
 
 ## Function invocation
@@ -26,7 +26,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 curl -fsSL -o gpg_keys.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
 
 # run the function to work with GPG
-kpt fn run --env SOPS_IMPORT_PGP="$(cat gpg_keys.asc)" gpg
+SOPS_IMPORT_PGP="$(cat gpg_keys.asc)" kpt fn run gpg
 ```
 
 ## Expected result

@@ -2,10 +2,14 @@ import {
   Configs,
   KubernetesObject,
   kubernetesObjectResult,
+  generalResult,
   Result,
 } from 'kpt-functions';
-import { ChildProcess, spawn } from 'child_process';
+import { ChildProcess, spawn, spawnSync } from 'child_process';
 import { Writable } from 'stream';
+
+const DEFAULT_SCHEMA_LOCATION = '/tmp';
+const DEFAULT_OPENAPI_LOCATION = '/home/node/openapi.json';
 
 const SCHEMA_LOCATION = 'schema_location';
 const ADDITIONAL_SCHEMA_LOCATIONS = 'additional_schema_locations';
@@ -38,6 +42,13 @@ export async function kubeval(configs: Configs): Promise<void> {
   const strict = JSON.parse(configs.getFunctionConfigValue(STRICT) || 'false');
 
   const results: Result[] = [];
+
+  // Convert openapi to json schema if neither schema_location nor
+  // additional_schema_locations is provided.
+  if (!schemaLocation && additionalSchemaLocations.length === 0) {
+    await runOpenapi2jsonschema(configs, strict, results);
+  }
+
   const args = buildKubevalArgs(
     schemaLocation,
     additionalSchemaLocations,
@@ -51,6 +62,60 @@ export async function kubeval(configs: Configs): Promise<void> {
   }
 
   configs.addResults(...results);
+}
+
+async function runOpenapi2jsonschema(
+  configs: Configs,
+  strict: boolean,
+  results: Result[]
+): Promise<void> {
+  const apiVersionKindSet = new Set();
+  for (const object of configs.getAll()) {
+    const avk = object.apiVersion + ',' + object.kind;
+    if (!apiVersionKindSet.has(avk)) {
+      apiVersionKindSet.add(avk);
+    }
+  }
+  if (apiVersionKindSet.size > 0) {
+    const openapi2jsonschemaArgs = [
+      '--kubernetes',
+      '--expanded',
+      '--stand-alone',
+      '--apiversionkind',
+      Array.from(apiVersionKindSet).join(';'),
+    ];
+    if (strict) {
+      openapi2jsonschemaArgs.push('--strict');
+      openapi2jsonschemaArgs.push(
+        '-o',
+        DEFAULT_SCHEMA_LOCATION + '/master-standalone-strict'
+      );
+    } else {
+      openapi2jsonschemaArgs.push(
+        '-o',
+        DEFAULT_SCHEMA_LOCATION + '/master-standalone'
+      );
+    }
+    openapi2jsonschemaArgs.push(DEFAULT_OPENAPI_LOCATION);
+
+    const openapi2jsonschemaProcess = spawnSync(
+      'openapi2jsonschema',
+      openapi2jsonschemaArgs,
+      {
+        encoding: 'utf-8',
+        stdio: [process.stdin, 'pipe', 'pipe'],
+      }
+    );
+    if (openapi2jsonschemaProcess.status !== 0) {
+      const result = generalResult(
+        String(openapi2jsonschemaProcess.stdout) +
+          String(openapi2jsonschemaProcess.stderr),
+        'error',
+        undefined
+      );
+      results.push(result);
+    }
+  }
 }
 
 async function runKubeval(
@@ -116,16 +181,21 @@ function buildKubevalArgs(
     args.push(schemaLocation);
   }
 
-  if (additionalSchemaLocations) {
+  if (additionalSchemaLocations.length > 0) {
     args.push('--additional-schema-locations');
     args.push(additionalSchemaLocations.join(','));
+  }
+
+  if (!schemaLocation && additionalSchemaLocations.length === 0) {
+    args.push('--schema-location');
+    args.push('file://' + DEFAULT_SCHEMA_LOCATION);
   }
 
   if (ignoreMissingSchemas) {
     args.push('--ignore-missing-schemas');
   }
 
-  if (skipKinds) {
+  if (skipKinds.length > 0) {
     args.push('--skip-kinds');
     args.push(skipKinds.join(','));
   }
@@ -155,19 +225,43 @@ function readStdoutToString(childProcess: ChildProcess): Promise<string> {
 }
 
 kubeval.usage = `
-Validates configuration using kubeval.
+Use kubeval to validate KRM resources against their json schemas.
 
-Configured using a ConfigMap with the following keys, all of which are optional:
-${SCHEMA_LOCATION}: The base URL used to download schemas.  If not specified,
-  the default location at https://kubernetesjsonschema.dev/ will be used.
-${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to download
-  schemas.  These URLs will be used if the URL specified by ${SCHEMA_LOCATION}
-  did not have the required schema.  By default, there are no secondary URLs,
-  and only the primary base URL will be used.
-${IGNORE_MISSING_SCHEMAS}: Skip validation for resource definitions without a
-  schema.  If omitted, a default value of false will be assumed.
+The function configuration must be a ConfigMap.
+
+The following keys can be used in the data field of the ConfigMap, and all of
+them are optional:
+
+${SCHEMA_LOCATION}: The base URL used to fetch the json schemas. The default is
+  empty. This feature only works with imperative runs, since declarative runs
+  allow neither network access nor volume mount.
+${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to fetch the
+  json schemas.  These URLs will be used if the URL specified by
+  ${SCHEMA_LOCATION} did not have the required schema.  The default is empty.
+  This feature only works with imperative runs.
+${IGNORE_MISSING_SCHEMAS}: Skip validation for resources without a schema. The
+  default is false.
 ${SKIP_KINDS}: Comma-separated list of case-sensitive kinds to skip when
-  validating against schemas.  If omitted, no kinds will be skipped.
-${STRICT}: Disallow additional properties not in schema.  If omitted, a default
-  value of false will be assumed.
+  validating against schemas. The default is empty.
+${STRICT}: Disallow additional properties that are not in the schemas. The
+  default is false.
+
+The following is an example function configuration:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-func-config
+data:
+  schema_location: "https://kubernetesjsonschema.dev"
+  additional_schema_locations: "https://example.com,file:///abs/path/to/your/schema/directory"
+  ignore_missing_schemas: "false"
+  skip_kinds: "DaemonSet,MyCRD"
+  strict: "true"
+
+If neither ${SCHEMA_LOCATION} nor ${ADDITIONAL_SCHEMA_LOCATIONS} is provided, we
+will convert the baked-in OpenAPI document to json schemas and use them.
+The baked-in OpenAPI document is from a GKE cluster with version v1.19.8. The
+OpenAPI document contains kubernetes built-in types and some GCP CRDs (e.g.
+BackendConfig), but it currently doesn't contain Config Connector CRDs.
 `;

@@ -8,13 +8,13 @@ This file is needed for decryption. For encryption it's possible to use
 E.g. for decryption it's possible to run:
 
 ```sh
-kpt fn run --env SOPS_IMPORT_AGE="$(cat <file with age keys>.txt)" <folder>
+SOPS_IMPORT_AGE="$(cat <file with age keys>.txt)" kpt fn run <folder>
 ```
 
 or if AGE keys are already stored in the host system so SOPS binary works locally, it's possible to run:
 
 ```sh
-kpt fn run --env SOPS_IMPORT_AGE="$(cat ~/.config/sops/age/keys.txt)" <folder>
+SOPS_IMPORT_AGE="$(cat ~/.config/sops/age/keys.txt)" kpt fn run <folder>
 ```
 
 ## Function invocation
@@ -29,7 +29,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 curl -fsSL -o age_keys.txt https://raw.githubusercontent.com/mozilla/sops/master/age/keys.txt
 
 # run the function to work with AGE
-kpt fn run --env SOPS_IMPORT_AGE="$(cat age_keys.txt)" age
+SOPS_IMPORT_AGE="$(cat age_keys.txt)" kpt fn run age
 ```
 
 ## Expected result

@@ -40,6 +40,10 @@ check-licenses:
 	cd functions/go && $(MAKE) check-licenses
 	cd functions/contrib/ts && $(MAKE) check-licenses
 
+verify-docs:
+	GO111MODULE=on go get github.com/monopole/mdrip
+	scripts/verify-docs.py
+
 build: ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 	cd functions/go && $(MAKE) TAG=$(TAG) build
 	cd functions/ts && $(MAKE) TAG=$(TAG) build
@@ -49,3 +53,8 @@ push: ## Push images to registry. WARN: This operation should only be done in CI
 	cd functions/go && $(MAKE) push
 	cd functions/ts && $(MAKE) push
 	cd functions/contrib/ts && $(MAKE) push
+
+site-generate: ## Collect function branches and generate a catalog of their examples and documentation using kpt next.
+	rm -rf ./examples/*/
+	# GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt@next
+	(cd scripts/generate_catalog/ && go run . ../.. ../../examples)
