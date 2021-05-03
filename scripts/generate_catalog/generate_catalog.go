@@ -138,22 +138,21 @@ func getFunctions(branches []string, source string, dest string) []function {
 		metadataPath := strings.TrimSpace(fmt.Sprintf("%v:%v", b, filepath.Join(relativeFuncPath, "metadata.yaml")))
 		md, err := getMetadata(metadataPath)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
+			fmt.Fprintf(os.Stderr, "Error getting metadata for %q in %q: %v\n", funcName, b, err)
 			os.Exit(1)
 		}
 		if md.Hidden {
 			continue
 		}
-
 		err = copyExamples(b, funcName, funcDest, versionDest)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
+			fmt.Fprintf(os.Stderr, "Error getting examples for %q in %q: %v\n", funcName, b, err)
 			os.Exit(1)
 		}
 
 		err = copyReadme(b, funcName, relativeFuncPath, versionDest)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
+			fmt.Fprintf(os.Stderr, "Error getting README for %q in %q: %v\n", funcName, b, err)
 			os.Exit(1)
 		}
 
