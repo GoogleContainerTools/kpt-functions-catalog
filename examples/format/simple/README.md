@@ -8,7 +8,6 @@ The `format` function formats the field ordering in YAML configuration files. Th
 Get the config example and try it out by running the following commands:
 
 <!-- @getAndRunPkg @test -->
-
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/format/simple .
 kpt fn run simple
@@ -22,7 +21,6 @@ is placed before `metadata.labels` field. The keys in `metadata.labels` field ar
 Verify that the changes are as described:
 
 <!-- @getAndRunPkg @test -->
-
 ```sh
 $ kpt cfg cat simple/
 ```
