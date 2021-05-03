@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -euo pipefail
+
 # Set read/execute permissions for newly created site files in macOS or Linux.
 setfacl -Rd -m o::rx site/ 2> /dev/null || chmod -R +a "everyone allow read,execute,file_inherit,directory_inherit" site/
 # Set read/execute permissions for existing site files.
