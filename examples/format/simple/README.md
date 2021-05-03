@@ -21,6 +21,8 @@ is placed before `metadata.labels` field. The keys in `metadata.labels` field ar
 
 Verify that the changes are as described:
 
+<!-- @getAndRunPkg @test -->
+
 ```sh
 $ kpt cfg cat simple/
 ```
