@@ -1,0 +1,30 @@
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
+metadata:
+  name: helloworld-set
+upstream:
+  type: git
+  git:
+    repo: https://github.com/GoogleContainerTools/kpt
+    directory: /package-examples/helloworld-set
+    ref: master
+  updateStrategy: resource-merge
+upstreamLock:
+  type: git
+  git:
+    repo: https://github.com/GoogleContainerTools/kpt
+    directory: /package-examples/helloworld-set
+    ref: master
+info:
+  description: kpt example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/set-annotations:v0.1
+      configPath: fn-config.yaml
+    - image: gcr.io/kpt-fn/set-namespace:v0.1
+      configPath: ns-config.yaml
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configMap:
+        http-port: "80"
+        image-tag: v0.3.0
+        replicas: "5"
