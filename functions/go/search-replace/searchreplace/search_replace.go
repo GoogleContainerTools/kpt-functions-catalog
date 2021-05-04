@@ -1,4 +1,4 @@
-package main
+package searchreplace
 
 import (
 	"fmt"
@@ -7,10 +7,23 @@ import (
 
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
+	"sigs.k8s.io/kustomize/kyaml/sets"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-const PathDelimiter = "."
+const (
+	ByValue       = "by-value"
+	ByValueRegex  = "by-value-regex"
+	ByPath        = "by-path"
+	PutValue      = "put-value"
+	PutComment    = "put-comment"
+	PathDelimiter = "."
+)
+
+// matchers returns the list of supported matchers
+func matchers() []string {
+	return []string{ByValue, ByValueRegex, ByPath, PutValue, PutComment}
+}
 
 // SearchReplace struct holds the input parameters and results for
 // Search and Replace operations on resource configs
@@ -46,20 +59,20 @@ type SearchReplace struct {
 
 // SearchResult holds result of search and replace operation
 type SearchResult struct {
-	// file path of the matching field
+	// FilePath is the file path of the matching field
 	FilePath string
 
-	// field path of the matching field
+	// FieldPath is field path of the matching field
 	FieldPath string
 
-	// value of the matching field
+	// Value of the matching field
 	Value string
 }
 
 // Filter performs the search and replace operation on all input nodes
 func (sr *SearchReplace) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	if sr.ByValue != "" && sr.ByValueRegex != "" {
-		return nodes, errors.Errorf(`only one of ["by-value", "by-value-regex"] can be provided`)
+	if err := sr.validateMatchers(); err != nil {
+		return nodes, err
 	}
 
 	// compile regex once so that it can be used everywhere
@@ -89,6 +102,9 @@ func (sr *SearchReplace) Perform(object *yaml.RNode) (*yaml.RNode, error) {
 		return object, err
 	}
 	sr.filePath = filePath
+	if err != nil {
+		return object, err
+	}
 
 	// check if value should be put by path and process it directly without needing
 	// to traverse all elements of the node
@@ -345,4 +361,43 @@ func (sr *SearchReplace) resultsString() string {
 	}
 	out += fmt.Sprintf("%s %d field(s)\n", action, sr.Count)
 	return out
+}
+
+// Decode decodes the input yaml RNode into SearchReplace struct
+// returns error if input yaml RNode contains invalid matcher name inputs
+func Decode(rn *yaml.RNode, fcd *SearchReplace) error {
+	dm := rn.GetDataMap()
+	if err := validateMatcherNames(dm); err != nil {
+		return err
+	}
+	fcd.ByPath = dm[ByPath]
+	fcd.ByValue = dm[ByValue]
+	fcd.ByValueRegex = dm[ByValueRegex]
+	fcd.PutValue = dm[PutValue]
+	fcd.PutComment = dm[PutComment]
+	return nil
+}
+
+// validateMatcherNames validates the input matcher names
+func validateMatcherNames(m map[string]string) error {
+	matcherSet := sets.String{}
+	matcherSet.Insert(matchers()...)
+	for key := range m {
+		if !matcherSet.Has(key) {
+			return errors.Errorf("invalid matcher %q, must be one of %q", key, matchers())
+		}
+	}
+	return nil
+}
+
+// validateMatchers validates the input matchers in SearchReplace struct
+func (sr *SearchReplace) validateMatchers() error {
+	if sr.ByValue == "" && sr.ByValueRegex == "" && sr.ByPath == "" {
+		return errors.Errorf(`at least one of [%q, %q, %q] must be provided`, ByValue, ByValueRegex, ByPath)
+	}
+
+	if sr.ByValue != "" && sr.ByValueRegex != "" {
+		return errors.Errorf(`only one of [%q, %q] can be provided`, ByValue, ByValueRegex)
+	}
+	return nil
 }

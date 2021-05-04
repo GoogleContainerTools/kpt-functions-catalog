@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/searchreplace"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
@@ -36,7 +37,7 @@ func main() {
 	}
 }
 
-// run resolves the function params and runs the function on resources
+// run resolves the function params from input ResourceList and runs the function on resources
 func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
 	sr, err := getSearchReplaceParams(resourceList.FunctionConfig)
 	if err != nil {
@@ -52,8 +53,8 @@ func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
 }
 
 // getSearchReplaceParams retrieve the search parameters from input config
-func getSearchReplaceParams(fc interface{}) (SearchReplace, error) {
-	var fcd SearchReplace
+func getSearchReplaceParams(fc interface{}) (searchreplace.SearchReplace, error) {
+	var fcd searchreplace.SearchReplace
 	f, ok := fc.(map[string]interface{})
 	if !ok {
 		return fcd, fmt.Errorf("function config %#v is not valid", fc)
@@ -63,32 +64,15 @@ func getSearchReplaceParams(fc interface{}) (SearchReplace, error) {
 		return fcd, fmt.Errorf("failed to parse input from function config: %w", err)
 	}
 
-	decode(rn, &fcd)
-	return fcd, nil
-}
-
-// decode decodes the input yaml node into SearchReplace struct
-func decode(rn *kyaml.RNode, fcd *SearchReplace) {
-	dm := rn.GetDataMap()
-	fcd.ByPath = getValue(dm, "by-path")
-	fcd.ByValue = getValue(dm, "by-value")
-	fcd.ByValueRegex = getValue(dm, "by-value-regex")
-	fcd.PutValue = getValue(dm, "put-value")
-	fcd.PutComment = getValue(dm, "put-comment")
-}
-
-// getValue returns the value for 'key' in map 'm'
-// returns empty string if 'key' doesn't exist in 'm'
-func getValue(m map[string]string, key string) string {
-	if val, ok := m[key]; ok {
-		return val
+	if err := searchreplace.Decode(rn, &fcd); err != nil {
+		return fcd, err
 	}
-	return ""
+	return fcd, nil
 }
 
 // searchResultsToItems converts the Search and Replace results to
 // equivalent items([]framework.Item)
-func searchResultsToItems(sr SearchReplace) []framework.Item {
+func searchResultsToItems(sr searchreplace.SearchReplace) []framework.Item {
 	var items []framework.Item
 	for _, res := range sr.Results {
 

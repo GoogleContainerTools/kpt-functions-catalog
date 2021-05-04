@@ -1,4 +1,4 @@
-package main
+package searchreplace
 
 var searchReplaceCases = []test{
 	{
@@ -726,5 +726,52 @@ spec:
   replicas: 3
  `,
 		errMsg: `only one of ["by-value", "by-value-regex"] can be provided`,
+	},
+	{
+		name: "error when none of the search matchers are provided",
+		config: `
+data: ~
+`,
+		input: `
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+ `,
+		expectedResources: `
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+ `,
+		errMsg: `at least one of ["by-value", "by-value-regex", "by-path"] must be provided`,
+	},
+	{
+		name: "error when none of the required search matchers are provided",
+		config: `
+data:
+  put-value: foo
+`,
+		input: `
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+ `,
+		expectedResources: `
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+ `,
+		errMsg: `at least one of ["by-value", "by-value-regex", "by-path"] must be provided`,
 	},
 }
