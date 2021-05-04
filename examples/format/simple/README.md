@@ -15,7 +15,7 @@ kpt fn run simple
 
 ## Expected result
 
-The fields should be ordered as per openapi schema definition of `Deployment` resource. For e.g. `metadata.name` field
+The fields should be ordered as per OpenAPI schema definition of `Deployment` resource. For e.g. `metadata.name` field
 is placed before `metadata.labels` field. The keys in `metadata.labels` field are sorted alphabetically.
 
 Verify that the changes are as described:

@@ -13,7 +13,7 @@ Format the field ordering in resources.
 <!--mdtogo:Long-->
 
 The `format` function formats the field ordering in YAML configuration files. Field
-ordering follows the ordering defined in the openapi document for Kubernetes resources,
+ordering follows the ordering defined in the OpenAPI document for Kubernetes resources,
 falling back on lexicographical sorting for unrecognized fields. This function also performs
 other changes like fixing indentation, adding quotes to ambiguous string values.
 
@@ -71,7 +71,7 @@ spec:
               containerPort: 80
 ```
 
-The fields are ordered as per the openapi schema definition of `Deployment` resource. For e.g. `metadata.name` field
+The fields are ordered as per the OpenAPI schema definition of `Deployment` resource. For e.g. `metadata.name` field
 is moved up. Since the type of annotation value is `string`, quotes are added to value `100` as it will be interpreted
 as `int` by yaml in its current form.
 
