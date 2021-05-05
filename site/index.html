@@ -29,6 +29,8 @@
           maxAge: 43200000,
           placeholder: "Search",
         },
+        crossOriginLinks: ["https://kpt.dev/"],
+        externalLinkTarget: "_self",
         alias: {
           "/.*/sidebar.md": "/sidebar.md",
         },
@@ -110,13 +112,13 @@
                 // Change the GH icon to point to the current example if it exists.
                 if (currentEx) {
                   ghElement.href = examples[currentEx].RemoteExamplePath;
-                } 
+                }
                 // If not on an example, change the GH icon to point to the current version if it exists.
                 else if (versionName) {
                   const exampleSuffix = /examples\/.+/;
                   ghElement.href = examples[exampleNames[0]].RemoteSourcePath;
                 }
-                // On every other page, point to the main catalog repo. 
+                // On every other page, point to the main catalog repo.
                 else {
                   ghElement.href = window.$docsify.corner.url;
                 }
