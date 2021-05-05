@@ -11,11 +11,11 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
     />
     <link
       rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
     />
     <link
       rel="icon"
@@ -164,8 +164,13 @@
       --sidebar-toggle-offset-top: unset;
       --sidebar-width: 20rem;
     }
-    .body {
-      line-height: var(--base-line-height) !important;
+    body {
+      line-height: unset;
+      font-family: unset;
+      font-size: unset;
+    }
+    h1 {
+      line-height: unset;
     }
 
     .dropdown-container {
