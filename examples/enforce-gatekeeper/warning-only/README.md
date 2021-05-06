@@ -1,6 +1,6 @@
-# enforce-gatekeeper: warning only
+# enforce-gatekeeper: Warning Only
 
-## Overview
+### Overview
 
 This example is very similar to the invalid configmap example. The major
 difference is that the violations are warnings instead of errors.
@@ -8,7 +8,7 @@ difference is that the violations are warnings instead of errors.
 In the constraint, we use `enforcementAction: warn` instead of
 `enforcementAction: deny`.
 
-## Function invocation
+### Function invocation
 
 Get the package:
 
@@ -30,7 +30,7 @@ Run the function:
 $ kpt fn run --results-dir=results .
 ```
 
-## Expected result
+### Expected result
 
 You won't any failure. But if you look at the structured output, you can find a
 warning about the constraint violation.
@@ -63,7 +63,7 @@ To pass validation, let's replace the key `private_key` in the ConfigMap in
 `resources.yaml` with something else e.g. `public_key`.
 Rerun the command. It will no longer have the warning.
 
-## Function Reference Doc
+### Function Reference Doc
 
 TODO: replace the following with the link to the reference doc when our site is live.
 https://github.com/GoogleContainerTools/kpt-functions-catalog/blob/master/functions/go/enforce-gatekeeper/README.md

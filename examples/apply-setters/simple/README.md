@@ -59,7 +59,7 @@ environments: # kpt-set: ${env}
   - stage
 ```
 
-## Function invocation
+### Function invocation
 
 Get the config example and try it out by running the following commands:
 
@@ -69,7 +69,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run simple
 ```
 
-## Expected result
+### Expected result
 
 Check the value of setter `name` is set to `my-new-map`.
 Check the value of setter `env` is set to array value `[prod, stage]`.

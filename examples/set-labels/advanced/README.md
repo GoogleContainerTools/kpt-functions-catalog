@@ -27,7 +27,7 @@ The desired labels is provided using `labels` field. We have a CRD with group
 added to field `.spec.selector.labels` as well. We specify it in field
 `fieldSpecs`.
 
-## Function invocation
+### Function invocation
 
 Get the example config and try it out by running the following commands:
 
@@ -37,7 +37,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run advanced
 ```
 
-## Expected result
+### Expected result
 
 Check all resources have 2 labels: `color: orange` and `fruit: apple`.
 
