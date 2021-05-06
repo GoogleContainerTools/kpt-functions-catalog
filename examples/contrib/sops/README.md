@@ -24,7 +24,7 @@ or if your keys are already in `gpg`, it's possibe to run:
 kpt fn run --env SOPS_IMPORT_PGP="$(gpg --armor --export-secret-keys)" <folder>
 ```
 
-## Function invocation
+### Function invocation
 
 Get this example and try it out by running the following commands:
 
@@ -37,7 +37,7 @@ curl -fsSL -o sops/key.asc https://raw.githubusercontent.com/mozilla/sops/master
 kpt fn run --env SOPS_IMPORT_PGP="$(cat sops/key.asc)" sops/local-configs
 ```
 
-## Expected result
+### Expected result
 
 Verify the updated configuration:
 

@@ -18,7 +18,7 @@ data:
 
 The desired labels are provided as key-value pairs using `data` field.
 
-## Function invocation
+### Function invocation
 
 Get the example config and try it out by running the following commands:
 
@@ -28,7 +28,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run simple
 ```
 
-## Expected result
+### Expected result
 
 Check all resources have 2 labels `color: orange` and `fruit: apple`.
 

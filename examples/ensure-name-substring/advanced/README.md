@@ -27,7 +27,7 @@ fieldSpecs:
 The function will not only update field `.metadata.name` but also field
 `.spec.name` in `MyResource`.
 
-## Function invocation
+### Function invocation
 
 Get the config example and try it out by running the following commands:
 
@@ -37,7 +37,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run advanced
 ```
 
-## Expected result
+### Expected result
 
 Check all resources have `prod-` in their names and the field `.spec.name` in
 `MyResource` also got updated.

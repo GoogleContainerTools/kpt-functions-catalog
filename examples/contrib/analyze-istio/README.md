@@ -5,7 +5,7 @@ Istio configuration and outputs structured results detailing any errors found
 during analysis. This example invokes the `analyze-istio` function using
 declarative configuration.
 
-## Function Invocation
+### Function Invocation
 
 Get this example and try it out by running the following commands:
 
@@ -14,7 +14,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run analyze-istio
 ```
 
-## Expected Results
+### Expected Results
 
 This should give the following output:
 

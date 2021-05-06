@@ -4,7 +4,7 @@ The `inflate-helm-chart` KRM config function generates a new kpt package from a
 local Helm chart. This example invokes the `inflate-helm-chart` function using
 declarative configuration.
 
-## Function invocation
+### Function invocation
 
 Get this example and try it out by running the following commands:
 
@@ -13,7 +13,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run --as-current-user inflate-helm-chart/local-configs --mount type=bind,src=$(pwd)/inflate-helm-chart/helloworld-chart,dst=/source
 ```
 
-## Expected result
+### Expected result
 
 Checking the contents of the `local-configs` directory with `kpt cfg tree inflate-helm-chart/local-configs/` should reveal the following new yaml files:
 
