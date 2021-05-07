@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
+	"sigs.k8s.io/kustomize/api/provider"
 	"sigs.k8s.io/kustomize/api/resmap"
-	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/kio"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
 
@@ -102,7 +102,7 @@ func getDefaultConfig() (transformerConfig, error) {
 }
 
 func newResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
+	resourceFactory := provider.NewDefaultDepProvider().GetResourceFactory()
 	return resmap.NewFactory(resourceFactory, nil)
 }
 
@@ -143,7 +143,7 @@ func run(resourceList *framework.ResourceList) error {
 		return fmt.Errorf("failed to configure function: %w", err)
 	}
 
-	resourceList.Items, err = fn.Run(resourceList.Items)
+	resourceList.Items, err = ProcessLocalConfigResources(resourceList.Items, kio.FilterFunc(fn.Run))
 	if err != nil {
 		return fmt.Errorf("failed to run function: %w", err)
 	}

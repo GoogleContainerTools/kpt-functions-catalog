@@ -12,7 +12,7 @@ labels:
   fruit: apple
 fieldSpecs:
 - kind: MyResource
-  group: dev.example.com
-  version: v1
   create: true
+  group: dev.example.com
   path: spec/selector/labels
+  version: v1
