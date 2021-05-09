@@ -143,6 +143,36 @@ spec:
 `,
 		},
 		{
+			name: "derive missing values from pattern - special characters in name and value",
+			config: `
+data:
+  image-~!@#$%^&*()<>?"|: ubuntu-~!@#$%^&*()<>?"|
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.7.9 # kpt-set: ${image-~!@#$%^&*()<>?"|}:${tag}`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: nginx
+          image: ubuntu-~!@#$%^&*()<>?"|:1.7.9 # kpt-set: ${image-~!@#$%^&*()<>?"|}:${tag}
+`,
+		},
+		{
 			name: "don't set if no relevant setter values are provided",
 			config: `
 data:
@@ -368,12 +398,23 @@ var resolvePatternCases = []patternTest{
 		},
 	},
 	{
-		name:    "setter values from pattern 1",
-		value:   "nginx:1.7.1",
-		pattern: `${image}:${tag}`,
+		name:    "setter values from pattern 2",
+		value:   "foo-dev-bar-us-east-1-baz",
+		pattern: `foo-${environment}-bar-${region}-baz`,
 		expected: map[string]string{
-			"image": "nginx",
-			"tag":   "1.7.1",
+			"environment": "dev",
+			"region":      "us-east-1",
+		},
+	},
+	{
+		name:    "setter values from pattern 3",
+		value:   "gcr.io/my-app/my-app-backend:1.0.0",
+		pattern: `${registry}/${app~!@#$%^&*()<>?:"|}/${app-image-name}:${app-image-tag}`,
+		expected: map[string]string{
+			"registry":             "gcr.io",
+			`app~!@#$%^&*()<>?:"|`: "my-app",
+			"app-image-name":       "my-app-backend",
+			"app-image-tag":        "1.0.0",
 		},
 	},
 	{

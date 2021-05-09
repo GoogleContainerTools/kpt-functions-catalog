@@ -196,42 +196,45 @@ func shouldSet(pattern string, setters []Setter) bool {
 
 // currentSetterValues takes pattern and value and returns setter names to values
 // derived using pattern matching
-// e.g. pattern = foo-${image}:${tag}-bar, value = foo-nginx:1.7.1-bar
-// returns {"image":"nginx", "tag":"1.7.1"}
+// e.g. pattern = foo-${image-setter}:${tag-setter}-bar, value = foo-nginx:1.14.1-bar
+// returns {"image-setter":"nginx", "tag-setter":"1.7.1"}
 func currentSetterValues(pattern, value string) map[string]string {
 	res := make(map[string]string)
 	// get all setter names enclosed in ${}
 	urs := unresolvedSetters(pattern)
-	// transform pattern replace pattern with named matching groups
-	// e.g. foo-${image}:${tag}-bar => foo-(?P<image>.*):(?P<tag>.*)-bar
+	// e.g. value: foo-nginx:1.14.1-bar
+	// pattern: foo-${image-setter}:${tag-setter}-bar
+	// urs: [${image-setter}, ${tag-setter}]
 	for _, setterName := range urs {
 		pattern = strings.ReplaceAll(
 			pattern,
 			setterName,
-			fmt.Sprintf(`(?P<%s>.*)`, clean(setterName)))
+			`(?P<x>.*)`) // x is just a place holder, it could be any alphanumeric string
 	}
+	// pattern: foo-(?P<x>.*):(?P<x>.*)-bar
 	r, err := regexp.Compile(pattern)
 	if err != nil {
 		// just return empty map if values can't be derived from pattern
 		return res
 	}
 	setterValues := r.FindStringSubmatch(value)
-	setterNames := r.SubexpNames()
-	if len(setterNames) != len(setterValues) {
+	if len(setterValues) == 0 {
+		return res
+	}
+	// setterValues: [foo-nginx:1.14.1-bar, nginx, 1.14.1]
+	setterValues = setterValues[1:]
+	// setterValues: [nginx, 1.14.1]
+	if len(urs) != len(setterValues) {
 		// just return empty map if values can't be derived
 		return res
 	}
-	for i := range setterNames {
-		if i == 0 {
-			// first value is just entire value, so skip it
-			continue
-		}
+	for i := range setterValues {
 		if setterValues[i] == "" {
 			// if any of the value is unresolved return empty map
 			// and expect users to provide all values
 			return make(map[string]string)
 		}
-		res[setterNames[i]] = setterValues[i]
+		res[clean(urs[i])] = setterValues[i]
 	}
 	return res
 }
