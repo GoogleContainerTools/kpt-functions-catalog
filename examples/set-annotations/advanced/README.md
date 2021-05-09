@@ -25,7 +25,7 @@ CRD with group `dev.example.com`, version `v1` and kind `MyResource`. We want
 the annotations to be added to field `.spec.selector.annotations` as well. We
 specify it in field `fieldSpecs`.
 
-## Function invocation
+### Function invocation
 
 Get the example config and try it out by running the following commands:
 
@@ -35,7 +35,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run advanced
 ```
 
-## Expected result
+### Expected result
 
 Check the 2 annotations have been added to both the k8s built-in resources and
 the custom resources.

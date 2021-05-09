@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/apply-setters/applysetters"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/apply-setters/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
@@ -37,8 +38,8 @@ func main() {
 }
 
 // getSetters retrieve the setters from input config
-func getSetters(fc interface{}) (ApplySetters, error) {
-	var fcd ApplySetters
+func getSetters(fc interface{}) (applysetters.ApplySetters, error) {
+	var fcd applysetters.ApplySetters
 	f, ok := fc.(map[string]interface{})
 	if !ok {
 		return fcd, fmt.Errorf("function config %#v is not valid", fc)
@@ -47,14 +48,6 @@ func getSetters(fc interface{}) (ApplySetters, error) {
 	if err != nil {
 		return fcd, fmt.Errorf("failed to parse input from function config: %w", err)
 	}
-
-	return fcd, decode(rn, &fcd)
-}
-
-// decode decodes the input yaml node into Set struct
-func decode(rn *kyaml.RNode, fcd *ApplySetters) error {
-	for k, v := range rn.GetDataMap() {
-		fcd.Setters = append(fcd.Setters, Setter{Name: k, Value: v})
-	}
-	return nil
+	applysetters.Decode(rn, &fcd)
+	return fcd, nil
 }

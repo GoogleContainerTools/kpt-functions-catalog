@@ -1,6 +1,6 @@
-# enforce-gatekeeper: invalid configmap
+# enforce-gatekeeper: Invalid Configmap
 
-## Overview
+### Overview
 
 This example demonstrates how to validate ConfigMaps using a constraint.
 
@@ -8,7 +8,7 @@ There are 3 resources: a ConstraintTemplate, a K8sBannedConfigMapKeysV1 and a
 ConfigMap.
 The constraint disallows using `private_key` as a key in the ConfigMap.
 
-## Function invocation
+### Function invocation
 
 Get the package:
 
@@ -30,7 +30,7 @@ Run the function:
 $ kpt fn run --results-dir=results .
 ```
 
-## Expected result
+### Expected result
 
 You should see the following output:
 
@@ -69,7 +69,7 @@ To pass validation, let's replace the key `private_key` in the ConfigMap in
 `resources.yaml` with something else e.g. `public_key`.
 Rerun the command. It will succeed (no output).
 
-## Function Reference Doc
+### Function Reference Doc
 
 TODO: replace the following with the link to the reference doc when our site is live.
 https://github.com/GoogleContainerTools/kpt-functions-catalog/blob/master/functions/go/enforce-gatekeeper/README.md

@@ -1,4 +1,4 @@
-package main
+package searchreplace
 
 import (
 	"io/ioutil"
@@ -47,11 +47,14 @@ func TestSearchCommand(t *testing.T) {
 				if !assert.NoError(t, err) {
 					t.FailNow()
 				}
-				decode(node, s)
 				inout := &kio.LocalPackageReadWriter{
 					PackagePath:     baseDir,
 					NoDeleteFiles:   true,
 					PackageFileName: "Kptfile",
+				}
+				err = Decode(node, s)
+				if !assert.NoError(t, err) {
+					t.FailNow()
 				}
 				err = kio.Pipeline{
 					Inputs:  []kio.Reader{inout},
@@ -89,4 +92,23 @@ func TestSearchCommand(t *testing.T) {
 			})
 		}
 	}
+}
+
+func TestDecode(t *testing.T) {
+	rn, err := kyaml.Parse(`data:
+  by-value: foo
+  put-values: bar`)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	err = Decode(rn, &SearchReplace{})
+	if !assert.Error(t, err) {
+		t.FailNow()
+	}
+	expected := `invalid matcher "put-values", must be one of ["by-value" "by-value-regex" "by-path" "put-value" "put-comment"]`
+	if !assert.Equal(t, expected, err.Error()) {
+		t.FailNow()
+	}
+
 }

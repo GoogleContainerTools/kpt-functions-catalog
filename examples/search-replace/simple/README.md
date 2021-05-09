@@ -41,7 +41,7 @@ metadata:
   namespace: my-space
 ```
 
-## Function invocation
+### Function invocation
 
 Get the config example and try it out by running the following commands:
 
@@ -51,7 +51,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run simple
 ```
 
-## Expected result
+### Expected result
 
 Check the value of deployment `the-deloyment` is changed to `my-deloyment`.
 

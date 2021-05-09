@@ -1,25 +1,17 @@
-# SOPS PGP example
+# sops: PGP example
 
-SOPS function introduces for PGP case an additional `SOPS_IMPORT_PGP` ENV variable
-that must contain the private key(s) needed to decrypt yamls and public key(s) to
-encrypt yamls. If you have a file with keys it's possible to run:
+### Overview
 
-```sh
-SOPS_IMPORT_PGP="$(cat <file with exported key>.asc)" kpt fn run <folder>
-```
+The `sops` KRM config function encrypts and decrypts resources. Learn more on the [sops website].
 
-or if your keys are already in stored in `gpg`-storage, it's possible to run:
-
-```sh
-SOPS_IMPORT_PGP="$(gpg --armor --export-secret-keys)" kpt fn run <folder>
-```
+This example demonstrates invocation of `sops` for encryption the resouce called `toEncrypt` and decryption of the resource called `toDecrypt` using the already existing PGP keys.
 
 ## Function invocation
 
 Get this example and try it out by running the following commands:
 
 ```sh
-# download sops kpt-function example
+# download this example
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/sops/gpg .
 
 # copy example GPG key from sops project
@@ -36,3 +28,7 @@ Verify the updated configuration:
 ```sh
 kpt cfg cat gpg
 ```
+
+The resource called `toDecrypt` must be decrypted and the resource called `toEncrypt` must be encrypted.
+
+[sops website]: https://github.com/mozilla/sops#test-with-the-dev-pgp-key

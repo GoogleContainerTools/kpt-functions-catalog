@@ -1,6 +1,6 @@
 # starlark: Simple Example
 
-## Overview
+### Overview
 
 In this example, we are going to demonstrate how to use the starlark function
 with an inline starlark script as function configuration.
@@ -25,7 +25,7 @@ The starlark script is embedded in the `source` field. This script read the
 input KRM resources from `ctx.resource_list` and sets the `.metadata.namespace`
 to `prod` for all resources.
 
-## Function invocation
+### Function invocation
 
 Get the config example and try it out by running the following commands:
 
@@ -35,7 +35,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run simple
 ```
 
-## Expected result
+### Expected result
 
 Check the `.metadata.namespace` field has been set to `prod` for every resource.
 

@@ -1,4 +1,4 @@
-# kubeval: simple example
+# kubeval: Simple Example
 
 The `kubeval` KRM config function validates Kubernetes resources using kubeval.
 Learn more on the [kubeval website].
@@ -6,7 +6,7 @@ Learn more on the [kubeval website].
 This example invokes the kubeval function against the builtin Kubernetes
 v1.19.8 schema.
 
-## Function invocation
+### Function invocation
 
 Get this example and try it out by running the following commands:
 
@@ -16,7 +16,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run simple
 ```
 
-## Expected Results
+### Expected Results
 
 This should give the following output:
 

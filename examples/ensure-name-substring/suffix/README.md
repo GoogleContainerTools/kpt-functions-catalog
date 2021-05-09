@@ -19,7 +19,7 @@ data:
   append: -prod
 ```
 
-## Function invocation
+### Function invocation
 
 Get the config example and try it out by running the following commands:
 
@@ -29,7 +29,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn run suffix
 ```
 
-## Expected result
+### Expected result
 
 Check all resources have `-prod` in their names:
 

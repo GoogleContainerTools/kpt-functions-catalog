@@ -11,24 +11,30 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
     />
     <link
       rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
     />
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/GoogleContainerTools/kpt/master/site/static/favicons/favicon.ico"
+      type="image/x-icon"
+    />
   </head>
   <body>
     <div id="app"></div>
     <script>
       window.$docsify = {
         name: "kpt",
-        nameLink: "https://kpt.dev/",
+        nameLink: "https://kpt.dev/?id=overview",
         search: {
           maxAge: 43200000,
           placeholder: "Search",
         },
+        crossOriginLinks: ["https://kpt.dev/?id=overview"],
+        externalLinkTarget: "_self",
         alias: {
           "/.*/sidebar.md": "/sidebar.md",
         },
@@ -110,13 +116,13 @@
                 // Change the GH icon to point to the current example if it exists.
                 if (currentEx) {
                   ghElement.href = examples[currentEx].RemoteExamplePath;
-                } 
+                }
                 // If not on an example, change the GH icon to point to the current version if it exists.
                 else if (versionName) {
                   const exampleSuffix = /examples\/.+/;
                   ghElement.href = examples[exampleNames[0]].RemoteSourcePath;
                 }
-                // On every other page, point to the main catalog repo. 
+                // On every other page, point to the main catalog repo.
                 else {
                   ghElement.href = window.$docsify.corner.url;
                 }
@@ -158,8 +164,13 @@
       --sidebar-toggle-offset-top: unset;
       --sidebar-width: 20rem;
     }
-    .body {
-      line-height: var(--base-line-height) !important;
+    body {
+      line-height: unset;
+      font-family: unset;
+      font-size: unset;
+    }
+    h1 {
+      line-height: unset;
     }
 
     .dropdown-container {

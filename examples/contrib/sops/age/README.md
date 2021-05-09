@@ -1,28 +1,17 @@
-# SOPS AGE example
+# sops: AGE example
 
-SOPS function introduces for AGE case an additional `SOPS_IMPORT_AGE` ENV variable
-that must contain the [SOPS age keys.txt file](https://github.com/mozilla/sops/blob/master/age/keys.txt).
-This file is needed for decryption. For encryption it's possible to use
-`SOPS_AGE_RECIPIENTS` ENV variable or parameter `age`.
+### Overview
 
-E.g. for decryption it's possible to run:
+The `sops` KRM config function encrypts and decrypts resources. Learn more on the [sops website].
 
-```sh
-SOPS_IMPORT_AGE="$(cat <file with age keys>.txt)" kpt fn run <folder>
-```
-
-or if AGE keys are already stored in the host system so SOPS binary works locally, it's possible to run:
-
-```sh
-SOPS_IMPORT_AGE="$(cat ~/.config/sops/age/keys.txt)" kpt fn run <folder>
-```
+This example demonstrates invocation of `sops` for encryption the resouce called `toEncrypt` and decryption of the resource called `toDecrypt` using the already existing AGE keys.
 
 ## Function invocation
 
 Get this example and try it out by running the following commands:
 
 ```sh
-# download sops kpt-function example
+# download this example
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/sops/age .
 
 # copy example AGE key from sops project
@@ -39,3 +28,7 @@ Verify the updated configuration:
 ```sh
 kpt cfg cat age
 ```
+
+The resource called `toDecrypt` must be decrypted and the resource called `toEncrypt` must be encrypted.
+
+[sops website]: https://github.com/mozilla/sops#encrypting-using-age
