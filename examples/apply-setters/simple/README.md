@@ -77,3 +77,7 @@ Check the value of setter `env` is set to array value `[prod, stage]`.
 ```sh
 $ kpt cfg cat simple/
 ```
+
+#### Note:
+
+Refer to the `create-setters` example in `search-replace` function examples for creating setters.

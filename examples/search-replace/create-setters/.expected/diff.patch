@@ -1,0 +1,16 @@
+diff --git a/resources.yaml b/resources.yaml
+index a35afee..b2d6263 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -3,9 +3,9 @@ kind: Deployment
+ metadata:
+   name: my-nginx
+ spec:
+-  replicas: 3
++  replicas: 3 # kpt-set: ${replicas}
+   template:
+     spec:
+       containers:
+       - name: nginx
+-        image: 'gcr.io/nginx:1.14.2'
++        image: 'gcr.io/nginx:1.14.2' # kpt-set: gcr.io/${image}:${tag}
