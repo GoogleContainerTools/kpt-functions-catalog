@@ -128,9 +128,9 @@ func main() {
 		return nil
 	})
 
-	cmd.Short = generated.SetLabelShort
-	cmd.Long = generated.SetLabelLong
-	cmd.Example = generated.SetLabelExamples
+	cmd.Short = generated.SetLabelsShort
+	cmd.Long = generated.SetLabelsLong
+	cmd.Example = generated.SetLabelsExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
