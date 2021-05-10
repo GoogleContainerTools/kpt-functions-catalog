@@ -7,7 +7,7 @@ diff=`git diff`
 
 if [[ $diff != "" ]];
 then 
-        echo "found unstaged changes, verify generated docs and add them before commit"
+        echo "found unstaged changes. Please ensure you have run `make generate` to update the generated docs and add them before commit."
         exit 1
 else 
         exit 0
