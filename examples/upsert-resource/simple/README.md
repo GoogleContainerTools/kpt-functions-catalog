@@ -1,0 +1,77 @@
+# upsert-resource: Simple Example
+
+In this example, we will see how `upsert-resource` function replaces/updates the 
+matching resource(identified by GKNN) in the package with the input resource.
+
+Let's start with the list of resources in a package:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  namespace: mySpace
+spec:
+  selector:
+    app: foo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+  namespace: mySpace
+spec:
+  replicas: 3
+```
+
+Resource to upsert:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  namespace: mySpace
+spec:
+  selector:
+    app: bar
+```
+
+Invoking `upsert-resource` function replaces the resource with name `myService`:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  namespace: mySpace
+spec:
+  selector:
+    app: bar
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+  namespace: mySpace
+spec:
+  replicas: 3
+```
+
+### Function invocation
+
+Get the config example and try it out by running the following commands:
+
+<!-- @getAndRunPkg @test -->
+```sh
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource/simple .
+kpt fn run simple
+```
+
+### Expected result
+
+Check the resource with name `myService` is replaced with input resource.
+
+```sh
+$ kpt cfg cat simple/
+```
