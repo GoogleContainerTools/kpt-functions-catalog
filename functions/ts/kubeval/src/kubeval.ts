@@ -130,6 +130,20 @@ async function runKubeval(
   await writeToStream(kubevalProcess.stdin, serializedObject);
   kubevalProcess.stdin.end();
   const rawOutput = await readStdoutToString(kubevalProcess);
+
+  if (rawOutput.includes('Failed initializing schema file')) {
+    results.push(
+      kubernetesObjectResult(
+        `Validating arbitrary CRDs is not supported yet. You can skip them by setting ${IGNORE_MISSING_SCHEMAS} or ${SKIP_KINDS} in the function config:\n` +
+          rawOutput,
+        object,
+        undefined,
+        'error'
+      )
+    );
+    return;
+  }
+
   try {
     const feedback = JSON.parse(rawOutput) as Feedback;
 
@@ -174,7 +188,7 @@ function buildKubevalArgs(
   skipKinds: string[],
   strict: boolean
 ) {
-  const args = ['--output', 'json'];
+  const args = ['--quiet', '--output', 'json'];
 
   if (schemaLocation) {
     args.push('--schema-location');
