@@ -19,3 +19,9 @@ spec:
         image: nginx
         ports:
         - containerPort: 80
+---
+apiVersion: example.com/v1
+kind: MyCustom
+metadata:
+  name: alice
+spec: {}

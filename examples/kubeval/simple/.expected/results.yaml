@@ -1,3 +1,15 @@
+- message: |
+    Validating arbitrary CRDs is not supported yet. You can skip them by setting ignore_missing_schemas or skip_kinds in the function config:
+    ERR  - stdin: Failed initializing schema file:///tmp/master-standalone-strict/mycustom-example-v1.json: open /tmp/master-standalone-strict/mycustom-example-v1.json: no such file or directory
+  severity: error
+  resourceRef:
+    apiVersion: example.com/v1
+    kind: MyCustom
+    namespace: ''
+    name: alice
+  file:
+    path: resources.yaml
+    index: 1
 - message: Additional property templates is not allowed
   severity: error
   resourceRef:
