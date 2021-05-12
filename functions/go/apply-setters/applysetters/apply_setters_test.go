@@ -315,6 +315,56 @@ spec:
 `,
 			errMsg: `invalid setter pattern for array node: "${images}:${tag}"`,
 		},
+		{
+			name: "scalar partial setter using dots",
+			config: `
+data:
+  domain: demo
+  tld: io
+`,
+			input: `apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    description: The route for the my-app-layer http service.
+  labels:
+    app: my-app
+    component: my-app-layer
+    stage: dev # kpt-set: ${stage}
+    version: 0.2.6 # kpt-set: ${version}
+  name: my-app-layer
+spec:
+  host: my-app-layer.dev.example.com # kpt-set: my-app-layer.${stage}.${domain}.${tld}
+  port:
+    targetPort: 80-tcp
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: my-app-layer
+ `,
+			expectedResources: `apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    description: The route for the my-app-layer http service.
+  labels:
+    app: my-app
+    component: my-app-layer
+    stage: dev # kpt-set: ${stage}
+    version: 0.2.6 # kpt-set: ${version}
+  name: my-app-layer
+spec:
+  host: my-app-layer.dev.demo.io # kpt-set: my-app-layer.${stage}.${domain}.${tld}
+  port:
+    targetPort: 80-tcp
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: my-app-layer
+ `,
+		},
 	}
 	for i := range tests {
 		test := tests[i]

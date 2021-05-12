@@ -202,10 +202,14 @@ func currentSetterValues(pattern, value string) map[string]string {
 	res := make(map[string]string)
 	// get all setter names enclosed in ${}
 	urs := unresolvedSetters(pattern)
+	// escape pattern
+	pattern = regexp.QuoteMeta(pattern)
 	// e.g. value: foo-nginx:1.14.1-bar
 	// pattern: foo-${image-setter}:${tag-setter}-bar
 	// urs: [${image-setter}, ${tag-setter}]
 	for _, setterName := range urs {
+		// escape setter name
+		setterName = regexp.QuoteMeta(setterName)
 		pattern = strings.ReplaceAll(
 			pattern,
 			setterName,
