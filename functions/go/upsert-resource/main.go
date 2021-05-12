@@ -6,7 +6,6 @@ import (
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/upsert-resource/generated"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/upsert-resource/upsertresource"
-	"github.com/ghodss/yaml"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
@@ -41,7 +40,7 @@ func main() {
 
 // getUpsertResource gets the UpsertResource instance with input Resource to upsert
 func getUpsertResource(fnConfig interface{}) (*upsertresource.UpsertResource, error) {
-	config, err := yaml.Marshal(fnConfig)
+	config, err := kyaml.Marshal(fnConfig)
 	if err != nil {
 		return nil, err
 	}

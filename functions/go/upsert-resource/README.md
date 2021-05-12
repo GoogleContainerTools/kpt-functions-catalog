@@ -12,8 +12,8 @@ Upsert a resource to the input list of resources.
 
 <!--mdtogo:Long-->
 
-Upsert is an operation that adds a resource(uniquely identified by Group, Kind, Name and Namespace(GKNN))
-if it does not already exist, or replaces it if it already exists in the input list of resources. 
+Upsert is an operation that adds a resource(uniquely identified by Group, Kind, Name and Namespace)
+if it does not already exist, or replaces it if it already exists in the input list of resources.
 `upsert-resource` function offers a safe way to upsert a resource to the list of input resources.
 
 <!--mdtogo-->
