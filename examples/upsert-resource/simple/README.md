@@ -70,7 +70,7 @@ kpt fn run simple
 
 ### Expected result
 
-Check the resource with name `myService` is replaced with input resource.
+Check the resource with name `myService` is replaced with input resource. The value of field `app` is updated.
 
 ```sh
 $ kpt cfg cat simple/

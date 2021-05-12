@@ -1,26 +1,8 @@
-diff --git a/fn-config.yaml b/fn-config.yaml
-deleted file mode 100644
-index da512ae..0000000
---- a/fn-config.yaml
-+++ /dev/null
-@@ -1,12 +0,0 @@
--apiVersion: v1
--kind: Service
--metadata:
--  name: myService
--  namespace: mySpace
--  annotations:
--    config.k8s.io/function: |
--      container:
--        image: gcr.io/kpt-fn/upsert-resource:unstable
--spec:
--  selector:
--    app: bar
 diff --git a/resources.yaml b/resources.yaml
-index 50886bd..debc420 100644
+index 50886bd..6b03663 100644
 --- a/resources.yaml
 +++ b/resources.yaml
-@@ -3,9 +3,26 @@ kind: Service
+@@ -3,9 +3,13 @@ kind: Service
  metadata:
    name: myService
    namespace: mySpace
@@ -31,19 +13,6 @@ index 50886bd..debc420 100644
  spec:
    selector:
 -    app: foo
-+    app: bar
-+---
-+apiVersion: v1
-+kind: Service
-+metadata:
-+  name: myService
-+  namespace: mySpace
-+  annotations:
-+    config.k8s.io/function: |
-+      container:
-+        image: gcr.io/kpt-fn/upsert-resource:unstable
-+spec:
-+  selector:
 +    app: bar
  ---
  apiVersion: apps/v1
