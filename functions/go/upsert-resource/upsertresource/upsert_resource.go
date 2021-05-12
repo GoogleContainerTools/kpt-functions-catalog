@@ -29,7 +29,10 @@ func (ur UpsertResource) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 		// check if there is a match and replace the resource
 		if IsSameResource(inputMeta, rMeta) {
 			nodes[i] = ur.Resource
-			nodes[i].SetAnnotations(mergeAnnotations(inputMeta.Annotations, rMeta.Annotations))
+			err = nodes[i].SetAnnotations(mergeAnnotations(inputMeta.Annotations, rMeta.Annotations))
+			if err != nil {
+				return nodes, err
+			}
 			// found a matching resource
 			found = true
 		}
