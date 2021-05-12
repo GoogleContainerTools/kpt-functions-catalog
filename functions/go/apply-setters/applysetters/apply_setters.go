@@ -31,6 +31,9 @@ type Setter struct {
 
 // Filter implements Set as a yaml.Filter
 func (as ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
+	if len(as.Setters) == 0 {
+		return nodes, fmt.Errorf("failed to configure function: input setters list cannot be empty")
+	}
 	for i := range nodes {
 		err := accept(&as, nodes[i])
 		if err != nil {
@@ -91,10 +94,18 @@ func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
 		// get the setter value for the setter name in the comment
 		sv := setterValue(as.Setters, setterPattern)
 
+		if sv == "" {
+			var elements []*yaml.Node
+			elements = append(elements, &yaml.Node{})
+			node.Value.YNode().Content = elements
+			node.Value.YNode().Style = yaml.FoldedStyle
+			return nil
+		}
+
 		// parse the setter value as yaml node
 		rn, err := yaml.Parse(sv)
 		if err != nil {
-			return err
+			return errors.Errorf("input to array setter must be an array of values, but found %q", sv)
 		}
 
 		// the setter value must parse as sequence node
