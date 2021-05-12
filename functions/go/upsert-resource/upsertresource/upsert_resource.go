@@ -28,8 +28,12 @@ func (ur UpsertResource) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 		}
 		// check if there is a match and replace the resource
 		if IsSameResource(inputMeta, rMeta) {
-			nodes[i] = ur.Resource
-			err = nodes[i].SetAnnotations(mergeAnnotations(inputMeta.Annotations, rMeta.Annotations))
+			nodes[i], err = deepCopy(ur.Resource)
+			if err != nil {
+				return nodes, err
+			}
+			a := mergeAnnotations(inputMeta.Annotations, rMeta.Annotations)
+			err = nodes[i].SetAnnotations(a)
 			if err != nil {
 				return nodes, err
 			}
@@ -64,13 +68,34 @@ func ParseGroupVersion(apiVersion string) (group, version string) {
 
 // mergeAnnotations adds the path and index annotations from matched resource to input resource annotations
 func mergeAnnotations(inputResourceAnno, matchedResourceAnno map[string]string) map[string]string {
+	res := make(map[string]string)
+	if inputResourceAnno == nil {
+		return res
+	}
 	if matchedResourceAnno == nil {
 		return inputResourceAnno
 	}
-	if inputResourceAnno == nil {
-		inputResourceAnno = make(map[string]string)
+	// copy the annotations from input resource to result as they must be preserved
+	for k, v := range inputResourceAnno {
+		res[k] = v
 	}
-	inputResourceAnno[kioutil.PathAnnotation] = matchedResourceAnno[kioutil.PathAnnotation]
-	inputResourceAnno[kioutil.IndexAnnotation] = matchedResourceAnno[kioutil.IndexAnnotation]
-	return inputResourceAnno
+	// add path and index annotation from matched resource in the directory
+	res[kioutil.PathAnnotation] = matchedResourceAnno[kioutil.PathAnnotation]
+	res[kioutil.IndexAnnotation] = matchedResourceAnno[kioutil.IndexAnnotation]
+	return res
+}
+
+// deepCopy returns the deep copy of the input RNode
+func deepCopy(node *yaml.RNode) (*yaml.RNode, error) {
+	// serialize input RNode to string
+	s, err := node.String()
+	if err != nil {
+		return nil, err
+	}
+	// create new RNode from yaml string
+	res, err := yaml.Parse(s)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
