@@ -315,6 +315,28 @@ spec:
 `,
 			errMsg: `invalid setter pattern for array node: "${images}:${tag}"`,
 		},
+		{
+			name: "scalar partial setter using dots",
+			config: `
+data:
+  domain: demo
+  tld: io
+`,
+			input: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-app-layer
+spec:
+  host: my-app-layer.dev.example.com # kpt-set: my-app-layer.${stage}.${domain}.${tld}
+`,
+			expectedResources: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-app-layer
+spec:
+  host: my-app-layer.dev.demo.io # kpt-set: my-app-layer.${stage}.${domain}.${tld}
+`,
+		},
 	}
 	for i := range tests {
 		test := tests[i]

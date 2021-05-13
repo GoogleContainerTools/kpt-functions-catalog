@@ -196,22 +196,29 @@ func shouldSet(pattern string, setters []Setter) bool {
 
 // currentSetterValues takes pattern and value and returns setter names to values
 // derived using pattern matching
-// e.g. pattern = foo-${image-setter}:${tag-setter}-bar, value = foo-nginx:1.14.1-bar
-// returns {"image-setter":"nginx", "tag-setter":"1.7.1"}
+// e.g. pattern = my-app-layer.${stage}.${domain}.${tld}, value = my-app-layer.dev.example.com
+// returns {"stage":"dev", "domain":"example", "tld":"com"}
 func currentSetterValues(pattern, value string) map[string]string {
 	res := make(map[string]string)
 	// get all setter names enclosed in ${}
+	// e.g. value: my-app-layer.dev.example.com
+	// pattern: my-app-layer.${stage}.${domain}.${tld}
+	// urs: [${stage}, ${domain}, ${tld}]
 	urs := unresolvedSetters(pattern)
-	// e.g. value: foo-nginx:1.14.1-bar
-	// pattern: foo-${image-setter}:${tag-setter}-bar
-	// urs: [${image-setter}, ${tag-setter}]
+	// and escape pattern
+	pattern = regexp.QuoteMeta(pattern)
+	// escaped pattern: my-app-layer\.\$\{stage\}\.\$\{domain\}\.\$\{tld\}
+
 	for _, setterName := range urs {
+		// escape setter name
+		// we need to escape the setterName as well to replace it in the escaped pattern string later
+		setterName = regexp.QuoteMeta(setterName)
 		pattern = strings.ReplaceAll(
 			pattern,
 			setterName,
 			`(?P<x>.*)`) // x is just a place holder, it could be any alphanumeric string
 	}
-	// pattern: foo-(?P<x>.*):(?P<x>.*)-bar
+	// pattern: my-app-layer\.(?P<x>.*)\.(?P<x>.*)\.(?P<x>.*)
 	r, err := regexp.Compile(pattern)
 	if err != nil {
 		// just return empty map if values can't be derived from pattern
@@ -221,9 +228,9 @@ func currentSetterValues(pattern, value string) map[string]string {
 	if len(setterValues) == 0 {
 		return res
 	}
-	// setterValues: [foo-nginx:1.14.1-bar, nginx, 1.14.1]
+	// setterValues: [ "my-app-layer.dev.example.com", "dev", "example", "com"]
 	setterValues = setterValues[1:]
-	// setterValues: [nginx, 1.14.1]
+	// setterValues: [ "dev", "example", "com"]
 	if len(urs) != len(setterValues) {
 		// just return empty map if values can't be derived
 		return res
