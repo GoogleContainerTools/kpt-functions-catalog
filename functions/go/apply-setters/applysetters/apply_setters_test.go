@@ -340,7 +340,7 @@ spec:
 		{
 			name: "error: no input",
 			config: `
-data: ~
+data: {}
 `,
 			input: `apiVersion: apps/v1
 kind: Deployment
