@@ -3,6 +3,8 @@ package upsertresource
 import (
 	"strings"
 
+	"sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil"
+	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -16,35 +18,73 @@ type UpsertResource struct {
 
 // Filter implements UpsertResource as a yaml.Filter
 func (ur UpsertResource) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	inputMeta, err := ur.Resource.GetMeta()
+	replaced, err := ReplaceResource(nodes, ur.Resource)
 	if err != nil {
 		return nodes, err
 	}
+	if !replaced {
+		return AddResource(nodes, ur.Resource)
+	}
+	return nodes, nil
+}
+
+// ReplaceResource checks if the inputResource matches with any of the resources in nodes list
+// and replaces it with inputResource
+// nodes are matched based on Group, Kind, Name and Namespace
+func ReplaceResource(nodes []*yaml.RNode, inputResource *yaml.RNode) (bool, error) {
 	found := false
+	inputMeta, err := inputResource.GetMeta()
+	if err != nil {
+		return false, err
+	}
 	for i := range nodes {
 		rMeta, err := nodes[i].GetMeta()
 		if err != nil {
-			return nodes, err
+			return false, err
+		}
+		// skip processing resource if it is a local config
+		if IsLocalConfig(rMeta) {
+			continue
 		}
 		// check if there is a match and replace the resource
 		if IsSameResource(inputMeta, rMeta) {
-			nodes[i], err = deepCopy(ur.Resource)
+			nodes[i], err = deepCopy(inputResource)
 			if err != nil {
-				return nodes, err
+				return false, err
 			}
-			a := copyPathIndexAnnotations(inputMeta.Annotations, rMeta.Annotations)
+			a := combineInputAndMatchedAnnotations(inputMeta.Annotations, rMeta.Annotations)
 			err = nodes[i].SetAnnotations(a)
 			if err != nil {
-				return nodes, err
+				return false, err
 			}
 			// found a matching resource
 			found = true
 		}
 	}
-	if !found {
-		// add resource if there is no matching resource
-		nodes = append(nodes, ur.Resource)
+	return found, nil
+}
+
+// AddResource appends the inputResource to the list of input nodes
+// it also cleans up the meta annotations so that resource is created in new file
+// by the function orchestrator
+func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode, error) {
+	new, err := deepCopy(inputResource)
+	if err != nil {
+		return nodes, err
 	}
+	meta, err := new.GetMeta()
+	if err != nil {
+		return nodes, err
+	}
+	// remove local, function, path and index annotations from the result
+	// removing path and index annotations makes orchestrator write resource
+	// to a new file
+	cleanedAnno := removeMetaAnnotations(meta.Annotations)
+	err = new.SetAnnotations(cleanedAnno)
+	if err != nil {
+		return nodes, err
+	}
+	nodes = append(nodes, new)
 	return nodes, nil
 }
 
@@ -66,18 +106,27 @@ func ParseGroupVersion(apiVersion string) (group, version string) {
 	return "", apiVersion
 }
 
-// copyPathIndexAnnotations copies the path and index annotations from matched resource to input resource annotations
-func copyPathIndexAnnotations(inputResourceAnno, matchedResourceAnno map[string]string) map[string]string {
+// combineInputAndMatchedAnnotations combines user provided non-meta annotations from inputResource,
+// with path and index annotations from matched resource and returns the result
+func combineInputAndMatchedAnnotations(inputResourceAnno, matchedResourceAnno map[string]string) map[string]string {
 	if inputResourceAnno == nil {
-		return make(map[string]string)
+		inputResourceAnno = make(map[string]string)
 	}
 	if matchedResourceAnno == nil {
-		return inputResourceAnno
+		matchedResourceAnno = make(map[string]string)
 	}
-	// copy path and index annotation from matched resource
-	inputResourceAnno[kioutil.PathAnnotation] = matchedResourceAnno[kioutil.PathAnnotation]
-	inputResourceAnno[kioutil.IndexAnnotation] = matchedResourceAnno[kioutil.IndexAnnotation]
-	return inputResourceAnno
+	res := make(map[string]string)
+	// retain the annotations from the input resource in fn-config,
+	// these should be written to matched resource
+	for k, v := range inputResourceAnno {
+		res[k] = v
+	}
+	// retain the path and index annotation from matched resource to result
+	res[kioutil.PathAnnotation] = matchedResourceAnno[kioutil.PathAnnotation]
+	res[kioutil.IndexAnnotation] = matchedResourceAnno[kioutil.IndexAnnotation]
+	// remove local and function meta annotations from the result as they should
+	// not be written to output resource
+	return removeLocalAndFnAnnotations(res)
 }
 
 // deepCopy returns the deep copy of the input RNode
@@ -93,4 +142,26 @@ func deepCopy(node *yaml.RNode) (*yaml.RNode, error) {
 		return nil, err
 	}
 	return res, nil
+}
+
+// removeMetaAnnotations cleans index, path, local and fn annotations
+func removeMetaAnnotations(a map[string]string) map[string]string {
+	a = removeLocalAndFnAnnotations(a)
+	delete(a, kioutil.PathAnnotation)
+	delete(a, kioutil.IndexAnnotation)
+	return a
+}
+
+// removeLocalAndFnAnnotations cleans local and fn annotations
+func removeLocalAndFnAnnotations(a map[string]string) map[string]string {
+	delete(a, filters.LocalConfigAnnotation)
+	delete(a, runtimeutil.FunctionAnnotationKey)
+	// using hard coded key as this annotation is deprecated and not exposed by kyaml
+	delete(a, "config.k8s.io/function")
+	return a
+}
+
+// IsLocalConfig returns true if input resource meta has local config annotation set to true
+func IsLocalConfig(rMeta yaml.ResourceMeta) bool {
+	return rMeta.Annotations != nil && rMeta.Annotations[filters.LocalConfigAnnotation] == "true"
 }
