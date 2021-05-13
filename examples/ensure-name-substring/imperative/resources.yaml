@@ -1,10 +1,10 @@
 apiVersion: v1
-data:
-  some-key: some-value
 kind: ConfigMap
 metadata:
   name: the-map
   namespace: the-namespace
+data:
+  some-key: some-value
 ---
 apiVersion: v1
 kind: Pod
@@ -13,7 +13,9 @@ metadata:
   namespace: the-namespace
 spec:
   containers:
-    - command:
+    - name: test-container
+      image: k8s.gcr.io/busybox
+      command:
         - /bin/sh
         - -c
         - env
@@ -21,10 +23,8 @@ spec:
         - name: SOME_KEY
           valueFrom:
             configMapKeyRef:
-              key: some-key
               name: the-map
-      image: k8s.gcr.io/busybox
-      name: test-container
+              key: some-key
 ---
 apiVersion: v1
 kind: Service
