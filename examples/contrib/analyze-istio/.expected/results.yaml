@@ -1,18 +1,21 @@
-- message: 'Istioctl analyze command results in error: function toString() { [native
-    code] }'
-  severity: error
-  file:
-    path: ''
-- message: 'Schema validation error: gateway must have at least one server'
-  severity: error
-  tags:
-    documentation_url: 'https://istio.io/docs/reference/config/analysis/IST0106?ref=istioctl-analyze'
-    origin: Gateway httpbin-gateway.default
-    code: IST0106
-  resourceRef:
-    apiVersion: networking.istio.io/v1alpha3
-    kind: Gateway
-    namespace: ''
-    name: httpbin-gateway
-  file:
-    path: istio-config.yaml
+apiVersion: kpt.dev/v1alpha2
+kind: FunctionResultList
+metadata:
+    name: fnresults
+exitCode: 1
+items:
+    - image: gcr.io/kpt-fn-contrib/analyze-istio:unstable
+      stderr: |
+        [ERROR] Istioctl analyze command results in error: function toString() { [native code] }
+        [ERROR] Schema validation error: gateway must have at least one server in object 'networking.istio.io/v1alpha3/Gateway//httpbin-gateway' in file istio-config.yaml
+      exitCode: 1
+      results:
+        - message: 'Istioctl analyze command results in error: function toString() { [native code] }'
+          severity: error
+        - message: 'Schema validation error: gateway must have at least one server'
+          severity: error
+          resourceRef:
+            apiVersion: networking.istio.io/v1alpha3
+            kind: Gateway
+          file:
+            path: istio-config.yaml

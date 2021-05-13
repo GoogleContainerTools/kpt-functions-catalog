@@ -1,0 +1,30 @@
+diff --git a/resources.yaml b/resources.yaml
+index 777b083..319dbeb 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -1,15 +1,16 @@
+ apiVersion: v1
++data:
++  some-key: some-value
+ kind: ConfigMap
+ metadata:
+   name: the-map
+-data:
+-  some-key: some-value
++  namespace: example-ns
+ ---
+ apiVersion: v1
+ kind: Service
+ metadata:
+   name: the-service
+-  namespace: the-namespace
++  namespace: example-ns
+ spec:
+   clusterIP: None
+   ports:
+@@ -22,4 +23,4 @@ spec:
+ apiVersion: v1
+ kind: Namespace
+ metadata:
+-  name: old-name
++  name: example-ns

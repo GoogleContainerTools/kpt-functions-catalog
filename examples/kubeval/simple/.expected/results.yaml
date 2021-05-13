@@ -1,34 +1,43 @@
-- message: |
-    Validating arbitrary CRDs is not supported yet. You can skip them by setting ignore_missing_schemas or skip_kinds in the function config:
-    ERR  - stdin: Failed initializing schema file:///tmp/master-standalone-strict/mycustom-example-v1.json: open /tmp/master-standalone-strict/mycustom-example-v1.json: no such file or directory
-  severity: error
-  resourceRef:
-    apiVersion: example.com/v1
-    kind: MyCustom
-    namespace: ''
-    name: alice
-  file:
-    path: resources.yaml
-    index: 1
-- message: Additional property templates is not allowed
-  severity: error
-  resourceRef:
-    apiVersion: v1
-    kind: ReplicationController
-    namespace: ''
-    name: bob
-  file:
-    path: resources.yaml
-  field:
-    path: templates
-- message: 'Invalid type. Expected: [integer,null], given: string'
-  severity: error
-  resourceRef:
-    apiVersion: v1
-    kind: ReplicationController
-    namespace: ''
-    name: bob
-  file:
-    path: resources.yaml
-  field:
-    path: spec.replicas
+apiVersion: kpt.dev/v1alpha2
+kind: FunctionResultList
+metadata:
+    name: fnresults
+exitCode: 1
+items:
+    - image: gcr.io/kpt-fn/kubeval:unstable
+      stderr: |
+        [ERROR] Validating arbitrary CRDs is not supported yet. You can skip them by setting ignore_missing_schemas or skip_kinds in the function config:
+        ERR  - stdin: Failed initializing schema file:///tmp/master-standalone-strict/mycustom-example-v1.json: open /tmp/master-standalone-strict/mycustom-example-v1.json: no such file or directory
+         in object 'example.com/v1/MyCustom//alice' in file resources.yaml
+        [ERROR] Additional property templates is not allowed in object 'v1/ReplicationController//bob' in file resources.yaml in field templates
+        [ERROR] Invalid type. Expected: [integer,null], given: string in object 'v1/ReplicationController//bob' in file resources.yaml in field spec.replicas
+      exitCode: 1
+      results:
+        - message: |
+            Validating arbitrary CRDs is not supported yet. You can skip them by setting ignore_missing_schemas or skip_kinds in the function config:
+            ERR  - stdin: Failed initializing schema file:///tmp/master-standalone-strict/mycustom-example-v1.json: open /tmp/master-standalone-strict/mycustom-example-v1.json: no such file or directory
+          severity: error
+          resourceRef:
+            apiVersion: example.com/v1
+            kind: MyCustom
+          file:
+            path: resources.yaml
+            index: 1
+        - message: Additional property templates is not allowed
+          severity: error
+          resourceRef:
+            apiVersion: v1
+            kind: ReplicationController
+          field:
+            path: templates
+          file:
+            path: resources.yaml
+        - message: 'Invalid type. Expected: [integer,null], given: string'
+          severity: error
+          resourceRef:
+            apiVersion: v1
+            kind: ReplicationController
+          field:
+            path: spec.replicas
+          file:
+            path: resources.yaml

@@ -1,0 +1,18 @@
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
+metadata:
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/set-namespace:unstable
+      config:
+        apiVersion: fn.kpt.dev/v1alpha1
+        kind: SetNamespaceConfig
+        metadata:
+          name: my-config
+        namespace: test
+        fieldSpecs:
+        - group: dev.example.com
+          version: v1
+          kind: MyResource
+          path: spec/selector/namespace

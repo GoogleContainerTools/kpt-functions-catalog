@@ -1,6 +1,9 @@
 package e2etest
 
 import (
+	"os"
+	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/GoogleContainerTools/kpt/pkg/test/runner"
@@ -36,12 +39,24 @@ import (
 // expected.
 //
 // Git is required to generate diff output.
+
+const (
+	kptBinEnv = "KPT_E2E_BIN"
+)
+
 func TestE2E(t *testing.T) {
+	out, err := exec.Command("which", "kpt").Output()
+	if err != nil {
+		t.Fatalf("can't find a kpt binary: %v", err)
+	}
+	err = os.Setenv(kptBinEnv, strings.TrimSpace(string(out)))
 	runTests(t, "../..")
 }
 
-// runTests will scan test cases in 'path' and run all the
-// tests in it. It returns an error if any of the tests fails.
+// runTests will scan test cases in 'path', run the command
+// on all of the packages in path, and test that
+// the diff between the results and the original package is as
+// expected
 func runTests(t *testing.T, path string) {
 	cases, err := runner.ScanTestCases(path)
 	if err != nil {
@@ -51,13 +66,16 @@ func runTests(t *testing.T, path string) {
 		c := c // capture range variable
 		t.Run(c.Path, func(t *testing.T) {
 			t.Parallel()
-			r, err := runner.NewRunner(c, runner.CommandFnEval)
+			r, err := runner.NewRunner(t, c, c.Config.TestType)
 			if err != nil {
 				t.Fatalf("failed to create test runner: %s", err)
 			}
+			if r.Skip() {
+				t.Skip()
+			}
 			err = r.Run()
 			if err != nil {
-				t.Fatalf("failed to run test: %s", err)
+				t.Fatalf("failed when running test: %s", err)
 			}
 		})
 	}
