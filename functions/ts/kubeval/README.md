@@ -33,8 +33,8 @@ kind: ConfigMap
 metadata:
   name: my-func-config
 data:
-  schema_location: "https://kubernetesjsonschema.dev"
-  additional_schema_locations: "https://example.com,file:///abs/path/to/your/schema/directory"
+  schema_location: "file:///abs/path/to/your/schema/directory"
+  additional_schema_locations: "https://kubernetesjsonschema.dev,https://example.com"
   ignore_missing_schemas: "false"
   skip_kinds: "DaemonSet,MyCRD"
   strict: "true"
