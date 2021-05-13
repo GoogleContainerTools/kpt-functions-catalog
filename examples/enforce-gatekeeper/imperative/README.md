@@ -1,44 +1,33 @@
-# enforce-gatekeeper: Invalid Configmap
+# enforce-gatekeeper: Imperative Example
 
 ### Overview
 
-This example demonstrates how to declaratively run the [enforce-gatekeeper]
+This example demonstrates how to imperatively invoke the [enforce-gatekeeper]
 function to validate resources using gatekeeper constraints.
 
 There are 3 resources: a ConstraintTemplate, a K8sBannedConfigMapKeysV1 and a
 ConfigMap.
 The constraint disallows using `private_key` as a key in the ConfigMap.
 
-Here's an example Kptfile to run the function:
-```yaml
-apiVersion: kpt.dev/v1alpha2
-kind: Kptfile
-metadata:
-  name: example
-pipeline:
-  validators:
-    - image: gcr.io/kpt-fn/enforce-gatekeeper:unstable
-```
-
 ### Function invocation
 
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enforce-gatekeeper/invalid-configmap .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enforce-gatekeeper/imperative .
 ```
 
 Create a directory for storing the structured output.
 
 ```shell
-$ cd invalid-configmap
+$ cd imperative
 $ mkdir results
 ```
 
 Run the function:
 
 ```shell
-$ kpt fn render --results-dir=results
+$ kpt fn eval --image=gcr.io/kpt-fn/enforce-gatekeeper:unstable --results-dir=results
 ```
 
 ### Expected result

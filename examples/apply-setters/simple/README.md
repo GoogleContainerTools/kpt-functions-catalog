@@ -1,5 +1,9 @@
 # apply-setters: Simple Example
 
+### Overview
+
+<!-- TODO(phanimarupaka): Populate here and update below -->
+
 Setters provide a solution for template-free setting of field values. The
 `apply-setters` KRM config function applies setter values to resource fields
 with setter references.
@@ -63,10 +67,9 @@ environments: # kpt-set: ${env}
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters/simple .
-kpt fn run simple
+kpt fn render simple
 ```
 
 ### Expected result
@@ -75,7 +78,7 @@ Check the value of setter `name` is set to `my-new-map`.
 Check the value of setter `env` is set to array value `[prod, stage]`.
 
 ```sh
-$ kpt cfg cat simple/
+$ kpt pkg cat simple/
 ```
 
 #### Note:

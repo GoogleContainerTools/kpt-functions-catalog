@@ -1,5 +1,9 @@
 # search-replace: Simple Example
 
+### Overview
+
+<!-- TODO(phanimarupaka): Populate this and below -->
+
 The `search-replace` function performs search and optionally replace fields
 across all resources.
 
@@ -45,10 +49,9 @@ metadata:
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/simple .
-kpt fn run simple
+kpt fn render simple
 ```
 
 ### Expected result
@@ -56,5 +59,5 @@ kpt fn run simple
 Check the value of deployment `the-deloyment` is changed to `my-deloyment`.
 
 ```sh
-$ kpt cfg cat simple/
+$ kpt pkg cat simple/
 ```

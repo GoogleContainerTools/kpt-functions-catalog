@@ -1,29 +1,34 @@
 # set-annotations: Simple Example
 
-The `set-annotation` function adds annotations to KRM resources.
+### Overview
 
-We use the following ConfigMap to configure the function.
+This example demonstrates how to declaratively run [`set-annotations`] function
+to upsert annotations to the `.metadata.annotations` field on all resources.
+
+We use the following `Kptfile` to configure the function.
 
 ```yaml
-apiVersion: v1
-kind: ConfigMap
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
 metadata:
-  ...
-data:
-  color: orange
-  fruit: apple
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/set-annotations:unstable
+      configMap:
+        color: orange
+        fruit: apple
 ```
 
-The desired annotations are provided as key-value pairs using `data` field.
+The desired annotations are provided as key-value pairs through ConfigMap.
 
 ### Function invocation
 
 Get the example config and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations/simple .
-kpt fn run simple
+kpt fn render simple
 ```
 
 ### Expected result
@@ -31,5 +36,7 @@ kpt fn run simple
 Check the 2 annotations have been added.
 
 ```sh
-kpt cfg cat simple
+kpt pkg cat simple
 ```
+
+[`set-annotations`]: https://catalog.kpt.dev/set-annotations/v0.1/

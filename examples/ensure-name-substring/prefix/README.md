@@ -1,32 +1,37 @@
 # ensure-name-substring: Prefix Example
 
+### Overview
+
 Note: This is an alpha function, and we are actively seeking feedback on the
 function config syntax and behavior. If you have suggestion or feedback, please
-file an issue [here](https://github.com/GoogleContainerTools/kpt/issues/new/choose).
+file an [issue].
 
-In this example, we use the function `ensure-name-substring` to ensure every
-resource name contains the desired name substring. We prepend the substring if
-it doesn't exist.
+This example demonstrates how to declaratively run the [`ensure-name-substring`]
+function to prepend prefix in the resource names.
 
-We use the following ConfigMap to configure the function.
+We use the following Kptfile to run the function.
 
 ```yaml
-apiVersion: v1
-kind: ConfigMap
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
 metadata:
-  ...
-data:
-  prepend: prod-
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/ensure-name-substring:unstable
+      configMap:
+        prepend: prod-
 ```
+
+We are going to prepend prefix `prod-` to resource names.
 
 ### Function invocation
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/prefix .
-kpt fn run prefix
+kpt fn render prefix
 ```
 
 ### Expected result
@@ -34,8 +39,11 @@ kpt fn run prefix
 Check all resources have `prod-` in their names:
 
 ```sh
-kpt cfg cat prefix
+kpt pkg cat prefix
 ```
 
 We have a `Service` object whose name is `with-prod-service` which already
-contains `prod-`. This function will skip it.
+contains substring `prod-`. This resource will be skipped.
+
+[issue]: https://github.com/GoogleContainerTools/kpt/issues/new/choose
+[ensure-name-substring]: https://catalog.kpt.dev/ensure-name-substring/v0.1/

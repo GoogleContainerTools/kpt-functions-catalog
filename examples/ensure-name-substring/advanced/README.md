@@ -1,29 +1,39 @@
 # ensure-name-substring: Advanced Example
 
+### Overview
+
 Note: This is an alpha function, and we are actively seeking feedback on the
 function config syntax and behavior. If you have suggestion or feedback, please
-file an issue [here](https://github.com/GoogleContainerTools/kpt/issues/new/choose).
+file an [issue].
 
-In this example, we use the function `ensure-name-substring` to ensure every
-resource name and the field declared in the field specs contain the desired name
-substring. We prepend the substring if it doesn't exist.
+This example demonstrates how to declaratively run the [`ensure-name-substring`]
+function to prepend prefix in the resource names.
 
-We use the following CustomResource to configure the function.
+We use the following Kptfile to run the function.
 
 ```yaml
-apiVersion: fn.kpt.dev/v1alpha1
-kind: EnsureNameSubstring
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
 metadata:
-  ...
-substring: prod-
-editMode: prepend
-fieldSpecs:
-  - group: dev.example.com
-    version: v1
-    kind: MyResource
-    path: spec/name
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/ensure-name-substring:unstable
+      config:
+        apiVersion: fn.kpt.dev/v1alpha1
+        kind: EnsureNameSubstring
+        metadata:
+          name: my-config
+        substring: prod-
+        editMode: prepend
+        fieldSpecs:
+          - group: dev.example.com
+            version: v1
+            kind: MyResource
+            path: spec/name
 ```
 
+We are going to prepend prefix `prod-` to resource names.
 The function will not only update field `.metadata.name` but also field
 `.spec.name` in `MyResource`.
 
@@ -31,10 +41,9 @@ The function will not only update field `.metadata.name` but also field
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/advanced .
-kpt fn run advanced
+kpt fn render advanced
 ```
 
 ### Expected result
@@ -43,5 +52,8 @@ Check all resources have `prod-` in their names and the field `.spec.name` in
 `MyResource` also got updated.
 
 ```sh
-kpt cfg cat advanced
+kpt pkg cat advanced
 ```
+
+[issue]: https://github.com/GoogleContainerTools/kpt/issues/new/choose
+[ensure-name-substring]: https://catalog.kpt.dev/ensure-name-substring/v0.1/

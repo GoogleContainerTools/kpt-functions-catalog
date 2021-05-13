@@ -1,31 +1,34 @@
 # set-labels: Simple Example
 
-The `set-label` function adds or updates labels in the `.metadata.labels` field
-and other fields that has the same meaning as a label on all resources. You can
-find more details about these fields in the help text of the function.
+### Overview
 
-We use the following ConfigMap to configure the function.
+This example demonstrates how to declaratively run [`set-labels`] function
+to upsert labels to the `.metadata.labels` field on all resources.
+
+We use the following `Kptfile` to configure the function.
 
 ```yaml
-apiVersion: v1
-kind: ConfigMap
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
 metadata:
-  ...
-data:
-  color: orange
-  fruit: apple
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/set-labels:unstable
+      configMap:
+        color: orange
+        fruit: apple
 ```
 
-The desired labels are provided as key-value pairs using `data` field.
+The desired labels are provided as key-value pairs through ConfigMap.
 
 ### Function invocation
 
 Get the example config and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels/simple .
-kpt fn run simple
+kpt fn render simple
 ```
 
 ### Expected result
@@ -33,5 +36,7 @@ kpt fn run simple
 Check all resources have 2 labels `color: orange` and `fruit: apple`.
 
 ```sh
-kpt cfg cat simple
+kpt pkg cat simple
 ```
+
+[`set-labels`]: https://catalog.kpt.dev/set-labels/v0.1/
