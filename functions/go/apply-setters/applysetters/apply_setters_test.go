@@ -337,6 +337,66 @@ spec:
   host: my-app-layer.dev.demo.io # kpt-set: my-app-layer.${stage}.${domain}.${tld}
 `,
 		},
+		{
+			name: "error: no input",
+			config: `
+data: {}
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+`,
+			errMsg: `failed to configure function: input setters list cannot be empty`,
+		},
+		{
+			name: "set empty values",
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService # kpt-set: ${app}
+  namespace: foo # kpt-set: ${ns}
+image: nginx:1.7.1 # kpt-set: ${image}:${tag}
+env: # kpt-set: ${env}
+  - foo
+  - bar
+`,
+			config: `
+data:
+  app: ""
+  ns: ~
+  image: ''
+  env: ~
+`,
+			expectedResources: `apiVersion: v1
+kind: Service
+metadata:
+  name: # kpt-set: ${app}
+  namespace: # kpt-set: ${ns}
+image: :1.7.1 # kpt-set: ${image}:${tag}
+env: # kpt-set: ${env}
+  - null
+`,
+		},
 	}
 	for i := range tests {
 		test := tests[i]
