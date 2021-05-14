@@ -16,6 +16,9 @@ func main() {
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
+		resourceList.Result = &framework.Result{
+			Name: "apply-setters",
+		}
 		s, err := getSetters(resourceList.FunctionConfig)
 		if err != nil {
 			return fmt.Errorf("failed to parse function config: %w", err)
@@ -24,6 +27,7 @@ func main() {
 		if err != nil {
 			return fmt.Errorf("failed to apply setters: %w", err)
 		}
+		resourceList.Result.Items = resultsToItems(s)
 		return nil
 	})
 
@@ -50,4 +54,24 @@ func getSetters(fc interface{}) (applysetters.ApplySetters, error) {
 	}
 	applysetters.Decode(rn, &fcd)
 	return fcd, nil
+}
+
+// resultsToItems converts the Search and Replace results to
+// equivalent items([]framework.Item)
+func resultsToItems(sr applysetters.ApplySetters) []framework.Item {
+	var items []framework.Item
+	if len(sr.Results) == 0 {
+		items = append(items, framework.Item{
+			Message: "no matches",
+		})
+		return items
+	}
+	for _, res := range sr.Results {
+		items = append(items, framework.Item{
+			Message: fmt.Sprintf("set field value to %q", res.Value),
+			Field:   framework.Field{Path: res.FieldPath},
+			File:    framework.File{Path: res.FilePath},
+		})
+	}
+	return items
 }

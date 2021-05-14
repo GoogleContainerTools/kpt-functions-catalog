@@ -7,18 +7,25 @@ import (
 
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/kio"
+	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 const SetterCommentIdentifier = "# kpt-set: "
 
-var _ kio.Filter = ApplySetters{}
+var _ kio.Filter = &ApplySetters{}
 
 // ApplySetters applies the setter values to the resource fields which are tagged
 // by the setter reference comments
 type ApplySetters struct {
 	// Setters holds the user provided values for all the setters
 	Setters []Setter `json:"setters,omitempty" yaml:"setters,omitempty"`
+
+	// Results are the results of applying setter values
+	Results []*Result `json:"results,omitempty" yaml:"results,omitempty"`
+
+	// filePath file path of resource
+	filePath string
 }
 
 type Setter struct {
@@ -29,13 +36,30 @@ type Setter struct {
 	Value string `json:"value,omitempty" yaml:"value,omitempty"`
 }
 
+// Result holds result of search and replace operation
+type Result struct {
+	// FilePath is the file path of the matching field
+	FilePath string
+
+	// FieldPath is field path of the matching field
+	FieldPath string
+
+	// Value of the matching field
+	Value string
+}
+
 // Filter implements Set as a yaml.Filter
-func (as ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
+func (as *ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	if len(as.Setters) == 0 {
 		return nodes, fmt.Errorf("failed to configure function: input setters list cannot be empty")
 	}
 	for i := range nodes {
-		err := accept(&as, nodes[i])
+		filePath, _, err := kioutil.GetFileAnnotations(nodes[i])
+		if err != nil {
+			return nodes, err
+		}
+		as.filePath = filePath
+		err = accept(as, nodes[i])
 		if err != nil {
 			return nil, errors.Wrap(err)
 		}
@@ -63,7 +87,7 @@ environments: # kpt-set: ${env}
 - prod
 
 */
-func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
+func (as *ApplySetters) visitMapping(object *yaml.RNode, path string) error {
 	return object.VisitFields(func(node *yaml.MapNode) error {
 		if node.IsNilOrEmpty() {
 			return nil
@@ -94,11 +118,19 @@ func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
 		// get the setter value for the setter name in the comment
 		sv := setterValue(as.Setters, setterPattern)
 
+		// add the key to the field path
+		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
+
 		if sv == "" {
 			var elements []*yaml.Node
 			elements = append(elements, &yaml.Node{})
 			node.Value.YNode().Content = elements
 			node.Value.YNode().Style = yaml.FoldedStyle
+			as.Results = append(as.Results, &Result{
+				FilePath:  as.filePath,
+				FieldPath: fieldPath,
+				Value:     sv,
+			})
 			return nil
 		}
 
@@ -115,6 +147,12 @@ func (as *ApplySetters) visitMapping(object *yaml.RNode) error {
 
 		node.Value.YNode().Content = rn.YNode().Content
 		node.Value.YNode().Style = yaml.FoldedStyle
+
+		as.Results = append(as.Results, &Result{
+			FilePath:  as.filePath,
+			FieldPath: fieldPath,
+			Value:     sv,
+		})
 		return nil
 	})
 }
@@ -139,7 +177,7 @@ apiVersion: v1
   image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
 
 */
-func (as *ApplySetters) visitScalar(object *yaml.RNode) error {
+func (as *ApplySetters) visitScalar(object *yaml.RNode, path string) error {
 	if object.IsNilOrEmpty() {
 		return nil
 	}
@@ -190,6 +228,11 @@ func (as *ApplySetters) visitScalar(object *yaml.RNode) error {
 
 	object.YNode().Value = setterPattern
 	object.YNode().Tag = yaml.NodeTagEmpty
+	as.Results = append(as.Results, &Result{
+		FilePath:  as.filePath,
+		FieldPath: strings.TrimPrefix(path, "."),
+		Value:     object.YNode().Value,
+	})
 	return nil
 }
 
