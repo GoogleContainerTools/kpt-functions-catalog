@@ -1,3 +1,3 @@
 name: search-replace
 items:
-- message: 'found 0 results for the input search criteria'
+- message: 'no matches'

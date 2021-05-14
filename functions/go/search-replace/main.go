@@ -76,7 +76,7 @@ func searchResultsToItems(sr searchreplace.SearchReplace) []framework.Item {
 	var items []framework.Item
 	if len(sr.Results) == 0 {
 		items = append(items, framework.Item{
-			Message: "found 0 results for the input search criteria",
+			Message: "no matches",
 		})
 		return items
 	}
