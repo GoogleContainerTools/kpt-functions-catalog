@@ -5,9 +5,10 @@
 In this example, we are going to demonstrate how to declaratively run the
 [`starlark`] function with an inline starlark script as function configuration.
 
-We are going to use the following Kptfile to run the function:
+We are going to use the following `Kptfile` and `fn-config.yaml` to configure
+the function:
 
-```
+```yaml
 apiVersion: kpt.dev/v1alpha2
 kind: Kptfile
 metadata:
@@ -15,18 +16,24 @@ metadata:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/starlark:unstable
-      config:
-        apiVersion: fn.kpt.dev/v1alpha1
-        kind: StarlarkRun
-        metadata:
-          name: set-namespace-to-prod
-        source: |
-          # set the namespace on all resources
-          def setnamespace(resources, namespace):
-            for resource in resources:
-              # mutate the resource
-              resource["metadata"]["namespace"] = namespace
-          setnamespace(ctx.resource_list["items"], "prod")
+      configPath: fn-config.yaml
+```
+
+```yaml
+# fn-config.yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
+metadata:
+  name: set-namespace-to-prod
+  annotations:
+    config.kubernetes.io/local-config: 'true'
+source: |
+  # set the namespace on all resources
+  def setnamespace(resources, namespace):
+    for resource in resources:
+      # mutate the resource
+      resource["metadata"]["namespace"] = namespace
+  setnamespace(ctx.resource_list["items"], "prod")
 ```
 
 The starlark script is embedded in the `source` field. This script read the
@@ -36,7 +43,6 @@ to `prod` for all resources.
 ### Function invocation
 
 Get the config example and try it out by running the following commands:
-
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple .

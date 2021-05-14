@@ -9,7 +9,7 @@ file an [issue].
 This example demonstrates how to declaratively run the [`ensure-name-substring`]
 function to prepend prefix in the resource names.
 
-We use the following Kptfile to run the function.
+We use the following `Kptfile` and `fn-config.yaml` to run the function.
 
 ```yaml
 apiVersion: kpt.dev/v1alpha2
@@ -19,18 +19,24 @@ metadata:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/ensure-name-substring:unstable
-      config:
-        apiVersion: fn.kpt.dev/v1alpha1
-        kind: EnsureNameSubstring
-        metadata:
-          name: my-config
-        substring: prod-
-        editMode: prepend
-        fieldSpecs:
-          - group: dev.example.com
-            version: v1
-            kind: MyResource
-            path: spec/name
+      configPath: fn-config.yaml
+```
+
+```yaml
+# fn-config.yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: EnsureNameSubstring
+metadata:
+  name: my-config
+  annotations:
+    config.kubernetes.io/local-config: 'true'
+substring: prod-
+editMode: prepend
+fieldSpecs:
+  - group: dev.example.com
+    version: v1
+    kind: MyResource
+    path: spec/name
 ```
 
 We are going to prepend prefix `prod-` to resource names.

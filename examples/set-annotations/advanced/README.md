@@ -5,7 +5,7 @@
 This example demonstrates how to declaratively run [`set-annotations`] function
 to upsert annotations to the `.metadata.annotations` field on all resources.
 
-We use the following `Kptfile` to configure the function.
+We use the following `Kptfile` and `fn-config.yaml` to configure the function.
 
 ```yaml
 apiVersion: kpt.dev/v1alpha2
@@ -15,20 +15,26 @@ metadata:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/set-annotations:unstable
-      config:
-        apiVersion: fn.kpt.dev/v1alpha1
-        kind: SetAnnotationConfig
-        metadata:
-          name: my-func-config
-        annotations:
-          fruit: apple
-          color: orange
-        fieldSpecs:
-          - kind: MyResource
-            group: dev.example.com
-            version: v1
-            create: true
-            path: spec/selector/annotations
+      configPath: fn-config.yaml
+```
+
+```yaml
+# fn-config.yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: SetAnnotationConfig
+metadata:
+  name: my-func-config
+  annotations:
+    config.kubernetes.io/local-config: 'true'
+annotations:
+  fruit: apple
+  color: orange
+fieldSpecs:
+  - kind: MyResource
+    group: dev.example.com
+    version: v1
+    create: true
+    path: spec/selector/annotations
 ```
 
 The desired annotations are provided using the `annotations` field. We have a

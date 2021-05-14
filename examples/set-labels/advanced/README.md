@@ -5,7 +5,7 @@
 This example demonstrates how to declaratively run [`set-labels`] function
 to upsert labels to the `.metadata.labels` field on all resources.
 
-We use the following `Kptfile` to configure the function.
+We use the following `Kptfile` and `fn-config.yaml` to configure the function.
 
 ```yaml
 apiVersion: kpt.dev/v1alpha2
@@ -15,20 +15,26 @@ metadata:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/set-labels:unstable
-      config:
-        apiVersion: fn.kpt.dev/v1alpha1
-        kind: SetLabelConfig
-        metadata:
-          name: my-config
-        labels:
-          color: orange
-          fruit: apple
-        fieldSpecs:
-          - kind: MyResource
-            group: dev.example.com
-            version: v1
-            create: true
-            path: spec/selector/labels
+      configPath: fn-config.yaml
+```
+
+```yaml
+# fn-config.yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: SetLabelConfig
+metadata:
+  name: my-config
+  annotations:
+    config.kubernetes.io/local-config: 'true'
+labels:
+  color: orange
+  fruit: apple
+fieldSpecs:
+  - kind: MyResource
+    group: dev.example.com
+    version: v1
+    create: true
+    path: spec/selector/labels
 ```
 
 The desired labels is provided using `labels` field. We have a CRD with group

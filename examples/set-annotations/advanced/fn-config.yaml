@@ -4,10 +4,12 @@ metadata:
   name: my-func-config
   annotations:
     config.kubernetes.io/local-config: 'true'
-annotations: {}
+annotations:
+  fruit: apple
+  color: orange
 fieldSpecs:
-- kind: MyResource
-  group: dev.example.com
-  version: v1
-  create: true
-  path: spec/selector/annotations
+  - kind: MyResource
+    group: dev.example.com
+    version: v1
+    create: true
+    path: spec/selector/annotations

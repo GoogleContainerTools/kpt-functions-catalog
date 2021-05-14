@@ -6,7 +6,7 @@ This example demonstrates how to declaratively run [`set-namespace`] function
 to add or replace the `.metadata.namespace` field on all resources except for
 those known to be cluster-scoped.
 
-We use the following `Kptfile` to configure the function.
+We use the following `Kptfile` and `fn-config.yaml` to configure the function.
 
 ```yaml
 apiVersion: kpt.dev/v1alpha2
@@ -16,16 +16,24 @@ metadata:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/set-namespace:unstable
-      config: # inline config
-        apiVersion: fn.kpt.dev/v1alpha1
-        kind: SetNamespaceConfig
-        namespace: example-ns
-        fieldSpecs:
-          - group: dev.example.com
-            version: v1
-            kind: MyResource
-            path: spec/configmapRef/namespace
-            create: true
+      configPath: fn-config.yaml
+```
+
+```yaml
+# fn-config.yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: SetNamespaceConfig
+metadata:
+  name: my-config
+  annotations:
+    config.kubernetes.io/local-config: 'true'
+namespace: example-ns
+fieldSpecs:
+  - group: dev.example.com
+    version: v1
+    kind: MyResource
+    path: spec/configmapRef/namespace
+    create: true
 ```
 
 `set-namespace` function not only support ConfigMap but also a CRD as the
