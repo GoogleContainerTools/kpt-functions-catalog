@@ -11,11 +11,11 @@ The function configuration must be a ConfigMap.
 The following keys can be used in the `data` field of the ConfigMap, and all of
 them are optional:
 
-- `schema_location`: The base URL used to fetch the json schemas. The default
+- `schema_location`: The base URI used to fetch the json schemas. The default
   is empty. This feature only works with imperative runs, since declarative runs
   allow neither network access nor volume mount.
-- `additional_schema_locations`: List of secondary base URLs used to fetch the
-  json schemas.  These URLs will be used if the URL specified by
+- `additional_schema_locations`: List of secondary base URIs used to fetch the
+  json schemas.  These URIs will be used if the URI specified by
   `schema_location` did not have the required schema.  The default is empty.
   This feature only works with imperative runs.
 - `ignore_missing_schemas`: Skip validation for resources without a schema. The
@@ -34,7 +34,7 @@ metadata:
   name: my-func-config
 data:
   schema_location: "file:///abs/path/to/your/schema/directory"
-  additional_schema_locations: "https://kubernetesjsonschema.dev,https://example.com"
+  additional_schema_locations: "https://kubernetesjsonschema.dev,file:///abs/path/to/your/other/schema/directory"
   ignore_missing_schemas: "false"
   skip_kinds: "DaemonSet,MyCRD"
   strict: "true"
