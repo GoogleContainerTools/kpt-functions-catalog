@@ -48,16 +48,14 @@ func ReplaceResource(nodes []*yaml.RNode, inputResource *yaml.RNode) (bool, erro
 		}
 		// check if there is a match and replace the resource
 		if IsSameResource(inputMeta, rMeta) {
-			nodes[i], err = deepCopy(inputResource)
-			if err != nil {
-				return false, err
-			}
+			nodes[i] = inputResource.Copy()
 			a := combineInputAndMatchedAnnotations(inputMeta.Annotations, rMeta.Annotations)
 			err = nodes[i].SetAnnotations(a)
 			if err != nil {
 				return false, err
 			}
 			// found a matching resource
+			// but continue to replace other instances of the resource
 			found = true
 		}
 	}
@@ -68,10 +66,7 @@ func ReplaceResource(nodes []*yaml.RNode, inputResource *yaml.RNode) (bool, erro
 // it also cleans up the meta annotations so that resource is created in new file
 // by the function orchestrator
 func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode, error) {
-	new, err := deepCopy(inputResource)
-	if err != nil {
-		return nodes, err
-	}
+	new := inputResource.Copy()
 	meta, err := new.GetMeta()
 	if err != nil {
 		return nodes, err
@@ -79,7 +74,7 @@ func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode,
 	// remove local, function, path and index annotations from the result
 	// removing path and index annotations makes orchestrator write resource
 	// to a new file
-	cleanedAnno := removeMetaAnnotations(meta.Annotations)
+	cleanedAnno := removeLocalFnPathIndexAnnotations(meta.Annotations)
 	err = new.SetAnnotations(cleanedAnno)
 	if err != nil {
 		return nodes, err
@@ -144,15 +139,15 @@ func deepCopy(node *yaml.RNode) (*yaml.RNode, error) {
 	return res, nil
 }
 
-// removeMetaAnnotations cleans index, path, local and fn annotations
-func removeMetaAnnotations(a map[string]string) map[string]string {
+// removeLocalFnPathIndexAnnotations removes index, path, local and fn annotations
+func removeLocalFnPathIndexAnnotations(a map[string]string) map[string]string {
 	a = removeLocalAndFnAnnotations(a)
 	delete(a, kioutil.PathAnnotation)
 	delete(a, kioutil.IndexAnnotation)
 	return a
 }
 
-// removeLocalAndFnAnnotations cleans local and fn annotations
+// removeLocalAndFnAnnotations removes local and fn annotations
 func removeLocalAndFnAnnotations(a map[string]string) map[string]string {
 	delete(a, filters.LocalConfigAnnotation)
 	delete(a, runtimeutil.FunctionAnnotationKey)
