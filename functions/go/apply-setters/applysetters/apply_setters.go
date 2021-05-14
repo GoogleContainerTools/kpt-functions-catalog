@@ -19,10 +19,10 @@ var _ kio.Filter = &ApplySetters{}
 // by the setter reference comments
 type ApplySetters struct {
 	// Setters holds the user provided values for all the setters
-	Setters []Setter `json:"setters,omitempty" yaml:"setters,omitempty"`
+	Setters []Setter
 
 	// Results are the results of applying setter values
-	Results []*Result `json:"results,omitempty" yaml:"results,omitempty"`
+	Results []*Result
 
 	// filePath file path of resource
 	filePath string
@@ -30,10 +30,10 @@ type ApplySetters struct {
 
 type Setter struct {
 	// Name is the name of the setter
-	Name string `json:"name,omitempty" yaml:"name,omitempty"`
+	Name string
 
 	// Value is the input value for setter
-	Value string `json:"value,omitempty" yaml:"value,omitempty"`
+	Value string
 }
 
 // Result holds result of search and replace operation

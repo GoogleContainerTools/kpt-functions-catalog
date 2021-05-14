@@ -16,9 +16,6 @@ func main() {
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
-		resourceList.Result = &framework.Result{
-			Name: "apply-setters",
-		}
 		s, err := getSetters(resourceList.FunctionConfig)
 		if err != nil {
 			return fmt.Errorf("failed to parse function config: %w", err)
@@ -27,7 +24,10 @@ func main() {
 		if err != nil {
 			return fmt.Errorf("failed to apply setters: %w", err)
 		}
-		resourceList.Result.Items = resultsToItems(s)
+		resourceList.Result = &framework.Result{
+			Name: "apply-setters",
+			Items: resultsToItems(s),
+		}
 		return nil
 	})
 
