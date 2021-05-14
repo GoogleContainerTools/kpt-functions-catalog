@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/searchreplace"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/generated"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/searchreplace"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -74,8 +74,13 @@ func getSearchReplaceParams(fc interface{}) (searchreplace.SearchReplace, error)
 // equivalent items([]framework.Item)
 func searchResultsToItems(sr searchreplace.SearchReplace) []framework.Item {
 	var items []framework.Item
+	if len(sr.Results) == 0 {
+		items = append(items, framework.Item{
+			Message: "found 0 results for the input search criteria",
+		})
+		return items
+	}
 	for _, res := range sr.Results {
-
 		var message string
 		if sr.PutComment != "" || sr.PutValue != "" {
 			message = fmt.Sprintf("Mutated field value to %q", res.Value)
