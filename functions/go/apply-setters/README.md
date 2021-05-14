@@ -135,3 +135,7 @@ environments: # kpt-set: ${env}
 ```
 
 <!--mdtogo-->
+
+#### Note:
+
+Refer to the `create-setters` example in `search-replace` function examples for creating setters.
