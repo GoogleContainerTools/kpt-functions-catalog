@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-func-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/search-replace:unstable
+    config.kubernetes.io/local-config: 'true'
+data:
+  by-value: non-existent-value
