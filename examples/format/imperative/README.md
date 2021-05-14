@@ -13,7 +13,7 @@ Get the config example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/format/imperative .
-kpt fn eval --image=gcr.io/kpt-fn/format:unstable imperative
+kpt fn eval imperative --image=gcr.io/kpt-fn/format:unstable
 ```
 
 ## Expected result

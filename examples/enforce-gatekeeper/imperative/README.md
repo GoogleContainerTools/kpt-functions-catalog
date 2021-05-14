@@ -27,7 +27,7 @@ $ mkdir results
 Run the function:
 
 ```shell
-$ kpt fn eval --image=gcr.io/kpt-fn/enforce-gatekeeper:unstable --results-dir=results
+kpt fn eval --image=gcr.io/kpt-fn/enforce-gatekeeper:unstable --results-dir=results
 ```
 
 ### Expected result

@@ -15,7 +15,7 @@ Get the config example and try it out by running the following commands:
 
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/imperative .
-kpt fn eval --image=gcr.io/kpt-fn/ensure-name-substring:unstable imperative -- prepend=prod
+kpt fn eval imperative --image=gcr.io/kpt-fn/ensure-name-substring:unstable -- prepend=prod
 ```
 
 The key-value pair(s) provided after `--` will be converted to ConfigMap by kpt
