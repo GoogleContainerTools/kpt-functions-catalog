@@ -42,8 +42,8 @@ func ReplaceResource(nodes []*yaml.RNode, inputResource *yaml.RNode) (bool, erro
 		if err != nil {
 			return false, err
 		}
-		// skip processing resource if it is a local config
-		if IsLocalConfig(rMeta) {
+		// skip processing resource if it is a function config
+		if IsFunctionConfig(rMeta) {
 			continue
 		}
 		// check if there is a match and replace the resource
@@ -124,21 +124,6 @@ func combineInputAndMatchedAnnotations(inputResourceAnno, matchedResourceAnno ma
 	return removeLocalAndFnAnnotations(res)
 }
 
-// deepCopy returns the deep copy of the input RNode
-func deepCopy(node *yaml.RNode) (*yaml.RNode, error) {
-	// serialize input RNode to string
-	s, err := node.String()
-	if err != nil {
-		return nil, err
-	}
-	// create new RNode from yaml string
-	res, err := yaml.Parse(s)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
 // removeLocalFnPathIndexAnnotations removes index, path, local and fn annotations
 func removeLocalFnPathIndexAnnotations(a map[string]string) map[string]string {
 	a = removeLocalAndFnAnnotations(a)
@@ -156,7 +141,8 @@ func removeLocalAndFnAnnotations(a map[string]string) map[string]string {
 	return a
 }
 
-// IsLocalConfig returns true if input resource meta has local config annotation set to true
-func IsLocalConfig(rMeta yaml.ResourceMeta) bool {
-	return rMeta.Annotations != nil && rMeta.Annotations[filters.LocalConfigAnnotation] == "true"
+// IsFunctionConfig returns true if input resource meta has function config annotation
+func IsFunctionConfig(rMeta yaml.ResourceMeta) bool {
+	return rMeta.Annotations != nil &&
+		(rMeta.Annotations[runtimeutil.FunctionAnnotationKey] != "" || rMeta.Annotations["config.k8s.io/function"] != "")
 }
