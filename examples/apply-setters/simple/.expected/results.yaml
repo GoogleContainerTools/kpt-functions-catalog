@@ -1,6 +1,0 @@
-name: apply-setters
-items:
-- message: 'set field value to "my-new-map" in file "resources.yaml" in field "metadata.name"'
-  severity: info
-- message: 'set field value to "- prod\n- stage\n" in file "resources.yaml" in field "environments"'
-  severity: info
