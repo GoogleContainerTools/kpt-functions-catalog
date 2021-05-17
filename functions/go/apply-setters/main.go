@@ -16,18 +16,15 @@ func main() {
 	resourceList.FunctionConfig = map[string]interface{}{}
 
 	cmd := framework.Command(resourceList, func() error {
-		s, err := getSetters(resourceList.FunctionConfig)
-		if err != nil {
-			return fmt.Errorf("failed to parse function config: %w", err)
-		}
-		_, err = s.Filter(resourceList.Items)
-		if err != nil {
-			return fmt.Errorf("failed to apply setters: %w", err)
-		}
 		resourceList.Result = &framework.Result{
 			Name: "apply-setters",
-			Items: resultsToItems(s),
 		}
+		items, err := run(resourceList)
+		if err != nil {
+			resourceList.Result.Items = getErrorItem(err.Error())
+			return resourceList.Result
+		}
+		resourceList.Result.Items = items
 		return nil
 	})
 
@@ -39,6 +36,22 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
+	s, err := getSetters(resourceList.FunctionConfig)
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.Filter(resourceList.Items)
+	if err != nil {
+		return nil, err
+	}
+	resultItems, err := resultsToItems(s)
+	if err != nil {
+		return nil, err
+	}
+	return resultItems, nil
 }
 
 // getSetters retrieve the setters from input config
@@ -58,13 +71,10 @@ func getSetters(fc interface{}) (applysetters.ApplySetters, error) {
 
 // resultsToItems converts the Search and Replace results to
 // equivalent items([]framework.Item)
-func resultsToItems(sr applysetters.ApplySetters) []framework.Item {
+func resultsToItems(sr applysetters.ApplySetters) ([]framework.Item, error) {
 	var items []framework.Item
 	if len(sr.Results) == 0 {
-		items = append(items, framework.Item{
-			Message: "no matches",
-		})
-		return items
+		return nil, fmt.Errorf("no matches for the input list of setters")
 	}
 	for _, res := range sr.Results {
 		items = append(items, framework.Item{
@@ -73,5 +83,15 @@ func resultsToItems(sr applysetters.ApplySetters) []framework.Item {
 			File:    framework.File{Path: res.FilePath},
 		})
 	}
-	return items
+	return items, nil
+}
+
+// getErrorItem returns the item for input error message
+func getErrorItem(errMsg string) []framework.Item {
+	return []framework.Item{
+		{
+			Message:  fmt.Sprintf("failed to apply setters: %s", errMsg),
+			Severity: framework.Error,
+		},
+	}
 }

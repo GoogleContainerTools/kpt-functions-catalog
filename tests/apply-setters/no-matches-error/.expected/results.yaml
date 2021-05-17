@@ -1,0 +1,4 @@
+name: apply-setters
+items:
+- message: 'failed to apply setters: no matches for the input list of setters'
+  severity: error
