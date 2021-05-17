@@ -366,7 +366,7 @@ spec:
         - name: nginx
           image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
-			errMsg: `failed to configure function: input setters list cannot be empty`,
+			errMsg: `input setters list cannot be empty`,
 		},
 		{
 			name: "set empty values",
@@ -374,28 +374,17 @@ spec:
 kind: Service
 metadata:
   name: myService # kpt-set: ${app}
-  namespace: foo # kpt-set: ${ns}
-image: nginx:1.7.1 # kpt-set: ${image}:${tag}
-env: # kpt-set: ${env}
-  - foo
-  - bar
 `,
 			config: `
 data:
   app: ""
-  ns: ~
-  image: ''
-  env: ~
 `,
 			expectedResources: `apiVersion: v1
 kind: Service
 metadata:
-  name: # kpt-set: ${app}
-  namespace: # kpt-set: ${ns}
-image: :1.7.1 # kpt-set: ${image}:${tag}
-env: # kpt-set: ${env}
-  - null
+  name: myService # kpt-set: ${app}
 `,
+			errMsg: `found empty input value for setter: "app"`,
 		},
 	}
 	for i := range tests {

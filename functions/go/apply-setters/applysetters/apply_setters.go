@@ -31,8 +31,8 @@ type Setter struct {
 
 // Filter implements Set as a yaml.Filter
 func (as ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	if len(as.Setters) == 0 {
-		return nodes, fmt.Errorf("failed to configure function: input setters list cannot be empty")
+	if err := as.validateInput(); err != nil {
+		return nodes, err
 	}
 	for i := range nodes {
 		err := accept(&as, nodes[i])
@@ -41,6 +41,19 @@ func (as ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 		}
 	}
 	return nodes, nil
+}
+
+// validateInput validates the input setter values
+func (as *ApplySetters) validateInput() error {
+	if len(as.Setters) == 0 {
+		return fmt.Errorf("input setters list cannot be empty")
+	}
+	for _, setter := range as.Setters {
+		if setter.Value == "" {
+			return fmt.Errorf("found empty input value for setter: %q", setter.Name)
+		}
+	}
+	return nil
 }
 
 /*
