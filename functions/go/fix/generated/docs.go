@@ -29,14 +29,7 @@ Let's start with a simple input resource which is compatible with kpt v0.X.Y
   metadata:
     name: my-nginx
   spec:
-    replicas: 3
-    template:
-      spec:
-        containers:
-          - name: nginx # {"$kpt-set":"image"}
-            image: nginx:1.14.1 # {"$kpt-set":"fullimage"}
-            ports:
-              - containerPort: 80
+    replicas: 3 # {"$kpt-set":"replicas"}
 
 Here is the corresponding v1alpha1 Kptfile in the package
 
@@ -46,26 +39,11 @@ Here is the corresponding v1alpha1 Kptfile in the package
     name: nginx
   openAPI:
     definitions:
-      io.k8s.cli.setters.image:
+      io.k8s.cli.setters.replicas:
         x-k8s-cli:
           setter:
-            name: image
-            value: nginx
-      io.k8s.cli.setters.tag:
-        x-k8s-cli:
-          setter:
-            name: tag
-            value: 1.14.1
-      io.k8s.cli.substitutions.fullimage:
-        x-k8s-cli:
-          substitution:
-            name: fullimage
-            pattern: ${image}:${tag}
-            values:
-              - marker: ${image}
-                ref: "#/definitions/io.k8s.cli.setters.image"
-              - marker: ${tag}
-                ref: "#/definitions/io.k8s.cli.setters.tag"
+            name: replicas
+            value: "3"
 
 Invoke ` + "`" + `fix` + "`" + ` function on the package:
 
@@ -78,14 +56,7 @@ Here is the transformed resource
   metadata:
     name: my-nginx
   spec:
-    replicas: 3
-    template:
-      spec:
-        containers:
-          - name: nginx # kpt-set: ${image}
-            image: nginx:1.14.1 # kpt-set: ${image}:${tag}
-            ports:
-              - containerPort: 80
+    replicas: 3 # kpt-set: ${replicas}
 
 Here is the transformed v1alpha2 Kptfile:
 
@@ -97,6 +68,5 @@ Here is the transformed v1alpha2 Kptfile:
     mutators:
       - image: gcr.io/kpt-fn/apply-setters:v0.1
         configMap:
-          image: nginx
-          tag: 1.14.1
+          replicas: "3"
 `

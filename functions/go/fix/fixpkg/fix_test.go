@@ -1,7 +1,6 @@
 package fixpkg
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -15,10 +14,10 @@ func TestFix(t *testing.T) {
 	dir, err := ioutil.TempDir("", "")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
-	err =  copyutil.CopyDir("../../../../testdata/fix/nginx-v1alpha1", dir)
+	err = copyutil.CopyDir("../../../../testdata/fix/nginx-v1alpha1", dir)
 	inout := &kio.LocalPackageReadWriter{
-		PackagePath:     dir,
-		MatchFilesGlob:  append(kio.DefaultMatch, "Kptfile"),
+		PackagePath:    dir,
+		MatchFilesGlob: append(kio.DefaultMatch, "Kptfile"),
 	}
 	f := &Fix{}
 	err = kio.Pipeline{
@@ -28,6 +27,5 @@ func TestFix(t *testing.T) {
 	}.Execute()
 	diff, err := copyutil.Diff(dir, "../../../../testdata/fix/nginx-v1alpha2")
 	assert.NoError(t, err)
-	fmt.Printf("%v", diff.List())
-	assert.Equal(t,0, len(diff.List()))
+	assert.Equal(t, 0, len(diff.List()))
 }
