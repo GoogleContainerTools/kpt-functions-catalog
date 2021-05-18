@@ -43,6 +43,7 @@ func ReplaceResource(nodes []*yaml.RNode, inputResource *yaml.RNode) (bool, erro
 			return false, err
 		}
 		// skip processing resource if it is a function config
+		// TODO: remove this check after we stop support for v0.X
 		if IsFunctionConfig(rMeta) {
 			continue
 		}
@@ -74,8 +75,8 @@ func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode,
 	// remove local, function, path and index annotations from the result
 	// removing path and index annotations makes orchestrator write resource
 	// to a new file
-	cleanedAnno := removeLocalFnPathIndexAnnotations(meta.Annotations)
-	err = new.SetAnnotations(cleanedAnno)
+	removeLocalFnPathIndexAnnotations(meta.Annotations)
+	err = new.SetAnnotations(meta.Annotations)
 	if err != nil {
 		return nodes, err
 	}
@@ -85,6 +86,7 @@ func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode,
 
 // IsSameResource returns true if metadata of two resources
 // have same Group, Kind, Name, Namespace
+// TODO: phanimarupaka move this to common util https://github.com/GoogleContainerTools/kpt/issues/2043
 func IsSameResource(meta1, meta2 yaml.ResourceMeta) bool {
 	g1, _ := ParseGroupVersion(meta1.APIVersion)
 	g2, _ := ParseGroupVersion(meta1.APIVersion)
@@ -121,24 +123,24 @@ func combineInputAndMatchedAnnotations(inputResourceAnno, matchedResourceAnno ma
 	res[kioutil.IndexAnnotation] = matchedResourceAnno[kioutil.IndexAnnotation]
 	// remove local and function meta annotations from the result as they should
 	// not be written to output resource
-	return removeLocalAndFnAnnotations(res)
+	removeLocalAndFnAnnotations(res)
+	return res
 }
 
 // removeLocalFnPathIndexAnnotations removes index, path, local and fn annotations
-func removeLocalFnPathIndexAnnotations(a map[string]string) map[string]string {
-	a = removeLocalAndFnAnnotations(a)
+func removeLocalFnPathIndexAnnotations(a map[string]string) {
+	removeLocalAndFnAnnotations(a)
 	delete(a, kioutil.PathAnnotation)
 	delete(a, kioutil.IndexAnnotation)
-	return a
 }
 
 // removeLocalAndFnAnnotations removes local and fn annotations
-func removeLocalAndFnAnnotations(a map[string]string) map[string]string {
+// TODO: phanimarupaka remove this method after we drop support for kpt 0.X
+func removeLocalAndFnAnnotations(a map[string]string) {
 	delete(a, filters.LocalConfigAnnotation)
 	delete(a, runtimeutil.FunctionAnnotationKey)
 	// using hard coded key as this annotation is deprecated and not exposed by kyaml
 	delete(a, "config.k8s.io/function")
-	return a
 }
 
 // IsFunctionConfig returns true if input resource meta has function config annotation
