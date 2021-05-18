@@ -366,7 +366,7 @@ spec:
         - name: nginx
           image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
-			errMsg: `failed to configure function: input setters list cannot be empty`,
+			errMsg: `input setters list cannot be empty`,
 		},
 		{
 			name: "set empty values",
