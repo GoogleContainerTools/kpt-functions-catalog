@@ -379,22 +379,24 @@ image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 env: # kpt-set: ${env}
   - foo
   - bar
+roles: [dev, prod] # kpt-set: ${roles}
 `,
 			config: `
 data:
   app: ""
   ns: ~
   image: ''
-  env: ~
+  env: ""
+  roles: ''
 `,
 			expectedResources: `apiVersion: v1
 kind: Service
 metadata:
-  name: null # kpt-set: ${app}
-  namespace: null # kpt-set: ${ns}
+  name: "" # kpt-set: ${app}
+  namespace: "" # kpt-set: ${ns}
 image: :1.7.1 # kpt-set: ${image}:${tag}
-env: # kpt-set: ${env}
-  - null
+env: [] # kpt-set: ${env}
+roles: [] # kpt-set: ${roles}
 `,
 		},
 		{
@@ -402,11 +404,11 @@ env: # kpt-set: ${env}
 			input: `apiVersion: v1
 kind: Service
 metadata:
-  name: null # kpt-set: ${app}
-  namespace: null # kpt-set: ${ns}
+  name: "" # kpt-set: ${app}
+  namespace: "" # kpt-set: ${ns}
 image: :1.7.1 # kpt-set: ${image}:${tag}
-env: # kpt-set: ${env}
-  - null
+env: [] # kpt-set: ${env}
+roles: [] # kpt-set: ${roles}
 `,
 			config: `
 data:
@@ -414,19 +416,23 @@ data:
   ns: foo
   image: nginx
   tag: 1.7.1
-  env: |
-    - foo
-    - bar
+  env: "[foo, bar]"
+  roles: |
+    - dev
+    - prod
 `,
 			expectedResources: `apiVersion: v1
 kind: Service
 metadata:
-  name: myService # kpt-set: ${app}
-  namespace: foo # kpt-set: ${ns}
+  name: "myService" # kpt-set: ${app}
+  namespace: "foo" # kpt-set: ${ns}
 image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 env: # kpt-set: ${env}
   - foo
   - bar
+roles: # kpt-set: ${roles}
+  - dev
+  - prod
 `,
 		},
 	}
