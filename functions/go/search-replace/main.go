@@ -7,25 +7,16 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/generated"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace/searchreplace"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 //nolint
 func main() {
 	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = map[string]interface{}{}
-	cmd := framework.Command(resourceList, func() error {
-		resourceList.Result = &framework.Result{
-			Name: "search-replace",
-		}
-		items, err := run(resourceList)
-		if err != nil {
-			resourceList.Result.Items = getErrorItem(err.Error())
-			return resourceList.Result
-		}
-		resourceList.Result.Items = items
-		return nil
-	})
+	resourceList.FunctionConfig = &kyaml.RNode{}
+	srp := SearchReplaceProcessor{}
+	cmd := command.Build(&srp, command.StandaloneEnabled, false)
 
 	cmd.Short = generated.SearchReplaceShort
 	cmd.Long = generated.SearchReplaceLong
@@ -37,8 +28,23 @@ func main() {
 	}
 }
 
+type SearchReplaceProcessor struct{}
+
+func (srp *SearchReplaceProcessor) Process(resourceList *framework.ResourceList) error {
+	resourceList.Result = &framework.Result{
+		Name: "search-replace",
+	}
+	items, err := run(resourceList)
+	if err != nil {
+		resourceList.Result.Items = getErrorItem(err.Error())
+		return err
+	}
+	resourceList.Result.Items = items
+	return nil
+}
+
 // run resolves the function params from input ResourceList and runs the function on resources
-func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
+func run(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
 	sr, err := getSearchReplaceParams(resourceList.FunctionConfig)
 	if err != nil {
 		return nil, err
@@ -53,18 +59,9 @@ func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
 }
 
 // getSearchReplaceParams retrieve the search parameters from input config
-func getSearchReplaceParams(fc interface{}) (searchreplace.SearchReplace, error) {
+func getSearchReplaceParams(fc *kyaml.RNode) (searchreplace.SearchReplace, error) {
 	var fcd searchreplace.SearchReplace
-	f, ok := fc.(map[string]interface{})
-	if !ok {
-		return fcd, fmt.Errorf("function config %#v is not valid", fc)
-	}
-	rn, err := kyaml.FromMap(f)
-	if err != nil {
-		return fcd, fmt.Errorf("failed to parse input from function config: %w", err)
-	}
-
-	if err := searchreplace.Decode(rn, &fcd); err != nil {
+	if err := searchreplace.Decode(fc, &fcd); err != nil {
 		return fcd, err
 	}
 	return fcd, nil
@@ -72,10 +69,10 @@ func getSearchReplaceParams(fc interface{}) (searchreplace.SearchReplace, error)
 
 // searchResultsToItems converts the Search and Replace results to
 // equivalent items([]framework.Item)
-func searchResultsToItems(sr searchreplace.SearchReplace) []framework.Item {
-	var items []framework.Item
+func searchResultsToItems(sr searchreplace.SearchReplace) []framework.ResultItem {
+	var items []framework.ResultItem
 	if len(sr.Results) == 0 {
-		items = append(items, framework.Item{
+		items = append(items, framework.ResultItem{
 			Message: "no matches",
 		})
 		return items
@@ -88,7 +85,7 @@ func searchResultsToItems(sr searchreplace.SearchReplace) []framework.Item {
 			message = fmt.Sprintf("Matched field value %q", res.Value)
 		}
 
-		items = append(items, framework.Item{
+		items = append(items, framework.ResultItem{
 			Message: message,
 			Field:   framework.Field{Path: res.FieldPath},
 			File:    framework.File{Path: res.FilePath},
@@ -98,8 +95,8 @@ func searchResultsToItems(sr searchreplace.SearchReplace) []framework.Item {
 }
 
 // getErrorItem returns the item for input error message
-func getErrorItem(errMsg string) []framework.Item {
-	return []framework.Item{
+func getErrorItem(errMsg string) []framework.ResultItem {
+	return []framework.ResultItem{
 		{
 			Message:  fmt.Sprintf("failed to perform search-replace operation: %q", errMsg),
 			Severity: framework.Error,
