@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  namespace: mySpace
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/upsert-resource:unstable
+    config.kubernetes.io/local-config: 'true'
+spec:
+  selector:
+    app: bar
