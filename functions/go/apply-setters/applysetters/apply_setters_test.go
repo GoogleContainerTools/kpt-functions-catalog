@@ -374,7 +374,7 @@ spec:
 kind: Service
 metadata:
   name: myService # kpt-set: ${app}
-  namespace: foo # kpt-set: ${ns}
+  namespace: "foo" # kpt-set: ${ns}
 image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 env: # kpt-set: ${env}
   - foo
@@ -390,11 +390,43 @@ data:
 			expectedResources: `apiVersion: v1
 kind: Service
 metadata:
-  name: # kpt-set: ${app}
-  namespace: # kpt-set: ${ns}
+  name: null # kpt-set: ${app}
+  namespace: null # kpt-set: ${ns}
 image: :1.7.1 # kpt-set: ${image}:${tag}
 env: # kpt-set: ${env}
   - null
+`,
+		},
+		{
+			name: "set non-empty values from empty values",
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: null # kpt-set: ${app}
+  namespace: null # kpt-set: ${ns}
+image: :1.7.1 # kpt-set: ${image}:${tag}
+env: # kpt-set: ${env}
+  - null
+`,
+			config: `
+data:
+  app: myService
+  ns: foo
+  image: nginx
+  tag: 1.7.1
+  env: |
+    - foo
+    - bar
+`,
+			expectedResources: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService # kpt-set: ${app}
+  namespace: foo # kpt-set: ${ns}
+image: nginx:1.7.1 # kpt-set: ${image}:${tag}
+env: # kpt-set: ${env}
+  - foo
+  - bar
 `,
 		},
 	}

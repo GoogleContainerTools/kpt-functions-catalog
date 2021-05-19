@@ -178,7 +178,7 @@ apiVersion: v1
 
 */
 func (as *ApplySetters) visitScalar(object *yaml.RNode, path string) error {
-	if object.IsNilOrEmpty() {
+	if object.IsNil() {
 		return nil
 	}
 
@@ -227,6 +227,10 @@ func (as *ApplySetters) visitScalar(object *yaml.RNode, path string) error {
 	}
 
 	object.YNode().Value = setterPattern
+	if setterPattern == "" {
+		object.YNode().Value = "null"
+		object.YNode().Style = yaml.TaggedStyle
+	}
 	object.YNode().Tag = yaml.NodeTagEmpty
 	as.Results = append(as.Results, &Result{
 		FilePath:  as.filePath,
