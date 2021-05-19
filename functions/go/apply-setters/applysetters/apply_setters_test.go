@@ -374,27 +374,65 @@ spec:
 kind: Service
 metadata:
   name: myService # kpt-set: ${app}
-  namespace: foo # kpt-set: ${ns}
+  namespace: "foo" # kpt-set: ${ns}
 image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 env: # kpt-set: ${env}
   - foo
   - bar
+roles: [dev, prod] # kpt-set: ${roles}
 `,
 			config: `
 data:
   app: ""
   ns: ~
   image: ''
-  env: ~
+  env: ""
+  roles: ''
 `,
 			expectedResources: `apiVersion: v1
 kind: Service
 metadata:
-  name: # kpt-set: ${app}
-  namespace: # kpt-set: ${ns}
+  name: "" # kpt-set: ${app}
+  namespace: "" # kpt-set: ${ns}
 image: :1.7.1 # kpt-set: ${image}:${tag}
+env: [] # kpt-set: ${env}
+roles: [] # kpt-set: ${roles}
+`,
+		},
+		{
+			name: "set non-empty values from empty values",
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: "" # kpt-set: ${app}
+  namespace: "" # kpt-set: ${ns}
+image: :1.7.1 # kpt-set: ${image}:${tag}
+env: [] # kpt-set: ${env}
+roles: [] # kpt-set: ${roles}
+`,
+			config: `
+data:
+  app: myService
+  ns: foo
+  image: nginx
+  tag: 1.7.1
+  env: "[foo, bar]"
+  roles: |
+    - dev
+    - prod
+`,
+			expectedResources: `apiVersion: v1
+kind: Service
+metadata:
+  name: "myService" # kpt-set: ${app}
+  namespace: "foo" # kpt-set: ${ns}
+image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 env: # kpt-set: ${env}
-  - null
+  - foo
+  - bar
+roles: # kpt-set: ${roles}
+  - dev
+  - prod
 `,
 		},
 	}

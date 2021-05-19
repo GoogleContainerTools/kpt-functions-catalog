@@ -89,16 +89,25 @@ environments: # kpt-set: ${env}
 */
 func (as *ApplySetters) visitMapping(object *yaml.RNode, path string) error {
 	return object.VisitFields(func(node *yaml.MapNode) error {
-		if node.IsNilOrEmpty() {
+		if node == nil || node.Key.IsNil() || node.Value.IsNil() {
+			// don't do IsNilOrEmpty check as empty sequences are allowed
 			return nil
 		}
+
 		// the aim of this method is to apply-setter for sequence nodes
 		if node.Value.YNode().Kind != yaml.SequenceNode {
 			// return if it is not a sequence node
 			return nil
 		}
 
-		setterPattern := extractSetterPattern(node.Key)
+		lineComment := node.Key.YNode().LineComment
+		if node.Value.YNode().Style == yaml.FlowStyle {
+			// if node is FlowStyle e.g. env: [foo, bar] # kpt-set: ${env}
+			// the setter comment will be on value node
+			lineComment = node.Value.YNode().LineComment
+		}
+
+		setterPattern := extractSetterPattern(lineComment)
 		if setterPattern == "" {
 			// the node is not tagged with setter pattern
 			return nil
@@ -122,10 +131,12 @@ func (as *ApplySetters) visitMapping(object *yaml.RNode, path string) error {
 		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
 
 		if sv == "" {
-			var elements []*yaml.Node
-			elements = append(elements, &yaml.Node{})
-			node.Value.YNode().Content = elements
-			node.Value.YNode().Style = yaml.FoldedStyle
+			node.Value.YNode().Content = []*yaml.Node{}
+			// empty sequence must be FlowStyle e.g. env: [] # kpt-set: ${env}
+			node.Value.YNode().Style = yaml.FlowStyle
+			// setter pattern comment must be on value node
+			node.Value.YNode().LineComment = lineComment
+			node.Key.YNode().LineComment = ""
 			as.Results = append(as.Results, &Result{
 				FilePath:  as.filePath,
 				FieldPath: fieldPath,
@@ -146,6 +157,11 @@ func (as *ApplySetters) visitMapping(object *yaml.RNode, path string) error {
 		}
 
 		node.Value.YNode().Content = rn.YNode().Content
+		node.Key.YNode().LineComment = lineComment
+		// non-empty sequences should be standardized to FoldedStyle
+		// env: # kpt-set: ${env}
+		//  - foo
+		//  - bar
 		node.Value.YNode().Style = yaml.FoldedStyle
 
 		as.Results = append(as.Results, &Result{
@@ -178,7 +194,7 @@ apiVersion: v1
 
 */
 func (as *ApplySetters) visitScalar(object *yaml.RNode, path string) error {
-	if object.IsNilOrEmpty() {
+	if object.IsNil() {
 		return nil
 	}
 
@@ -188,7 +204,7 @@ func (as *ApplySetters) visitScalar(object *yaml.RNode, path string) error {
 	}
 
 	// perform a direct set of the field if it matches
-	setterPattern := extractSetterPattern(object)
+	setterPattern := extractSetterPattern(object.YNode().LineComment)
 	if setterPattern == "" {
 		// the node is not tagged with setter pattern
 		return nil
@@ -227,6 +243,9 @@ func (as *ApplySetters) visitScalar(object *yaml.RNode, path string) error {
 	}
 
 	object.YNode().Value = setterPattern
+	if setterPattern == "" {
+		object.YNode().Style = yaml.DoubleQuotedStyle
+	}
 	object.YNode().Tag = yaml.NodeTagEmpty
 	as.Results = append(as.Results, &Result{
 		FilePath:  as.filePath,
@@ -311,13 +330,9 @@ func setterValue(setters []Setter, setterName string) string {
 }
 
 // extractSetterPattern extracts the setter pattern from the line comment of the
-// input yaml RNode. If the the line comment doesn't contain SetterCommentIdentifier
+// yaml RNode. If the the line comment doesn't contain SetterCommentIdentifier
 // prefix, then it returns empty string
-func extractSetterPattern(node *yaml.RNode) string {
-	if node == nil {
-		return ""
-	}
-	lineComment := node.YNode().LineComment
+func extractSetterPattern(lineComment string) string {
 	if !strings.HasPrefix(lineComment, SetterCommentIdentifier) {
 		return ""
 	}
