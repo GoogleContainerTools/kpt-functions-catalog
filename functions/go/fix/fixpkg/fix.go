@@ -161,7 +161,7 @@ func filesInPackage(pkgPath string, resourcesPaths, kptFilePaths sets.String) se
 	res := sets.String{}
 	for _, resourcePath := range resourcesPaths.List() {
 		dirPath := filepath.Dir(resourcePath)
-		for true {
+		for {
 			// check if the input pkgPath is the immediate parent package for the resource
 			kfPath := filepath.Join(dirPath, v1alpha2.KptFileName)
 			if kptFilePaths.Has(kfPath) {
@@ -211,7 +211,10 @@ func (s *Fix) FunctionsInPkg(nodes []*yaml.RNode, pkgPath string) []v1alpha2.Fun
 			meta.Annotations[kioutil.PathAnnotation] = filepath.Join(pkgPath, fnFileName)
 			delete(meta.Annotations, runtimeutil.FunctionAnnotationKey)
 			delete(meta.Annotations, "config.k8s.io/function")
-			node.SetAnnotations(meta.Annotations)
+			err = node.SetAnnotations(meta.Annotations)
+			if err != nil {
+				return res
+			}
 		}
 	}
 	return res
@@ -282,7 +285,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 	pl.Mutators = append(pl.Mutators, functions...)
 	kfNew.Pipeline = pl
 
-	if setters != nil && len(setters) > 0 {
+	if len(setters) > 0 {
 		fn := v1alpha2.Function{
 			Image:     "gcr.io/kpt-fn/apply-setters:v0.1",
 			ConfigMap: setters,

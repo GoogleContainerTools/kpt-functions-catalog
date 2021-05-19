@@ -15,6 +15,7 @@ func TestFix(t *testing.T) {
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 	err = copyutil.CopyDir("../../../../testdata/fix/nginx-v1alpha1", dir)
+	assert.NoError(t, err)
 	inout := &kio.LocalPackageReadWriter{
 		PackagePath:    dir,
 		MatchFilesGlob: append(kio.DefaultMatch, "Kptfile"),
@@ -25,6 +26,7 @@ func TestFix(t *testing.T) {
 		Filters: []kio.Filter{f},
 		Outputs: []kio.Writer{inout},
 	}.Execute()
+	assert.NoError(t, err)
 	diff, err := copyutil.Diff(dir, "../../../../testdata/fix/nginx-v1alpha2")
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(diff.List()))
