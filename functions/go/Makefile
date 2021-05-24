@@ -22,6 +22,7 @@ FUNCTIONS := \
 	apply-setters \
 	enforce-gatekeeper \
 	ensure-name-substring \
+	fix \
 	format \
 	search-replace \
 	set-annotations \
