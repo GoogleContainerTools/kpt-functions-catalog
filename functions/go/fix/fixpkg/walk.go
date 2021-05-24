@@ -2,11 +2,12 @@ package fixpkg
 
 import (
 	"encoding/json"
-	"github.com/go-openapi/spec"
+	"strings"
+
+	"k8s.io/kube-openapi/pkg/validation/spec"
 	"sigs.k8s.io/kustomize/kyaml/fieldmeta"
 	"sigs.k8s.io/kustomize/kyaml/openapi"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
-	"strings"
 )
 
 // visitor is implemented by structs which need to walk the configuration.

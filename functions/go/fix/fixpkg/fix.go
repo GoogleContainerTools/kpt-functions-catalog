@@ -8,7 +8,7 @@ import (
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1alpha1"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1alpha2"
-	"github.com/go-openapi/spec"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/fieldmeta"
 	"sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil"
@@ -37,6 +37,18 @@ type Fix struct {
 	// this must be updated while processing each resources so that the visitor
 	// interface methods have access to it
 	settersSchema *spec.Schema
+
+	// Results are the results of fixing packages
+	Results []*Result
+}
+
+// Result holds result of fixing packages
+type Result struct {
+	// FilePath is the file path of the resource
+	FilePath string
+
+	// Message is the result message
+	Message string
 }
 
 // Filter implements Fix as a yaml.Filter
@@ -76,6 +88,14 @@ func (s *Fix) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 				return nodes, err
 			}
 			nodes[i] = kNode
+			continue
+		}
+
+		if meta.Labels["cli-utils.sigs.k8s.io/inventory-id"] != "" {
+			s.Results = append(s.Results, &Result{
+				FilePath: meta.Annotations[kioutil.PathAnnotation],
+				Message:  `Please refer to https://googlecontainertools.github.io/kpt/reference/live/alpha/, this package is using "inventory-object"`,
+			})
 			continue
 		}
 
@@ -249,6 +269,10 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 			Keywords:    kfOld.PackageMeta.Tags,
 			Man:         kfOld.PackageMeta.Man,
 		}
+		s.Results = append(s.Results, &Result{
+			FilePath: meta.Annotations[kioutil.PathAnnotation],
+			Message:  `Transformed "packageMetadata" to "info"`,
+		})
 	}
 
 	// convert upstream section
@@ -271,6 +295,11 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 				Ref:       kfOld.Upstream.Git.Ref,
 			},
 		}
+
+		s.Results = append(s.Results, &Result{
+			FilePath: meta.Annotations[kioutil.PathAnnotation],
+			Message:  `Transformed "upstream" to "upstream" and "upstreamLock"`,
+		})
 	}
 
 	if err != nil {
@@ -284,6 +313,12 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 	pl := &v1alpha2.Pipeline{}
 	pl.Mutators = append(pl.Mutators, functions...)
 	kfNew.Pipeline = pl
+	for _, fn := range functions {
+		s.Results = append(s.Results, &Result{
+			FilePath: meta.Annotations[kioutil.PathAnnotation],
+			Message:  fmt.Sprintf(`Added %q to mutators list, please move it to validators section if it is a validator function`, fn.Image),
+		})
+	}
 
 	if len(setters) > 0 {
 		fn := v1alpha2.Function{
@@ -291,6 +326,10 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 			ConfigMap: setters,
 		}
 		pl.Mutators = append(pl.Mutators, fn)
+		s.Results = append(s.Results, &Result{
+			FilePath: meta.Annotations[kioutil.PathAnnotation],
+			Message:  `Transformed "openAPI" definitions to "apply-setters" function`,
+		})
 	}
 
 	// convert inventory section
