@@ -37,8 +37,4 @@ kpt fn render simple
 
 Check all resources have `metadata.namespace` set to `example-ns`:
 
-```sh
-kpt pkg cat simple
-```
-
 [`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/

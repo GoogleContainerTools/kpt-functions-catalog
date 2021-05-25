@@ -14,9 +14,9 @@ metadata:
   name: example
 pipeline:
   validators:
-  - image: gcr.io/kpt-fn/kubeval:unstable
-    configMap:
-      strict: 'true'
+    - image: gcr.io/kpt-fn/kubeval:unstable
+      configMap:
+        strict: 'true'
 ```
 
 The function configuration is provided using a ConfigMap. We set 1 key-value

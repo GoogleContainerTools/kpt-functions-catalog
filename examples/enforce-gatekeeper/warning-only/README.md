@@ -2,10 +2,9 @@
 
 ### Overview
 
-This example is very similar to the invalid configmap example. It also
-demonstrates how to declaratively run the [enforce-gatekeeper]
-function to validate resources using gatekeeper constraints. The major
-difference is that the violations are warnings instead of errors.
+This example demonstrates how to declaratively run the [enforce-gatekeeper]
+function to validate resources using gatekeeper constraints. The violations are
+configured to be warnings instead of errors.
 
 Here's an example Kptfile to run the function:
 
@@ -40,23 +39,15 @@ Get the package:
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enforce-gatekeeper/warning-only .
 ```
 
-Create a directory for storing the structured output.
-
-```shell
-$ cd warnning-only
-$ mkdir results
-```
-
 Run the function:
 
 ```shell
-$ kpt fn render --results-dir=results
+$ kpt fn render warning-only --results-dir=/tmp
 ```
 
 ### Expected result
 
-You won't see any failure from the console. But if you look at the structured
-result, you can find a warning about the constraint violation.
+Let's take a look at the structured results in `/tmp/results.yaml`:
 
 ```shell
 apiVersion: kpt.dev/v1alpha2

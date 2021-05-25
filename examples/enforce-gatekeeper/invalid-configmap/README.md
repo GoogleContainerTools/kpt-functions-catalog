@@ -1,4 +1,4 @@
-# enforce-gatekeeper: Invalid Configmap
+# enforce-gatekeeper: Invalid ConfigMap
 
 ### Overview
 
@@ -28,35 +28,15 @@ Get the package:
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enforce-gatekeeper/invalid-configmap .
 ```
 
-Create a directory for storing the structured output.
-
-```shell
-$ cd invalid-configmap
-$ mkdir results
-```
-
 Run the function:
 
 ```shell
-$ kpt fn render --results-dir=results
+$ kpt fn render invalid-configmap --results-dir=/tmp
 ```
 
 ### Expected result
 
-You should see the output like the following:
-
-```
-[RUNNING] "gcr.io/kpt-fn/enforce-gatekeeper:unstable"
-[FAIL] "gcr.io/kpt-fn/enforce-gatekeeper:unstable"
-  Stderr:
-    "The following banned keys are being used in the ConfigMap: {\"private_key\"}"
-    "violatedConstraint: no-secrets-in-configmap"
-  Exit Code: 1
-
-For complete results, see results/results.yaml
-```
-
-Let's take a look at the structured result:
+Let's take a look at the structured results in `/tmp/results.yaml`:
 
 ```yaml
 apiVersion: kpt.dev/v1alpha2

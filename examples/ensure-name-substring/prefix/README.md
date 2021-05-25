@@ -2,10 +2,6 @@
 
 ### Overview
 
-Note: This is an alpha function, and we are actively seeking feedback on the
-function config syntax and behavior. If you have suggestion or feedback, please
-file an [issue].
-
 This example demonstrates how to declaratively run the [`ensure-name-substring`]
 function to prepend prefix in the resource names.
 
@@ -38,12 +34,7 @@ kpt fn render prefix
 
 Check all resources have `prod-` in their names:
 
-```sh
-kpt pkg cat prefix
-```
-
 We have a `Service` object whose name is `with-prod-service` which already
 contains substring `prod-`. This resource will be skipped.
 
-[issue]: https://github.com/GoogleContainerTools/kpt/issues/new/choose
 [ensure-name-substring]: https://catalog.kpt.dev/ensure-name-substring/v0.1/

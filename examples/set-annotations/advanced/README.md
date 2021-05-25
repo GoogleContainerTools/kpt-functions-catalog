@@ -24,8 +24,6 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: SetAnnotationConfig
 metadata:
   name: my-func-config
-  annotations:
-    config.kubernetes.io/local-config: 'true'
 annotations:
   fruit: apple
   color: orange
@@ -55,9 +53,5 @@ kpt fn render advanced
 
 Check the 2 annotations have been added to both the k8s built-in resources and
 the custom resources.
-
-```sh
-kpt pkg cat advanced
-```
 
 [`set-annotations`]: https://catalog.kpt.dev/set-annotations/v0.1/

@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: the-map # kpt-set: ${name}
-data:
-  some-key: some-value

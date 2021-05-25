@@ -21,9 +21,3 @@ kpt fn eval imperative --image=gcr.io/kpt-fn/format:unstable
 The fields should be ordered as per OpenAPI schema definition of `Deployment`
 resource. For e.g. `metadata.name` field is placed before `metadata.labels`
 field. The keys in `metadata.labels` field are sorted alphabetically.
-
-Verify that the changes are as described:
-
-```sh
-$ kpt pkg cat simple/
-```

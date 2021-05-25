@@ -26,7 +26,6 @@ kind: StarlarkRun
 metadata:
   name: set-namespace-to-prod
   annotations:
-    config.kubernetes.io/local-config: 'true'
 source: |
   # set the namespace on all resources
   def setnamespace(resources, namespace):
@@ -52,9 +51,5 @@ kpt fn render simple
 ### Expected result
 
 Check the `.metadata.namespace` field has been set to `prod` for every resource.
-
-```sh
-kpt pkg cat simple
-```
 
 [`starlark`]: https://catalog.kpt.dev/starlark/v0.1/

@@ -127,6 +127,14 @@ def validate_example_md(fn_name, dir_name, example_name, branch):
     stdout, stderr = process.communicate()
     if len(stderr) > 0:
         print(f'stderr of mdrip: {str(stderr)}')
+
+    process = subprocess.Popen(['mdrip', '--label', 'skip', md_file_path],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout2, stderr2 = process.communicate()
+    if len(stderr2) > 0:
+        print(f'stderr of mdrip: {str(stderr2)}')
+
     tag = branch
     if branch == 'master':
         tag = 'unstable'
@@ -136,12 +144,18 @@ def validate_example_md(fn_name, dir_name, example_name, branch):
             raise Exception(f'the release branch {branch} must has format <fn-name>/vX.Y')
         tag = splits[1]
 
-    for line in stdout.decode("utf-8").splitlines():
+    lines = stdout.decode("utf-8").splitlines()
+    lines2 = stdout2.decode("utf-8").splitlines()
+
+    for line in lines:
         if line.startswith('#') or line.startswith('echo'):
             continue
         for disallowed in disallowed_kpt_commands:
             if disallowed in line:
                 raise Exception(f'command {disallowed} is not allowed in the desired package url in {md_file_path}')
+
+        if line in lines2:
+            continue
 
         for item in line.split():
             if item.startswith(git_url_prefix):

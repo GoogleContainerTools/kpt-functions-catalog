@@ -77,10 +77,6 @@ kpt fn render simple
 Check the value of setter `name` is set to `my-new-map`.
 Check the value of setter `env` is set to array value `[prod, stage]`.
 
-```sh
-$ kpt pkg cat simple/
-```
-
 #### Note:
 
 Refer to the `create-setters` example in `search-replace` function examples for creating setters.

@@ -57,7 +57,3 @@ kpt fn render simple
 ### Expected result
 
 Check the value of deployment `the-deloyment` is changed to `my-deloyment`.
-
-```sh
-$ kpt pkg cat simple/
-```

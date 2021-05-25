@@ -1,5 +1,5 @@
 diff --git a/resources.yaml b/resources.yaml
-index a35afee..b2d6263 100644
+index 7dde53d..7f031c6 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -3,9 +3,9 @@ kind: Deployment
@@ -11,6 +11,6 @@ index a35afee..b2d6263 100644
    template:
      spec:
        containers:
-       - name: nginx
--        image: 'gcr.io/nginx:1.14.2'
-+        image: 'gcr.io/nginx:1.14.2' # kpt-set: gcr.io/${image}:${tag}
+         - name: nginx
+-          image: 'gcr.io/nginx:1.14.2'
++          image: 'gcr.io/nginx:1.14.2' # kpt-set: gcr.io/${image}:${tag}

@@ -1,9 +1,6 @@
 package e2etest
 
 import (
-	"os"
-	"os/exec"
-	"strings"
 	"testing"
 
 	"github.com/GoogleContainerTools/kpt/pkg/test/runner"
@@ -40,16 +37,7 @@ import (
 //
 // Git is required to generate diff output.
 
-const (
-	kptBinEnv = "KPT_E2E_BIN"
-)
-
 func TestE2E(t *testing.T) {
-	out, err := exec.Command("which", "kpt").Output()
-	if err != nil {
-		t.Fatalf("can't find a kpt binary: %v", err)
-	}
-	err = os.Setenv(kptBinEnv, strings.TrimSpace(string(out)))
 	runTests(t, "../..")
 }
 

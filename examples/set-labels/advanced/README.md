@@ -24,8 +24,6 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: SetLabelConfig
 metadata:
   name: my-config
-  annotations:
-    config.kubernetes.io/local-config: 'true'
 labels:
   color: orange
   fruit: apple
@@ -54,9 +52,5 @@ kpt fn render advanced
 ### Expected result
 
 Check all resources have 2 labels: `color: orange` and `fruit: apple`.
-
-```sh
-kpt pkg cat advanced
-```
 
 [`set-labels`]: https://catalog.kpt.dev/set-labels/v0.1/

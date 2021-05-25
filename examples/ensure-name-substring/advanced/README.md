@@ -2,10 +2,6 @@
 
 ### Overview
 
-Note: This is an alpha function, and we are actively seeking feedback on the
-function config syntax and behavior. If you have suggestion or feedback, please
-file an [issue].
-
 This example demonstrates how to declaratively run the [`ensure-name-substring`]
 function to prepend prefix in the resource names.
 
@@ -28,8 +24,6 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: EnsureNameSubstring
 metadata:
   name: my-config
-  annotations:
-    config.kubernetes.io/local-config: 'true'
 substring: prod-
 editMode: prepend
 fieldSpecs:
@@ -57,9 +51,4 @@ kpt fn render advanced
 Check all resources have `prod-` in their names and the field `.spec.name` in
 `MyResource` also got updated.
 
-```sh
-kpt pkg cat advanced
-```
-
-[issue]: https://github.com/GoogleContainerTools/kpt/issues/new/choose
 [ensure-name-substring]: https://catalog.kpt.dev/ensure-name-substring/v0.1/

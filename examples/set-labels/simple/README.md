@@ -35,8 +35,4 @@ kpt fn render simple
 
 Check all resources have 2 labels `color: orange` and `fruit: apple`.
 
-```sh
-kpt pkg cat simple
-```
-
 [`set-labels`]: https://catalog.kpt.dev/set-labels/v0.1/

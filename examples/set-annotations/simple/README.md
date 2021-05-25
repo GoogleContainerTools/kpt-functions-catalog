@@ -35,8 +35,4 @@ kpt fn render simple
 
 Check the 2 annotations have been added.
 
-```sh
-kpt pkg cat simple
-```
-
 [`set-annotations`]: https://catalog.kpt.dev/set-annotations/v0.1/

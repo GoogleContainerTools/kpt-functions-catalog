@@ -1,13 +1,11 @@
+namespace: example-ns
 apiVersion: fn.kpt.dev/v1alpha1
 kind: SetNamespaceConfig
 metadata:
   name: my-config
-  annotations:
-    config.kubernetes.io/local-config: 'true'
-namespace: example-ns
 fieldSpecs:
-  - group: dev.example.com
-    version: v1
-    kind: MyResource
-    path: spec/configmapRef/namespace
+  - kind: MyResource
     create: true
+    group: dev.example.com
+    path: spec/configmapRef/namespace
+    version: v1

@@ -14,9 +14,8 @@ items:
           resourceRef:
             apiVersion: v1
             kind: ConfigMap
-            metadata:
-                name: super-secret
-                namespace: default
+            name: super-secret
+            namespace: default
           file:
             path: resources.yaml
             index: 2

@@ -14,5 +14,6 @@ items:
           resourceRef:
             apiVersion: networking.istio.io/v1alpha3
             kind: Gateway
+            name: httpbin-gateway
           file:
             path: istio-config.yaml

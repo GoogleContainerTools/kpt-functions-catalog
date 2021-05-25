@@ -25,8 +25,6 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: SetNamespaceConfig
 metadata:
   name: my-config
-  annotations:
-    config.kubernetes.io/local-config: 'true'
 namespace: example-ns
 fieldSpecs:
   - group: dev.example.com
@@ -57,9 +55,5 @@ kpt fn render advanced
 ### Expected result
 
 Check all resources have `.metadata.namespace` set to `example-ns`:
-
-```sh
-kpt pkg cat advanced
-```
 
 [`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/

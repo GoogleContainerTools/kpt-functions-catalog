@@ -14,6 +14,7 @@ items:
           resourceRef:
             apiVersion: example.com/v1
             kind: MyCustom
+            name: alice
           file:
             path: resources.yaml
             index: 1
@@ -22,6 +23,7 @@ items:
           resourceRef:
             apiVersion: v1
             kind: ReplicationController
+            name: bob
           field:
             path: templates
           file:
@@ -31,6 +33,7 @@ items:
           resourceRef:
             apiVersion: v1
             kind: ReplicationController
+            name: bob
           field:
             path: spec.replicas
           file:

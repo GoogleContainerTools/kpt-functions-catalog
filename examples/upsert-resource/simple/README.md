@@ -62,16 +62,12 @@ spec:
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
 ```sh
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource/simple .
-kpt fn run simple
+kpt fn render simple
 ```
 
 ### Expected result
 
-Check the resource with name `myService` is replaced with input resource. The value of field `app` is updated.
-
-```sh
-$ kpt cfg cat simple/
-```
+Check the resource with name `myService` is replaced with input resource. The
+value of field `app` is updated.
