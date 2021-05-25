@@ -311,7 +311,6 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 	}
 
 	pl := &v1alpha2.Pipeline{}
-	pl.Mutators = append(pl.Mutators, functions...)
 	kfNew.Pipeline = pl
 	for _, fn := range functions {
 		s.Results = append(s.Results, &Result{
@@ -331,6 +330,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 			Message:  `Transformed "openAPI" definitions to "apply-setters" function`,
 		})
 	}
+	pl.Mutators = append(pl.Mutators, functions...)
 
 	// convert inventory section
 	if kfOld.Inventory != nil {
