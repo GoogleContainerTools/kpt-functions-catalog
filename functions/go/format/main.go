@@ -3,26 +3,20 @@ package main
 import (
 	"fmt"
 	"os"
-	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/format/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
+	"sigs.k8s.io/kustomize/kyaml/kio/filters"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 //nolint
 func main() {
 	resourceList := &framework.ResourceList{}
-
-	cmd := framework.Command(resourceList, func() error {
-		f := filters.FormatFilter{
-			UseSchema: true,
-		}
-		_, err := f.Filter(resourceList.Items)
-		if err != nil {
-			return fmt.Errorf("failed to format resources: %w", err)
-		}
-		return nil
-	})
+	resourceList.FunctionConfig = &kyaml.RNode{}
+	asp := FormatProcessor{}
+	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 
 	cmd.Short = generated.FormatShort
 	cmd.Long = generated.FormatLong
@@ -33,3 +27,16 @@ func main() {
 		os.Exit(1)
 	}
 }
+
+func (fp *FormatProcessor) Process(resourceList *framework.ResourceList) error {
+	f := filters.FormatFilter{
+		UseSchema: true,
+	}
+	_, err := f.Filter(resourceList.Items)
+	if err != nil {
+		return fmt.Errorf("failed to format resources: %w", err)
+	}
+	return nil
+}
+
+type FormatProcessor struct{}
