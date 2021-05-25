@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
-	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
-	"sigs.k8s.io/kustomize/kyaml/kio/filters"
-	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/format/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
+	"sigs.k8s.io/kustomize/kyaml/kio/filters"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 //nolint
