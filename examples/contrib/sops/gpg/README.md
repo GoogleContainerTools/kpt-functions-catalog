@@ -10,7 +10,7 @@ This example demonstrates invocation of `sops` for encryption the resouce called
 
 Get this example and try it out by running the following commands:
 
-```sh
+```shell
 # download this example
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/sops/gpg .
 
@@ -25,7 +25,7 @@ SOPS_IMPORT_PGP="$(cat gpg_keys.asc)" kpt fn run gpg
 
 Verify the updated configuration:
 
-```sh
+```shell
 kpt cfg cat gpg
 ```
 

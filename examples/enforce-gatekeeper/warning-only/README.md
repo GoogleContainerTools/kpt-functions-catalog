@@ -6,7 +6,7 @@ This example demonstrates how to declaratively run the [enforce-gatekeeper]
 function to validate resources using gatekeeper constraints. The violations are
 configured to be warnings instead of errors.
 
-Here's an example Kptfile to run the function:
+Here's an example `Kptfile` to run the function:
 
 ```yaml
 apiVersion: kpt.dev/v1alpha2
@@ -80,7 +80,7 @@ You can find:
 - what constraint does it violate
 - where does the resource live and its index in the file
 
-To pass validation, let's replace the key `private_key` in the ConfigMap in
+To pass validation, let's replace the key `private_key` in the `ConfigMap` in
 `resources.yaml` with something else e.g. `public_key`.
 Rerun the command. It will no longer have the warning.
 

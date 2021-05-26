@@ -9,7 +9,7 @@ declarative configuration.
 
 Get this example and try it out by running the following commands:
 
-```sh
+```shell
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/analyze-istio .
 kpt fn run analyze-istio
 ```
@@ -18,7 +18,7 @@ kpt fn run analyze-istio
 
 This should give the following output:
 
-```sh
+```shell
 [ERROR] Schema validation error: gateway must have at least one server in object 'networking.istio.io/v1alpha3/Gateway//httpbin-gateway' in file example-config.yaml
 error: exit status 1
 ```

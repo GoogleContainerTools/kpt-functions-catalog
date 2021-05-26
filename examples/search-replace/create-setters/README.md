@@ -25,19 +25,19 @@ spec:
 
 Get the config example:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/create-setters .
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/create-setters .
 ```
 
 Suppose you want to expose the values of `image` and `tag` as parameters.
 You can create [setters] by invoking `search-replace` function with following arguments:
 
-```sh
-kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=spec.replicas' 'put-comment=kpt-set: ${replicas}'
+```shell
+$ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=spec.replicas' 'put-comment=kpt-set: ${replicas}'
 ```
 
-```sh
-kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=spec.**.image' 'put-comment=kpt-set: gcr.io/${image}:${tag}'
+```shell
+$ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=spec.**.image' 'put-comment=kpt-set: gcr.io/${image}:${tag}'
 ```
 
 ### Expected result
@@ -61,7 +61,7 @@ spec:
 Next, you can try to run the `apply-setters` function to use the [setters] that
 you just created. For example:
 ```shell
-kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- replicas=3 image=nginx tag=1.14.2
+$ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- replicas=3 image=nginx tag=1.14.2
 ```
 
 You should be able to see the values got updated by the [setters].

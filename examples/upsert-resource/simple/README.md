@@ -1,7 +1,8 @@
 # upsert-resource: Simple Example
 
 In this example, we will see how `upsert-resource` function replaces the
-matching resource(identified by GKNN) in the package with the input resource.
+matching resource (identified by GKNN (Group, Kind, Namespace and Name)) in the
+package with the input resource.
 
 Let's start with the list of resources in a package:
 
@@ -62,9 +63,9 @@ spec:
 
 Get the config example and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource/simple .
-kpt fn render simple
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource/simple .
+$ kpt fn render simple
 ```
 
 ### Expected result

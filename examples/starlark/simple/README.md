@@ -43,9 +43,9 @@ to `prod` for all resources.
 
 Get the config example and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple .
-kpt fn render simple
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple .
+$ kpt fn render simple
 ```
 
 ### Expected result

@@ -7,3 +7,4 @@ pipeline:
     - image: gcr.io/kpt-fn/kubeval:unstable
       configMap:
         strict: 'true'
+        skip_kinds: MyCustom

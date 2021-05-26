@@ -20,7 +20,7 @@ pipeline:
         namespace: example-ns
 ```
 
-The function configuration is provided using a ConfigMap. We set only one
+The function configuration is provided using a `ConfigMap`. We set only one
 key-value pair:
 - `namespace: example-ns`: The desired namespace.
 
@@ -28,9 +28,9 @@ key-value pair:
 
 Get the config example and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/simple .
-kpt fn render simple
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/simple .
+$ kpt fn render simple
 ```
 
 ### Expected result

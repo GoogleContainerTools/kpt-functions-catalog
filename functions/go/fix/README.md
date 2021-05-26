@@ -84,7 +84,7 @@ openAPI:
 
 Invoke `fix` function on the package:
 
-```sh
+```shell
 $ kpt fn eval --image gcr.io/kpt-fn/fix:unstable --include-meta-resources
 ```
 

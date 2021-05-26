@@ -20,15 +20,15 @@ pipeline:
         fruit: apple
 ```
 
-The desired labels are provided as key-value pairs through ConfigMap.
+The desired labels are provided as key-value pairs through `ConfigMap`.
 
 ### Function invocation
 
 Get the example config and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels/simple .
-kpt fn render simple
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels/simple .
+$ kpt fn render simple
 ```
 
 ### Expected result

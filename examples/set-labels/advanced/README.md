@@ -44,9 +44,9 @@ added to field `.spec.selector.labels` as well. We specify it in field
 
 Get the example config and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels/advanced .
-kpt fn render advanced
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels/advanced .
+$ kpt fn render advanced
 ```
 
 ### Expected result

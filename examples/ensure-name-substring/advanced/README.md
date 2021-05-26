@@ -41,9 +41,9 @@ The function will not only update field `.metadata.name` but also field
 
 Get the config example and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/advanced .
-kpt fn render advanced
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/advanced .
+$ kpt fn render advanced
 ```
 
 ### Expected result

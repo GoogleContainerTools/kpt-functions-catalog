@@ -5,7 +5,7 @@
 This example demonstrates how to declaratively run the [`ensure-name-substring`]
 function to prepend prefix in the resource names.
 
-We use the following Kptfile to run the function.
+We use the following `Kptfile` to run the function.
 
 ```yaml
 apiVersion: kpt.dev/v1alpha2
@@ -25,9 +25,9 @@ We are going to prepend prefix `prod-` to resource names.
 
 Get the config example and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/prefix .
-kpt fn render prefix
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/prefix .
+$ kpt fn render prefix
 ```
 
 ### Expected result

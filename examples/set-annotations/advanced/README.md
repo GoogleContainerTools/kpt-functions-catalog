@@ -44,9 +44,9 @@ specify it in field `fieldSpecs`.
 
 Get the example config and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations/advanced .
-kpt fn render advanced
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations/advanced .
+$ kpt fn render advanced
 ```
 
 ### Expected result

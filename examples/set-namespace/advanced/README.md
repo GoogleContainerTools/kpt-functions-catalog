@@ -34,7 +34,7 @@ fieldSpecs:
     create: true
 ```
 
-`set-namespace` function not only support ConfigMap but also a CRD as the
+`set-namespace` function not only support `ConfigMap` but also a CRD as the
 function configuration. We embed the CRD in the `Kptfile` in this example.
 The desired namespace is provided using `.namespace` field in the function
 configuration.
@@ -47,9 +47,9 @@ Suppose we have a CRD with group `dev.example.com`, version `v1` and kind
 
 Get the example config and try it out by running the following commands:
 
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/advanced .
-kpt fn render advanced
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/advanced .
+$ kpt fn render advanced
 ```
 
 ### Expected result
