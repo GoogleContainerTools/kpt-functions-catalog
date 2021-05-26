@@ -19,6 +19,7 @@ on:
       - "functions/**"
       - "examples/**"
       - "site/**"
+      - "scripts/generate_catalog/**"
 jobs:
   build:
     runs-on: ubuntu-latest
