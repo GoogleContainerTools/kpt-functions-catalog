@@ -132,7 +132,12 @@ func getFunctions(branches []string, source string, dest string) []function {
 		relativeFuncPath, err := getRelativeFunctionPath(source, funcName)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
-			os.Exit(1)
+			continue
+		}
+
+		// Skip contributed functions.
+		if strings.Contains(relativeFuncPath, "contrib/") {
+			continue
 		}
 
 		// Functions with the hidden field enabled should not be processed.
