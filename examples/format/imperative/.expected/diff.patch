@@ -1,37 +1,40 @@
 diff --git a/resources.yaml b/resources.yaml
-index 968a0f4..a33d07a 100644
+index 2ce8de6..6c12c43 100644
 --- a/resources.yaml
 +++ b/resources.yaml
-@@ -1,22 +1,22 @@
+@@ -2,24 +2,24 @@
  apiVersion: apps/v1
  kind: Deployment
  metadata:
 -  labels:
 -    foo: bar
--    env: dev
+-    env: dev # must be one of prod, staging and dev
    name: my-nginx
+   # namespace for team foo
    namespace: my-space
 +  labels:
-+    env: dev
++    env: dev # must be one of prod, staging and dev
 +    foo: bar
  spec:
++  # The desired replicas
 +  replicas: 3
    selector:
 -    matchLabels:
 -      app: nginx
      spec:
        containers:
--      - image: nginx:1.14.2
+-      - image: nginx:1.14.2 # version should be >= 1.14.2
 -        name: nginx
 -        ports:
 -        - containerPort: 80
+-  # The desired replicas
 -  replicas: 3
 +        - name: nginx
-+          image: nginx:1.14.2
++          image: nginx:1.14.2 # version should be >= 1.14.2
 +          ports:
 +            - containerPort: 80
 +    matchLabels:
 +      app: nginx
-   template:
+   template: # pod template
      metadata:
        labels:

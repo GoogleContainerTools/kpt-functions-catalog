@@ -1,0 +1,20 @@
+diff --git a/resources.yaml b/resources.yaml
+index 4a2f098..5d6b87a 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -4,7 +4,7 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: my-cm
+-  namespace: my-ns # comment 3
++  namespace: prod # comment 3
+ data:
+   # comment 4
+   some-key: some-value
+@@ -14,5 +14,6 @@ apiVersion: foo.com/v1
+ kind: Bar
+ metadata:
+   name: my-bar
++  namespace: prod
+ spec:
+   featureA: true # comment 6

@@ -1,0 +1,24 @@
+diff --git a/resources.yaml b/resources.yaml
+index 0bf78e1..e14316d 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -5,7 +5,8 @@ kind: ConfigMap
+ metadata: # comment 4
+   name: the-map
+   labels: # comment 5
+-    color: red # comment 6
++    color: orange # comment 6
++    fruit: apple
+ data:
+   some-key: some-value
+ ---
+@@ -15,6 +16,9 @@ kind: MyResource
+ metadata:
+   name: the-service
+   namespace: the-namespace
++  labels:
++    color: orange
++    fruit: apple
+ spec: # comment 8
+   selector:
+     labels:

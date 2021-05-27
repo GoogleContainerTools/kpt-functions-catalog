@@ -1,0 +1,21 @@
+diff --git a/resources.yaml b/resources.yaml
+index bc3856e..41a8456 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -5,7 +5,8 @@ kind: ConfigMap
+ metadata: # comment 3
+   name: the-map
+   annotations:
+-    color: red # comment 4
++    color: orange # comment 4
++    fruit: apple
+ # comment 5
+ data:
+   some-key: some-value
+@@ -15,3 +16,6 @@ apiVersion: v1
+ kind: Namespace
+ metadata:
+   name: ns
++  annotations:
++    color: orange
++    fruit: apple

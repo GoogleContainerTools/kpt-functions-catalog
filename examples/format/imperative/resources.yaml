@@ -1,10 +1,12 @@
+# This is a Deployment for app foo
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     foo: bar
-    env: dev
+    env: dev # must be one of prod, staging and dev
   name: my-nginx
+  # namespace for team foo
   namespace: my-space
 spec:
   selector:
@@ -12,12 +14,13 @@ spec:
       app: nginx
     spec:
       containers:
-      - image: nginx:1.14.2
+      - image: nginx:1.14.2 # version should be >= 1.14.2
         name: nginx
         ports:
         - containerPort: 80
+  # The desired replicas
   replicas: 3
-  template:
+  template: # pod template
     metadata:
       labels:
         app: nginx

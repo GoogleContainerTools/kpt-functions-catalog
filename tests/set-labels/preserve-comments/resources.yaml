@@ -1,0 +1,21 @@
+# comment 1
+# comment 2
+apiVersion: v1
+kind: ConfigMap
+metadata: # comment 4
+  name: the-map
+  labels: # comment 5
+    color: red # comment 6
+data:
+  some-key: some-value
+---
+# comment 7
+apiVersion: dev.example.com/v1
+kind: MyResource
+metadata:
+  name: the-service
+  namespace: the-namespace
+spec: # comment 8
+  selector:
+    labels:
+      foo: bar

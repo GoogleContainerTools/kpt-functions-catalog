@@ -1,0 +1,18 @@
+# comment 1
+# comment 2
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-cm
+  namespace: my-ns # comment 3
+data:
+  # comment 4
+  some-key: some-value
+---
+# comment 5
+apiVersion: foo.com/v1
+kind: Bar
+metadata:
+  name: my-bar
+spec:
+  featureA: true # comment 6
