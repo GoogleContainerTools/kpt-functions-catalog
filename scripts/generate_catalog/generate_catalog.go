@@ -58,10 +58,6 @@ func main() {
 	}
 
 	functions := getFunctions(branches, source, dest)
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 	err = writeFunctionIndex(functions, source, dest)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -77,10 +73,7 @@ func main() {
 
 type function struct {
 	FunctionName      string
-<<<<<<< HEAD
-=======
 	ImagePath         string
->>>>>>> master
 	VersionToExamples map[string]map[string]example
 	LatestVersion     string
 	Path              string
@@ -107,10 +100,6 @@ var (
 	// Match start of a version such as v1.9.1
 	branchSemverPrefix = regexp.MustCompile(`[-\w]*\/(v\d*\.\d*)`)
 	functionDirPrefix  = regexp.MustCompile(`.+/functions/`)
-<<<<<<< HEAD
-	exampleDirPrefix   = regexp.MustCompile(`.+/examples/`)
-=======
->>>>>>> master
 )
 
 func getBranches() ([]string, error) {
@@ -143,52 +132,33 @@ func getFunctions(branches []string, source string, dest string) []function {
 		relativeFuncPath, err := getRelativeFunctionPath(source, funcName)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
-<<<<<<< HEAD
-			os.Exit(1)
-=======
 			continue
 		}
 
 		// Skip contributed functions.
 		if strings.Contains(relativeFuncPath, "contrib/") {
 			continue
->>>>>>> master
 		}
 
 		// Functions with the hidden field enabled should not be processed.
 		metadataPath := strings.TrimSpace(fmt.Sprintf("%v:%v", b, filepath.Join(relativeFuncPath, "metadata.yaml")))
 		md, err := getMetadata(metadataPath)
 		if err != nil {
-<<<<<<< HEAD
-			fmt.Fprintf(os.Stderr, "%v\n", err)
-=======
 			fmt.Fprintf(os.Stderr, "Error getting metadata for %q in %q: %v\n", funcName, b, err)
->>>>>>> master
 			os.Exit(1)
 		}
 		if md.Hidden {
 			continue
 		}
-<<<<<<< HEAD
-
-		err = copyExamples(b, funcName, funcDest, versionDest)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
-=======
 		err = copyExamples(b, funcName, funcDest, versionDest)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error getting examples for %q in %q: %v\n", funcName, b, err)
->>>>>>> master
 			os.Exit(1)
 		}
 
 		err = copyReadme(b, funcName, relativeFuncPath, versionDest)
 		if err != nil {
-<<<<<<< HEAD
-			fmt.Fprintf(os.Stderr, "%v\n", err)
-=======
 			fmt.Fprintf(os.Stderr, "Error getting README for %q in %q: %v\n", funcName, b, err)
->>>>>>> master
 			os.Exit(1)
 		}
 
@@ -221,11 +191,7 @@ func copyExamples(b string, funcName string, funcDest string, versionDest string
 	}
 
 	// Copy examples for the function's version to a temporary directory.
-<<<<<<< HEAD
-	tempDir, err := os.MkdirTemp("", "examples")
-=======
 	tempDir, err := ioutil.TempDir("", "examples")
->>>>>>> master
 	if err != nil {
 		return err
 	}
@@ -246,22 +212,14 @@ func copyExamples(b string, funcName string, funcDest string, versionDest string
 
 func copyReadme(b string, funcName string, relativeFuncPath string, versionDest string) error {
 	// Copy README for the function's version to the example directory.
-<<<<<<< HEAD
-	tempDir, err := os.MkdirTemp("", "functions")
-=======
 	tempDir, err := ioutil.TempDir("", "functions")
->>>>>>> master
 	if err != nil {
 		return err
 	}
 	cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", filepath.Join(relativeFuncPath, "README.md"))
 	err = cmd.Run()
 	if err != nil {
-<<<<<<< HEAD
-		return err
-=======
 		return fmt.Errorf("Error running %v: %v", cmd, err)
->>>>>>> master
 	}
 
 	// Find the README in the example directory.
@@ -321,26 +279,15 @@ func parseMetadata(f function, md metadata, version string, versionDest string) 
 	f.LatestVersion = version
 	f.Path = versionDest
 	f.Description = md.Description
-<<<<<<< HEAD
-	sort.Sort(sort.StringSlice(md.Tags))
-	f.Tags = strings.Join(md.Tags, ",")
-=======
 	sort.Strings(md.Tags)
 	f.Tags = strings.Join(md.Tags, ", ")
 	f.ImagePath = md.Image
->>>>>>> master
 
 	return f
 }
 
 func getRelativeFunctionPath(source string, funcName string) (string, error) {
 	// Find the directory for the function's source.
-<<<<<<< HEAD
-	m, err := filepath.Glob(filepath.Join(source, "functions", "*", funcName))
-	if err != nil {
-		return "", err
-	}
-=======
 	sourcePattern := filepath.Join(source, "functions", "*", funcName)
 	m, err := filepath.Glob(sourcePattern)
 	if err != nil {
@@ -349,7 +296,6 @@ func getRelativeFunctionPath(source string, funcName string) (string, error) {
 	if m == nil {
 		return "", fmt.Errorf("Could not find a function with the following pattern: %v", sourcePattern)
 	}
->>>>>>> master
 
 	return functionDirPrefix.ReplaceAllString(m[0], "functions/"), nil
 }
@@ -357,11 +303,7 @@ func getRelativeFunctionPath(source string, funcName string) (string, error) {
 func writeFunctionIndex(functions []function, source string, dest string) error {
 	out := []string{"# Functions Catalog", "", "| Name | Description | Tags |", "| ---- | ----------- | ---- |"}
 	for _, f := range functions {
-<<<<<<< HEAD
-		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.FunctionName, strings.Replace(f.Path, filepath.Join(source, "examples"), "", 1), f.Description, f.Tags)
-=======
 		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.ImagePath, strings.Replace(f.Path, filepath.Join(source, "site"), "", 1), f.Description, f.Tags)
->>>>>>> master
 		out = append(out, functionEntry)
 	}
 
@@ -379,11 +321,7 @@ func writeExampleIndex(functions []function, source string, dest string) error {
 			exampleToPaths := make(map[string]example)
 			for exName, ex := range examples {
 				e := ex
-<<<<<<< HEAD
-				e.LocalExamplePath = strings.Replace(ex.LocalExamplePath, filepath.Join(source, "examples"), "", 1)
-=======
 				e.LocalExamplePath = strings.Replace(ex.LocalExamplePath, filepath.Join(source, "site"), "", 1)
->>>>>>> master
 				exampleToPaths[exName] = e
 			}
 			vToE[v] = exampleToPaths

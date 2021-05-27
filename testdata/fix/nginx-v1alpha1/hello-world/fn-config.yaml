@@ -5,11 +5,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-<<<<<<< HEAD:examples/set-labels/simple/fn-config.yaml
-        image: gcr.io/kpt-fn/set-labels:v0.1
-=======
         image: gcr.io/kpt-fn/set-annotations:v0.1
->>>>>>> master:testdata/fix/nginx-v1alpha1/hello-world/fn-config.yaml
     config.kubernetes.io/local-config: "true"
 data:
   anno1: foo

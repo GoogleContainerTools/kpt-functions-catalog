@@ -55,11 +55,6 @@ push: ## Push images to registry. WARN: This operation should only be done in CI
 	cd functions/contrib/ts && $(MAKE) push
 
 site-generate: ## Collect function branches and generate a catalog of their examples and documentation using kpt next.
-<<<<<<< HEAD
-	rm -rf ./examples/*/
-	# GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt@next
-	(cd scripts/generate_catalog/ && go run . ../.. ../../examples)
-=======
 	rm -rf ./site/*/
 	# GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt@next
 	(cd scripts/generate_catalog/ && go run . ../.. ../../site)
@@ -71,4 +66,3 @@ site-run: ## Run the site locally.
 site-check: ## Test site for broken catalog links.
 	make site-run
 	./scripts/check-site.sh
->>>>>>> master
