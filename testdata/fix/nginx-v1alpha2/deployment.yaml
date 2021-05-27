@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+  namespace: some-space # kpt-set: ${namespace}
+  annotations:
+    image-identifier: deployment-nginx:1.14.1 # kpt-set: deployment-${image}:${tag}
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: nginx # kpt-set: ${image}
+          image: nginx:1.14.1 # kpt-set: ${image}:${tag}
+          ports:
+            - containerPort: 80
+    foo:
+      env: # kpt-set: ${list}
+        - dev
+        - stage
