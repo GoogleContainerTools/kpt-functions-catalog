@@ -1,13 +1,15 @@
-# enforce-gatekeeper: Warning Only
+# gatekeeper: Invalid ConfigMap
 
 ### Overview
 
-This example demonstrates how to declaratively run the [enforce-gatekeeper]
-function to validate resources using gatekeeper constraints. The violations are
-configured to be warnings instead of errors.
+This example demonstrates how to declaratively run the [gatekeeper]
+function to validate resources using gatekeeper constraints.
 
-Here's an example `Kptfile` to run the function:
+There are 3 resources: a `ConstraintTemplate`, a `K8sBannedConfigMapKeysV1` and
+a `ConfigMap`.
+The constraint disallows using `private_key` as a key in the `ConfigMap`.
 
+Here's an example Kptfile to run the function:
 ```yaml
 apiVersion: kpt.dev/v1alpha2
 kind: Kptfile
@@ -15,20 +17,7 @@ metadata:
   name: example
 pipeline:
   validators:
-    - image: gcr.io/kpt-fn/enforce-gatekeeper:unstable
-```
-
-In the constraint, we use `enforcementAction: warn` instead of
-`enforcementAction: deny`.
-
-```yaml
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sBannedConfigMapKeysV1
-metadata:
-  name: no-secrets-in-configmap
-spec:
-  enforcementAction: warn
-  ...
+    - image: gcr.io/kpt-fn/gatekeeper:unstable
 ```
 
 ### Function invocation
@@ -36,33 +25,36 @@ spec:
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enforce-gatekeeper/warning-only .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/invalid-configmap .
 ```
 
 Run the function:
 
 ```shell
-$ kpt fn render warning-only --results-dir=/tmp
+$ kpt fn render invalid-configmap --results-dir=/tmp
 ```
 
 ### Expected result
 
 Let's take a look at the structured results in `/tmp/results.yaml`:
 
-```shell
+```yaml
 apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
   name: fnresults
-exitCode: 0
+exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/enforce-gatekeeper:unstable
-    exitCode: 0
+  - image: gcr.io/kpt-fn/gatekeeper:unstable
+    stderr: |-
+      The following banned keys are being used in the ConfigMap: {"private_key"}
+      violatedConstraint: no-secrets-in-configmap
+    exitCode: 1
     results:
       - message: |-
           The following banned keys are being used in the ConfigMap: {"private_key"}
           violatedConstraint: no-secrets-in-configmap
-        severity: warning
+        severity: error
         resourceRef:
           apiVersion: v1
           kind: ConfigMap
@@ -82,6 +74,6 @@ You can find:
 
 To pass validation, let's replace the key `private_key` in the `ConfigMap` in
 `resources.yaml` with something else e.g. `public_key`.
-Rerun the command. It will no longer have the warning.
+Rerun the command. It will succeed.
 
-[enforce-gatekeeper]: https://catalog.kpt.dev/enforce-gatekeeper/v0.1/
+[gatekeeper]: https://catalog.kpt.dev/gatekeeper/v0.1/

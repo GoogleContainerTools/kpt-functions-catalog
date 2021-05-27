@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/enforce-gatekeeper
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gatekeeper
 
 go 1.15
 

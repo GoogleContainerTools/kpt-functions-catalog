@@ -20,10 +20,10 @@ GOBIN := $(shell go env GOPATH)/bin
 # Edit this list to contain all go functions
 FUNCTIONS := \
 	apply-setters \
-	enforce-gatekeeper \
 	ensure-name-substring \
 	fix \
 	format \
+	gatekeeper \
 	search-replace \
 	set-annotations \
 	set-labels \
