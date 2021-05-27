@@ -1,0 +1,44 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: helloworld-set
+upstream:
+  type: git
+  git:
+    commit: 9b9a299effacf0f9b0619585916022a7be28544b
+    repo: https://github.com/GoogleContainerTools/kpt
+    directory: /package-examples/helloworld-set
+    ref: master
+packageMetadata:
+  shortDescription: kpt example
+openAPI:
+  definitions:
+    io.k8s.cli.setters.http-port:
+      description: helloworld port
+      x-k8s-cli:
+        setter:
+          name: http-port
+          setBy: package-default
+          value: "80"
+    io.k8s.cli.setters.image-tag:
+      description: helloworld image tag
+      x-k8s-cli:
+        setter:
+          name: image-tag
+          setBy: package-default
+          value: v0.3.0
+    io.k8s.cli.setters.replicas:
+      description: helloworld replicas
+      x-k8s-cli:
+        setter:
+          name: replicas
+          setBy: package-default
+          value: "5"
+    io.k8s.cli.substitutions.image:
+      x-k8s-cli:
+        substitution:
+          name: image
+          pattern: gcr.io/kpt-dev/helloworld-gke:${image-tag}
+          values:
+          - marker: ${image-tag}
+            ref: '#/definitions/io.k8s.cli.setters.image-tag'

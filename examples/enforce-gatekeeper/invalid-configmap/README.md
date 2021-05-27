@@ -1,62 +1,69 @@
-# enforce-gatekeeper: invalid configmap
+# enforce-gatekeeper: Invalid ConfigMap
 
-## Overview
+### Overview
 
-This example demonstrates how to validate ConfigMaps using a constraint.
+This example demonstrates how to declaratively run the [enforce-gatekeeper]
+function to validate resources using gatekeeper constraints.
 
-There are 3 resources: a ConstraintTemplate, a K8sBannedConfigMapKeysV1 and a
-ConfigMap.
-The constraint disallows using `private_key` as a key in the ConfigMap.
+There are 3 resources: a `ConstraintTemplate`, a `K8sBannedConfigMapKeysV1` and
+a `ConfigMap`.
+The constraint disallows using `private_key` as a key in the `ConfigMap`.
 
-## Function invocation
+Here's an example Kptfile to run the function:
+```yaml
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
+metadata:
+  name: example
+pipeline:
+  validators:
+    - image: gcr.io/kpt-fn/enforce-gatekeeper:unstable
+```
+
+### Function invocation
 
 Get the package:
 
-<!-- @getPkg @test -->
 ```shell
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enforce-gatekeeper/invalid-configmap .
-```
-
-Create a directory for storing the structured output.
-
-```shell
-$ cd invalid-configmap
-$ mkdir results
 ```
 
 Run the function:
 
 ```shell
-$ kpt fn run --results-dir=results .
+$ kpt fn render invalid-configmap --results-dir=/tmp
 ```
 
-## Expected result
+### Expected result
 
-You should see the following output:
+Let's take a look at the structured results in `/tmp/results.yaml`:
 
-```
-The following banned keys are being used in the ConfigMap: {"private_key"}
-violatedConstraint: no-secrets-in-configmaperror: exit status 1
-```
-
-Let's take a look at the structured output:
-
-```shell
-$ cat results/results-0.yaml 
+```yaml
+apiVersion: kpt.dev/v1alpha2
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 1
 items:
-- message: |-
-    The following banned keys are being used in the ConfigMap: {"private_key"}
-    violatedConstraint: no-secrets-in-configmap
-  severity: error
-  resourceRef:
-    apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: super-secret
-      namespace: default
-  file:
-    path: resources.yaml
-    index: 2
+  - image: gcr.io/kpt-fn/enforce-gatekeeper:unstable
+    stderr: |-
+      The following banned keys are being used in the ConfigMap: {"private_key"}
+      violatedConstraint: no-secrets-in-configmap
+    exitCode: 1
+    results:
+      - message: |-
+          The following banned keys are being used in the ConfigMap: {"private_key"}
+          violatedConstraint: no-secrets-in-configmap
+        severity: error
+        resourceRef:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+              name: super-secret
+              namespace: default
+        file:
+          path: resources.yaml
+          index: 2
 ```
 
 You can find:
@@ -65,11 +72,8 @@ You can find:
 - what constraint does it violate
 - where does the resource live and its index in the file
 
-To pass validation, let's replace the key `private_key` in the ConfigMap in
+To pass validation, let's replace the key `private_key` in the `ConfigMap` in
 `resources.yaml` with something else e.g. `public_key`.
-Rerun the command. It will succeed (no output).
+Rerun the command. It will succeed.
 
-## Function Reference Doc
-
-TODO: replace the following with the link to the reference doc when our site is live.
-https://github.com/GoogleContainerTools/kpt-functions-catalog/blob/master/functions/go/enforce-gatekeeper/README.md
+[enforce-gatekeeper]: https://catalog.kpt.dev/enforce-gatekeeper/v0.1/
