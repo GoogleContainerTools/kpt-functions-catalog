@@ -31,7 +31,13 @@ directories_to_scan = [os.path.join(functions_directory, 'go'), os.path.join(fun
 examples_directories_to_skip = ['_template', 'contrib']
 required_fields = ['image', 'description', 'tags', 'sourceURL', 'examplePackageURLs', 'emails', 'license']
 kpt_team_email = 'kpt-team@google.com'
+<<<<<<< HEAD
 
+=======
+disallowed_kpt_commands = ['kpt fn run', 'kpt cfg']
+gcr_prefix = 'gcr.io/kpt-fn/'
+git_url_prefix = 'https://github.com/GoogleContainerTools/kpt-functions-catalog.git'
+>>>>>>> master
 
 def validate_master_branch():
     fn_name_to_examples = validate_examples_dir_for_master_branch()
@@ -49,7 +55,11 @@ def validate_examples_dir_for_master_branch():
             example_list = []
             for example_name in os.listdir(dir_name):
                 example_list.append(example_name)
+<<<<<<< HEAD
                 validate_example_md(os.path.join(dir_name, example_name), 'master')
+=======
+                validate_example_md(fn_name, dir_name, example_name, 'master')
+>>>>>>> master
             fn_name_to_examples[fn_name] = example_list
     return fn_name_to_examples
 
@@ -89,7 +99,11 @@ def validate_examples_dir_for_release_branch(branch_name, fn_name):
     dir_name = os.path.join(examples_directory, fn_name)
     for example_name in os.listdir(dir_name):
         examples.append(example_name)
+<<<<<<< HEAD
         validate_example_md(os.path.join(dir_name, example_name), branch_name)
+=======
+        validate_example_md(fn_name, dir_name, example_name, branch_name)
+>>>>>>> master
     return examples
 
 
@@ -106,14 +120,32 @@ def validate_functions_dir_for_release_branch(examples, branch_name, fn_name):
     validate_metadata(meta, branch_name, path_name, fn_name, examples)
 
 
+<<<<<<< HEAD
 def validate_example_md(example_path, branch):
     md_file_path = os.path.join(example_path, 'README.md')
     process = subprocess.Popen(['mdrip', '--label', 'test', md_file_path],
+=======
+def validate_example_md(fn_name, dir_name, example_name, branch):
+    example_path = os.path.join(dir_name, example_name)
+    md_file_path = os.path.join(example_path, 'README.md')
+
+    with open(md_file_path) as f:
+        first_line = f.readline().strip()
+        if not first_line.startswith('# '):
+            raise Exception(f'title must be in the 1st line and starts with one "#"')
+        if fn_name not in first_line:
+            raise Exception(f'title "{first_line}" must be in format "<fn-name>: Example Name" and contains "{fn_name}"')
+        if example_name.replace('-', ' ') not in first_line.lower():
+            raise Exception(f'title "{first_line}" must be in format "<fn-name>: Example Name" and contains "{example_name.replace("-", " ")}"')
+
+    process = subprocess.Popen(['mdrip', md_file_path],
+>>>>>>> master
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if len(stderr) > 0:
         print(f'stderr of mdrip: {str(stderr)}')
+<<<<<<< HEAD
     found_pkg_url = False
     for line in str(stdout).splitlines():
         if line.startswith('#') or line.startswith('echo'):
@@ -122,13 +154,55 @@ def validate_example_md(example_path, branch):
             git_url_prefix = 'https://github.com/GoogleContainerTools/kpt-functions-catalog.git'
             if item.startswith(git_url_prefix):
                 found_pkg_url = True
+=======
+
+    process = subprocess.Popen(['mdrip', '--label', 'skip', md_file_path],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout2, stderr2 = process.communicate()
+    if len(stderr2) > 0:
+        print(f'stderr of mdrip: {str(stderr2)}')
+
+    tag = branch
+    if branch == 'master':
+        tag = 'unstable'
+    else:
+        splits = branch.split('/')
+        if len(splits) != 2:
+            raise Exception(f'the release branch {branch} must has format <fn-name>/vX.Y')
+        tag = splits[1]
+
+    lines = stdout.decode("utf-8").splitlines()
+    lines2 = stdout2.decode("utf-8").splitlines()
+
+    for line in lines:
+        if line.startswith('#') or line.startswith('echo'):
+            continue
+        for disallowed in disallowed_kpt_commands:
+            if disallowed in line:
+                raise Exception(f'command {disallowed} is not allowed in the desired package url in {md_file_path}')
+
+        if line in lines2:
+            continue
+
+        for item in line.split():
+            if item.startswith(git_url_prefix):
+>>>>>>> master
                 desired_pkg_url = f'{git_url_prefix}/{example_path}'
                 if branch != 'master':
                     desired_pkg_url = desired_pkg_url + f'@{branch}'
                 if item != desired_pkg_url:
                     raise Exception(f'the desired package url in {md_file_path} is {desired_pkg_url}, but found {item}')
+<<<<<<< HEAD
     if not found_pkg_url:
         raise Exception(f'at least one fenced code block should be marked with "<!-- @yourComment @test -->" in {md_file_path}')
+=======
+
+            if gcr_prefix in item:
+                desired_image_name = f'{gcr_prefix}{fn_name}:{tag}'
+                if desired_image_name not in item:
+                    raise Exception(f'expect "{line}" to contain "{desired_image_name}" in {md_file_path}')
+>>>>>>> master
 
 
 def validate_metadata(metadata, branch, path, fn, examples_list):

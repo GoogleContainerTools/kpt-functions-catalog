@@ -2,10 +2,6 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
   name: set-namespace-to-prod
-  annotations:
-    config.k8s.io/function: |
-      container:
-        image: gcr.io/kpt-fn/starlark:unstable
 source: |
   # set the namespace on all resources
   def setnamespace(resources, namespace):

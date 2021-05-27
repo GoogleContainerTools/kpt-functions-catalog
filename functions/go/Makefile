@@ -22,11 +22,14 @@ FUNCTIONS := \
 	apply-setters \
 	enforce-gatekeeper \
 	ensure-name-substring \
+	fix \
+	format \
 	search-replace \
 	set-annotations \
 	set-labels \
 	set-namespace \
-	starlark
+	starlark \
+	upsert-resource
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))

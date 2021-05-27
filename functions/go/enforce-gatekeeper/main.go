@@ -72,9 +72,9 @@ func main() {
 		}
 		return nil
 	})
-	cmd.Short = generated.GatekeeperValidateShort
-	cmd.Long = generated.GatekeeperValidateLong
-	cmd.Example = generated.GatekeeperValidateExamples
+	cmd.Short = generated.EnforceGatekeeperShort
+	cmd.Long = generated.EnforceGatekeeperLong
+	cmd.Example = generated.EnforceGatekeeperExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

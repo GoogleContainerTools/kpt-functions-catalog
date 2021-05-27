@@ -10,5 +10,5 @@ kind: MyKind
 metadata:
   name: ns
 environments: # kpt-set: ${env}
-- dev
-- stage
+  - dev
+  - stage
