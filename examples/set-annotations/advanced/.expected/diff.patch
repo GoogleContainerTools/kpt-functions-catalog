@@ -1,0 +1,27 @@
+diff --git a/resources.yaml b/resources.yaml
+index bfeadb4..4821d69 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,6 +2,9 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: the-map
++  annotations:
++    color: orange
++    fruit: apple
+ data:
+   some-key: some-value
+ ---
+@@ -10,7 +13,12 @@ kind: MyResource
+ metadata:
+   name: the-service
+   namespace: the-namespace
++  annotations:
++    color: orange
++    fruit: apple
+ spec:
+   selector:
+     annotations:
++      color: orange
+       foo: bar
++      fruit: apple

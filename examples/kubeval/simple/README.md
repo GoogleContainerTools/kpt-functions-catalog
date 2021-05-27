@@ -1,32 +1,78 @@
-# Kubeval
+# kubeval: Simple Example
 
-The `kubeval` KRM config function validates Kubernetes resources using kubeval.
-Learn more on the [kubeval website].
+### Overview
 
-This example invokes the kubeval function against Kubernetes v1.18.0.
+This example demonstrates how to declaratively run [`kubeval`] function to
+validate KRM resources.
 
-## Function invocation
+The following is the `Kptfile` in this example: 
+
+```yaml
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
+metadata:
+  name: example
+pipeline:
+  validators:
+    - image: gcr.io/kpt-fn/kubeval:unstable
+      configMap:
+        strict: 'true'
+```
+
+The function configuration is provided using a `ConfigMap`. We set 2 key-value
+pairs:
+- `strict: 'true'`: We disallow unknown fields.
+- `skip_kinds: MyCustom`: We skip resources of kind `MyCustom`.
+
+### Function invocation
 
 Get this example and try it out by running the following commands:
 
-<!-- TODO: no --network. See: https://github.com/GoogleContainerTools/kpt/issues/1621 -->
-
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval .
-kpt fn run kubeval --network
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval/simple .
+$ kpt fn render simple --results-dir=/tmp
 ```
 
-## Expected Results
+### Expected Results
 
-This should give the following output:
+Let's take a look at the structured results in `/tmp/results.yaml`:
 
-```sh
-[ERROR] Invalid type. Expected: [integer,null], given: string in object 'v1/ReplicationController//bob' in file example-config.yaml in field spec.replicas
-error: exit status 1
+```yaml
+apiVersion: kpt.dev/v1alpha2
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 1
+items:
+  - image: gcr.io/kpt-fn/kubeval:unstable
+    exitCode: 1
+    results:
+      - message: Additional property templates is not allowed
+        severity: error
+        resourceRef:
+          apiVersion: v1
+          kind: ReplicationController
+          name: bob
+        field:
+          path: templates
+        file:
+          path: resources.yaml
+      - message: 'Invalid type. Expected: [integer,null], given: string'
+        severity: error
+        resourceRef:
+          apiVersion: v1
+          kind: ReplicationController
+          name: bob
+        field:
+          path: spec.replicas
+        file:
+          path: resources.yaml
 ```
 
-In the `example-config.yaml` file, replace the value of `spec.replicas`
-with an integer to pass validation and rerun the command. This will return
-success (no output).
+There are validation error in the `resources.yaml` file, to fix them:
+- replace the value of `spec.replicas` with an integer
+- change `templates` to `template`
 
-[kubeval website]: https://www.kubeval.com/
+Rerun the command, and it should succeed now.
+
+[`kubeval`]: https://catalog.kpt.dev/kubeval/v0.1/

@@ -1,0 +1,9 @@
+testType: eval
+image: gcr.io/kpt-fn-contrib/inflate-helm-chart:unstable
+network: true
+args:
+  name: nginx-test
+  chart: bitnami/nginx
+  chart-repo: bitnami
+  chart-repo-url: 'https://charts.bitnami.com/bitnami'
+  chart-version: 8.4.0

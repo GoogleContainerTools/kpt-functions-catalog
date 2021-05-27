@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: search-replace-fn-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/search-replace:v0.1
+data:
+  by-path: spec.replicas
+  put-comment: "kpt-set: ${replicas}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: search-replace-fn-config
+  annotations:
+    config.k8s.io/function: |
+      container:
+        image: gcr.io/kpt-fn/search-replace:v0.1
+data:
+  by-path: spec.**.image
+  put-comment: "kpt-set: gcr.io/${image}:${tag}"

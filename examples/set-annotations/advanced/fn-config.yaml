@@ -1,0 +1,13 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: SetAnnotationConfig
+metadata:
+  name: my-func-config
+annotations:
+  color: orange
+  fruit: apple
+fieldSpecs:
+  - kind: MyResource
+    create: true
+    group: dev.example.com
+    path: spec/selector/annotations
+    version: v1
