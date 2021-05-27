@@ -303,7 +303,7 @@ func getRelativeFunctionPath(source string, funcName string) (string, error) {
 func writeFunctionIndex(functions []function, source string, dest string) error {
 	out := []string{"# Functions Catalog", "", "| Name | Description | Tags |", "| ---- | ----------- | ---- |"}
 	for _, f := range functions {
-		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.ImagePath, strings.Replace(f.Path, filepath.Join(source, "site"), "", 1), f.Description, f.Tags)
+		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.FunctionName, strings.Replace(f.Path, filepath.Join(source, "site"), "", 1), f.Description, f.Tags)
 		out = append(out, functionEntry)
 	}
 
