@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: the-map
+  namespace: the-namespace
+data:
+  some-key: some-value
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: the-pod
+  namespace: the-namespace
+spec:
+  containers:
+    - name: test-container
+      image: k8s.gcr.io/busybox
+      command:
+        - /bin/sh
+        - -c
+        - env
+      env:
+        - name: SOME_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: the-map
+              key: some-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: the-service-prod
+  namespace: the-namespace
+spec:
+  ports:
+    - name: etcd-server-ssl
+      port: 2380
+    - name: etcd-client-ssl
+      port: 2379
+  clusterIP: None
+  publishNotReadyAddresses: true
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: the-namespace
