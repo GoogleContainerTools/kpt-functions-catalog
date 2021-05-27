@@ -64,13 +64,13 @@ data:
 
 Render the declared values by invoking:
 
-```sh
+```shell
 $ kpt fn run --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
-```sh
+```shell
 $ kpt fn run --image gcr.io/kpt-fn/apply-setters:unstable -- 'image=ubuntu' 'replicas=3'
 ```
 

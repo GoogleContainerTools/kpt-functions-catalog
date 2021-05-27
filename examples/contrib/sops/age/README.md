@@ -10,7 +10,7 @@ This example demonstrates invocation of `sops` for encryption the resouce called
 
 Get this example and try it out by running the following commands:
 
-```sh
+```shell
 # download this example
 kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/sops/age .
 
@@ -25,7 +25,7 @@ SOPS_IMPORT_AGE="$(cat age_keys.txt)" kpt fn run age
 
 Verify the updated configuration:
 
-```sh
+```shell
 kpt cfg cat age
 ```
 

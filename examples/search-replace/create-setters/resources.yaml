@@ -7,5 +7,5 @@ spec:
   template:
     spec:
       containers:
-      - name: nginx
-        image: 'gcr.io/nginx:1.14.2'
+        - name: nginx
+          image: 'gcr.io/nginx:1.14.2'

@@ -1,5 +1,7 @@
 # search-replace: Simple Example
 
+### Overview
+
 The `search-replace` function performs search and optionally replace fields
 across all resources.
 
@@ -18,7 +20,7 @@ metadata:
 Search matchers are provided with `by-` prefix. When multiple matchers are
 provided they are AND’ed together. `put-` matchers are mutually exclusive.
 
-We use the following ConfigMap to provide input matchers to the function.
+We use the following `ConfigMap` to provide input matchers to the function.
 
 ```yaml
 apiVersion: v1
@@ -45,16 +47,11 @@ metadata:
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/simple .
-kpt fn run simple
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/simple .
+$ kpt fn render simple
 ```
 
 ### Expected result
 
 Check the value of deployment `the-deloyment` is changed to `my-deloyment`.
-
-```sh
-$ kpt cfg cat simple/
-```

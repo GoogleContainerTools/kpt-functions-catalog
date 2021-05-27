@@ -2,16 +2,30 @@
 
 ### Overview
 
-In this example, we are going to demonstrate how to use the starlark function
-with an inline starlark script as function configuration.
+In this example, we are going to demonstrate how to declaratively run the
+[`starlark`] function with an inline starlark script as function configuration.
 
-We are going to use the following function configuration:
+We are going to use the following `Kptfile` and `fn-config.yaml` to configure
+the function:
 
+```yaml
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
+metadata:
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/starlark:unstable
+      configPath: fn-config.yaml
 ```
+
+```yaml
+# fn-config.yaml
 apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
-  ...
+  name: set-namespace-to-prod
+  annotations:
 source: |
   # set the namespace on all resources
   def setnamespace(resources, namespace):
@@ -29,16 +43,13 @@ to `prod` for all resources.
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple .
-kpt fn run simple
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple .
+$ kpt fn render simple
 ```
 
 ### Expected result
 
 Check the `.metadata.namespace` field has been set to `prod` for every resource.
 
-```sh
-kpt cfg cat simple
-```
+[`starlark`]: https://catalog.kpt.dev/starlark/v0.1/

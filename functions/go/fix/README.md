@@ -24,7 +24,7 @@ Here are the automated changes performed by `fix` function on `v1alpha1` kpt pac
 3. `dependencies` section will be removed from the Kptfile.
 4. Setters no longer follow the OpenAPI format. The setters and substitutions will be converted
    to simple setter patterns. `apply-setters` function is declared in the `pipeline` section.
-   Setters are configured using [configMap] option.
+   Setters are configured using [ConfigMap] option.
 5. Function annotation from function configs will be removed and corresponding
    function definitions will be [declared in pipeline] section of Kptfile. Reference
    to function config is added via [configPath] option.
@@ -84,7 +84,7 @@ openAPI:
 
 Invoke `fix` function on the package:
 
-```sh
+```shell
 $ kpt fn eval --image gcr.io/kpt-fn/fix:unstable --include-meta-resources
 ```
 
@@ -125,4 +125,4 @@ pipeline:
 [live migrate]: https://googlecontainertools.github.io/kpt/reference/live/alpha/
 [configpath]: https://kpt.dev/book/04-using-functions/01-declarative-function-execution?id=configpath
 [declared in pipeline]: https://kpt.dev/book/04-using-functions/01-declarative-function-execution?id=_41-declarative-function-execution
-[configmap]: https://kpt.dev/book/04-using-functions/01-declarative-function-execution?id=configmap
+[Configmap]: https://kpt.dev/book/04-using-functions/01-declarative-function-execution?id=configmap

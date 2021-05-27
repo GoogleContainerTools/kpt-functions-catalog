@@ -1,14 +1,29 @@
 # set-annotations: Advanced Example
 
-The `set-annotation` function adds annotations to KRM resources.
+### Overview
 
-We use the following `SetAnnotationConfig` to configure the function.
+This example demonstrates how to declaratively run [`set-annotations`] function
+to upsert annotations to the `.metadata.annotations` field on all resources.
+
+We use the following `Kptfile` and `fn-config.yaml` to configure the function.
 
 ```yaml
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
+metadata:
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/set-annotations:unstable
+      configPath: fn-config.yaml
+```
+
+```yaml
+# fn-config.yaml
 apiVersion: fn.kpt.dev/v1alpha1
 kind: SetAnnotationConfig
 metadata:
-  ...
+  name: my-func-config
 annotations:
   fruit: apple
   color: orange
@@ -29,10 +44,9 @@ specify it in field `fieldSpecs`.
 
 Get the example config and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations/advanced .
-kpt fn run advanced
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations/advanced .
+$ kpt fn render advanced
 ```
 
 ### Expected result
@@ -40,6 +54,4 @@ kpt fn run advanced
 Check the 2 annotations have been added to both the k8s built-in resources and
 the custom resources.
 
-```sh
-kpt cfg cat advanced
-```
+[`set-annotations`]: https://catalog.kpt.dev/set-annotations/v0.1/

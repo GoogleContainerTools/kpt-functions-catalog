@@ -21,18 +21,28 @@ spec:
           image: "gcr.io/nginx:1.14.2"
 ```
 
-Suppose you want to expose the values of `replicas`, `image` and `tag` as parameters.
+### Function invocation
+
+Get the config example:
+
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/create-setters .
+```
+
+Suppose you want to expose the values of `image` and `tag` as parameters.
 You can create [setters] by invoking `search-replace` function with following arguments:
 
-```sh
-kpt fn run --image gcr.io/kpt-fn/search-replace:v0.1 'by-path=spec.replicas' 'put-comment=kpt-set: ${replicas}'
+```shell
+$ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=spec.replicas' 'put-comment=kpt-set: ${replicas}'
 ```
 
-```sh
-kpt fn run --image gcr.io/kpt-fn/search-replace:v0.1 'by-path=spec.**.image' 'put-comment=kpt-set: gcr.io/${image}:${tag}'
+```shell
+$ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=spec.**.image' 'put-comment=kpt-set: gcr.io/${image}:${tag}'
 ```
 
-Transformed resource:
+### Expected result
+
+Verify that the setter comments are added as below:
 
 ```yaml
 apiVersion: apps/v1
@@ -48,44 +58,13 @@ spec:
           image: "gcr.io/nginx:1.14.2" # kpt-set: gcr.io/${image}:${tag}
 ```
 
-Create `apply-setters` function config file and manually add created [setters] information to it.
-This file can be used by package consumers to discover and pass new [setter] values.
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: apply-setters-fn-config
-  annotations:
-    config.k8s.io/function: |
-      container:
-        image: gcr.io/kpt-fn/apply-setters:v0.1
-data:
-  # you may add description as comments
-  replicas: 3
-  image: nginx
-  tag: 1.14.2
+Next, you can try to run the `apply-setters` function to use the [setters] that
+you just created. For example:
+```shell
+$ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- replicas=3 image=nginx tag=1.14.2
 ```
 
-### Function invocation
-
-Get the config example and try it out by running the following commands:
-
-<!-- @getAndRunPkg @test -->
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/create-setters .
-kpt fn run create-setters
-```
-
-### Expected result
-
-Verify that the setter comments are added as depicted in the transformed resource above.
-
-```sh
-$ kpt cfg cat create-setters
-```
-
-Make sure that you add setters info to `apply-setters` function config as described above.
+You should be able to see the values got updated by the [setters].
 
 [setter]: https://catalog.kpt.dev/apply-setters/v0.1/
 [setters]: https://catalog.kpt.dev/apply-setters/v0.1/

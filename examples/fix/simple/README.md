@@ -50,6 +50,7 @@ data:
   some-key: some-value
 ```
 
+<!-- @skip -->
 ```yaml
 apiVersion: kpt.dev/v1alpha2
 kind: Kptfile
@@ -59,7 +60,7 @@ info:
   description: describe this package
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:unstable
       configMap:
         name: the-map
 upstream:
@@ -83,10 +84,9 @@ The transformed package is compatible with kpt 1.0 binary.
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/fix/simple .
-kpt fn eval simple --image gcr.io/kpt-fn/fix:unstable --include-meta-resources
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/fix/simple .
+$ kpt fn eval simple --image gcr.io/kpt-fn/fix:unstable --include-meta-resources
 ```
 
 ### Expected result
