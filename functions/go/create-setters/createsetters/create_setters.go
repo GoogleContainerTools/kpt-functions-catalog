@@ -142,7 +142,6 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 			// don't do IsNilOrEmpty check cs empty sequences are allowed
 			return nil
 		}
-
 		// the aim of this method is to create-setter for sequence nodes
 		if node.Value.YNode().Kind != yaml.SequenceNode {
 			// return if it is not a sequence node

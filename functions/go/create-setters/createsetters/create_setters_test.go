@@ -19,7 +19,11 @@ func TestCreateSettersFilter(t *testing.T) {
 		errMsg            string
 	}{
 		{
+<<<<<<< HEAD
 			name: "set comment for array setter of flow style",
+=======
+			name: "apply array setter for flow style",
+>>>>>>> 4e488a0 (added comments)
 			config: `
 data:
   env: |
