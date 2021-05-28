@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Apply setter values on resource fields. Setters serve as parameters for template-free
+Create setter values on resource fields. Setters serve as parameters for template-free
 setting of field values.
 
 <!--mdtogo-->
@@ -45,9 +45,9 @@ Let's start with the input resource in a package
 apiVersion: v1
 kind: Deployment
 metadata:
-  name: nginx-deployment # kpt-set: ${image}-deployment
+  name: ubuntu-deployment 
 spec:
-  replicas: 1 # kpt-set: ${replicas}
+  replicas: 3 
 ```
 
 Discover the names of setters in the function config file and declare desired values.
@@ -89,7 +89,7 @@ spec:
 
 Array values can also be parameterized using setters. Since the values of configMap
 in pipeline definition must be of string type, the array values must be wrapped into
-string. However, the rendered values in the resources will be array type.
+string.
 
 Let's start with the input resource
 
@@ -98,7 +98,7 @@ apiVersion: v1
 kind: MyKind
 metadata:
   name: foo
-environments: # kpt-set: ${env}
+environments:
   - dev
   - stage
 ```
@@ -112,8 +112,8 @@ metadata:
   name: create-setters-fn-config
 data:
   env: |
-    - prod
     - dev
+    - stage
 ```
 
 Render the declared values by invoking:
@@ -130,12 +130,6 @@ kind: MyKind
 metadata:
   name: foo
 environments: # kpt-set: ${env}
-  - prod
   - dev
+  - stage
 ```
-
-<!--mdtogo-->
-
-#### Note:
-
-Refer to the `create-setters` example in `search-replace` function examples for creating setters.

@@ -19,7 +19,7 @@ func TestCreateSettersFilter(t *testing.T) {
 		errMsg            string
 	}{
 		{
-			name: "apply array setter",
+			name: "apply array setter for flow style",
 			config: `
 data:
   env: |
@@ -41,7 +41,7 @@ metadata:
 
 		},
 		{
-			name: "set non-empty values from empty values",
+			name: "set comment to Setters and ArraySetters",
 			input: `apiVersion: v1
 kind: Service
 metadata:
