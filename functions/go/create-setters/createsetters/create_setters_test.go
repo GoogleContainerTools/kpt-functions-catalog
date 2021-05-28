@@ -19,11 +19,7 @@ func TestCreateSettersFilter(t *testing.T) {
 		errMsg            string
 	}{
 		{
-<<<<<<< HEAD
 			name: "set comment for array setter of flow style",
-=======
-			name: "apply array setter for flow style",
->>>>>>> 4e488a0 (added comments)
 			config: `
 data:
   env: |
@@ -242,6 +238,79 @@ spec:
     - ubuntu
 `,
 		},
+
+		{
+			name: "scalar setter donot match",
+			config: `
+data:
+  name: ubuntu
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  env: [foo, bar]
+ `,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  env: [foo, bar]
+`,
+
+		},
+		{
+			name: "array setter with flow style donot match",
+			config: `
+data:
+  env: |
+    [foo, bar, pro]
+  name: nginx
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  env: [foo, bar]
+ `,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment # kpt-set: ${name}-deployment
+  env: [foo, bar]
+`,
+
+		},
+		{
+			name: "apply array setter with scalar error",
+			config: `
+data:
+  app: myService
+  ns: foo
+  images: |
+    - ubuntu
+    - linux
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images:
+    - nginx
+    - ubuntu
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images:
+    - nginx
+    - ubuntu
+`,
+		},
+		
 	}
 	for i := range tests {
 		test := tests[i]
