@@ -7,16 +7,36 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/create-setters/createsetters"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/create-setters/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+<<<<<<< HEAD
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
+=======
+>>>>>>> d517aba (create-setters: functionality)
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 //nolint
 func main() {
 	resourceList := &framework.ResourceList{}
+<<<<<<< HEAD
 	resourceList.FunctionConfig = &kyaml.RNode{}
 	asp := CreateSettersProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)
+=======
+	resourceList.FunctionConfig = map[string]interface{}{}
+
+	cmd := framework.Command(resourceList, func() error {
+		resourceList.Result = &framework.Result{
+			Name: "create-setters",
+		}
+		items, err := run(resourceList)
+		if err != nil {
+			resourceList.Result.Items = getErrorItem(err.Error())
+			return resourceList.Result
+		}
+		resourceList.Result.Items = items
+		return nil
+	})
+>>>>>>> d517aba (create-setters: functionality)
 
 	cmd.Short = generated.CreateSettersShort
 	cmd.Long = generated.CreateSettersLong
