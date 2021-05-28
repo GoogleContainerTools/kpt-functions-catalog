@@ -19,7 +19,7 @@ func TestCreateSettersFilter(t *testing.T) {
 		errMsg            string
 	}{
 		{
-			name: "apply array setter for flow style",
+			name: "set comment for array setter of flow style",
 			config: `
 data:
   env: |
@@ -41,7 +41,27 @@ metadata:
 
 		},
 		{
-			name: "set comment to Setters and ArraySetters",
+			name: "set comment for scalar nodes",
+			config: `
+data:
+  name: nginx
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  env: [foo, bar]
+ `,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment # kpt-set: ${name}-deployment
+  env: [foo, bar]
+`,
+
+		},
+		{
+			name: "set comment for scalar and sequence nodes",
 			input: `apiVersion: v1
 kind: Service
 metadata:
@@ -74,6 +94,78 @@ env: [foo, bar] # kpt-set: ${env}
 roles: # kpt-set: ${roles}
   - dev
   - prod
+`,
+		},
+
+		{
+			name: "scalar setter donot match",
+			config: `
+data:
+  name: ubuntu
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  env: [foo, bar]
+ `,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  env: [foo, bar]
+`,
+
+		},
+		{
+			name: "array setter with flow style donot match",
+			config: `
+data:
+  env: |
+    [foo, bar, pro]
+  name: nginx
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  env: [foo, bar]
+ `,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment # kpt-set: ${name}-deployment
+  env: [foo, bar]
+`,
+
+		},
+		{
+			name: "apply array setter with scalar error",
+			config: `
+data:
+  app: myService
+  ns: foo
+  images: |
+    - ubuntu
+    - linux
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images:
+    - nginx
+    - ubuntu
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images:
+    - nginx
+    - ubuntu
 `,
 		},
 		
@@ -141,62 +233,3 @@ roles: # kpt-set: ${roles}
 		})
 	}
 }
-
-type patternTest struct {
-	name     string
-	value    string
-	pattern  string
-	expected map[string]string
-}
-
-var resolvePatternCases = []patternTest{
-	{
-		name:    "setter values from pattern 1",
-		value:   "foo-dev-bar-us-east-1-baz",
-		pattern: `foo-${environment}-bar-${region}-baz`,
-		expected: map[string]string{
-			"environment": "dev",
-			"region":      "us-east-1",
-		},
-	},
-	{
-		name:    "setter values from pattern 2",
-		value:   "foo-dev-bar-us-east-1-baz",
-		pattern: `foo-${environment}-bar-${region}-baz`,
-		expected: map[string]string{
-			"environment": "dev",
-			"region":      "us-east-1",
-		},
-	},
-	{
-		name:    "setter values from pattern 3",
-		value:   "gcr.io/my-app/my-app-backend:1.0.0",
-		pattern: `${registry}/${app~!@#$%^&*()<>?:"|}/${app-image-name}:${app-image-tag}`,
-		expected: map[string]string{
-			"registry":             "gcr.io",
-			`app~!@#$%^&*()<>?:"|`: "my-app",
-			"app-image-name":       "my-app-backend",
-			"app-image-tag":        "1.0.0",
-		},
-	},
-	{
-		name:     "setter values from pattern unresolved",
-		value:    "foo-dev-bar-us-east-1-baz",
-		pattern:  `${image}:${tag}`,
-		expected: map[string]string{},
-	},
-	{
-		name:     "setter values from pattern unresolved 2",
-		value:    "nginx:1.2",
-		pattern:  `${image}${tag}`,
-		expected: map[string]string{},
-	},
-	{
-		name:     "setter values from pattern unresolved 3",
-		value:    "my-project/nginx:1.2",
-		pattern:  `${project-id}/${image}${tag}`,
-		expected: map[string]string{},
-	},
-}
-
-
