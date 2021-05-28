@@ -1,4 +1,4 @@
-package applysetters
+package createsetters
 
 import (
 	"io/ioutil"
@@ -10,7 +10,7 @@ import (
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-func TestApplySettersFilter(t *testing.T) {
+func TestCreateSettersFilter(t *testing.T) {
 	var tests = []struct {
 		name              string
 		config            string
@@ -18,33 +18,65 @@ func TestApplySettersFilter(t *testing.T) {
 		expectedResources string
 		errMsg            string
 	}{
-
 		{
-			name: "set name and label",
-			input: `apiVersion: v1
-kind: Deployment
-metadata:
-  name: nginx
-  namespace: nginx-space
-spec:
-  image: apache:1.7.1			
-`,
+			name: "apply array setter",
 			config: `
 data:
+  env: |
+    [foo, bar]
   name: nginx
-  image: apache
-  tag: 1.7.1
 `,
-			expectedResources: `apiVersion: v1
+			input: `apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx # kpt-set: ${name}
-  namespace: nginx-space # kpt-set: ${name}-space
-spec:
-  image: apache:1.7.1 # kpt-set: ${image}:${tag}
+  name: nginx-deployment
+  env: [foo, bar]
+ `,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment # kpt-set: ${name}-deployment
+  env: [foo, bar] # kpt-set: ${env}
 `,
 
 		},
+		{
+			name: "set non-empty values from empty values",
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  namespace: foo 
+image: nginx:1.7.1 
+env: [foo, bar] 
+roles:
+  - dev
+  - prod
+`,
+			config: `
+data:
+  app: myService
+  ns: foo
+  image: nginx
+  tag: 1.7.1
+  env: "[foo, bar]"
+  roles: |
+    - prod
+    - dev
+`,
+			expectedResources: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService # kpt-set: ${app}
+  namespace: foo # kpt-set: ${ns}
+image: nginx:1.7.1 # kpt-set: ${image}:${tag}
+env: [foo, bar] # kpt-set: ${env}
+roles: # kpt-set: ${roles}
+  - dev
+  - prod
+`,
+		},
+		
 	}
 	for i := range tests {
 		test := tests[i]
@@ -65,7 +97,7 @@ spec:
 				t.FailNow()
 			}
 
-			s := &ApplySetters{}
+			s := &CreateSetters{}
 			node, err := kyaml.Parse(test.config)
 			if !assert.NoError(t, err) {
 				t.FailNow()
@@ -167,16 +199,4 @@ var resolvePatternCases = []patternTest{
 	},
 }
 
-func TestCurrentSetterValues(t *testing.T) {
-	for _, tests := range [][]patternTest{resolvePatternCases} {
-		for i := range tests {
-			test := tests[i]
-			t.Run(test.name, func(t *testing.T) {
-				res := currentSetterValues(test.pattern, test.value)
-				if !assert.Equal(t, test.expected, res) {
-					t.FailNow()
-				}
-			})
-		}
-	}
-}
+

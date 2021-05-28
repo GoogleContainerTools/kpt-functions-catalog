@@ -1,4 +1,4 @@
-package applysetters
+package createsetters
 
 import (
 	"fmt"

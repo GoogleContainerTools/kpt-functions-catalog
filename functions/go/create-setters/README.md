@@ -1,4 +1,4 @@
-# apply-setters
+# create-setters
 
 ### Overview
 
@@ -15,9 +15,9 @@ setting of field values.
 
 Setters are a safer alternative to other substitution techniques which do not
 have the context of the structured data. Setters may be invoked to modify the
-package resources using `apply-setters` function to set desired values.
+package resources using `create-setters` function to set desired values.
 
-We use ConfigMap to configure the `apply-setters` function. The desired setter
+We use ConfigMap to configure the `create-setters` function. The desired setter
 values are provided as key-value pairs using `data` field where key is the name of the
 setter and value is the new desired value for the setter.
 
@@ -56,7 +56,7 @@ Discover the names of setters in the function config file and declare desired va
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: apply-setters-fn-config
+  name: create-setters-fn-config
 data:
   image: ubuntu
   replicas: "3"
@@ -65,13 +65,13 @@ data:
 Render the declared values by invoking:
 
 ```sh
-$ kpt fn run --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
+$ kpt fn run --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```sh
-$ kpt fn run --image gcr.io/kpt-fn/apply-setters:unstable -- 'image=ubuntu' 'replicas=3'
+$ kpt fn run --image gcr.io/kpt-fn/create-setters:unstable -- 'image=ubuntu' 'replicas=3'
 ```
 
 Rendered resource looks like the following:
@@ -109,7 +109,7 @@ Declare the desired array values, wrapped into string.
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: apply-setters-fn-config
+  name: create-setters-fn-config
 data:
   env: |
     - prod
@@ -119,7 +119,7 @@ data:
 Render the declared values by invoking:
 
 ```
-$ kpt fn run --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
+$ kpt fn run --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
 ```
 
 Rendered resource looks like the following:
