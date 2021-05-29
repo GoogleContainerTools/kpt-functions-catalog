@@ -48,13 +48,13 @@ type ArraySetter struct {
 
 // Result holds result of search and replace operation
 type Result struct {
-	// FilePath is the file path of the matching field
+	// FilePath is the file path of the matching value
 	FilePath string
 
-	// FieldPath is field path of the matching field
+	// FieldPath is field path of the matching value
 	FieldPath string
 
-	// Value of the matching field
+	// Comment of the matching value
 	Value string
 }
 
@@ -268,7 +268,7 @@ func getArraySetter(input string) map[string]bool {
 
 // isArraySetter checks if it is a array setter 
 func isArraySetter(value string) bool {
-	if strings.Contains(value, "-") || strings.Contains(value, "[") {
+	if strings.Contains(value, "- ") || strings.Contains(value, "[") {
 		return true
 	}
 	return false
