@@ -151,6 +151,9 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		// add the key to the field path
 		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
 
+		// add the key to the field path
+		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
+
 		elements, err := node.Value.Elements()
 		if err != nil {
 			return errors.Wrap(err)
