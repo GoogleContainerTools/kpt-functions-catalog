@@ -125,6 +125,9 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 			changeNodeComment = node.Value
 		}
 
+		// add the key to the field path
+		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
+
 		elements, err := node.Value.Elements()
 		if err != nil {
 			return errors.Wrap(err)
@@ -143,6 +146,11 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 			}
 		}
 
+		cs.Results = append(cs.Results, &Result{
+			FilePath:  cs.filePath,
+			FieldPath: fieldPath,
+			Value: changeNodeComment.YNode().LineComment,
+		})
 		return nil
 	})
 }
@@ -175,30 +183,38 @@ func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 	}
 
 	// checks if the path ends with "]"
-	if path[len(path)-1] != ']' {
+	if path[len(path)-1] == ']' {
+		return nil
+	}
 
-		// its a flag to indicate if value matches with any of the setter 
-		contains := false
+	// its a flag to indicate if value matches with any of the setter 
+	contains := false
 
-		linecomment := object.YNode().Value
+	linecomment := object.YNode().Value
 
-		for _, setter := range cs.Setters {
+	for _, setter := range cs.Setters {
 
-			if strings.Contains(object.YNode().Value, setter.Value) {
-				contains = true
-				linecomment = strings.ReplaceAll(
-					linecomment,
-					setter.Value,
-					fmt.Sprintf("${%s}", setter.Name),
-				)
-			}
-		}
-
-		// sets the linecomment
-		if contains {
-			object.YNode().LineComment = fmt.Sprintf("kpt-set: %s", linecomment)
+		if strings.Contains(object.YNode().Value, setter.Value) {
+			contains = true
+			linecomment = strings.ReplaceAll(
+				linecomment,
+				setter.Value,
+				fmt.Sprintf("${%s}", setter.Name),
+			)
 		}
 	}
+
+	// sets the linecomment
+	if contains {
+		object.YNode().LineComment = fmt.Sprintf("kpt-set: %s", linecomment)
+	}
+
+	cs.Results = append(cs.Results, &Result{
+		FilePath:  cs.filePath,
+		FieldPath: strings.TrimPrefix(path, "."),
+		Value:  object.YNode().LineComment,
+	})
+	
 	return nil
 }
 

@@ -7,26 +7,16 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/create-setters/createsetters"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/create-setters/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 //nolint
 func main() {
 	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = map[string]interface{}{}
-
-	cmd := framework.Command(resourceList, func() error {
-		resourceList.Result = &framework.Result{
-			Name: "create-setters",
-		}
-		items, err := run(resourceList)
-		if err != nil {
-			resourceList.Result.Items = getErrorItem(err.Error())
-			return resourceList.Result
-		}
-		resourceList.Result.Items = items
-		return nil
-	})
+	resourceList.FunctionConfig = &kyaml.RNode{}
+	asp := CreateSettersProcessor{}
+	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 
 	cmd.Short = generated.CreateSettersShort
 	cmd.Long = generated.CreateSettersLong
@@ -38,7 +28,22 @@ func main() {
 	}
 }
 
-func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
+type CreateSettersProcessor struct{}
+
+func (asp *CreateSettersProcessor) Process(resourceList *framework.ResourceList) error {
+	resourceList.Result = &framework.Result{
+		Name: "create-setters",
+	}
+	items, err := run(resourceList)
+	if err != nil {
+		resourceList.Result.Items = getErrorItem(err.Error())
+		return err
+	}
+	resourceList.Result.Items = items
+	return nil
+}
+
+func run(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
 	s, err := getSetters(resourceList.FunctionConfig)
 	if err != nil {
 		return nil, err
@@ -55,29 +60,21 @@ func run(resourceList *framework.ResourceList) ([]framework.Item, error) {
 }
 
 // getSetters retrieve the setters from input config
-func getSetters(fc interface{}) (createsetters.CreateSetters, error) {
+func getSetters(fc *kyaml.RNode) (createsetters.CreateSetters, error) {
 	var fcd createsetters.CreateSetters
-	f, ok := fc.(map[string]interface{})
-	if !ok {
-		return fcd, fmt.Errorf("function config %#v is not valid", fc)
-	}
-	rn, err := kyaml.FromMap(f)
-	if err != nil {
-		return fcd, fmt.Errorf("failed to parse input from function config: %w", err)
-	}
-	createsetters.Decode(rn, &fcd)
+	createsetters.Decode(fc, &fcd)
 	return fcd, nil
 }
 
 // resultsToItems converts the Search and Replace results to
 // equivalent items([]framework.Item)
-func resultsToItems(cs createsetters.CreateSetters) ([]framework.Item, error) {
-	var items []framework.Item
-	if len(cs.Results) == 0 {
+func resultsToItems(sr createsetters.CreateSetters) ([]framework.ResultItem, error) {
+	var items []framework.ResultItem
+	if len(sr.Results) == 0 {
 		return nil, fmt.Errorf("no matches for the input list of setters")
 	}
-	for _, res := range cs.Results {
-		items = append(items, framework.Item{
+	for _, res := range sr.Results {
+		items = append(items, framework.ResultItem{
 			Message: fmt.Sprintf("set field value to %q", res.Value),
 			Field:   framework.Field{Path: res.FieldPath},
 			File:    framework.File{Path: res.FilePath},
@@ -87,8 +84,8 @@ func resultsToItems(cs createsetters.CreateSetters) ([]framework.Item, error) {
 }
 
 // getErrorItem returns the item for input error message
-func getErrorItem(errMsg string) []framework.Item {
-	return []framework.Item{
+func getErrorItem(errMsg string) []framework.ResultItem {
+	return []framework.ResultItem{
 		{
 			Message:  fmt.Sprintf("failed to create setters: %s", errMsg),
 			Severity: framework.Error,
