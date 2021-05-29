@@ -138,4 +138,4 @@ environments: # kpt-set: ${env}
 
 #### Note:
 
-Refer to the `apply-setters` example in `search-replace` function examples for creating setters.
+Refer to the `create-setters` example in `search-replace` function examples for creating setters.
