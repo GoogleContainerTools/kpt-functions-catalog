@@ -4,8 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Create setter values on resource fields. Setters serve as parameters for template-free
-setting of field values.
+Create Setters are the template-free solution to set a comment for matching resource fields.
 
 <!--mdtogo-->
 
@@ -18,8 +17,8 @@ have the context of the structured data. Setters may be invoked to modify the
 package resources using `create-setters` function to set desired values.
 
 We use ConfigMap to configure the `create-setters` function. The desired setter
-values are provided as key-value pairs using `data` field where key is the name of the
-setter and value is the new desired value for the setter.
+values are provided as key-value pairs using `data` field.
+Here, the key is the name of the setter which is used to set the comment and value is used to match the value of the resource field.
 
 ```yaml
 apiVersion: v1
@@ -37,7 +36,7 @@ data:
 
 <!--mdtogo:Examples-->
 
-#### Setting scalar values
+#### Setting comment for scalar values
 
 Let's start with the input resource in a package
 
@@ -50,7 +49,7 @@ spec:
   replicas: 3 
 ```
 
-Discover the names of setters in the function config file and declare desired values.
+Declare the name of the setter with the value for which comments need to be created.
 
 ```yaml
 apiVersion: v1
@@ -85,7 +84,7 @@ spec:
   replicas: 3 # kpt-set: ${replicas}
 ```
 
-#### Setting array values
+#### Setting comment for array values
 
 Array values can also be parameterized using setters. Since the values of configMap
 in pipeline definition must be of string type, the array values must be wrapped into
@@ -103,7 +102,7 @@ environments:
   - stage
 ```
 
-Declare the desired array values, wrapped into string.
+Declare the array values, wrapped into string. Here the order of the array values doesn't make a difference.
 
 ```yaml
 apiVersion: v1
