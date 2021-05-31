@@ -62,8 +62,8 @@ func run(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
 // getSetters retrieve the setters from input config
 func getSetters(fc *kyaml.RNode) (createsetters.CreateSetters, error) {
 	var fcd createsetters.CreateSetters
-	createsetters.Decode(fc, &fcd)
-	return fcd, nil
+	err := createsetters.Decode(fc, &fcd)
+	return fcd, err
 }
 
 // resultsToItems converts the Search and Replace results to

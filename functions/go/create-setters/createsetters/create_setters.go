@@ -2,6 +2,7 @@ package createsetters
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"sigs.k8s.io/kustomize/kyaml/errors"
@@ -12,8 +13,8 @@ import (
 
 var _ kio.Filter = &CreateSetters{}
 
-// CreateSetters creates a comment for the resource fields which 
-// contains the same value as setter reference value 
+// CreateSetters creates a comment for the resource fields which
+// contains the same value as setter reference value
 type CreateSetters struct {
 	// Setters holds the user provided values for simple map setters
 	Setters []Setter
@@ -42,11 +43,11 @@ type ArraySetter struct {
 	// Name is the name of the setter
 	Name string
 
-	// ValueSet is the set of the values for setter
-	ValueSet map[string]bool
+	// Values is the set of the values for setter
+	Values []string
 }
 
-// Result holds result of search and replace operation
+// Result holds result of create-setters operation
 type Result struct {
 	// FilePath is the file path of the matching value
 	FilePath string
@@ -54,11 +55,31 @@ type Result struct {
 	// FieldPath is field path of the matching value
 	FieldPath string
 
-	// Comment of the matching value
+	// Value of the matching value
 	Value string
+
+	// LineComment of the matching value
+	Comment string
 }
 
-// Filter implements Set cs a yaml.Filter
+type CompareSetters []Setter
+
+func (a CompareSetters) Len() int {
+	return len(a)
+}
+
+func (a CompareSetters) Less(i, j int) bool {
+	if strings.Contains(a[i].Value, a[j].Name) {
+		return false
+	}
+	return true
+}
+
+func (a CompareSetters) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+// Filter implements CreatSetters cs a yaml.Filter
 func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	if len(cs.Setters) == 0 {
 		return nodes, fmt.Errorf("input setters list cannot be empty")
@@ -79,17 +100,17 @@ func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 
 /**
 visitMapping takes the mapping node and performs following steps,
-checks if it is a sequence node 
+checks if it is a sequence node
 checks if all the values in the node are present to any of the ArraySetters
-adds the linecomment if they are equal 
+adds the linecomment if they are equal
 
 e.g. for input of Mapping node
 
-environments: 
+environments:
   - dev
   - stage
 
-For input ApplySetters [Name: env, ValueSet: [dev, stage]], yaml node is transformed to
+For input CreateSetters [Name: env, Values: [dev, stage]], yaml node is transformed to
 
 environments: # kpt-set: ${env}
   - dev
@@ -99,7 +120,7 @@ e.g. for input of Mapping node with FlowStyle
 
 env: [foo, bar]
 
-For input ApplySetters [Name: env, ValueSet: [foo, bar]], yaml node is transformed to
+For input CreateSetters [Name: env, Values: [foo, bar]], yaml node is transformed to
 
 env: [foo, bar] # kpt-set: ${env}
 */
@@ -110,20 +131,12 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 			// don't do IsNilOrEmpty check cs empty sequences are allowed
 			return nil
 		}
-		
+
 		// the aim of this method is to create-setter for sequence nodes
 		if node.Value.YNode().Kind != yaml.SequenceNode {
 			// return if it is not a sequence node
 			return nil
-		}
-
-		// checks if the kind is flowstyle and adds comment to its value node 
-		// else it adds the comment to the key node 
-		changeNodeComment := node.Key
-
-		if node.Value.YNode().Style == yaml.FlowStyle {
-			changeNodeComment = node.Value
-		}
+		}		
 
 		// add the key to the field path
 		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
@@ -132,16 +145,28 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		if err != nil {
 			return errors.Wrap(err)
 		}
-		// extracts the values in sequence node to an array 
+		// extracts the values in sequence node to an array
 		var nodeValues []string
 		for _, values := range elements {
 			nodeValues = append(nodeValues, values.YNode().Value)
 		}
 
+		// checks if the kind is flowstyle and adds comment to its value node
+		// else it adds the comment to the key node
+		nodeToAddComment := node.Value
+		if nodeToAddComment.YNode().Style == yaml.FlowStyle {
+			if hasMatchValue(nodeValues, cs.Setters) {
+				// changing the node style to FoldedStyle
+				nodeToAddComment.YNode().Style = yaml.FoldedStyle
+				// To add the comment to the key for the FoldedStyle value node
+				nodeToAddComment = node.Key
+			}
+		}
+
 		for _, arraySetters := range cs.ArraySetters {
 			// checks if all the values in node are present in array setter
-			if checkEqual(nodeValues, arraySetters.ValueSet) {
-				changeNodeComment.YNode().LineComment = fmt.Sprintf("kpt-set: ${%s}", arraySetters.Name)
+			if checkEqual(nodeValues, arraySetters.Values) {
+				nodeToAddComment.YNode().LineComment = fmt.Sprintf("kpt-set: ${%s}", arraySetters.Name)
 				return nil
 			}
 		}
@@ -149,7 +174,8 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		cs.Results = append(cs.Results, &Result{
 			FilePath:  cs.filePath,
 			FieldPath: fieldPath,
-			Value: changeNodeComment.YNode().LineComment,
+			Value:     nodeToAddComment.YNode().Value,
+			Comment:   nodeToAddComment.YNode().LineComment,
 		})
 		return nil
 	})
@@ -157,9 +183,8 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 
 /**
 visitScalar accepts the input scalar node and performs following steps,
-checks if it is a scalar node 
-checks if the path ends with ']' (which is the value of a sequence node)
-adds the linecomment if it's value matches with any of the setter 
+checks if it is a scalar node
+adds the linecomment if it's value matches with any of the setter
 
 e.g.for input of scalar node 'nginx:1.7.1' in the yaml node
 
@@ -182,94 +207,101 @@ func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 		return nil
 	}
 
-	// checks if the path ends with "]"
-	if path[len(path)-1] == ']' {
-		return nil
-	}
-
-	// its a flag to indicate if value matches with any of the setter 
-	contains := false
-
-	linecomment := object.YNode().Value
-
-	for _, setter := range cs.Setters {
-
-		if strings.Contains(object.YNode().Value, setter.Value) {
-			contains = true
-			linecomment = strings.ReplaceAll(
-				linecomment,
-				setter.Value,
-				fmt.Sprintf("${%s}", setter.Name),
-			)
-		}
-	}
+	linecomment, valueMatch := getLineComment(object.YNode().Value, cs.Setters)
 
 	// sets the linecomment
-	if contains {
+	if valueMatch {
 		object.YNode().LineComment = fmt.Sprintf("kpt-set: %s", linecomment)
 	}
 
 	cs.Results = append(cs.Results, &Result{
 		FilePath:  cs.filePath,
 		FieldPath: strings.TrimPrefix(path, "."),
-		Value:  object.YNode().LineComment,
+		Value:     object.YNode().Value,
+		Comment:   object.YNode().LineComment,
 	})
-	
+
 	return nil
 }
 
-// Decode decodes the input yaml node into Set struct
-func Decode(rn *yaml.RNode, fcd *CreateSetters) {
+// Decode decodes the input yaml node into CreatSetters struct
+func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
 	for k, v := range rn.GetDataMap() {
-		// add the setter to ArraySetters if value is array 
+		// add the setter to ArraySetters if value is array
 		// else add to the Setters
-		if isArraySetter(v) {
-			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, ValueSet: getArraySetter(v)})
-		} else {
+		parsedInput, err := yaml.Parse(v)
+		if err != nil {
+			return err
+		}
+		if parsedInput.YNode().Kind == yaml.SequenceNode {
+			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
+		} else if parsedInput.YNode().Kind == yaml.ScalarNode {
 			fcd.Setters = append(fcd.Setters, Setter{Name: k, Value: v})
+			sort.Sort(CompareSetters(fcd.Setters))
 		}
 	}
+	return nil
 }
 
 // checkEqual checks if all the values in node are present in array setter
-func checkEqual(nodeValues []string, arraySetters map[string]bool) bool {
+func checkEqual(nodeValues []string, arraySetters []string) bool {
 	if len(nodeValues) != len(arraySetters) {
 		return false
 	}
 
-	for _, value := range nodeValues{
-		if !arraySetters[value] {
+	sort.Strings(nodeValues)
+	for idx := range nodeValues {
+		if arraySetters[idx] != nodeValues[idx] {
 			return false
-		} 
+		}
 	}
 	return true
 }
 
 // parses the input and returns array setters
-func getArraySetter(input string) map[string]bool {
-	output := make(map[string]bool)
+func getArraySetter(input *yaml.RNode) []string {
+	output := []string{}
 
-	parsedInput, err := yaml.Parse(input)
+	elements, err := input.Elements()
 	if err != nil {
 		return output
 	}
 
-	elements, err := parsedInput.Elements()
-	if err != nil {
-		return output
-	}
-	
 	for _, as := range elements {
-		output[as.YNode().Value] = true
+		output = append(output, as.YNode().Value)
 	}
-	
+
+	sort.Strings(output)
 	return output
 }
 
-// isArraySetter checks if it is a array setter 
-func isArraySetter(value string) bool {
-	if strings.Contains(value, "- ") || strings.Contains(value, "[") {
-		return true
+// checkEqual checks if all the values in node are present in array setter
+func hasMatchValue(nodeValues []string, setters []Setter) bool {
+	for _, value := range nodeValues {
+		for _, setter := range setters {
+			if strings.Contains(value, setter.Value) {
+				return true
+			}
+		}
 	}
 	return false
+}
+
+func getLineComment(input string, setters []Setter) (string, bool) {
+	nodeValue := input
+	output := input
+	valueMatch := false
+
+	for _, setter := range setters {
+		if strings.Contains(nodeValue, setter.Value) {
+			valueMatch = true
+			output = strings.ReplaceAll(
+				output,
+				setter.Value,
+				fmt.Sprintf("${%s}", setter.Name),
+			)
+		}
+	}
+
+	return output, valueMatch
 }
