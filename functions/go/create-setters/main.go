@@ -66,7 +66,7 @@ func getSetters(fc *kyaml.RNode) (createsetters.CreateSetters, error) {
 	return fcd, err
 }
 
-// resultsToItems converts the Search and Replace results to
+// resultsToItems converts the create-setters results to
 // equivalent items([]framework.Item)
 func resultsToItems(sr createsetters.CreateSetters) ([]framework.ResultItem, error) {
 	var items []framework.ResultItem

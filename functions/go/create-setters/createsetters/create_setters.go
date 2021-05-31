@@ -70,10 +70,7 @@ func (a CompareSetters) Len() int {
 }
 
 func (a CompareSetters) Less(i, j int) bool {
-	if strings.Contains(a[i].Value, a[j].Name) {
-		return false
-	}
-	return true
+	return !strings.Contains(a[i].Value, a[j].Name)
 }
 
 func (a CompareSetters) Swap(i, j int) {

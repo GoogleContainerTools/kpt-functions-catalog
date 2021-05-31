@@ -199,7 +199,7 @@ metadata:
 			name: "Empty array values",
 			config: `
 data:
-  image: []
+  image: "[]"
 `,
 			input: `apiVersion: apps/v1
 kind: Deployment
@@ -263,7 +263,9 @@ spec:
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
-			Decode(node, s)
+
+			err = Decode(node, s)
+
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
