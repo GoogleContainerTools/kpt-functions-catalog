@@ -257,7 +257,6 @@ metadata:
   name: nginx-deployment
   env: [foo, bar]
 `,
-
 		},
 		{
 			name: "array setter with flow style donot match",
@@ -279,10 +278,9 @@ metadata:
   name: nginx-deployment # kpt-set: ${name}-deployment
   env: [foo, bar]
 `,
-
 		},
 		{
-			name: "apply array setter with scalar error",
+			name: "create array setter with scalar error",
 			config: `
 data:
   app: myService
@@ -310,7 +308,87 @@ spec:
     - ubuntu
 `,
 		},
-		
+		{
+			name: "containing overlap values",
+			config: `
+data:
+  image: nginx
+  name: image
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment # kpt-set: ${image}-deployment
+`,
+		},
+		{
+			name: "FlowStyle to FoldedStyle",
+			config: `
+data:
+  image: "[nginx, ubuntu]"
+  os: ubuntu
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: [nginx, ubuntu]
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: # kpt-set: ${image}
+    - nginx
+    - ubuntu # kpt-set: ${os}
+`,
+		},
+		{
+			name: "Empty array values",
+			config: `
+data:
+  image: []
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: [nginx, ubuntu]
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: [nginx, ubuntu]
+`,
+			errMsg: "input setters list cannot be empty",
+		},
+
+		{
+			name: "create array setter with scalar error",
+			config: `
+data:
+  app: myService
+  image: nginx
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images: [nginx, ubuntu]
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment # kpt-set: ${image}-deployment
+spec:
+  images:
+    - nginx # kpt-set: ${image}
+    - ubuntu
+`,
+		},
 	}
 	for i := range tests {
 		test := tests[i]

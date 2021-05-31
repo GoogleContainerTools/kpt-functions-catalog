@@ -102,9 +102,6 @@ checks if it is a sequence node
 checks if all the values in the node are present to any of the ArraySetters
 adds the linecomment if they are equal
 
-checks if any of the values of node matches with Setters
-changes the node to FoldedStyle
-
 e.g. for input of Mapping node
 
 environments:
@@ -151,9 +148,6 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		// add the key to the field path
 		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
 
-		// add the key to the field path
-		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
-
 		elements, err := node.Value.Elements()
 		if err != nil {
 			return errors.Wrap(err)
@@ -164,8 +158,8 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 			nodeValues = append(nodeValues, values.YNode().Value)
 		}
 
-		// checks if any of the values of node matches with Setters
-		// changes the node to FoldedStyle
+		// checks if the kind is flowstyle and adds comment to its value node
+		// else it adds the comment to the key node
 		nodeToAddComment := node.Value
 		if nodeToAddComment.YNode().Style == yaml.FlowStyle {
 			if hasMatchValue(nodeValues, cs.Setters) {
@@ -254,6 +248,7 @@ func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
 			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
 		} else if parsedInput.YNode().Kind == yaml.ScalarNode {
 			fcd.Setters = append(fcd.Setters, Setter{Name: k, Value: v})
+			sort.Sort(CompareSetters(fcd.Setters))
 		}
 	}
 
