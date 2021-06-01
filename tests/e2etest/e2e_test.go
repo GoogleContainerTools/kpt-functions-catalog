@@ -72,6 +72,6 @@ func runTests(t *testing.T, path string) {
 
 func setImagePullPolicyToIfNotPresent(testcases []runner.TestCase) {
 	for i := range testcases {
-		testcases[i].Config.ImagePullPolicy = "ifNotPresent"
+		testcases[i].Config.ImagePullPolicy = "never"
 	}
 }
