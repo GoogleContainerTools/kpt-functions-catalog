@@ -4,15 +4,28 @@
 
 <!--mdtogo:Short-->
 
-Run a Starlark script to update or validate resources.
+Run a Starlark script to mutate or validate resources.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
-You can specify your Starlark script inline under field source like this:
+[Starlark], formerly known as Skylark, is a dialect of Python. It is commonly
+used as a configuration language. It is an untyped dynamic language with
+high-level data types, first-class functions with lexical scope, and garbage
+collection.
+
+The starlark function is light-weight approach to write functions. You will have
+the following advantages:
+
+- No need to maintain container images.
+- No need to do serialization and deserialization.
+- Only need a Starlark script.
+
+The starlark function currently uses `StarlarkRun` as the function config. It
+looks like this:
 
 ```yaml
 apiVersion: fn.kpt.dev/v1alpha1
@@ -28,14 +41,9 @@ source: |
   run(ctx.resource_list["items"], "prod")
 ```
 
-<!--mdtogo-->
-
-### Examples
-
-<!-- TODO: update the following link to web page -->
-
-<!--mdtogo:Examples-->
-
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/starlark/
+`StarlarkRun` has the following field beside the standard KRM fields:
+- `source`: (required) The source code of the Starlark script.
 
 <!--mdtogo-->
+
+[Starlark]: https://docs.bazel.build/versions/master/skylark/language.html

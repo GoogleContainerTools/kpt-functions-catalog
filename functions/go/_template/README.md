@@ -12,7 +12,7 @@ Explain what this function does in one or two sentences.
 <!--mdtogo-->
 
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 

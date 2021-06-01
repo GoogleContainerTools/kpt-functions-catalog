@@ -31,7 +31,7 @@ directories_to_scan = [os.path.join(functions_directory, 'go'), os.path.join(fun
 examples_directories_to_skip = ['_template', 'contrib']
 required_fields = ['image', 'description', 'tags', 'sourceURL', 'examplePackageURLs', 'emails', 'license']
 kpt_team_email = 'kpt-team@google.com'
-disallowed_kpt_commands = ['kpt fn run', 'kpt cfg']
+disallowed_kpt_commands = ['kpt fn run', 'kpt cfg', 'kpt pkg cat']
 gcr_prefix = 'gcr.io/kpt-fn/'
 git_url_prefix = 'https://github.com/GoogleContainerTools/kpt-functions-catalog.git'
 

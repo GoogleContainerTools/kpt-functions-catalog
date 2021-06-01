@@ -74,7 +74,6 @@ func main() {
 	})
 	cmd.Short = generated.GatekeeperShort
 	cmd.Long = generated.GatekeeperLong
-	cmd.Example = generated.GatekeeperExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

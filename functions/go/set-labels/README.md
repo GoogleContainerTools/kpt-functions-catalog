@@ -8,7 +8,7 @@ Add a list of labels to all resources.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
@@ -80,15 +80,5 @@ Field spec has following fields:
 
 For more information about fieldSpecs, please see
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-3
-
-<!--mdtogo-->
-
-### Examples
-
-<!-- TODO: update the following link to web page -->
-
-<!--mdtogo:Examples-->
-
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-labels/
 
 <!--mdtogo-->

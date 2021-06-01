@@ -74,6 +74,3 @@ For example, to ensure ` + "`" + `dev-` + "`" + ` also exists ` + "`" + `spec/na
   - path: spec/name
     kind: MyOwnResource
 `
-var EnsureNameSubstringExamples = `
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/ensure-name-substring/
-`

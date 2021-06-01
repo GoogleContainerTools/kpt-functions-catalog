@@ -4,7 +4,7 @@
 
 Use [sops] to encrypt/decrypt KRM resources.
 
-### Synopsis
+### FunctionConfig
 
 The function configuration must be a ConfigMap.
 

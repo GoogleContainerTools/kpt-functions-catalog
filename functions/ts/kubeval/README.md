@@ -4,7 +4,7 @@
 
 Use [kubeval] to validate KRM resources against their [json schemas].
 
-### Synopsis
+### FunctionConfig
 
 The function configuration must be a ConfigMap.
 

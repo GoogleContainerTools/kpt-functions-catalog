@@ -8,7 +8,7 @@ Upsert a resource to the input list of resources.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 

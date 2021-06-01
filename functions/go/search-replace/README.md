@@ -8,7 +8,7 @@ Search and optionally replace fields across all resources.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 There is a spectrum of configuration customization techniques as described in
 [this document].
