@@ -17,7 +17,7 @@ package main
 import (
 	"os"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/enforce-gatekeeper/generated"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gatekeeper/generated"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -72,9 +72,9 @@ func main() {
 		}
 		return nil
 	})
-	cmd.Short = generated.EnforceGatekeeperShort
-	cmd.Long = generated.EnforceGatekeeperLong
-	cmd.Example = generated.EnforceGatekeeperExamples
+	cmd.Short = generated.GatekeeperShort
+	cmd.Long = generated.GatekeeperLong
+	cmd.Example = generated.GatekeeperExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
