@@ -17,12 +17,12 @@ var _ kio.Filter = &CreateSetters{}
 // contain the same value as setter value
 type CreateSetters struct {
 	// Setters holds the user provided values for simple map setters
-	Setters []Setter
+	ScalarSetters []Setter
 
 	// ArraySetters holds the user provided values for array setters
 	ArraySetters []ArraySetter
 
-	// Results are the results of applying setter values
+	// Results are the results of adding setter comments
 	Results []*Result
 
 	// filePath file path of resource
@@ -34,16 +34,16 @@ type Setter struct {
 	// Name is the name of the setter
 	Name string
 
-	// Value is the input value for setter
+	// Value is the value of the field to which setter comment is added.
 	Value string
 }
 
 // ArraySetter stores name and values of the array setter
 type ArraySetter struct {
-	// name of the setter
+	// Name is the name of the setter
 	Name string
 
-	// values for array setter
+	// Values are the values of the field to which setter comment is added.
 	Values []string
 }
 
@@ -55,7 +55,7 @@ type Result struct {
 	// FieldPath is field path of the matching value
 	FieldPath string
 
-	// Value of the matching value
+	// Value is the value of the field to which setter comment is added.
 	Value string
 
 	// LineComment of the matching value
@@ -79,9 +79,7 @@ func (a CompareSetters) Swap(i, j int) {
 
 // Filter implements CreatSetters cs a yaml.Filter
 func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	if len(cs.Setters) == 0 {
-		return nodes, fmt.Errorf("input setters list cannot be empty")
-	}
+
 	for i := range nodes {
 		filePath, _, err := kioutil.GetFileAnnotations(nodes[i])
 		if err != nil {
@@ -102,7 +100,7 @@ checks if it is a sequence node
 checks if all the values in the node are present to any of the ArraySetters
 adds the linecomment if they are equal
 
-checks if any of the values of node matches with Setters
+checks if any of the values of node matches with ScalarSetters
 changes the node to FoldedStyle
 
 e.g. for input of Mapping node
@@ -125,7 +123,7 @@ For input CreateSetters [Name: env, Values: [foo, bar]], yaml node is transforme
 
 env: [foo, bar] # kpt-set: ${env}
 
-e.g. for input of Mapping node with FlowStyle matching few values from Setters
+e.g. for input of Mapping node with FlowStyle matching few values from ScalarSetters
 
 env: [foo, bar]
 
@@ -161,11 +159,11 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 			nodeValues = append(nodeValues, values.YNode().Value)
 		}
 
-		// checks if any of the values of node matches with Setters
+		// checks if any of the values of node matches with ScalarSetters
 		// changes the node to FoldedStyle
 		nodeToAddComment := node.Value
 		if nodeToAddComment.YNode().Style == yaml.FlowStyle {
-			if hasMatchValue(nodeValues, cs.Setters) {
+			if hasMatchValue(nodeValues, cs.ScalarSetters) {
 				// changing the node style to FoldedStyle
 				nodeToAddComment.YNode().Style = yaml.FoldedStyle
 				// To add the comment to the key for the FoldedStyle value node
@@ -176,6 +174,10 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		for _, arraySetters := range cs.ArraySetters {
 			// checks if all the values in node are present in array setter
 			if checkEqual(nodeValues, arraySetters.Values) {
+				if nodeToAddComment.YNode().Style == yaml.FlowStyle && len(nodeValues) > 0{
+					nodeToAddComment.YNode().Style = yaml.FoldedStyle
+					nodeToAddComment = node.Key
+				}
 				nodeToAddComment.YNode().LineComment = fmt.Sprintf("kpt-set: ${%s}", arraySetters.Name)
 				return nil
 			}
@@ -184,7 +186,7 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		cs.Results = append(cs.Results, &Result{
 			FilePath:  cs.filePath,
 			FieldPath: fieldPath,
-			Value:     nodeToAddComment.YNode().Value,
+			Value:     fmt.Sprint(nodeValues),
 			Comment:   nodeToAddComment.YNode().LineComment,
 		})
 		return nil
@@ -219,7 +221,7 @@ func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 		return nil
 	}
 
-	linecomment, valueMatch := getLineComment(object.YNode().Value, cs.Setters)
+	linecomment, valueMatch := getLineComment(object.YNode().Value, cs.ScalarSetters)
 
 	// sets the linecomment if the match is found
 	if valueMatch {
@@ -238,24 +240,27 @@ func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 
 // Decode decodes the input yaml node into CreatSetters struct
 func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
+	if len(rn.GetDataMap())==0 {
+		return fmt.Errorf("config map cannot be empty")
+	}
 	for k, v := range rn.GetDataMap() {
 		parsedInput, err := yaml.Parse(v)
 		if err != nil {
-			return err
+			return fmt.Errorf("parsing error")
 		}
 
 		// checks if the value is SequenceNode
 		// adds to the ArraySetters if it is a SequenceNode
-		// adds to the Setters if it is a ScalarNode
+		// adds to the ScalarSetters if it is a ScalarNode
 		if parsedInput.YNode().Kind == yaml.SequenceNode {
 			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
 		} else if parsedInput.YNode().Kind == yaml.ScalarNode {
-			fcd.Setters = append(fcd.Setters, Setter{Name: k, Value: v})
+			fcd.ScalarSetters = append(fcd.ScalarSetters, Setter{Name: k, Value: v})
 		}
 	}
 
 	// sorts all the Setters
-	sort.Sort(CompareSetters(fcd.Setters))
+	sort.Sort(CompareSetters(fcd.ScalarSetters))
 	return nil
 }
 
@@ -274,7 +279,7 @@ func checkEqual(nodeValues []string, arraySetters []string) bool {
 	return true
 }
 
-// parses the input and returns array setters
+// getArraySetter parses the input and returns array setters
 func getArraySetter(input *yaml.RNode) []string {
 	output := []string{}
 
@@ -303,7 +308,7 @@ func hasMatchValue(nodeValues []string, setters []Setter) bool {
 	return false
 }
 
-// checks if any of the setters value matches with the node value
+// getLineComment checks if any of the setters value matches with the node value
 // replaces that part of the node value with the ${setterName}
 // e.g.for input of scalar node 'nginx:1.7.1' in the yaml node
 

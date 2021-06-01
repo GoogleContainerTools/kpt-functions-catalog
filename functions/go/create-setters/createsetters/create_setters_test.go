@@ -1,6 +1,7 @@
 package createsetters
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -36,7 +37,9 @@ metadata:
 kind: Deployment
 metadata:
   name: nginx-deployment # kpt-set: ${name}-deployment
-  env: [foo, bar] # kpt-set: ${env}
+  env: # kpt-set: ${env}
+    - foo
+    - bar
 `,
 		},
 		{
@@ -129,7 +132,7 @@ metadata:
 `,
 		},
 		{
-			name: "create array setter with scalar error",
+			name: "setter with no matching values",
 			config: `
 data:
   app: myService
@@ -204,18 +207,34 @@ data:
 			input: `apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: [nginx, ubuntu]
+  name: []
 `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: [nginx, ubuntu]
+  name: [] # kpt-set: ${image}
 `,
-			errMsg: "input setters list cannot be empty",
+		},
+		{
+			name: "Empty data map",
+			config: `
+data: {}
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: []
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: []
+`,
+			errMsg: "config map cannot be empty",
 		},
 
 		{
-			name: "create array setter with scalar error",
+			name: "some values in sequence node match",
 			config: `
 data:
   app: myService
@@ -411,14 +430,23 @@ spec:
 
 			s := &CreateSetters{}
 			node, err := kyaml.Parse(test.config)
-			if !assert.NoError(t, err) {
-				t.FailNow()
+			if err != nil {
+				err = fmt.Errorf("parsing error in Config Map")
+				if test.errMsg != "" && !assert.Contains(t, err.Error(), test.errMsg) {
+					t.FailNow()
+				}else if test.errMsg == "" {
+					t.FailNow()
+				}
+				return
 			}
-
 			err = Decode(node, s)
-
-			if !assert.NoError(t, err) {
-				t.FailNow()
+			if err != nil {
+				if test.errMsg != "" && !assert.Contains(t, err.Error(), test.errMsg) {
+					t.FailNow()
+				}else if test.errMsg == "" {
+					t.FailNow()
+				}
+				return
 			}
 			inout := &kio.LocalPackageReadWriter{
 				PackagePath:     baseDir,

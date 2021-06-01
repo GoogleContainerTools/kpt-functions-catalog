@@ -14,20 +14,9 @@ import (
 //nolint
 func main() {
 	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = map[string]interface{}{}
-
-	cmd := framework.Command(resourceList, func() error {
-		resourceList.Result = &framework.Result{
-			Name: "create-setters",
-		}
-		items, err := run(resourceList)
-		if err != nil {
-			resourceList.Result.Items = getErrorItem(err.Error())
-			return resourceList.Result
-		}
-		resourceList.Result.Items = items
-		return nil
-	})
+	resourceList.FunctionConfig = &kyaml.RNode{}
+	csp := CreateSettersProcessor{}
+	cmd := command.Build(&csp, command.StandaloneEnabled, false)
 
 	cmd.Short = generated.CreateSettersShort
 	cmd.Long = generated.CreateSettersLong
@@ -41,7 +30,7 @@ func main() {
 
 type CreateSettersProcessor struct{}
 
-func (asp *CreateSettersProcessor) Process(resourceList *framework.ResourceList) error {
+func (csp *CreateSettersProcessor) Process(resourceList *framework.ResourceList) error {
 	resourceList.Result = &framework.Result{
 		Name: "create-setters",
 	}
@@ -86,7 +75,7 @@ func resultsToItems(sr createsetters.CreateSetters) ([]framework.ResultItem, err
 	}
 	for _, res := range sr.Results {
 		items = append(items, framework.ResultItem{
-			Message: fmt.Sprintf("set field value to %q", res.Value),
+			Message: fmt.Sprintf("Added line comment %q for field with value %q", res.Comment, res.Value),
 			Field:   framework.Field{Path: res.FieldPath},
 			File:    framework.File{Path: res.FilePath},
 		})
