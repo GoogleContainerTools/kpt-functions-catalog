@@ -50,6 +50,7 @@ func runTests(t *testing.T, path string) {
 	if err != nil {
 		t.Fatalf("failed to scan test cases: %s", err)
 	}
+	setImagePullPolicyToIfNotPresent(*cases)
 	for _, c := range *cases {
 		c := c // capture range variable
 		t.Run(c.Path, func(t *testing.T) {
@@ -66,5 +67,11 @@ func runTests(t *testing.T, path string) {
 				t.Fatalf("failed when running test: %s", err)
 			}
 		})
+	}
+}
+
+func setImagePullPolicyToIfNotPresent(testcases []runner.TestCase) {
+	for i := range testcases {
+		testcases[i].Config.ImagePullPolicy = "never"
 	}
 }
