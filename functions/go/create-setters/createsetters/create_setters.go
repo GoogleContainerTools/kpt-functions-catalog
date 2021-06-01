@@ -17,7 +17,7 @@ var _ kio.Filter = &CreateSetters{}
 // contain the same value as setter value
 type CreateSetters struct {
 	// Setters holds the user provided values for simple map setters
-	ScalarSetters []Setter
+	ScalarSetters []ScalarSetter
 
 	// ArraySetters holds the user provided values for array setters
 	ArraySetters []ArraySetter
@@ -29,8 +29,8 @@ type CreateSetters struct {
 	filePath string
 }
 
-// Setter stores name and value of the map setter
-type Setter struct {
+// ScalarSetter stores name and value of the map setter
+type ScalarSetter struct {
 	// Name is the name of the setter
 	Name string
 
@@ -63,7 +63,7 @@ type Result struct {
 }
 
 // CompareSetters is to sort the setter values
-type CompareSetters []Setter
+type CompareSetters []ScalarSetter
 
 func (a CompareSetters) Len() int {
 	return len(a)
@@ -158,6 +158,7 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		for _, values := range elements {
 			nodeValues = append(nodeValues, values.YNode().Value)
 		}
+		sort.Strings(nodeValues)
 
 		// checks if any of the values of node matches with ScalarSetters
 		// changes the node to FoldedStyle
@@ -255,7 +256,7 @@ func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
 		if parsedInput.YNode().Kind == yaml.SequenceNode {
 			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
 		} else if parsedInput.YNode().Kind == yaml.ScalarNode {
-			fcd.ScalarSetters = append(fcd.ScalarSetters, Setter{Name: k, Value: v})
+			fcd.ScalarSetters = append(fcd.ScalarSetters, ScalarSetter{Name: k, Value: v})
 		}
 	}
 
@@ -270,7 +271,6 @@ func checkEqual(nodeValues []string, arraySetters []string) bool {
 		return false
 	}
 
-	sort.Strings(nodeValues)
 	for idx := range nodeValues {
 		if arraySetters[idx] != nodeValues[idx] {
 			return false
@@ -296,8 +296,8 @@ func getArraySetter(input *yaml.RNode) []string {
 	return output
 }
 
-// hasMatchValue checks if any of the Setter value matches with the node value
-func hasMatchValue(nodeValues []string, setters []Setter) bool {
+// hasMatchValue checks if any of the ScalarSetter value matches with the node value
+func hasMatchValue(nodeValues []string, setters []ScalarSetter) bool {
 	for _, value := range nodeValues {
 		for _, setter := range setters {
 			if strings.Contains(value, setter.Value) {
@@ -322,7 +322,7 @@ func hasMatchValue(nodeValues []string, setters []Setter) bool {
 // apiVersion: v1
 // ...
 //  image: nginx:1.7.1 # kpt-set: ${image}:${tag}
-func getLineComment(nodeValue string, setters []Setter) (string, bool) {
+func getLineComment(nodeValue string, setters []ScalarSetter) (string, bool) {
 	output := nodeValue
 	valueMatch := false
 

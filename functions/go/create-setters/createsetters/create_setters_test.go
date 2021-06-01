@@ -483,3 +483,83 @@ spec:
 		})
 	}
 }
+
+type lineCommentTest struct {
+	name     string
+	value    string
+	comment  string
+}
+
+var resolvePatternCases = []lineCommentTest{
+	{
+		name:    "comment for pattern 1",
+		value:   "foo-dev-bar-us-east-baz",
+		comment: `foo-${role}-bar-${region}-baz`,
+	},
+	{
+		name:    "comment for pattern 2",
+		value:   "nginx:1.2.1",
+		comment: `${image}:1.2.1`,
+	},
+	{
+		name:    "comment for pattern 3",
+		value:   "nginx:1.1.2",
+		comment: `${image}:${tag}`,
+	},
+	{
+		name:     "comment for pattern 4",
+		value:    "ubuntu",
+		comment:  `${env}`,
+	},
+	{
+		name:     "comment for pattern 5",
+		value:    "linux",
+		comment:  ``,
+	},
+}
+
+var setter = []ScalarSetter{
+	{
+		Name: "env",
+		Value: "ubuntu",
+	}, 
+	{
+		Name: "image",
+		Value: "nginx",
+	},
+	{
+		Name: "role",
+		Value: "dev",
+	},	
+	{
+		Name: "tag",
+		Value: "1.1.2",
+	},
+	{
+		Name: "region",
+		Value: "us-east",
+	},
+
+}
+
+func TestCurrentSetterValues(t *testing.T) {
+	for _, tests := range [][]lineCommentTest{resolvePatternCases} {
+		for i := range tests {
+			test := tests[i]
+			t.Run(test.name, func(t *testing.T) {
+				res, match := getLineComment(test.value, setter)
+				if match {
+					if !assert.Equal(t, test.comment, res) {
+						t.FailNow()
+					}
+				}else{
+					if !assert.Equal(t, test.comment, "") {
+						t.FailNow()
+					}
+				}
+				
+			})
+		}
+	}
+}
+
