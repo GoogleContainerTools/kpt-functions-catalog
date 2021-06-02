@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Validate the KRM resources using [Gatekeeper] constraints.
+Validate the KRM resources using [Gatekeeper] policies.
 
 <!--mdtogo-->
 
@@ -13,7 +13,7 @@ Validate the KRM resources using [Gatekeeper] constraints.
 <!--mdtogo:Long-->
 
 [Gatekeeper] allows users to validate the KRM resources against the Gatekeeper
-constraints.
+policies.
 
 You will need to define a [Constraint Template] first before defining a
 [Constraint]. Every constraint should be backed by a constraint template that
@@ -21,8 +21,8 @@ defines the schema and logic of the constraint.
 To learn more about how to use the Gatekeeper project, see [here].
 
 At least one constraint template and at least one constraint must be provided
-using `resourceList.items` along with other KRM resources. No function config is
-needed in `resourceList.functionConfig`.
+using `input items` along with other KRM resources. No function config is
+needed in `input functionConfig`.
 
 <!--mdtogo-->
 

@@ -41,11 +41,3 @@ spec:
   parameters:
     keys:
       - private_key
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: super-secret
-  namespace: default
-data:
-  private_key: sensitive data goes here

@@ -12,17 +12,9 @@ Run a Starlark script to mutate or validate resources.
 
 <!--mdtogo:Long-->
 
-[Starlark], formerly known as Skylark, is a dialect of Python. It is commonly
-used as a configuration language. It is an untyped dynamic language with
+[Starlark] is a dialect of Python. It is commonly used as a configuration language. It is an untyped dynamic language with
 high-level data types, first-class functions with lexical scope, and garbage
 collection.
-
-The starlark function is light-weight approach to write functions. You will have
-the following advantages:
-
-- No need to maintain container images.
-- No need to do serialization and deserialization.
-- Only need a Starlark script.
 
 The starlark function currently uses `StarlarkRun` as the function config. It
 looks like this:
