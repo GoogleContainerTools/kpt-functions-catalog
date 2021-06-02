@@ -41,7 +41,6 @@ func main() {
 	})
 	cmd.Short = generated.StarlarkShort
 	cmd.Long = generated.StarlarkLong
-	cmd.Example = generated.StarlarkExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

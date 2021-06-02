@@ -15,7 +15,8 @@ spec:
                 items:
                   type: string
   targets:
-    - rego: |-
+    - target: admission.k8s.gatekeeper.sh
+      rego: |-
         package ban_keys
 
         violation[{"msg": sprintf("%v", [val])}] {
@@ -25,7 +26,6 @@ spec:
           count(overlap) > 0
           val := sprintf("The following banned keys are being used in the ConfigMap: %v", [overlap])
         }
-      target: admission.k8s.gatekeeper.sh
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sBannedConfigMapKeysV1
@@ -41,11 +41,3 @@ spec:
   parameters:
     keys:
       - private_key
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: super-secret
-  namespace: default
-data:
-  public_key: no secrets here

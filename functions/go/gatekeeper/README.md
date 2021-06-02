@@ -4,42 +4,29 @@
 
 <!--mdtogo:Short-->
 
-Validate the KRM resources using [Gatekeeper] constraints.
+Validate the KRM resources using [Gatekeeper] policies.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
-You can use Gatekeeper to validate KRM resources. To learn more about how to use
-the Gatekeeper project, see: https://open-policy-agent.github.io/gatekeeper/website/docs/howto.
+[Gatekeeper] allows users to validate the KRM resources against the Gatekeeper
+policies.
 
-The function evaluates constraint policies against KRM resources.
-The function takes 3 types of resources from the input resource list:
+You will need to define a [Constraint Template] first before defining a
+[Constraint]. Every constraint should be backed by a constraint template that
+defines the schema and logic of the constraint.
+To learn more about how to use the Gatekeeper project, see [here].
 
-- constraint templates
-- constraints
-- other KRM resources
-
-Every constraint should be backed by a constraint template that defines the
-schema and logic of the constraint.
-
-To learn more about how to write constraint templates and constraints, see:
-https://cloud.google.com/anthos-config-management/docs/how-to/write-a-constraint-template
-and
-https://cloud.google.com/anthos-config-management/docs/how-to/creating-constraints.
+At least one constraint template and at least one constraint must be provided
+using `input items` along with other KRM resources. No function config is
+needed in `input functionConfig`.
 
 <!--mdtogo-->
 
-### Examples
-
-<!-- TODO: update the following link to web page -->
-
-<!--mdtogo:Examples-->
-
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/gatekeeper/
-
-<!--mdtogo-->
-
-[Gatekeeper]:https://github.com/open-policy-agent/gatekeeper
+[Gatekeeper]: https://open-policy-agent.github.io/gatekeeper/website/docs/
+[Constraint Template]: https://open-policy-agent.github.io/gatekeeper/website/docs/howto#constraint-templates
+[Constraint]: https://open-policy-agent.github.io/gatekeeper/website/docs/howto#constraints
+[here]: https://open-policy-agent.github.io/gatekeeper/website/docs/howto

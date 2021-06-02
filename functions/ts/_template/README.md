@@ -4,7 +4,7 @@
 
 Explain what this function does in one or two sentences.
 
-### Synopsis
+### FunctionConfig
 
 Explain the function config and behavior for this function in detail.
 For each field in the function config, specify:

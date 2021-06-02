@@ -8,7 +8,7 @@ Format the field ordering in resources.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 

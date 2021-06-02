@@ -25,7 +25,7 @@ pipeline:
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/invalid-configmap .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/invalid-configmap
 ```
 
 Run the function:

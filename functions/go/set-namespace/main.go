@@ -32,7 +32,6 @@ func main() {
 
 	cmd.Short = generated.SetNamespaceShort
 	cmd.Long = generated.SetNamespaceLong
-	cmd.Example = generated.SetNamespaceExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

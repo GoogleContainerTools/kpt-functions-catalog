@@ -68,6 +68,3 @@ Field spec has following fields:
 For more information about fieldSpecs, please see
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-3
 `
-var SetLabelsExamples = `
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-labels/
-`

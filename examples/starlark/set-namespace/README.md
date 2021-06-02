@@ -1,9 +1,10 @@
-# starlark: Simple Example
+# starlark: Set Namespace
 
 ### Overview
 
 In this example, we are going to demonstrate how to declaratively run the
-[`starlark`] function with an inline starlark script as function configuration.
+[`starlark`] function with an inline starlark script as function configuration
+to set namespaces to KRM resources.
 
 We are going to use the following `Kptfile` and `fn-config.yaml` to configure
 the function:
@@ -35,7 +36,7 @@ source: |
   setnamespace(ctx.resource_list["items"], "prod")
 ```
 
-The starlark script is embedded in the `source` field. This script read the
+The Starlark script is embedded in the `source` field. This script reads the
 input KRM resources from `ctx.resource_list` and sets the `.metadata.namespace`
 to `prod` for all resources.
 
@@ -44,8 +45,8 @@ to `prod` for all resources.
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/simple .
-$ kpt fn render simple
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/set-namespace
+$ kpt fn render set-namespace
 ```
 
 ### Expected result

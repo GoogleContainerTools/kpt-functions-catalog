@@ -20,5 +20,4 @@ items:
             name: super-secret
             namespace: default
           file:
-            path: resources.yaml
-            index: 2
+            path: config-map.yaml

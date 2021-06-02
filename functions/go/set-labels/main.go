@@ -32,7 +32,6 @@ func main() {
 
 	cmd.Short = generated.SetLabelsShort
 	cmd.Long = generated.SetLabelsLong
-	cmd.Example = generated.SetLabelsExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

@@ -9,7 +9,7 @@ setting of field values.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 

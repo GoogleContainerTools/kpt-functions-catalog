@@ -1,0 +1,12 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
+metadata:
+  name: no-private-key
+source: |
+  def contains_private_key(r):
+    return r["apiVersion"] == "v1" and r["kind"] == "ConfigMap" and r["data"]["private-key"]
+  def ensure_no_private_key(resource_list):
+    for resource in resource_list["items"]:
+      if contains_private_key(resource):
+        fail("it is prohibited to have private key in a configmap")
+  ensure_no_private_key(ctx.resource_list)

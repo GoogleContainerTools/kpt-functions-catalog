@@ -8,7 +8,7 @@ Fix resources and make them compatible with kpt 1.0.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
