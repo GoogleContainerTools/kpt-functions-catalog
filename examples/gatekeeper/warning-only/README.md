@@ -36,7 +36,7 @@ spec:
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/warning-only .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/warning-only
 ```
 
 Run the function:
