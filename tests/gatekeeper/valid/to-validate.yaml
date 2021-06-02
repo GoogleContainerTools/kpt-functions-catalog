@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: super-secret
+  namespace: default
+data:
+  public_key: no secrets here

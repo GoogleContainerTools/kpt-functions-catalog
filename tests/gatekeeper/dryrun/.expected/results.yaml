@@ -18,4 +18,3 @@ items:
             namespace: default
           file:
             path: resources.yaml
-            index: 2
