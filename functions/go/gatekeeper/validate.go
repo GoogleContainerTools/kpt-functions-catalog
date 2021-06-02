@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strconv"
 
+	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1beta1"
 	opaclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
@@ -36,7 +37,7 @@ import (
 var scheme = runtime.NewScheme()
 
 func init() {
-	err := v1beta1.SchemeBuilder.AddToScheme(scheme)
+	err := opaapis.AddToScheme(scheme)
 	if err != nil {
 		panic(err)
 	}
@@ -124,7 +125,7 @@ func Validate(objects []runtime.Object) (*framework.Result, error) {
 
 func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 	out := &framework.Result{
-		Items: []framework.Item{},
+		Items: []framework.ResultItem{},
 	}
 
 	for _, r := range results {
@@ -133,7 +134,7 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 			return nil, fmt.Errorf("could not cast to unstructured: %+v", r.Resource)
 		}
 
-		item := framework.Item{
+		item := framework.ResultItem{
 			Message: fmt.Sprintf("%s\nviolatedConstraint: %s", r.Msg, r.Constraint.GetName()),
 			ResourceRef: yaml.ResourceMeta{
 				TypeMeta: yaml.TypeMeta{
