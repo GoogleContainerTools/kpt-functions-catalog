@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ubuntu-development # kpt-set: ${image}-development 
+  name: ubuntu-development
 data:
   some-key: some-value
 ---
@@ -9,7 +9,7 @@ apiVersion: v1
 kind: MyKind
 metadata:
   name: ubuntu
-image: nginx:1.1.2 # kpt-set: ${app}:${tag}
-roles: # kpt-set: ${role}
+image: nginx:1.1.2
+roles:
   - dev
   - pro

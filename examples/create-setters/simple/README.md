@@ -19,7 +19,7 @@ data:
 apiVersion: v1
 kind: MyKind
 metadata:
-  name: MyApp
+  name: ubuntu
 image: nginx:1.1.2
 roles:
   - dev
@@ -37,11 +37,11 @@ kind: ConfigMap
 metadata:
   name: create-setters-fn-config
 data:
+  app: nginx
+  image: ubuntu
   role: |
     - dev
     - pro
-  app: nginx
-  image: ubuntu
   tag: 1.1.2
 ```
 
@@ -58,7 +58,7 @@ data:
 apiVersion: v1
 kind: MyKind
 metadata:
-  name: ubuntu
+  name: ubuntu # kpt-set: ${image}
 image: nginx:1.1.2 # kpt-set: ${app}:${tag}
 roles: # kpt-set: ${role}
   - dev
@@ -83,6 +83,9 @@ $ kpt fn render simple
 
 Check the comment for resource with the value `ubuntu-development` is set to
 `# kpt-set: ${image}-development` as it matches the setter `image: ubuntu`
+
+Check the comment for resource with the value `ubuntu` is set to
+`# kpt-set: ${image}` as it matches the setter `image: ubuntu`
 
 Check the comment for resource with the value `nginx:1.1.2` is set to
 `# kpt-set: ${app}:${tag}` as it matches the setters `image: ubuntu, tag: 1.1.2`
