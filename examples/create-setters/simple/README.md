@@ -83,7 +83,9 @@ $ kpt fn render simple
 
 Check the comment for resource with the value `ubuntu-development` is set to
 `# kpt-set: ${image}-development` as it matches the setter `image: ubuntu`
+
 Check the comment for resource with the value `nginx:1.1.2` is set to
 `# kpt-set: ${app}:${tag}` as it matches the setters `image: ubuntu, tag: 1.1.2`
+
 Check the comment for resource with the value `-dev\n-pro` is set to
 `# kpt-set: ${role}` as it matches the array setter `role: |\n  - pro\n  - dev`

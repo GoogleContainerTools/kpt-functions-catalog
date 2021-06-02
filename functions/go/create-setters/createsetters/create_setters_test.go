@@ -179,26 +179,6 @@ metadata:
 `,
 		},
 		{
-			name: "FlowStyle to FoldedStyle",
-			config: `
-data:
-  image: "[nginx, ubuntu]"
-  os: ubuntu
-`,
-			input: `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: [nginx, ubuntu]
-`,
-			expectedResources: `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: # kpt-set: ${image}
-    - nginx
-    - ubuntu # kpt-set: ${os}
-`,
-		},
-		{
 			name: "Empty array values",
 			config: `
 data:
@@ -299,7 +279,7 @@ metadata:
 `,
 		},
 		{
-			name: "create array setter with scalar error",
+			name: "setters donot match",
 			config: `
 data:
   app: myService
@@ -366,26 +346,7 @@ metadata:
 `,
 		},
 		{
-			name: "Empty array values",
-			config: `
-data:
-  image: []
-`,
-			input: `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: [nginx, ubuntu]
-`,
-			expectedResources: `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: [nginx, ubuntu]
-`,
-			errMsg: "input setters list cannot be empty",
-		},
-
-		{
-			name: "create array setter with scalar error",
+			name: "array with partial match",
 			config: `
 data:
   app: myService
@@ -407,7 +368,6 @@ spec:
     - nginx # kpt-set: ${image}
     - ubuntu
 `,
-			errMsg: `parsing error in Config Map`,
 		},
 	}
 	for i := range tests {
