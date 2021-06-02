@@ -16,7 +16,7 @@ var _ kio.Filter = &CreateSetters{}
 // CreateSetters creates a comment for the resource fields which
 // contain the same value as setter value
 type CreateSetters struct {
-	// Setters holds the user provided values for simple map setters
+	// Setters holds the user provided values for simple scalar setters
 	ScalarSetters []ScalarSetter
 
 	// ArraySetters holds the user provided values for array setters
