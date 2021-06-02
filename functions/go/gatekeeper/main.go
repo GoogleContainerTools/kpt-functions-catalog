@@ -22,56 +22,63 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	k8syaml "sigs.k8s.io/yaml"
 )
 
-func main() {
-	resourceList := &framework.ResourceList{}
+type GatekeeperProcessor struct{}
 
-	cmd := framework.Command(resourceList, func() error {
-		var objects []runtime.Object
-		for _, item := range resourceList.Items {
-			meta, err := item.GetValidatedMetadata()
-			if err != nil {
-				return err
-			}
-
-			s, err := item.String()
-			if err != nil {
-				return err
-			}
-			obj, err := scheme.New(schema.FromAPIVersionAndKind(meta.APIVersion, meta.Kind))
-			switch {
-			case runtime.IsNotRegisteredError(err):
-				obj = &unstructured.Unstructured{}
-			case err != nil:
-				return err
-			}
-			err = k8syaml.Unmarshal([]byte(s), obj)
-			if err != nil {
-				return err
-			}
-			objects = append(objects, obj)
-		}
-
-		result, err := Validate(objects)
-		// When err is not nil, result should be nil.
+func (gkp *GatekeeperProcessor) Process(resourceList *framework.ResourceList) error {
+	resourceList.Result = &framework.Result{
+		Name: "gatekeeper",
+	}
+	var objects []runtime.Object
+	for _, item := range resourceList.Items {
+		meta, err := item.GetValidatedMetadata()
 		if err != nil {
-			result = &framework.Result{
-				Items: []framework.Item{
-					{
-						Message:  err.Error(),
-						Severity: framework.Error,
-					},
+			return err
+		}
+
+		s, err := item.String()
+		if err != nil {
+			return err
+		}
+		obj, err := scheme.New(schema.FromAPIVersionAndKind(meta.APIVersion, meta.Kind))
+		switch {
+		case runtime.IsNotRegisteredError(err):
+			obj = &unstructured.Unstructured{}
+		case err != nil:
+			return err
+		}
+		err = k8syaml.Unmarshal([]byte(s), obj)
+		if err != nil {
+			return err
+		}
+		objects = append(objects, obj)
+	}
+
+	result, err := Validate(objects)
+	// When err is not nil, result should be nil.
+	if err != nil {
+		result = &framework.Result{
+			Items: []framework.ResultItem{
+				{
+					Message:  err.Error(),
+					Severity: framework.Error,
 				},
-			}
+			},
 		}
-		resourceList.Result = result
-		if resultContainsError(result) {
-			return result
-		}
-		return nil
-	})
+	}
+	resourceList.Result = result
+	if resultContainsError(result) {
+		return result
+	}
+	return nil
+}
+
+func main() {
+	gkp := GatekeeperProcessor{}
+	cmd := command.Build(&gkp, command.StandaloneEnabled, false)
 	cmd.Short = generated.GatekeeperShort
 	cmd.Long = generated.GatekeeperLong
 	if err := cmd.Execute(); err != nil {
