@@ -17,7 +17,7 @@ Here are the automated changes performed by ` + "`" + `fix` + "`" + ` function o
 3. ` + "`" + `dependencies` + "`" + ` section will be removed from the Kptfile.
 4. Setters no longer follow the OpenAPI format. The setters and substitutions will be converted
    to simple setter patterns. ` + "`" + `apply-setters` + "`" + ` function is declared in the ` + "`" + `pipeline` + "`" + ` section.
-   Setters are configured using [configMap] option.
+   Setters are configured using [ConfigMap] option.
 5. Function annotation from function configs will be removed and corresponding
    function definitions will be [declared in pipeline] section of Kptfile. Reference
    to function config is added via [configPath] option.
