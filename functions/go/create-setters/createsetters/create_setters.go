@@ -58,7 +58,7 @@ type Result struct {
 	// Value is the value of the field to which setter comment is added.
 	Value string
 
-	// LineComment of the matching value
+	// Comment is the line comment of the matching value
 	Comment string
 }
 
@@ -69,6 +69,8 @@ func (a CompareSetters) Len() int {
 	return len(a)
 }
 
+// checks if the jth node's Name is a substring of ith node's Value
+// jth node is sorted first if the condition statisfies
 func (a CompareSetters) Less(i, j int) bool {
 	return !strings.Contains(a[i].Value, a[j].Name)
 }
@@ -97,7 +99,7 @@ func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 /**
 visitMapping takes the mapping node and performs following steps,
 checks if it is a sequence node
-checks if all the values in the node are present to any of the ArraySetters
+checks if all the values in the node match any of the ArraySetters
 adds the linecomment if they are equal
 
 checks if any of the values of node matches with ScalarSetters
@@ -144,7 +146,7 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		if node.Value.YNode().Kind != yaml.SequenceNode {
 			// return if it is not a sequence node
 			return nil
-		}		
+		}
 
 		// add the key to the field path
 		fieldPath := strings.TrimPrefix(fmt.Sprintf("%s.%s", path, node.Key.YNode().Value), ".")
@@ -175,21 +177,20 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		for _, arraySetters := range cs.ArraySetters {
 			// checks if all the values in node are present in array setter
 			if checkEqual(nodeValues, arraySetters.Values) {
-				if nodeToAddComment.YNode().Style == yaml.FlowStyle && len(nodeValues) > 0{
+				if nodeToAddComment.YNode().Style == yaml.FlowStyle && len(nodeValues) > 0 {
 					nodeToAddComment.YNode().Style = yaml.FoldedStyle
 					nodeToAddComment = node.Key
 				}
 				nodeToAddComment.YNode().LineComment = fmt.Sprintf("kpt-set: ${%s}", arraySetters.Name)
+				cs.Results = append(cs.Results, &Result{
+					FilePath:  cs.filePath,
+					FieldPath: fieldPath,
+					Value:     fmt.Sprint(nodeValues),
+					Comment:   nodeToAddComment.YNode().LineComment,
+				})
 				return nil
 			}
 		}
-
-		cs.Results = append(cs.Results, &Result{
-			FilePath:  cs.filePath,
-			FieldPath: fieldPath,
-			Value:     fmt.Sprint(nodeValues),
-			Comment:   nodeToAddComment.YNode().LineComment,
-		})
 		return nil
 	})
 }
@@ -227,36 +228,54 @@ func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 	// sets the linecomment if the match is found
 	if valueMatch {
 		object.YNode().LineComment = fmt.Sprintf("kpt-set: %s", linecomment)
+		cs.Results = append(cs.Results, &Result{
+			FilePath:  cs.filePath,
+			FieldPath: strings.TrimPrefix(path, "."),
+			Value:     object.YNode().Value,
+			Comment:   object.YNode().LineComment,
+		})
 	}
-
-	cs.Results = append(cs.Results, &Result{
-		FilePath:  cs.filePath,
-		FieldPath: strings.TrimPrefix(path, "."),
-		Value:     object.YNode().Value,
-		Comment:   object.YNode().LineComment,
-	})
 
 	return nil
 }
 
-// Decode decodes the input yaml node into CreatSetters struct
+/**
+Decode decodes the input yaml node into CreatSetters struct
+places the setter either in ScalarSetters or ArraySetters
+sorts the ScalarSetters using CompareSetters
+
+e.g.for input ScalarSetters
+	[[name: image, value: nginx], [name: ubuntu, value: image]]
+
+Input:
+	spec: nginx-development
+
+To avoid this case, sorts the ScalarSetters
+	spec: nginx-development # kpt-set: ${ubuntu}-development
+
+ScalarSetters array is transformed to
+	[[name: ubuntu, value: image], [name: image, value: nginx]]
+*/
 func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
-	if len(rn.GetDataMap())==0 {
+	if len(rn.GetDataMap()) == 0 {
 		return fmt.Errorf("config map cannot be empty")
 	}
 	for k, v := range rn.GetDataMap() {
-		parsedInput, err := yaml.Parse(v)
-		if err != nil {
-			return fmt.Errorf("parsing error")
-		}
-
-		// checks if the value is SequenceNode
-		// adds to the ArraySetters if it is a SequenceNode
-		// adds to the ScalarSetters if it is a ScalarNode
-		if parsedInput.YNode().Kind == yaml.SequenceNode {
-			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
-		} else if parsedInput.YNode().Kind == yaml.ScalarNode {
+		if len(v) == 0 {
 			fcd.ScalarSetters = append(fcd.ScalarSetters, ScalarSetter{Name: k, Value: v})
+		} else {
+			parsedInput, err := yaml.Parse(v)
+			if err != nil {
+				return fmt.Errorf("parsing error")
+			}
+			// checks if the value is SequenceNode
+			// adds to the ArraySetters if it is a SequenceNode
+			// adds to the ScalarSetters if it is a ScalarNode
+			if parsedInput.YNode().Kind == yaml.SequenceNode {
+				fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
+			} else if parsedInput.YNode().Kind == yaml.ScalarNode {
+				fcd.ScalarSetters = append(fcd.ScalarSetters, ScalarSetter{Name: k, Value: v})
+			}
 		}
 	}
 
@@ -307,21 +326,22 @@ func hasMatchValue(nodeValues []string, setters []ScalarSetter) bool {
 	}
 	return false
 }
+/**
+getLineComment checks if any of the setters value matches with the node value
+replaces that part of the node value with the ${setterName}
+e.g.for input of scalar node 'nginx:1.7.1' in the yaml node
 
-// getLineComment checks if any of the setters value matches with the node value
-// replaces that part of the node value with the ${setterName}
-// e.g.for input of scalar node 'nginx:1.7.1' in the yaml node
+apiVersion: v1
+...
+image: nginx:1.7.1
 
-// apiVersion: v1
-// ...
-//  image: nginx:1.7.1
+and for input CreateSetters [[name: image, value: nginx], [name: tag, value: 1.7.1]]
+The yaml node is transformed to
 
-// and for input CreateSetters [[name: image, value: nginx], [name: tag, value: 1.7.1]]
-// The yaml node is transformed to
-
-// apiVersion: v1
-// ...
-//  image: nginx:1.7.1 # kpt-set: ${image}:${tag}
+apiVersion: v1
+...
+image: nginx:1.7.1 # kpt-set: ${image}:${tag}
+*/
 func getLineComment(nodeValue string, setters []ScalarSetter) (string, bool) {
 	output := nodeValue
 	valueMatch := false

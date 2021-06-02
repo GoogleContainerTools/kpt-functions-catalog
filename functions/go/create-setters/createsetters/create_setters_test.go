@@ -407,6 +407,7 @@ spec:
     - nginx # kpt-set: ${image}
     - ubuntu
 `,
+			errMsg: `parsing error in Config Map`,
 		},
 	}
 	for i := range tests {
@@ -432,18 +433,18 @@ spec:
 			node, err := kyaml.Parse(test.config)
 			if err != nil {
 				err = fmt.Errorf("parsing error in Config Map")
-				if test.errMsg != "" && !assert.Contains(t, err.Error(), test.errMsg) {
+				if test.errMsg != "" && !assert.Equal(t, err.Error(), test.errMsg) {
 					t.FailNow()
-				}else if test.errMsg == "" {
+				} else if test.errMsg == "" {
 					t.FailNow()
 				}
 				return
 			}
 			err = Decode(node, s)
 			if err != nil {
-				if test.errMsg != "" && !assert.Contains(t, err.Error(), test.errMsg) {
+				if test.errMsg != "" && !assert.Equal(t, err.Error(), test.errMsg) {
 					t.FailNow()
-				}else if test.errMsg == "" {
+				} else if test.errMsg == "" {
 					t.FailNow()
 				}
 				return
@@ -485,12 +486,12 @@ spec:
 }
 
 type lineCommentTest struct {
-	name     string
-	value    string
-	comment  string
+	name    string
+	value   string
+	comment string
 }
 
-var resolvePatternCases = []lineCommentTest{
+var resolveLineCommentCases = []lineCommentTest{
 	{
 		name:    "comment for pattern 1",
 		value:   "foo-dev-bar-us-east-baz",
@@ -507,59 +508,57 @@ var resolvePatternCases = []lineCommentTest{
 		comment: `${image}:${tag}`,
 	},
 	{
-		name:     "comment for pattern 4",
-		value:    "ubuntu",
-		comment:  `${env}`,
+		name:    "comment for pattern 4",
+		value:   "ubuntu",
+		comment: `${env}`,
 	},
 	{
-		name:     "comment for pattern 5",
-		value:    "linux",
-		comment:  ``,
+		name:    "comment for pattern 5",
+		value:   "linux",
+		comment: ``,
 	},
 }
 
-var setter = []ScalarSetter{
+var inputSetters = []ScalarSetter{
 	{
-		Name: "env",
+		Name:  "env",
 		Value: "ubuntu",
-	}, 
+	},
 	{
-		Name: "image",
+		Name:  "image",
 		Value: "nginx",
 	},
 	{
-		Name: "role",
+		Name:  "role",
 		Value: "dev",
-	},	
+	},
 	{
-		Name: "tag",
+		Name:  "tag",
 		Value: "1.1.2",
 	},
 	{
-		Name: "region",
+		Name:  "region",
 		Value: "us-east",
 	},
-
 }
 
 func TestCurrentSetterValues(t *testing.T) {
-	for _, tests := range [][]lineCommentTest{resolvePatternCases} {
+	for _, tests := range [][]lineCommentTest{resolveLineCommentCases} {
 		for i := range tests {
 			test := tests[i]
 			t.Run(test.name, func(t *testing.T) {
-				res, match := getLineComment(test.value, setter)
+				res, match := getLineComment(test.value, inputSetters)
 				if match {
 					if !assert.Equal(t, test.comment, res) {
 						t.FailNow()
 					}
-				}else{
+				} else {
 					if !assert.Equal(t, test.comment, "") {
 						t.FailNow()
 					}
 				}
-				
+
 			})
 		}
 	}
 }
-

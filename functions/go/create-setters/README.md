@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Add setter comments to matching resource fields. Setters serve as parameters for template-free setting of field values.
+Add setter comments to matching resource fields. Setters serve as parameters for template-free setting of comments.
 
 <!--mdtogo-->
 
@@ -64,13 +64,13 @@ data:
 Render the declared values by invoking:
 
 ```sh
-$ kpt fn run --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```sh
-$ kpt fn run --image gcr.io/kpt-fn/create-setters:unstable -- 'image=ubuntu' 'replicas=3'
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- 'image=ubuntu' 'replicas=3'
 ```
 
 Rendered resource looks like the following:
@@ -118,7 +118,7 @@ data:
 Render the declared values by invoking:
 
 ```
-$ kpt fn run --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
 ```
 
 Rendered resource looks like the following:
