@@ -6,19 +6,14 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/starlark/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
-	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 type StarlarkProcessor struct{}
 
 func (gkp *StarlarkProcessor) Process(resourceList *framework.ResourceList) error {
 	err := func() error {
-		s, err := resourceList.FunctionConfig.String()
-		if err != nil {
-			return err
-		}
 		sf := StarlarkRun{}
-		if err = yaml.Unmarshal([]byte(s), &sf); err != nil {
+		if err := framework.LoadFunctionConfig(resourceList.FunctionConfig, &sf); err != nil {
 			return err
 		}
 		if ve := sf.Validate(); ve != nil {
