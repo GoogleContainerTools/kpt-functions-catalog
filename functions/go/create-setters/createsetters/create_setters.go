@@ -16,7 +16,7 @@ var _ kio.Filter = &CreateSetters{}
 // CreateSetters creates a comment for the resource fields which
 // contain the same value as setter value
 type CreateSetters struct {
-	// Setters holds the user provided values for simple scalar setters
+	// ScalarSetters holds the user provided values for simple scalar setters
 	ScalarSetters []ScalarSetter
 
 	// ArraySetters holds the user provided values for array setters
@@ -261,21 +261,17 @@ func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
 		return fmt.Errorf("config map cannot be empty")
 	}
 	for k, v := range rn.GetDataMap() {
-		if len(v) == 0 {
+		parsedInput, err := yaml.Parse(v)
+		if err != nil {
+			return fmt.Errorf("parsing error")
+		}
+		// checks if the value is SequenceNode
+		// adds to the ArraySetters if it is a SequenceNode
+		// adds to the ScalarSetters if it is a ScalarNode
+		if parsedInput.YNode().Kind == yaml.SequenceNode {
+			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
+		} else if parsedInput.YNode().Kind == yaml.ScalarNode {
 			fcd.ScalarSetters = append(fcd.ScalarSetters, ScalarSetter{Name: k, Value: v})
-		} else {
-			parsedInput, err := yaml.Parse(v)
-			if err != nil {
-				return fmt.Errorf("parsing error")
-			}
-			// checks if the value is SequenceNode
-			// adds to the ArraySetters if it is a SequenceNode
-			// adds to the ScalarSetters if it is a ScalarNode
-			if parsedInput.YNode().Kind == yaml.SequenceNode {
-				fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
-			} else if parsedInput.YNode().Kind == yaml.ScalarNode {
-				fcd.ScalarSetters = append(fcd.ScalarSetters, ScalarSetter{Name: k, Value: v})
-			}
 		}
 	}
 
