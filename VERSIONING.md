@@ -2,14 +2,16 @@
 
 ## SemVer and shorter SemVer
 
-We use [semantic versioning] for all of our images. We also support a shorter
-version of semantic versioning. E.g. `v<major> and v<major>.<minor>`.
+We use [semantic versioning] for all of our images. The images with fully
+specified version (e.g. `vX.Y.Z`) are immutable and will never be changed. We
+also support a shorter version of semantic versioning. E.g.
+`v<major> and v<major>.<minor>`.
 
 The shorter version of semantic versioning is going to be "moving tags":
 
 - `v<major>.<minor>` always points to `v<major>.<minor>.X` where X is the latest
-(largest) patch version number. E.g. assume `v1.2` points `v1.2.0` initially.
-After `v1.2.1` is released, `v1.2` now points to `v1.2.1`.
+  (largest) patch version number. E.g. assume `v1.2` points `v1.2.0` initially.
+  After `v1.2.1` is released, `v1.2` now points to `v1.2.1`.
   
 - `v<major>` always points to `v<major>.X` where X is the latest (largest) minor
   version number. E.g. assume `v1` points `v1.2.0` initially. After `v1.3.0` is
@@ -20,25 +22,24 @@ Note: We do NOT support the `latest` tag, since we cannot provide any
 compatibility guarantee for it, and the pipeline won’t produce deterministic
 results.
 
-## API
+## Interfaces
 
-All functions in the catalog comply with the [function spec]. A function can be
-represented as the following:
+All functions in the catalog comply with the [function spec]. To learn more
+about the functions concept, see [here](http://kpt.dev/book/02-concepts/03-functions).
 
-![function representation](https://kpt.dev/static/images/func.svg)
+There are 2 interfaces for a function:
+- The `functionConfig`
+- The function itself
 
-There are 2 API surfaces for a function:
-- The CRD function config API
-- The behavior of a function as API
+### functionConfig as an interface
 
-### CRD Function Config API
+A `functionConfig` can be either a CRD or other KRM resource (e.g. `ConfigMap`).
+If the `functionConfig` is a CRD, it can be versioned independently as a normal
+CRD. 
 
-A function can choose to support a CRD as the function config. It can be
-versioned as a normal CRD. 
+### Function as an interface
 
-### Function API
-
-#### What are NOT part of the function API
+#### What are NOT part of the function interface
 
 - The formatting of serialization for output items and results. e.g. yaml
   indentation and order of fields in a map.
@@ -46,11 +47,11 @@ versioned as a normal CRD.
 - The order of result items in the results.
 - The content of the unstructured messages in the results.
 
-#### What are part of the function API
+#### What are part of the function interface
 
-- The supported fields in the ConfigMap as the function config.
-- The supported versions of the CRD function configs.
-- How the function behave given the input items and function config:
+- The supported fields in the ConfigMap as the `functionConfig`.
+- The supported versions of the CRD `functionConfigs`.
+- How the function behave given the input items and `functionConfig`:
   - The reminder aspects of the output items that are not mentioned in the
     previous section.
   - The reminder aspects of the results that are not mentioned in the
@@ -58,9 +59,9 @@ versioned as a normal CRD.
 
 ### Breaking Changes
 
-We define a breaking change as: For any given input (including input items,
-functionConfig and OpenAPI), the function produces a different output (including
-output items, results) that are part of the API.
+We define a breaking change as: For any given input (including `input items`,
+`functionConfig` and OpenAPI), the function produces a different output
+(including output items, results) that are part of the interface.
 
 ### Backwards Compatibility
 
