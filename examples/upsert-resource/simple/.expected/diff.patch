@@ -1,0 +1,13 @@
+diff --git a/resources.yaml b/resources.yaml
+index 50886bd..c18550c 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -5,7 +5,7 @@ metadata:
+   namespace: mySpace
+ spec:
+   selector:
+-    app: foo
++    app: bar
+ ---
+ apiVersion: apps/v1
+ kind: Deployment

@@ -1,0 +1,15 @@
+diff --git a/poddisruptionbudget_nginx-pdb.yaml b/poddisruptionbudget_nginx-pdb.yaml
+new file mode 100644
+index 0000000..b382e85
+--- /dev/null
++++ b/poddisruptionbudget_nginx-pdb.yaml
+@@ -0,0 +1,9 @@
++apiVersion: policy/v1beta1
++kind: PodDisruptionBudget
++metadata:
++  name: nginx-pdb
++spec:
++  selector:
++    matchLabels:
++      app: nginx
++  minAvailable: 1

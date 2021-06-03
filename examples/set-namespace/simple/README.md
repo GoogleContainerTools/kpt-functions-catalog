@@ -1,35 +1,40 @@
 # set-namespace: Simple Example
 
-The `set-namespace` function adds or replaces the `.metadata.namespace` field on
-all resources except for those known to be cluster-scoped.
+### Overview
 
-We use the following ConfigMap to configure the function.
+This example demonstrates how to declaratively run [`set-namespace`] function
+to adds or replaces the `.metadata.namespace` field on all resources except for
+those known to be cluster-scoped.
+
+We use the following `Kptfile` to configure the function.
 
 ```yaml
-apiVersion: v1
-kind: ConfigMap
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
 metadata:
-  ...
-data:
-  namespace: example-ns
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/set-namespace:unstable
+      configMap:
+        namespace: example-ns
 ```
 
-The desired namespace is provided using `.data.namespace` field.
+The function configuration is provided using a `ConfigMap`. We set only one
+key-value pair:
+- `namespace: example-ns`: The desired namespace.
 
-## Function invocation
+### Function invocation
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/simple .
-kpt fn run simple
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/simple .
+$ kpt fn render simple
 ```
 
-## Expected result
+### Expected result
 
 Check all resources have `metadata.namespace` set to `example-ns`:
 
-```sh
-kpt cfg cat simple
-```
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/

@@ -1,0 +1,20 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: nginx
+packageMetadata:
+  shortDescription: describe this package
+upstream:
+  type: git
+  git:
+    commit: 4d2aa98b45ddee4b5fa45fbca16f2ff887de9efb
+    repo: https://github.com/GoogleContainerTools/kpt
+    directory: package-examples/nginx
+    ref: v0.2
+openAPI:
+  definitions:
+    io.k8s.cli.setters.name:
+      x-k8s-cli:
+        setter:
+          name: name
+          value: the-map

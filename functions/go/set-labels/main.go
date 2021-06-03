@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/generated"
 	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
-
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/generated"
 )
 
 const (
@@ -22,6 +22,39 @@ const (
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
 	fnConfigKind       = "SetLabelConfig"
 )
+
+//nolint
+func main() {
+	resourceList := &framework.ResourceList{}
+	resourceList.FunctionConfig = &kyaml.RNode{}
+	asp := SetLabelsProcessor{}
+	cmd := command.Build(&asp, command.StandaloneEnabled, false)
+
+	cmd.Short = generated.SetLabelsShort
+	cmd.Long = generated.SetLabelsLong
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
+type SetLabelsProcessor struct{}
+
+func (slp *SetLabelsProcessor) Process(resourceList *framework.ResourceList) error {
+	err := run(resourceList)
+	if err != nil {
+		resourceList.Result = &framework.Result{
+			Name: "set-labels",
+			Items: []framework.ResultItem{
+				{
+					Message:  err.Error(),
+					Severity: framework.Error,
+				},
+			},
+		}
+		return resourceList.Result
+	}
+	return nil
+}
 
 type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"commonLabels,omitempty" yaml:"commonLabels,omitempty"`
@@ -32,15 +65,7 @@ type setLabelFunction struct {
 	plugin             `json:",inline" yaml:",inline"`
 }
 
-func (f *setLabelFunction) Config(fnConfig interface{}) error {
-	configMap, ok := fnConfig.(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("function config %#v is not valid", fnConfig)
-	}
-	rn, err := kyaml.FromMap(configMap)
-	if err != nil {
-		return fmt.Errorf("failed to construct RNode from %#v: %w", configMap, err)
-	}
+func (f *setLabelFunction) Config(rn *kyaml.RNode) error {
 	switch {
 	case f.validGVK(rn, "v1", "ConfigMap"):
 		f.plugin.Labels = rn.GetDataMap()
@@ -104,36 +129,6 @@ func getDefaultConfig() (transformerConfig, error) {
 func newResMapFactory() *resmap.Factory {
 	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
 	return resmap.NewFactory(resourceFactory, nil)
-}
-
-//nolint
-func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = map[string]interface{}{}
-
-	cmd := framework.Command(resourceList, func() error {
-		err := run(resourceList)
-		if err != nil {
-			resourceList.Result = &framework.Result{
-				Name: "set-labels",
-				Items: []framework.Item{
-					{
-						Message:  err.Error(),
-						Severity: framework.Error,
-					},
-				},
-			}
-			return resourceList.Result
-		}
-		return nil
-	})
-
-	cmd.Short = generated.SetLabelShort
-	cmd.Long = generated.SetLabelLong
-	cmd.Example = generated.SetLabelExamples
-	if err := cmd.Execute(); err != nil {
-		os.Exit(1)
-	}
 }
 
 func run(resourceList *framework.ResourceList) error {

@@ -29,13 +29,21 @@ kpt fn source example-configs |
   kpt fn run --env SOPS_IMPORT_PGP="$(cat key.asc)" --image gcr.io/kpt-fn-contrib/sops:"${TAG}" -- verbose=true >out.yaml
 assert_contains_string out.yaml "t00m4nys3cr3tzupdated"
 
-testcase "kpt_sops_declarative_example"
+testcase "kpt_sops_declarative_example_gpg"
 # get examples from the current version of repo
-cp -r "$REPODIR"/examples/contrib/sops .
+cp -r "$REPODIR"/examples/contrib/sops/gpg .
 curl -fsSL -o key.asc https://raw.githubusercontent.com/mozilla/sops/master/pgp/sops_functional_tests_key.asc
-SOPS_IMPORT_PGP="$(cat key.asc)" kpt fn run sops
-assert_contains_string sops/to-decrypt.yaml "nnn-password: k8spassphrase"
-assert_contains_string sops/to-encrypt.yaml "nnn-password: 'ENC"
+SOPS_IMPORT_PGP="$(cat key.asc)" kpt fn run gpg
+assert_contains_string gpg/to-decrypt.yaml "nnn-password: k8spassphrase"
+assert_contains_string gpg/to-encrypt.yaml "nnn-password: 'ENC"
+
+testcase "kpt_sops_declarative_example_age"
+# get examples from the current version of repo
+cp -r "$REPODIR"/examples/contrib/sops/age .
+curl -fsSL -o keys.txt https://raw.githubusercontent.com/mozilla/sops/master/age/keys.txt
+SOPS_IMPORT_AGE="$(cat keys.txt)" kpt fn run age
+assert_contains_string age/to-decrypt.yaml "nnn-password: k8spassphrase"
+assert_contains_string age/to-encrypt.yaml "nnn-password: 'ENC"
 
 testcase "kpt_sops_declarative_fn_path"
 cat >fc.yaml <<EOF

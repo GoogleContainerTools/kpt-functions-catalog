@@ -130,9 +130,8 @@ func main() {
 		return nil
 	})
 
-	cmd.Short = generated.SetAnnotationShort
-	cmd.Long = generated.SetAnnotationLong
-	cmd.Example = generated.SetAnnotationExamples
+	cmd.Short = generated.SetAnnotationsShort
+	cmd.Long = generated.SetAnnotationsLong
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

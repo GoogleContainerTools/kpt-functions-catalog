@@ -130,6 +130,20 @@ async function runKubeval(
   await writeToStream(kubevalProcess.stdin, serializedObject);
   kubevalProcess.stdin.end();
   const rawOutput = await readStdoutToString(kubevalProcess);
+
+  if (rawOutput.includes('Failed initializing schema file')) {
+    results.push(
+      kubernetesObjectResult(
+        `Validating arbitrary CRDs is not supported yet. You can skip them by setting ${IGNORE_MISSING_SCHEMAS} or ${SKIP_KINDS} in the function config:\n` +
+          rawOutput,
+        object,
+        undefined,
+        'error'
+      )
+    );
+    return;
+  }
+
   try {
     const feedback = JSON.parse(rawOutput) as Feedback;
 
@@ -174,7 +188,7 @@ function buildKubevalArgs(
   skipKinds: string[],
   strict: boolean
 ) {
-  const args = ['--output', 'json'];
+  const args = ['--quiet', '--output', 'json'];
 
   if (schemaLocation) {
     args.push('--schema-location');
@@ -232,11 +246,11 @@ The function configuration must be a ConfigMap.
 The following keys can be used in the data field of the ConfigMap, and all of
 them are optional:
 
-${SCHEMA_LOCATION}: The base URL used to fetch the json schemas. The default is
+${SCHEMA_LOCATION}: The base URI used to fetch the json schemas. The default is
   empty. This feature only works with imperative runs, since declarative runs
   allow neither network access nor volume mount.
-${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URLs used to fetch the
-  json schemas.  These URLs will be used if the URL specified by
+${ADDITIONAL_SCHEMA_LOCATIONS}: List of secondary base URIs used to fetch the
+  json schemas.  These URIs will be used if the URI specified by
   ${SCHEMA_LOCATION} did not have the required schema.  The default is empty.
   This feature only works with imperative runs.
 ${IGNORE_MISSING_SCHEMAS}: Skip validation for resources without a schema. The
@@ -253,8 +267,8 @@ kind: ConfigMap
 metadata:
   name: my-func-config
 data:
-  schema_location: "https://kubernetesjsonschema.dev"
-  additional_schema_locations: "https://example.com,file:///abs/path/to/your/schema/directory"
+  schema_location: "file:///abs/path/to/your/schema/directory"
+  additional_schema_locations: "https://kubernetesjsonschema.dev,file:///abs/path/to/your/other/schema/directory"
   ignore_missing_schemas: "false"
   skip_kinds: "DaemonSet,MyCRD"
   strict: "true"
