@@ -1,0 +1,20 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
+metadata:
+  name: inject-sidecar-to-depl
+source: |
+  def ensure_inject_sidecar_to_depl(r):
+    if r["apiVersion"] == "apps/v1" and r["kind"] == "Deployment":
+      containers = r["spec"]["template"]["spec"]["containers"]
+      for container in containers:
+        if container["name"] == "logging-agent":
+          return
+      sidecar = {
+        "name": "logging-agent",
+        "image": "k8s.gcr.io/fluentd-gcp:1.30",
+      }
+      containers.append(sidecar)
+  def ensure_inject_sidecar(resources):
+    for resource in resources:
+      ensure_inject_sidecar_to_depl(resource)
+  ensure_inject_sidecar(ctx.resource_list["items"])
