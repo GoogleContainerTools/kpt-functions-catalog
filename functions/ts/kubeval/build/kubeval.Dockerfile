@@ -42,6 +42,4 @@ COPY --from=builder /home/node/app /home/node/app
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY openapi.json /home/node/
 
-ENV LOG_TO_STDERR=true
-
 ENTRYPOINT ["node", "/home/node/app/dist/kubeval_run.js"]

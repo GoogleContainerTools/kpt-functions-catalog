@@ -8,7 +8,7 @@ Ensure a name substring is part of the name.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
@@ -86,15 +86,5 @@ fieldSpecs:
 - path: spec/name
   kind: MyOwnResource
 ```
-
-<!--mdtogo-->
-
-### Examples
-
-<!-- TODO: update the following link to web page -->
-
-<!--mdtogo:Examples-->
-
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/ensure-name-substring/
 
 <!--mdtogo-->
