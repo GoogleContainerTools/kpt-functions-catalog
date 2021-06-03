@@ -2,7 +2,7 @@ FROM node:14.15-alpine3.12 as builder
 
 RUN apk add bash curl git && apk update
 
-ARG SOPS_VERSION="v3.6.1"
+ARG SOPS_VERSION="v3.7.1"
 RUN curl -fsSL -o /usr/local/bin/sops https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.linux && \
     chmod +x /usr/local/bin/sops
 
@@ -50,5 +50,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 ENV PATH /usr/local/bin:$PATH
 ENV GNUPGHOME /tmp
+ENV XDG_CONFIG_HOME /tmp
 
 ENTRYPOINT ["node", "/home/node/app/dist/sops_run.js"]
