@@ -5,11 +5,7 @@ metadata:
   annotations:
     config.k8s.io/function: |
       container:
-<<<<<<< HEAD:tests/set-labels/empty-list/simple/fn-config.yaml
-        image: gcr.io/kpt-fn/set-labels:unstable
-=======
         image: gcr.io/kpt-fn/set-namespace:v0.1
->>>>>>> master:testdata/fix/nginx-v1alpha1/hello-world/service/ns-config.yaml
     config.kubernetes.io/local-config: "true"
 data:
   namespace: foo
