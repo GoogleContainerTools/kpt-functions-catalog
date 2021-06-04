@@ -80,10 +80,10 @@ $ kpt fn render simple
 
 | Setters                                    | Value                        | Comment                               |
 |--------------------------------------------|------------------------------|---------------------------------------|
-| <pre>image: ubuntu</pre>                   | <pre>ubuntu</pre>            | ```# kpt-set: ${image}```             |
-| <pre>image: ubuntu</pre>                   | <pre>ubuntu-development</pre>| ```# kpt-set: ${image}-development``` |
-|<pre>app: nginx<br>tag: 1.1.2</pre>         | <pre>nginx:1.1.2</pre>       | ```# kpt-set: ${app}:${tag}```        |
-| <pre>role: \|<br>  - pro<br/>  - dev</pre> |<pre>- dev<br/>- pro</pre>    | ```# kpt-set: ${role}```              |
+| <pre>image: ubuntu</pre>                   | <pre>ubuntu</pre>            | `# kpt-set: ${image}`                 |
+| <pre>image: ubuntu</pre>                   | <pre>ubuntu-development</pre>| `# kpt-set: ${image}-development`     |
+| <pre>app: nginx<br>tag: 1.1.2</pre>        | <pre>nginx:1.1.2</pre>       | `# kpt-set: ${app}:${tag}`            |
+| <pre>role: \|<br>  - pro<br>  - dev</pre>  | <pre>- dev<br>- pro</pre>    | `# kpt-set: ${role}`                  |
 
 #### Note:
 

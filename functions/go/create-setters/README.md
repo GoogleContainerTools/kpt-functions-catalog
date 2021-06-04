@@ -17,7 +17,7 @@ Setters are a safer alternative to other substitution techniques which do not
 have the context of the structured data. Setter comments can be added to
 parameterize the field values of resources using create-setters function.
 
-We use ConfigMap to configure the `create-setters` function. The desired setter
+We use `ConfigMap` to configure the `create-setters` function. The desired setter
 values are provided as key-value pairs using `data` field.
 Here, the key is the name of the setter which is used to set the comment and
 value is the field value to parameterize.
@@ -88,7 +88,7 @@ spec:
 
 #### Setting comment for array values
 
-Array values can also be parameterized using setters. Since the values of configMap
+Array values can also be parameterized using setters. Since the values of `ConfigMap`
 in pipeline definition must be of string type, the array values must be wrapped into
 string.
 
