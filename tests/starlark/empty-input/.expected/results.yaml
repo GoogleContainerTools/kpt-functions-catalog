@@ -5,7 +5,7 @@ metadata:
 exitCode: 1
 items:
     - image: gcr.io/kpt-fn/starlark:unstable
-      stderr: '`source` must not be empty'
+      stderr: '[error] /// : `source` must not be empty'
       exitCode: 1
       results:
         - message: '`source` must not be empty'
