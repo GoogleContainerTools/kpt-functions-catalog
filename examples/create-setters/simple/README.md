@@ -65,11 +65,6 @@ roles: # kpt-set: ${role}
   - pro
 ```
 
-#### Note:
-
-If this function adds setter comments to fields for which you didn't intend to parameterize,
-you can simply review and delete those comments manually.
-
 ### Function invocation
 
 Get the config example and try it out by running the following commands:
@@ -81,14 +76,16 @@ $ kpt fn render simple
 
 ### Expected result
 
-Check the comment for resource with the value `ubuntu-development` is set to
-`# kpt-set: ${image}-development` as it matches the setter `image: ubuntu`
+`Comment` is added to the resources with the `Values` given below as they match the `Setters`.
 
-Check the comment for resource with the value `ubuntu` is set to
-`# kpt-set: ${image}` as it matches the setter `image: ubuntu`
+| Setters                                    | Value                        | Comment                               |
+|--------------------------------------------|------------------------------|---------------------------------------|
+| <pre>image: ubuntu</pre>                   | <pre>ubuntu</pre>            | ```# kpt-set: ${image}```             |
+| <pre>image: ubuntu</pre>                   | <pre>ubuntu-development</pre>| ```# kpt-set: ${image}-development``` |
+|<pre>app: nginx<br>tag: 1.1.2</pre>         | <pre>nginx:1.1.2</pre>       | ```# kpt-set: ${app}:${tag}```        |
+| <pre>role: \|<br>  - pro<br/>  - dev</pre> |<pre>- dev<br/>- pro</pre>    | ```# kpt-set: ${role}```              |
 
-Check the comment for resource with the value `nginx:1.1.2` is set to
-`# kpt-set: ${app}:${tag}` as it matches the setters `image: ubuntu, tag: 1.1.2`
+#### Note:
 
-Check the comment for resource with the value `-dev\n-pro` is set to
-`# kpt-set: ${role}` as it matches the array setter `role: |\n  - pro\n  - dev`
+If this function adds setter comments to fields for which you didn't intend to parameterize,
+you can simply review and delete those comments manually.

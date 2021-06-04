@@ -79,7 +79,7 @@ func (a CompareSetters) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }
 
-// Filter implements CreatSetters cs a yaml.Filter
+// Filter implements CreatSetters as a yaml.Filter
 func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 
 	for i := range nodes {
@@ -135,11 +135,10 @@ env:
   - foo
   - bar
 */
-
 func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 	return object.VisitFields(func(node *yaml.MapNode) error {
 		if node == nil || node.Key.IsNil() || node.Value.IsNil() {
-			// don't do IsNilOrEmpty check cs empty sequences are allowed
+			// don't do IsNilOrEmpty check as empty sequences are allowed
 			return nil
 		}
 		// the aim of this method is to create-setter for sequence nodes
@@ -167,11 +166,14 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 		nodeToAddComment := node.Value
 		if nodeToAddComment.YNode().Style == yaml.FlowStyle {
 			if hasMatchValue(nodeValues, cs.ScalarSetters) {
-				// changing the node style to FoldedStyle
+				// changes the node style to FoldedStyle
 				nodeToAddComment.YNode().Style = yaml.FoldedStyle
-				// To add the comment to the key for the FoldedStyle value node
+				// adds the comment to the key for the FoldedStyle value node
 				nodeToAddComment = node.Key
 			}
+		}else{
+			// adds comment to the key for the FoldedStyle value node
+			nodeToAddComment = node.Key
 		}
 
 		for _, arraySetters := range cs.ArraySetters {
@@ -214,9 +216,7 @@ apiVersion: v1
 ...
   env: dev # kpt-set: ${env}
   image: nginx:1.7.1 # kpt-set: ${image}:${tag}
-
 */
-
 func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 	if object.YNode().Kind != yaml.ScalarNode {
 		// return if it is not a scalar node
@@ -236,47 +236,6 @@ func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 		})
 	}
 
-	return nil
-}
-
-/**
-Decode decodes the input yaml node into CreatSetters struct
-places the setter either in ScalarSetters or ArraySetters
-sorts the ScalarSetters using CompareSetters
-
-e.g.for input ScalarSetters
-	[[name: image, value: nginx], [name: ubuntu, value: image]]
-
-Input:
-	spec: nginx-development
-
-To avoid this case, sorts the ScalarSetters
-	spec: nginx-development # kpt-set: ${ubuntu}-development
-
-ScalarSetters array is transformed to
-	[[name: ubuntu, value: image], [name: image, value: nginx]]
-*/
-func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
-	if len(rn.GetDataMap()) == 0 {
-		return fmt.Errorf("config map cannot be empty")
-	}
-	for k, v := range rn.GetDataMap() {
-		parsedInput, err := yaml.Parse(v)
-		if err != nil {
-			return fmt.Errorf("parsing error")
-		}
-		// checks if the value is SequenceNode
-		// adds to the ArraySetters if it is a SequenceNode
-		// adds to the ScalarSetters if it is a ScalarNode
-		if parsedInput.YNode().Kind == yaml.SequenceNode {
-			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
-		} else if parsedInput.YNode().Kind == yaml.ScalarNode {
-			fcd.ScalarSetters = append(fcd.ScalarSetters, ScalarSetter{Name: k, Value: v})
-		}
-	}
-
-	// sorts all the Setters
-	sort.Sort(CompareSetters(fcd.ScalarSetters))
 	return nil
 }
 
@@ -322,6 +281,7 @@ func hasMatchValue(nodeValues []string, setters []ScalarSetter) bool {
 	}
 	return false
 }
+
 /**
 getLineComment checks if any of the setters value matches with the node value
 replaces that part of the node value with the ${setterName}
@@ -354,4 +314,45 @@ func getLineComment(nodeValue string, setters []ScalarSetter) (string, bool) {
 	}
 
 	return output, valueMatch
+}
+
+/**
+Decode decodes the input yaml node into CreatSetters struct
+places the setter either in ScalarSetters or ArraySetters
+sorts the ScalarSetters using CompareSetters
+
+e.g.for input ScalarSetters
+	[[name: image, value: nginx], [name: ubuntu, value: image]]
+
+for scalar node:
+	spec: nginx-development
+
+Sorts the ScalarSetters to avoid following case
+	spec: nginx-development # kpt-set: ${ubuntu}-development
+
+ScalarSetters array is transformed to
+	[[name: ubuntu, value: image], [name: image, value: nginx]]
+*/
+func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
+	if len(rn.GetDataMap()) == 0 {
+		return fmt.Errorf("config map cannot be empty")
+	}
+	for k, v := range rn.GetDataMap() {
+		parsedInput, err := yaml.Parse(v)
+		if err != nil {
+			return fmt.Errorf("parsing error")
+		}
+		// checks if the value is SequenceNode
+		// adds to the ArraySetters if it is a SequenceNode
+		// adds to the ScalarSetters if it is a ScalarNode
+		if parsedInput.YNode().Kind == yaml.SequenceNode {
+			fcd.ArraySetters = append(fcd.ArraySetters, ArraySetter{Name: k, Values: getArraySetter(parsedInput)})
+		} else if parsedInput.YNode().Kind == yaml.ScalarNode {
+			fcd.ScalarSetters = append(fcd.ScalarSetters, ScalarSetter{Name: k, Value: v})
+		}
+	}
+
+	// sorts all the Setters
+	sort.Sort(CompareSetters(fcd.ScalarSetters))
+	return nil
 }

@@ -161,6 +161,33 @@ spec:
 `,
 		},
 		{
+			name: "FoldedStyle with matching values",
+			config: `
+data:
+  images: |
+    - nginx
+    - ubuntu
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images:
+    - nginx
+    - ubuntu
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images: # kpt-set: ${images}
+    - nginx
+    - ubuntu
+`,
+		},
+		{
 			name: "containing overlap values",
 			config: `
 data:

@@ -4,21 +4,23 @@
 
 <!--mdtogo:Short-->
 
-Add setter comments to matching resource fields. Setters serve as parameters for template-free setting of comments.
+Add setter comments to matching resource fields. Setters serve as parameters 
+for template-free setting of comments.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
 Setters are a safer alternative to other substitution techniques which do not
-have the context of the structured data. Setter comments can be added to 
+have the context of the structured data. Setter comments can be added to
 parameterize the field values of resources using create-setters function.
 
 We use ConfigMap to configure the `create-setters` function. The desired setter
 values are provided as key-value pairs using `data` field.
-Here, the key is the name of the setter which is used to set the comment and value is the field value to parameterize.
+Here, the key is the name of the setter which is used to set the comment and
+value is the field value to parameterize.
 
 ```yaml
 apiVersion: v1
@@ -63,14 +65,14 @@ data:
 
 Render the declared values by invoking:
 
-```sh
+```shell
 $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
-```sh
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- 'image=ubuntu' 'replicas=3'
+```shell
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- image=ubuntu replicas=3
 ```
 
 Rendered resource looks like the following:
@@ -102,7 +104,8 @@ environments:
   - stage
 ```
 
-Declare the array values, wrapped into string. Here the order of the array values doesn't make a difference.
+Declare the array values, wrapped into string. Here the order of the array values
+doesn't make a difference.
 
 ```yaml
 apiVersion: v1
@@ -117,7 +120,7 @@ data:
 
 Render the declared values by invoking:
 
-```
+```shell
 $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
 ```
 
@@ -133,3 +136,8 @@ environments: # kpt-set: ${env}
   - stage
 ```
 <!--mdtogo-->
+
+#### Note:
+
+If this function adds setter comments to fields for which you didn't intend to parameterize,
+you can simply review and delete those comments manually.

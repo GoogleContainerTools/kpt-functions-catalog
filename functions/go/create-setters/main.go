@@ -13,8 +13,6 @@ import (
 
 //nolint
 func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = &kyaml.RNode{}
 	csp := CreateSettersProcessor{}
 	cmd := command.Build(&csp, command.StandaloneEnabled, false)
 
