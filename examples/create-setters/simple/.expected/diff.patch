@@ -3,22 +3,22 @@ index 36ebeed..9e435d7 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -1,15 +1,15 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
+ apiVersion: v1
+ kind: ConfigMap
+ metadata:
 -  name: ubuntu-development
 +  name: ubuntu-development # kpt-set: ${image}-development
-data:
-  some-key: some-value
----
-apiVersion: v1
-kind: MyKind
-metadata:
+ data:
+   some-key: some-value
+ ---
+ apiVersion: v1
+ kind: MyKind
+ metadata:
 -  name: ubuntu
 -image: nginx:1.1.2
 -roles:
 +  name: ubuntu # kpt-set: ${image}
 +image: nginx:1.1.2 # kpt-set: ${app}:${tag}
 +roles: # kpt-set: ${role}
-  - dev
-  - pro
+   - dev
+   - pro
