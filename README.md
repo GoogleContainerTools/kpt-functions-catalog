@@ -4,6 +4,8 @@
 
 [Documentation]
 
+[Open an Issue]
+
 [Contributor Guide]
 
 [Release Process]
@@ -14,3 +16,4 @@
 [Contributor Guide]: CONTRIBUTING.md
 [Code of Conduct]: CODE_OF_CONDUCT.md
 [Release Process]: RELEASING.md
+[Open an Issue]: https://github.com/GoogleContainerTools/kpt/issues
