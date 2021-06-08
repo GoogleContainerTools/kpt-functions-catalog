@@ -48,7 +48,7 @@ metadata:
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/simple .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/simple
 $ kpt fn render simple
 ```
 
