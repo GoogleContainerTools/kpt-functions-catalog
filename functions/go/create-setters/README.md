@@ -32,10 +32,10 @@ data:
   setter_name2: setter_value2
 ```
 
-If this function adds setter comments to fields for which you didn't intend 
-to parameterize, you can simply review and delete/modify those comments manually.
-
 <!--mdtogo-->
+
+?> If this function adds setter comments to fields for which you didn't intend 
+to parameterize, you can simply review and delete/modify those comments manually.
 
 ### Examples
 

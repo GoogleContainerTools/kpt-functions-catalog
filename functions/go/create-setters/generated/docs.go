@@ -22,9 +22,6 @@ value is the field value to parameterize.
   data:
     setter_name1: setter_value1
     setter_name2: setter_value2
-
-If this function adds setter comments to fields for which you didn't intend 
-to parameterize, you can simply review and delete/modify those comments manually.
 `
 var CreateSettersExamples = `
 Setting comment for scalar values:
@@ -50,11 +47,11 @@ Declare the name of the setter with the value for which comments should be added
 
 Render the declared values by invoking:
 
-  $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
+  $ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
-  $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- image=ubuntu replicas=3
+  $ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 -- image=ubuntu replicas=3
 
 Rendered resource looks like the following:
 
@@ -95,7 +92,7 @@ doesn't make a difference.
 
 Render the declared values by invoking:
 
-  $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
+  $ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config
 
 Rendered resource looks like the following:
 
