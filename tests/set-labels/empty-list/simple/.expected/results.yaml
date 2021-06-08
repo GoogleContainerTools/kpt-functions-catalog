@@ -1,12 +1,12 @@
 apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
-    name: fnresults
+  name: fnresults
 exitCode: 1
 items:
-    - image: gcr.io/kpt-fn/set-labels:unstable
-      stderr: '[error] /// : failed to configure function: function config must be a ConfigMap or SetLabelConfig'
-      exitCode: 1
-      results:
-        - message: 'failed to configure function: function config must be a ConfigMap or SetLabelConfig'
-          severity: error
+  - image: gcr.io/kpt-fn/set-labels:unstable
+    stderr: '[error] /// : failed to configure function: function config must be a ConfigMap or SetLabelConfig'
+    exitCode: 1
+    results:
+      - message: 'failed to configure function: function config must be a ConfigMap or SetLabelConfig'
+        severity: error
