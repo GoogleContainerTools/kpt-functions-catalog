@@ -70,7 +70,7 @@ roles: # kpt-set: ${role}
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/create-setters/simple
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/create-setters/simple@create-setters/v0.1
 $ kpt fn render simple
 ```
 
