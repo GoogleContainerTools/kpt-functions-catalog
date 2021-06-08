@@ -356,3 +356,75 @@ metadata:
 		})
 	}
 }
+
+func TestCombineInputAndMatchedAnnotations(t *testing.T) {
+	var tests = []struct {
+		name                string
+		inputResourceAnno   map[string]string
+		matchedResourceAnno map[string]string
+		expected            map[string]string
+	}{
+		{
+			name: "combine annotations 1",
+			inputResourceAnno: map[string]string{
+				"inputFoo":                          "inputBar",
+				"config.kubernetes.io/local-config": "true",
+			},
+			matchedResourceAnno: map[string]string{
+				"existingFoo":                       "existingBar",
+				"config.kubernetes.io/index":        "0",
+				"config.kubernetes.io/path":         "foo.yaml",
+				"config.kubernetes.io/local-config": "true",
+			},
+			expected: map[string]string{
+				"inputFoo":                          "inputBar",
+				"config.kubernetes.io/index":        "0",
+				"config.kubernetes.io/path":         "foo.yaml",
+				"config.kubernetes.io/local-config": "true",
+			},
+		},
+
+		{
+			name: "combine annotations 2",
+			inputResourceAnno: map[string]string{
+				"inputFoo":                          "inputBar",
+				"config.kubernetes.io/local-config": "true",
+			},
+			matchedResourceAnno: map[string]string{
+				"existingFoo":                "existingBar",
+				"config.kubernetes.io/index": "0",
+				"config.kubernetes.io/path":  "foo.yaml",
+			},
+			expected: map[string]string{
+				"inputFoo":                          "inputBar",
+				"config.kubernetes.io/index":        "0",
+				"config.kubernetes.io/path":         "foo.yaml",
+				"config.kubernetes.io/local-config": "true",
+			},
+		},
+
+		{
+			name: "combine annotations 3",
+			inputResourceAnno: map[string]string{
+				"inputFoo": "inputBar",
+			},
+			matchedResourceAnno: map[string]string{
+				"existingFoo":                       "existingBar",
+				"config.kubernetes.io/index":        "0",
+				"config.kubernetes.io/path":         "foo.yaml",
+				"config.kubernetes.io/local-config": "true",
+			},
+			expected: map[string]string{
+				"inputFoo":                   "inputBar",
+				"config.kubernetes.io/index": "0",
+				"config.kubernetes.io/path":  "foo.yaml",
+			},
+		},
+	}
+	for i := range tests {
+		test := tests[i]
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.expected, combineInputAndMatchedAnnotations(test.inputResourceAnno, test.matchedResourceAnno))
+		})
+	}
+}
