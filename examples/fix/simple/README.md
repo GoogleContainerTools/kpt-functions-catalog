@@ -85,7 +85,7 @@ The transformed package is compatible with kpt 1.0 binary.
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/fix/simple .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/fix/simple
 $ kpt fn eval simple --image gcr.io/kpt-fn/fix:unstable --include-meta-resources
 ```
 

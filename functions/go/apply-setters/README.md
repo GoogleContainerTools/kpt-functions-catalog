@@ -7,15 +7,15 @@
 Apply setter values on resource fields. Setters serve as parameters for template-free
 setting of field values.
 
+Setters are a safer alternative to other substitution techniques which do not
+have the context of the structured data. Setters may be invoked to modify the
+package resources using this function to set desired values.
+
 <!--mdtogo-->
 
 ### FunctionConfig
 
 <!--mdtogo:Long-->
-
-Setters are a safer alternative to other substitution techniques which do not
-have the context of the structured data. Setters may be invoked to modify the
-package resources using `apply-setters` function to set desired values.
 
 We use ConfigMap to configure the `apply-setters` function. The desired setter
 values are provided as key-value pairs using `data` field where key is the name of the
@@ -138,4 +138,4 @@ environments: # kpt-set: ${env}
 
 #### Note:
 
-Refer to the `create-setters` example in `search-replace` function examples for creating setters.
+Refer to the `create-setters` function documentation for information about creating setters.

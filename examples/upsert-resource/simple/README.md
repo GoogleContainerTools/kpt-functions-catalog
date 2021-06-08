@@ -64,7 +64,7 @@ spec:
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource/simple .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource/simple
 $ kpt fn render simple
 ```
 

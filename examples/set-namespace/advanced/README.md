@@ -48,7 +48,7 @@ Suppose we have a CRD with group `dev.example.com`, version `v1` and kind
 Get the example config and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/advanced .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace/advanced
 $ kpt fn render advanced
 ```
 

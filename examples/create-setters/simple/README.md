@@ -84,8 +84,3 @@ $ kpt fn render simple
 | <pre>image: ubuntu</pre>                   | <pre>ubuntu-development</pre>| `# kpt-set: ${image}-development`     |
 | <pre>app: nginx<br>tag: 1.1.2</pre>        | <pre>nginx:1.1.2</pre>       | `# kpt-set: ${app}:${tag}`            |
 | <pre>role: \|<br>  - pro<br>  - dev</pre>  | <pre>- dev<br>- pro</pre>    | `# kpt-set: ${role}`                  |
-
-#### Note:
-
-If this function adds setter comments to fields for which you didn't intend to parameterize,
-you can simply review and delete those comments manually.

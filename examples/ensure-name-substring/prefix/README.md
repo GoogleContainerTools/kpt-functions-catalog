@@ -26,7 +26,7 @@ We are going to prepend prefix `prod-` to resource names.
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/prefix .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/prefix
 $ kpt fn render prefix
 ```
 

@@ -1,29 +1,29 @@
 apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
-    name: fnresults
+  name: fnresults
 exitCode: 1
 items:
-    - image: gcr.io/kpt-fn/kubeval:unstable
-      exitCode: 1
-      results:
-        - message: Additional property templates is not allowed
-          severity: error
-          resourceRef:
-            apiVersion: v1
-            kind: ReplicationController
-            name: bob
-          field:
-            path: templates
-          file:
-            path: resources.yaml
-        - message: 'Invalid type. Expected: [integer,null], given: string'
-          severity: error
-          resourceRef:
-            apiVersion: v1
-            kind: ReplicationController
-            name: bob
-          field:
-            path: spec.replicas
-          file:
-            path: resources.yaml
+  - image: gcr.io/kpt-fn/kubeval:unstable
+    exitCode: 1
+    results:
+      - message: Additional property templates is not allowed
+        severity: error
+        resourceRef:
+          apiVersion: v1
+          kind: ReplicationController
+          name: bob
+        field:
+          path: templates
+        file:
+          path: resources.yaml
+      - message: 'Invalid type. Expected: [integer,null], given: string'
+        severity: error
+        resourceRef:
+          apiVersion: v1
+          kind: ReplicationController
+          name: bob
+        field:
+          path: spec.replicas
+        file:
+          path: resources.yaml
