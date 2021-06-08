@@ -1,13 +1,13 @@
 apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
-    name: fnresults
+  name: fnresults
 exitCode: 1
 items:
-    - image: gcr.io/kpt-fn/apply-setters:unstable
-      stderr: |
-        no matches for the input list of settersno matches for the input list of setters
-      exitCode: 1
-      results:
-        - message: 'failed to apply setters: no matches for the input list of setters'
-          severity: error
+  - image: gcr.io/kpt-fn/apply-setters:unstable
+    stderr: |
+      no matches for the input list of settersno matches for the input list of setters
+    exitCode: 1
+    results:
+      - message: 'failed to apply setters: no matches for the input list of setters'
+        severity: error
