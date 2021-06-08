@@ -1,4 +1,12 @@
-name: starlark
+apiVersion: kpt.dev/v1alpha2
+kind: FunctionResultList
+metadata:
+    name: fnresults
+exitCode: 1
 items:
-- message: '`source` must not be empty'
-  severity: error
+    - image: gcr.io/kpt-fn/starlark:unstable
+      stderr: '[error] /// : `source` must not be empty'
+      exitCode: 1
+      results:
+        - message: '`source` must not be empty'
+          severity: error

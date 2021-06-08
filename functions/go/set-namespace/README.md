@@ -8,7 +8,7 @@ Update or add namespace.
 
 <!--mdtogo-->
 
-### Synopsis
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
@@ -100,15 +100,5 @@ fieldSpecs:
 
 For more information about fieldSpecs, please see
 https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-4
-
-<!--mdtogo-->
-
-### Examples
-
-<!-- TODO: update the following link to web page -->
-
-<!--mdtogo:Examples-->
-
-https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-namespace/
 
 <!--mdtogo-->

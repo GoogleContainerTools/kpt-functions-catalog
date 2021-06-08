@@ -46,11 +46,11 @@ Discover the names of setters in the function config file and declare desired va
 
 Render the declared values by invoking:
 
-  $ kpt fn run . --image gcr.io/kpt-fn/apply-setters:v0.1 --fn-config ./apply-setters-fn-config
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.1 --fn-config ./apply-setters-fn-config
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
-  $ kpt fn run . --image gcr.io/kpt-fn/apply-setters:v0.1 -- 'image=ubuntu' 'replicas=3'
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.1 -- 'image=ubuntu' 'replicas=3'
 
 Rendered resource looks like the following:
 
@@ -90,7 +90,7 @@ Declare the desired array values, wrapped into string.
 
 Render the declared values by invoking:
 
-  $ kpt fn run . --image gcr.io/kpt-fn/apply-setters:v0.1 --fn-config ./apply-setters-fn-config
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.1 --fn-config ./apply-setters-fn-config
 
 Rendered resource looks like the following:
 

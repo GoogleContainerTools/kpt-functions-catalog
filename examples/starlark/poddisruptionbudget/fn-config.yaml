@@ -1,0 +1,28 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
+metadata:
+  name: pdb-for-depl
+source: |
+  pdb = {
+    "apiVersion": "policy/v1beta1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "name": "nginx-pdb",
+    },
+    "spec": {
+      "minAvailable": 1,
+      "selector": {
+        "matchLabels": {
+          "app": "nginx",
+        },
+      },
+    },
+  }
+  def is_pdb(r):
+    return r["apiVersion"] == "policy/v1beta1" and r["kind"] == "PodDisruptionBudget" and r["metadata"]["name"] == "nginx-pdb"
+  def ensure_pdb(resources):
+    for resource in resources:
+      if is_pdb(resource):
+        return
+    resources.append(pdb)
+  ensure_pdb(ctx.resource_list["items"])

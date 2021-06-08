@@ -43,7 +43,9 @@ let cmdTolerateFailures = false;
 
 // pre-exec command may be overriden from config
 let preExecCmd =
-  '[ "$SOPS_IMPORT_PGP" == "" ] || (echo "$SOPS_IMPORT_PGP" | gpg --import)';
+  '[ "$SOPS_IMPORT_PGP" == "" ] || (echo "$SOPS_IMPORT_PGP" | gpg --import 2>/dev/null); \
+  [ "$XDG_CONFIG_HOME" == "" ] || [ "$SOPS_IMPORT_AGE" == "" ] || \
+  (mkdir -p $XDG_CONFIG_HOME/sops/age/ && echo "$SOPS_IMPORT_AGE" > $XDG_CONFIG_HOME/sops/age/keys.txt);';
 
 // list of annotations that will be detached before decryption
 // this is needed, because tools like kpt add some annotations
