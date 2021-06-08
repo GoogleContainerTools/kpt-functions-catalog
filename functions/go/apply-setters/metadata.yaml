@@ -1,5 +1,5 @@
 image: gcr.io/kpt-fn/apply-setters
-description: Apply setter values on resource fields. Setters serve as parameters for template-free setting of field values.
+description: Apply setter values on resource fields.
 tags:
   - mutator
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/apply-setters/v0.1/functions/go/apply-setters

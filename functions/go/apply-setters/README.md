@@ -13,6 +13,8 @@ package resources using this function to set desired values.
 
 <!--mdtogo-->
 
+?> Refer to the `create-setters` function documentation for information about creating setters.
+
 ### FunctionConfig
 
 <!--mdtogo:Long-->
@@ -135,7 +137,3 @@ environments: # kpt-set: ${env}
 ```
 
 <!--mdtogo-->
-
-#### Note:
-
-Refer to the `create-setters` function documentation for information about creating setters.
