@@ -1,5 +1,5 @@
 image: gcr.io/kpt-fn/create-setters
-description: Add setter comments to matching resource fields.
+description: Add setter comments to resource fields.
 tags:
   - mutator
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/create-setters/v0.1/functions/go/create-setters
