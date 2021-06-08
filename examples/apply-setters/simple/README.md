@@ -77,9 +77,10 @@ $ kpt fn render simple
 
 ### Expected result
 
-Check the value of setter `image` is set to `darwin`.
-Check the value of setter `tag` is set to value `2.1.2`.
-Check the value of setter `role` is set to array value `[dev, intermediate]`.
+1. Check the value of field `metadata.name` is set to `darwin-development` in `ConfigMap` resource.
+2. Check the value of field `metadata.name` is set to value `darwin` in `MyKind` resource.
+3. Check the value of field `image` is set to value `nginx:2.1.2` in `MyKind` resource.
+4. Check the value of field `roles` is set to array value `[dev, intermediate]` in `MyKind` resource.
 
 #### Note:
 

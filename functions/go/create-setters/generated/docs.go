@@ -4,12 +4,12 @@
 package generated
 
 var CreateSettersShort = `Add setter comments to matching resource fields. Setters serve as parameters 
-for template-free setting of comments.`
-var CreateSettersLong = `
+for template-free setting of comments.
+
 Setters are a safer alternative to other substitution techniques which do not
 have the context of the structured data. Setter comments can be added to
-parameterize the field values of resources using create-setters function.
-
+parameterize the field values of resources using this function.`
+var CreateSettersLong = `
 We use ` + "`" + `ConfigMap` + "`" + ` to configure the ` + "`" + `create-setters` + "`" + ` function. The desired setter
 values are provided as key-value pairs using ` + "`" + `data` + "`" + ` field.
 Here, the key is the name of the setter which is used to set the comment and
