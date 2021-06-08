@@ -1,0 +1,43 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sbannedconfigmapkeysv1
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBannedConfigMapKeysV1
+        validation:
+          openAPIV3Schema:
+            properties:
+              keys:
+                type: array
+                items:
+                  type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |-
+        package ban_keys
+
+        violation[{"msg": sprintf("%v", [val])}] {
+          keys = {key | input.review.object.data[key]}
+          banned = {key | input.parameters.keys[_] = key}
+          overlap = keys & banned
+          count(overlap) > 0
+          val := sprintf("The following banned keys are being used in the ConfigMap: %v", [overlap])
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sBannedConfigMapKeysV1
+metadata:
+  name: no-secrets-in-configmap
+spec:
+  match:
+    kinds:
+      - apiGroups:
+          - ''
+        kinds:
+          - ConfigMap
+  parameters:
+    keys:
+      - private_key

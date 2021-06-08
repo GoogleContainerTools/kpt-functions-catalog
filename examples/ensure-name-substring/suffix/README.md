@@ -1,41 +1,40 @@
 # ensure-name-substring: Suffix Example
 
-Note: This is an alpha function, and we are actively seeking feedback on the
-function config syntax and behavior. If you have suggestion or feedback, please
-file an issue [here](https://github.com/GoogleContainerTools/kpt/issues/new/choose).
+### Overview
 
-In this example, we use the function `ensure-name-substring` to ensure every
-resource name contains the desired name substring. We append the substring if it
-doesn't exist.
+This example demonstrates how to declaratively run the [`ensure-name-substring`]
+function to append suffix in the resource names.
 
-We use the following ConfigMap to configure the function.
+We use the following `Kptfile` to run the function.
 
 ```yaml
-apiVersion: v1
-kind: ConfigMap
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
 metadata:
-  ...
-data:
-  append: -prod
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/ensure-name-substring:v0.1
+      configMap:
+        append: -prod
 ```
 
-## Function invocation
+We are going to append suffix `-prod` to resource names.
+
+### Function invocation
 
 Get the config example and try it out by running the following commands:
 
-<!-- @getAndRunPkg @test -->
-```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/suffix@ensure-name-substring/v0.1 .
-kpt fn run suffix
+```shell
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/suffix@ensure-name-substring/v0.1 .
+$ kpt fn render suffix
 ```
 
-## Expected result
+### Expected result
 
 Check all resources have `-prod` in their names:
 
-```sh
-kpt cfg cat suffix
-```
-
 We have a `Service` object whose name is `the-service-prod` which already
-contains `-prod`. This function will skip it.
+contains substring`-prod`. This resource will be skipped.
+
+[ensure-name-substring]: https://catalog.kpt.dev/ensure-name-substring/v0.1/

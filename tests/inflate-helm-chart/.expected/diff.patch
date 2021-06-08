@@ -19,7 +19,7 @@ index 0000000..bb8c2f0
 +    include  "/opt/bitnami/nginx/conf/server_blocks/common/*.conf";
 diff --git a/deployment_nginx-test.yaml b/deployment_nginx-test.yaml
 new file mode 100644
-index 0000000..667ceca
+index 0000000..d1962aa
 --- /dev/null
 +++ b/deployment_nginx-test.yaml
 @@ -0,0 +1,75 @@
@@ -47,60 +47,60 @@ index 0000000..667ceca
 +        helm.sh/chart: nginx-8.4.0
 +    spec:
 +      containers:
-+      - name: nginx
-+        image: 'docker.io/bitnami/nginx:1.19.6-debian-10-r21'
-+        ports:
-+        - name: http
-+          containerPort: 8080
-+        env:
-+        - name: BITNAMI_DEBUG
-+          value: 'false'
-+        resources:
-+          limits: {}
-+          requests: {}
-+        volumeMounts:
-+        - name: nginx-server-block-paths
-+          mountPath: /opt/bitnami/nginx/conf/server_blocks
-+        livenessProbe:
-+          failureThreshold: 6
-+          periodSeconds: 10
-+          successThreshold: 1
-+          tcpSocket:
-+            port: http
-+          timeoutSeconds: 5
-+        readinessProbe:
-+          failureThreshold: 3
-+          initialDelaySeconds: 5
-+          periodSeconds: 5
-+          successThreshold: 1
-+          tcpSocket:
-+            port: http
-+          timeoutSeconds: 3
-+        imagePullPolicy: IfNotPresent
++        - name: nginx
++          image: 'docker.io/bitnami/nginx:1.19.6-debian-10-r21'
++          ports:
++            - name: http
++              containerPort: 8080
++          env:
++            - name: BITNAMI_DEBUG
++              value: 'false'
++          resources:
++            limits: {}
++            requests: {}
++          volumeMounts:
++            - name: nginx-server-block-paths
++              mountPath: /opt/bitnami/nginx/conf/server_blocks
++          livenessProbe:
++            failureThreshold: 6
++            periodSeconds: 10
++            successThreshold: 1
++            tcpSocket:
++              port: http
++            timeoutSeconds: 5
++          readinessProbe:
++            failureThreshold: 3
++            initialDelaySeconds: 5
++            periodSeconds: 5
++            successThreshold: 1
++            tcpSocket:
++              port: http
++            timeoutSeconds: 3
++          imagePullPolicy: IfNotPresent
 +      volumes:
-+      - name: nginx-server-block-paths
-+        configMap:
-+          name: nginx-test-server-block
-+          items:
-+          - key: server-blocks-paths.conf
-+            path: server-blocks-paths.conf
++        - name: nginx-server-block-paths
++          configMap:
++            name: nginx-test-server-block
++            items:
++              - key: server-blocks-paths.conf
++                path: server-blocks-paths.conf
 +      affinity:
 +        nodeAffinity: null
 +        podAffinity: null
 +        podAntiAffinity:
 +          preferredDuringSchedulingIgnoredDuringExecution:
-+          - podAffinityTerm:
-+              labelSelector:
-+                matchLabels:
-+                  app.kubernetes.io/instance: nginx-test
-+                  app.kubernetes.io/name: nginx
-+              namespaces:
-+              - default
-+              topologyKey: kubernetes.io/hostname
-+            weight: 1
++            - podAffinityTerm:
++                labelSelector:
++                  matchLabels:
++                    app.kubernetes.io/instance: nginx-test
++                    app.kubernetes.io/name: nginx
++                namespaces:
++                  - default
++                topologyKey: kubernetes.io/hostname
++              weight: 1
 diff --git a/service_nginx-test.yaml b/service_nginx-test.yaml
 new file mode 100644
-index 0000000..1c0b0f3
+index 0000000..da90a97
 --- /dev/null
 +++ b/service_nginx-test.yaml
 @@ -0,0 +1,19 @@
@@ -119,7 +119,7 @@ index 0000000..1c0b0f3
 +    app.kubernetes.io/instance: nginx-test
 +    app.kubernetes.io/name: nginx
 +  ports:
-+  - name: http
-+    port: 80
-+    targetPort: http
++    - name: http
++      port: 80
++      targetPort: http
 +  externalTrafficPolicy: Cluster
