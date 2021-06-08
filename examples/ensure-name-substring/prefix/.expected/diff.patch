@@ -1,0 +1,31 @@
+diff --git a/resources.yaml b/resources.yaml
+index cff6bae..80988f6 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -1,7 +1,7 @@
+ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+-  name: the-map
++  name: prod-the-map
+   namespace: the-namespace
+ data:
+   some-key: some-value
+@@ -9,7 +9,7 @@ data:
+ apiVersion: v1
+ kind: Pod
+ metadata:
+-  name: the-pod
++  name: prod-the-pod
+   namespace: the-namespace
+ spec:
+   containers:
+@@ -23,7 +23,7 @@ spec:
+         - name: SOME_KEY
+           valueFrom:
+             configMapKeyRef:
+-              name: the-map
++              name: prod-the-map
+               key: some-key
+ ---
+ apiVersion: v1

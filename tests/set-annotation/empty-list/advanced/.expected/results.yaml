@@ -1,4 +1,0 @@
-name: set-annotation
-items:
-- message: 'failed to configure function: input annotation list cannot be empty'
-  severity: error

@@ -1,0 +1,14 @@
+apiVersion: kpt.dev/v1alpha2
+kind: Kptfile
+metadata:
+  name: example
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/create-setters:unstable
+      configMap:
+        app: nginx
+        image: ubuntu
+        role: |
+          - dev
+          - pro
+        tag: 1.1.2
