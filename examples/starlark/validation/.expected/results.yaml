@@ -1,12 +1,12 @@
 apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
-    name: fnresults
+  name: fnresults
 exitCode: 1
 items:
-    - image: gcr.io/kpt-fn/starlark:unstable
-      stderr: '[error] /// : fail: it is prohibited to have private key in a configmap'
-      exitCode: 1
-      results:
-        - message: 'fail: it is prohibited to have private key in a configmap'
-          severity: error
+  - image: gcr.io/kpt-fn/starlark:unstable
+    stderr: '[error] /// : fail: it is prohibited to have private key in a configmap'
+    exitCode: 1
+    results:
+      - message: 'fail: it is prohibited to have private key in a configmap'
+        severity: error
