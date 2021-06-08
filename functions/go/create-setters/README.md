@@ -69,13 +69,13 @@ data:
 Render the declared values by invoking:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- image=ubuntu replicas=3
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 -- image=ubuntu replicas=3
 ```
 
 Rendered resource looks like the following:
@@ -124,7 +124,7 @@ data:
 Render the declared values by invoking:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config
 ```
 
 Rendered resource looks like the following:
