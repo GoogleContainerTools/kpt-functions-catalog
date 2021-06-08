@@ -2,9 +2,11 @@
 
 ### Overview
 
-Setters provide a solution for template-free setting of field values. The
-`apply-setters` KRM config function applies setter values to resource fields
+The `apply-setters` KRM config function applies setter values to resource fields
 with setter references.
+
+In this example, we will see how to apply desired setter values to the 
+resource fields parameterized by `kpt-set` comments.
 
 Let's start with the input resources
 
@@ -12,17 +14,18 @@ Let's start with the input resources
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: the-map # kpt-set: ${name}
+  name: ubuntu-development # kpt-set: ${image}-development
 data:
   some-key: some-value
 ---
 apiVersion: v1
 kind: MyKind
 metadata:
-  name: ns
-environments: # kpt-set: ${env}
+  name: ubuntu # kpt-set: ${image}
+image: nginx:1.1.2 # kpt-set: ${app}:${tag}
+roles: # kpt-set: ${role}
   - dev
-  - stage
+  - pro
 ```
 
 We use `ConfigMap` to configure the `apply-setters` function. The desired
@@ -36,10 +39,11 @@ kind: ConfigMap
 metadata:
   name: apply-setters-fn-config
 data:
-  name: my-new-map
-  env: |
-    - prod
-    - stage
+  image: darwin
+  role: |
+    - dev
+    - intermediate
+  tag: 2.1.2
 ```
 
 Invoking `apply-setters` function would apply the changes to resource configs
@@ -48,17 +52,18 @@ Invoking `apply-setters` function would apply the changes to resource configs
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: my-new-map # kpt-set: ${name}
+  name: darwin-development # kpt-set: ${image}-development
 data:
   some-key: some-value
 ---
 apiVersion: v1
 kind: MyKind
 metadata:
-  name: ns
-environments: # kpt-set: ${env}
-  - prod
-  - stage
+  name: darwin # kpt-set: ${image}
+image: nginx:2.1.2 # kpt-set: ${app}:${tag}
+roles: # kpt-set: ${role}
+  - dev
+  - intermediate
 ```
 
 ### Function invocation
@@ -66,15 +71,17 @@ environments: # kpt-set: ${env}
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters/simple .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters/simple
 $ kpt fn render simple
 ```
 
 ### Expected result
 
-Check the value of setter `name` is set to `my-new-map`.
-Check the value of setter `env` is set to array value `[prod, stage]`.
+1. Check the value of field `metadata.name` is set to `darwin-development` in `ConfigMap` resource.
+2. Check the value of field `metadata.name` is set to value `darwin` in `MyKind` resource.
+3. Check the value of field `image` is set to value `nginx:2.1.2` in `MyKind` resource.
+4. Check the value of field `roles` is set to array value `[dev, intermediate]` in `MyKind` resource.
 
 #### Note:
 
-Refer to the `create-setters` example in `search-replace` function examples for creating setters.
+Refer to the `create-setters` function documentation for information about creating setters.

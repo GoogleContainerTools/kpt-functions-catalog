@@ -7,15 +7,15 @@
 Add setter comments to matching resource fields. Setters serve as parameters 
 for template-free setting of comments.
 
+Setters are a safer alternative to other substitution techniques which do not
+have the context of the structured data. Setter comments can be added to
+parameterize the field values of resources using this function.
+
 <!--mdtogo-->
 
 ### FunctionConfig
 
 <!--mdtogo:Long-->
-
-Setters are a safer alternative to other substitution techniques which do not
-have the context of the structured data. Setter comments can be added to
-parameterize the field values of resources using create-setters function.
 
 We use `ConfigMap` to configure the `create-setters` function. The desired setter
 values are provided as key-value pairs using `data` field.
@@ -31,6 +31,9 @@ data:
   setter_name1: setter_value1
   setter_name2: setter_value2
 ```
+
+If this function adds setter comments to fields for which you didn't intend 
+to parameterize, you can simply review and delete/modify those comments manually.
 
 <!--mdtogo-->
 
@@ -136,8 +139,3 @@ environments: # kpt-set: ${env}
   - stage
 ```
 <!--mdtogo-->
-
-#### Note:
-
-If this function adds setter comments to fields for which you didn't intend to parameterize,
-you can simply review and delete those comments manually.

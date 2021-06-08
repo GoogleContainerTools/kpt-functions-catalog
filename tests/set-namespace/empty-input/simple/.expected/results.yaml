@@ -1,12 +1,12 @@
 apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
-    name: fnresults
+  name: fnresults
 exitCode: 1
 items:
-    - image: gcr.io/kpt-fn/set-namespace:unstable
-      stderr: '[error] /// : failed to configure function: function config must be a ConfigMap or SetNamespaceConfig'
-      exitCode: 1
-      results:
-        - message: 'failed to configure function: function config must be a ConfigMap or SetNamespaceConfig'
-          severity: error
+  - image: gcr.io/kpt-fn/set-namespace:unstable
+    stderr: '[error] /// : failed to configure function: function config must be a ConfigMap or SetNamespaceConfig'
+    exitCode: 1
+    results:
+      - message: 'failed to configure function: function config must be a ConfigMap or SetNamespaceConfig'
+        severity: error
