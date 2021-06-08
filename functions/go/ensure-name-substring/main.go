@@ -68,7 +68,6 @@ func run() error {
 
 	cmd.Short = generated.EnsureNameSubstringShort
 	cmd.Long = generated.EnsureNameSubstringLong
-	cmd.Example = generated.EnsureNameSubstringExamples
 	return cmd.Execute()
 }
 

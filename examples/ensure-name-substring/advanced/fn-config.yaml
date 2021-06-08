@@ -1,0 +1,11 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: EnsureNameSubstring
+metadata:
+  name: my-config
+editMode: prepend
+fieldSpecs:
+  - kind: MyResource
+    group: dev.example.com
+    path: spec/name
+    version: v1
+substring: prod-

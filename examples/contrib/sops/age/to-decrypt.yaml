@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: somekind
+metadata:
+    name: toDecrypt
+nnn-password: ENC[AES256_GCM,data:G2i53KNBoAEycMHD5w==,iv:PjywQXtBGZDgn5zNgI/0BsKiov7drduyyXSt8gNtdDs=,tag:slGGtNbvT01rtgDb1pCkFw==,type:str]
+user-password: ENC[AES256_GCM,data:iM5w/l6egeDlvkjc2tpk,iv:kBtgkTNuNuUL6FvYGa+NA0U0jkcmm0IIRZ8j5PicSMs=,tag:lACKq9kbf4n72xFmZb1Ymw==,type:str]
+k8s-password: ENC[AES256_GCM,data:uZb3qTvx3Ucq,iv:VQTP3fimb3uitY/0LuJMhvdjd2s9bq8xguWgTOkCqG4=,tag:4JT50F72xL5Gyy5mqGjkrg==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBsR2ZvT21Bd2NuWnBXaFZa
+            OG9YUzg2b1g1VDQ3bHlaSGdMQW10UE9jYjEwCndSbWpDdis4S1IyOFdxL2U4eDVL
+            cG00RUxpcE1IRnR3cVk0dDJtK3Zwc00KLS0tIHhuNlVTakF1a3dyZFF4ZWg3TXFE
+            QzFjYmR1MVh3bVhydURmZ25ORmQxNGsKkcHUujLrlwycauIr1nJ9O9KG4T6NkmMv
+            8szwCF4AuqHzhSKhqGzYUnRQB1Igfpw85XjdR5O1aCf0mux/+E6Ihg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2021-04-27T04:12:50Z"
+    mac: ENC[AES256_GCM,data:darUiOLASNLXAMucmoQsaMvAk6KmMkb5owGfv38vsaF8JDXhxom0B6MTp2KRyiliv2KICEWv8BRofNXWQpgKGwvS8CPmZic7JgqdJhNpNVrt5NipisMcCigUVdk7WtQ73l7tTuqI5vBg9FnrnDgndnTr4CoqjxwThlbTtNy7+30=,iv:WmiLyZMMtsyL3KOTaki6EClKAyJ2KcVxanxcVJZGalo=,tag:ZJOBM+1NiyDN0a+OSndG6Q==,type:str]
+    pgp: []
+    unencrypted_regex: ^(kind|apiVersion|group|metadata)$
+    version: 3.7.1
