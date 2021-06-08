@@ -32,6 +32,9 @@ data:
   setter_name2: setter_value2
 ```
 
+If this function adds setter comments to fields for which you didn't intend 
+to parameterize, you can simply review and delete/modify those comments manually.
+
 <!--mdtogo-->
 
 ### Examples
@@ -136,8 +139,3 @@ environments: # kpt-set: ${env}
   - stage
 ```
 <!--mdtogo-->
-
-#### Note:
-
-If this function adds setter comments to fields for which you didn't intend to parameterize,
-you can simply review and delete those comments manually.

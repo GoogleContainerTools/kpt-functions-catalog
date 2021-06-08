@@ -22,6 +22,9 @@ value is the field value to parameterize.
   data:
     setter_name1: setter_value1
     setter_name2: setter_value2
+
+If this function adds setter comments to fields for which you didn't intend 
+to parameterize, you can simply review and delete/modify those comments manually.
 `
 var CreateSettersExamples = `
 Setting comment for scalar values:
