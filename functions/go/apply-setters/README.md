@@ -73,7 +73,7 @@ $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.1 --fn-config ./apply-sette
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.1 -- 'image=ubuntu' 'replicas=3'
+$ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.1 -- image=ubuntu replicas=3
 ```
 
 Rendered resource looks like the following:
