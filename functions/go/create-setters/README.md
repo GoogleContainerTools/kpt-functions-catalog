@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Add setter comments to matching resource fields. Setters serve as parameters 
+Add setter comments to resource fields. Setters serve as parameters 
 for template-free setting of comments.
 
 Setters are a safer alternative to other substitution techniques which do not
