@@ -247,6 +247,16 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 	if err != nil {
 		return node, err
 	}
+
+	// return if the package with this Kptfile is already fixed
+	if meta.APIVersion == v1alpha2.KptFileAPIVersion {
+		s.Results = append(s.Results, &Result{
+			FilePath: meta.Annotations[kioutil.PathAnnotation],
+			Message:  fmt.Sprintf("This package is already fixed as it is on latest apiVersion %s", v1alpha2.KptFileAPIVersion),
+		})
+		return node, nil
+	}
+
 	kfOld, err := v1alpha1.ReadFile(node)
 	if err != nil {
 		return node, err
