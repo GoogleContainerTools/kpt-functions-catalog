@@ -36,7 +36,7 @@ func (fp *FixProcessor) Process(resourceList *framework.ResourceList) error {
 	resourceList.Result = &framework.Result{
 		Name: "fix",
 	}
-	_, err = s.Filter(resourceList.Items)
+	resourceList.Items, err = s.Filter(resourceList.Items)
 	if err != nil {
 		resourceList.Result.Items = getErrorItem(err.Error())
 		return err
