@@ -48,9 +48,7 @@ Here's what you can do in the Starlark script:
   the [KRM Functions Specification]. You can read the input resources from
   `ctx.resource_list[items]` and the `functionConfig` from
   `ctx.resource_list[functionConfig]`.
-- Write resources to `ctx.resource_list[items]`. We do NOT support the `results`
-  field, i.e. if you write some results in `ctx.resource_list["results"]`, they
-  will be ignored.
+- Write resources to `ctx.resource_list[items]`.
 - Return an error using [`fail`][fail].
 - Write error message to stderr using [`print`][print]
 
@@ -58,7 +56,15 @@ In Starlark, a [for loop] is permitted only within a function definition. It
 means if you want to iterate over `ctx.resource_list["items"]`, it has to be in
 a function. You can refer the example `functionConfig` above.
 
-### Debugging
+Here's what you cannot do in the Starlark script:
+
+- We don't support the `results` field, i.e. if you write some results in
+  `ctx.resource_list["results"]`, they will be ignored.
+- While Starlark programs don't support working with yaml comments on resources,
+  kpt will attempt to retain comments by copying them from the function inputs
+  to the function outputs.
+
+#### Debugging
 
 <!-- TODO: fix https://github.com/GoogleContainerTools/kpt/issues/2200 -->
 
