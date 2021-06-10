@@ -165,6 +165,19 @@
                   }
 
                   html = dropdowns + html;
+                  
+                  const doc = new DOMParser().parseFromString(
+                    html,
+                    "text/html"
+                  );
+
+                  // Update title of page to title of document.
+                  const title = doc
+                    .getElementsByTagName("h1")
+                    .item(0)?.textContent;
+                  if (title) {
+                    document.title = title;
+                  }
                 } catch (err) {
                   console.error(err);
                 }
