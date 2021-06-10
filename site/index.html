@@ -66,7 +66,6 @@
               createIssue.title = "Create documentation issue";
               createIssue.id = "create-issue";
               createIssue.appendChild(issueIcon);
-              createIssue.href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Functions Catalog`;
 
               const editIcon = document.createElement("span");
               editIcon.innerText = "edit";
@@ -77,7 +76,8 @@
               editPage.id = "edit-page";
               editPage.appendChild(editIcon);
 
-              // Fallback link for generated pages.
+              // Fallback links for generated pages.
+              createIssue.href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Functions Catalog`;
               editPage.href =
                 "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/site";
 
@@ -181,6 +181,9 @@
                   doc.getElementById(
                     "create-issue"
                   ).href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Function Catalog - ${document.title}`;
+                  doc.getElementById(
+                    "edit-page"
+                  ).href = ghElement.href.replace("kpt-functions-catalog/tree", "kpt-functions-catalog/edit") + "/README.md";
 
                   html = doc.body.innerHTML;
                 } catch (err) {
