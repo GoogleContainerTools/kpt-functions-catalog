@@ -11,6 +11,8 @@ Setters are a safer alternative to other substitution techniques which do not
 have the context of the structured data. Setter comments can be added to
 parameterize the field values of resources using this function.
 
+>? Refer to [`apply-setters`](https://catalog.kpt.dev/apply-setters/v0.1/) for easy understanding of setters.
+
 <!--mdtogo-->
 
 ### FunctionConfig
@@ -19,7 +21,7 @@ parameterize the field values of resources using this function.
 
 We use `ConfigMap` to configure the `create-setters` function. The desired setter
 values are provided as key-value pairs using `data` field.
-Here, the key is the name of the setter which is used to set the comment and
+Here, the key is the name of the setter used as parameter and
 value is the field value to parameterize.
 
 ```yaml
@@ -32,7 +34,19 @@ data:
   setter_name2: setter_value2
 ```
 
-If this function adds setter comments to fields for which you didn't intend 
+### How comments are added
+1. Searches for the setter values to be parameterized in each of the resource fields
+2. Adds comments to the fields matching the setter values using setter names as parameters
+
+### Adds comment
+- Scalar value matching atleast one of the setter values.
+- Array values matching all of the values in a setter_value.
+- Any of the array value matching any of the setter_value.
+
+### Doesn't add comment
+- Resource field values with multiple lines.
+
+>? If this function adds setter comments to fields for which you didn't intend 
 to parameterize, you can simply review and delete/modify those comments manually.
 
 <!--mdtogo-->
@@ -41,11 +55,12 @@ to parameterize, you can simply review and delete/modify those comments manually
 
 <!--mdtogo:Examples-->
 
-#### Setting comment for scalar values
+### Setting comment for scalar values
 
 Let's start with the input resource in a package
 
 ```yaml
+# resources.yaml
 apiVersion: v1
 kind: Deployment
 metadata:
@@ -54,9 +69,10 @@ spec:
   replicas: 3 
 ```
 
-Declare the name of the setter with the value for which comments should be added.
+Declare the name of the setter with the value which need to be parameterized.
 
 ```yaml
+# create-setters-fn-config
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -81,6 +97,7 @@ $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- image=ubuntu repl
 Rendered resource looks like the following:
 
 ```yaml
+# resources.yaml
 apiVersion: v1
 kind: Deployment
 metadata:
@@ -88,16 +105,20 @@ metadata:
 spec:
   replicas: 3 # kpt-set: ${replicas}
 ```
+- As `metadata.name` field value contains a match with the setter value of `image`, `# kpt-set: ${image}-development` comment is added
+- As `spec.replicas` field value matches with the setter value of `replicas`, `# kpt-set: ${replicas}` comment is added
 
-#### Setting comment for array values
 
-Array values can also be parameterized using setters. Since the values of `ConfigMap`
+### Setting comment for array values
+
+Fields with array values can also be parameterized using setters. Since the values of `ConfigMap`
 in pipeline definition must be of string type, the array values must be wrapped into
 string.
 
 Let's start with the input resource
 
 ```yaml
+# resources.yaml
 apiVersion: v1
 kind: MyKind
 metadata:
@@ -111,11 +132,13 @@ Declare the array values, wrapped into string. Here the order of the array value
 doesn't make a difference.
 
 ```yaml
+# create-setters-fn-config
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: create-setters-fn-config
 data:
+  role: dev
   env: |
     - dev
     - stage
@@ -130,12 +153,16 @@ $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create
 Rendered resource looks like the following:
 
 ```yaml
+# resources.yaml
 apiVersion: v1
 kind: MyKind
 metadata:
   name: foo
 environments: # kpt-set: ${env}
-  - dev
+  - dev # kpt-set: ${role}
   - stage
 ```
+
+- As the values for `environments` match the setter values of `env`, `# kpt-set: ${env}` comment is added.
+- As the array value `dev` matches with the setter value of `role`, `# kpt-set: ${role}` comment is added.
 <!--mdtogo-->

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -188,6 +190,58 @@ spec:
 `,
 		},
 		{
+			name: "Multiple lines FoldedStyle",
+			config: `
+data:
+  images: |
+    - nginx
+    - ubuntu
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images: |
+    - nginx
+    - ubuntu
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images: |
+    - nginx
+    - ubuntu
+`,
+		},
+		{
+			name: "Multiple lines ScalarNode",
+			config: `
+data:
+  image: ubuntu
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images: |
+    nginx
+    ubuntu
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images: |
+    nginx
+    ubuntu
+`,
+		},
+		{
 			name: "containing overlap values",
 			config: `
 data:
@@ -262,6 +316,24 @@ spec:
   images:
     - nginx # kpt-set: ${image}
     - ubuntu
+`,
+		},
+		{
+			name: "substrings",
+			config: `
+data:
+  app: nginx
+  image: nginx-abc
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-abc-deployment
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-abc-deployment # kpt-set: ${image}-deployment
 `,
 		},
 
@@ -396,6 +468,48 @@ spec:
     - ubuntu
 `,
 		},
+		{
+			name: "FlowStyle to FoldedStyle",
+			config: `
+data:
+  image: "[nginx, ubuntu]"
+  os: ubuntu
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: [nginx, ubuntu]
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: # kpt-set: ${image}
+    - nginx
+    - ubuntu # kpt-set: ${os}
+`,
+		},
+		{
+			name: "longest length match",
+			config: `
+data:
+  app: development
+  role: dev
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-development
+spec:
+  image: dev
+`,
+			expectedResources: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-development # kpt-set: nginx-${app}
+spec:
+  image: dev # kpt-set: ${role}
+`,
+		},
 	}
 	for i := range tests {
 		test := tests[i]
@@ -480,52 +594,84 @@ type lineCommentTest struct {
 
 var resolveLineCommentCases = []lineCommentTest{
 	{
-		name:    "comment for pattern 1",
+		name:    "matches multiple setters",
 		value:   "foo-dev-bar-us-east-baz",
 		comment: `foo-${role}-bar-${region}-baz`,
 	},
 	{
-		name:    "comment for pattern 2",
+		name:    "matches part of a string",
 		value:   "nginx:1.2.1",
-		comment: `${image}:1.2.1`,
+		comment: `${app}:1.2.1`,
 	},
 	{
-		name:    "comment for pattern 3",
+		name:    "matches multiple setters",
 		value:   "nginx:1.1.2",
-		comment: `${image}:${tag}`,
+		comment: `${app}:${tag}`,
 	},
 	{
-		name:    "comment for pattern 4",
+		name:    "simple match setter",
 		value:   "ubuntu",
 		comment: `${env}`,
 	},
 	{
-		name:    "comment for pattern 5",
+		name:    "no match",
 		value:   "linux",
 		comment: ``,
+	},
+	{
+		name:    "matches the maximum length setter",
+		value:   "nginx-abc",
+		comment: `${image}`,
+	},
+	{
+		name:    "setters matches part of a string",
+		value:   "nginx-base",
+		comment: `${app}-base`,
+	},
+	{
+		name:    "overlap case",
+		value:   "dev",
+		comment: `${role}`,
+	},
+	{
+		name:    "longest length match",
+		value:   "development",
+		comment: `${stage}`,
 	},
 }
 
 var inputSetters = []ScalarSetter{
 	{
-		Name:  "env",
-		Value: "ubuntu",
-	},
-	{
-		Name:  "image",
-		Value: "nginx",
+		Name:  "tag",
+		Value: "1.1.2",
 	},
 	{
 		Name:  "role",
 		Value: "dev",
 	},
 	{
-		Name:  "tag",
-		Value: "1.1.2",
+		Name:  "stage",
+		Value: "development",
+	},
+	{
+		Name:  "app",
+		Value: "nginx",
+	},
+	{
+		Name:  "image",
+		Value: "nginx-abc",
+	},
+	{
+		Name:  "ns",
+		Value: "role",
 	},
 	{
 		Name:  "region",
 		Value: "us-east",
+	},
+	{
+		Name:  "env",
+		Value: "ubuntu",
 	},
 }
 
@@ -534,7 +680,14 @@ func TestCurrentSetterValues(t *testing.T) {
 		for i := range tests {
 			test := tests[i]
 			t.Run(test.name, func(t *testing.T) {
-				res, match := getLineComment(test.value, inputSetters)
+				sort.Sort(CompareSetters(inputSetters))
+				replacerArgs := []string{}
+				for _, setter := range inputSetters {
+					replacerArgs = append(replacerArgs, setter.Value)
+					replacerArgs = append(replacerArgs, fmt.Sprintf("${%s}", setter.Name))
+				}
+				Replacer := strings.NewReplacer(replacerArgs...)
+				res, match := getLineComment(test.value, Replacer)
 				if match {
 					if !assert.Equal(t, test.comment, res) {
 						t.FailNow()

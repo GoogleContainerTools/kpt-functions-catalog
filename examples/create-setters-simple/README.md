@@ -17,6 +17,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 ```
 
 ```yaml
+# resources.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -40,6 +41,7 @@ Here, key is the name of the setter which is used to set the comment and value
 is the field value to parameterize.
 
 ```yaml
+# create-setters-fn-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -56,6 +58,7 @@ data:
 Invoking `create-setters` function would add the setter comments.
 
 ```yaml
+# resources.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
