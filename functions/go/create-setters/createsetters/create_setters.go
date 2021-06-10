@@ -313,7 +313,7 @@ func getLineComment(nodeValue string, replacer *strings.Replacer) (string, bool)
 	output := nodeValue
 	valueMatch := false
 
-	// replaces the strings simulataneously
+	// replaces the strings
 	output = replacer.Replace(nodeValue)
 
 	if output != nodeValue {
@@ -362,7 +362,7 @@ func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
 	// sorts all the Setters
 	sort.Sort(CompareSetters(fcd.ScalarSetters))
 
-	// replacerArgs contains the setter values with parameter
+	// replacerArgs contains the setter values with parameter as pairs
 	replacerArgs := []string{}
 	for _, setter := range fcd.ScalarSetters {
 		replacerArgs = append(replacerArgs, setter.Value)
