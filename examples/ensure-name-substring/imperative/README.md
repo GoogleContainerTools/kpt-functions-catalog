@@ -14,8 +14,8 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn eval imperative --image=gcr.io/kpt-fn/ensure-name-substring:unstable -- prepend=prod
 ```
 
-The key-value pair(s) provided after `--` will be converted to ConfigMap by kpt
-and used as the function configuration.
+The key-value pair(s) provided after `--` will be converted to `ConfigMap` by
+kpt and used as the function configuration.
 
 ### Expected result
 

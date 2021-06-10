@@ -2,12 +2,17 @@
 
 ### Overview
 
-This example demonstrates how to imperatively invoke the [gatekeeper]
-function to validate resources using gatekeeper constraints.
+This example demonstrates how to imperatively invoke the [gatekeeper] function
+to validate resources using gatekeeper constraints.
 
-There are 3 resources: a ConstraintTemplate, a K8sBannedConfigMapKeysV1 and a
-ConfigMap.
-The constraint disallows using `private_key` as a key in the ConfigMap.
+There are 2 resources in `policy.yaml`:
+
+- `ConstraintTemplate`
+- `K8sBannedConfigMapKeysV1`
+
+There is one `ConfigMap` in `config-map.yaml`.
+
+The constraint disallows using `private_key` as a key in the `ConfigMap`.
 
 ### Function invocation
 
@@ -61,7 +66,7 @@ You can find:
 - what constraint does it violate
 - where does the resource live and its index in the file
 
-To pass validation, let's replace the key `private_key` in the ConfigMap in
+To pass validation, let's replace the key `private_key` in the `ConfigMap` in
 `resources.yaml` with something else e.g. `public_key`.
 Rerun the command. It will succeed.
 

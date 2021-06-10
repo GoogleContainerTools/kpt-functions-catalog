@@ -16,7 +16,7 @@ kpt fn eval imperative --image=gcr.io/kpt-fn/set-namespace:unstable -- namespace
 ```
 
 The desired namespace is provided after `--` and it will be converted to
-ConfigMap by kpt and used as the function configuration.
+`ConfigMap` by kpt and used as the function configuration.
 
 ### Expected result
 

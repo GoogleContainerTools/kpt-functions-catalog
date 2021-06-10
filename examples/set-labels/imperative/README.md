@@ -2,8 +2,8 @@
 
 ### Overview
 
-This example demonstrates how to declaratively run [`set-labels`] function
-to upsert labels to the `.metadata.labels` field on all resources.
+This example demonstrates how to declaratively run [`set-labels`] function to
+upsert labels to the `.metadata.labels` field on all resources.
 
 ### Function invocation
 
@@ -14,8 +14,8 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 kpt fn eval imperative --image=gcr.io/kpt-fn/set-labels:unstable -- color=orange fruit=apple
 ```
 
-The key-value pair(s) provided after `--` will be converted to ConfigMap by kpt
-and used as the function configuration.
+The key-value pair(s) provided after `--` will be converted to `ConfigMap` by
+kpt and used as the function configuration.
 
 ### Expected result
 
