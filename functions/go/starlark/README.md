@@ -8,7 +8,7 @@ The `starlark` function contains a Starlark interpreter to run a Starlark script
 to mutate or validate resources.
 
 It follows the [executable configuration] pattern. It makes writing simple
-function trivial.
+function much easier.
 
 <!--mdtogo-->
 
@@ -63,9 +63,9 @@ Here's what you can do in the Starlark script:
 - Return an error using [`fail`][fail].
 - Write error message to stderr using [`print`][print]
 
-Here's what you cannot do in the Starlark script:
+Here's what you currently cannot do in the Starlark script:
 
-- We don't support the `results` field, i.e. if you write some results in
+- We don't support the `results` field yet, i.e. if you write some results in
   `ctx.resource_list["results"]`, they will be ignored.
 - While Starlark programs don't support working with yaml comments on resources,
   kpt will attempt to retain comments by copying them from the function inputs
