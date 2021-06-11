@@ -11,7 +11,7 @@ Setters are a safer alternative to other substitution techniques which do not
 have the context of the structured data. Setter comments can be added to
 parameterize the field values of resources using this function.
 
->? Refer to [`apply-setters`](https://catalog.kpt.dev/apply-setters/v0.1/) for easy understanding of setters.
+>? Refer to `apply-setters` for easy understanding of setters.
 
 <!--mdtogo-->
 
@@ -63,7 +63,7 @@ kind: Deployment
 metadata:
   name: ubuntu-deployment 
 spec:
-  replicas: 3
+  image: ubuntu
   app: nginx:1.1.2
 ```
 
@@ -103,11 +103,14 @@ kind: Deployment
 metadata:
   name: ubuntu-deployment-1 # kpt-set: ${deploy}-1
 spec:
+  image: ubuntu # kpt-set: ${env}
   app: nginx:1.1.2 # kpt-set: ${image}:${tag}
 ```
+
 Explanation for the changes:
 - Value of `metadata.name` matches with setter values of `env` and `deploy` which have same substring `ubuntu`.
 As `ubuntu-deployment` has the longest length match, `# kpt-set: ${deploy}-1` comment is added.
+- As value of `image` matches with the setter value of `env`, `# kpt-set: ${env}` comment is added.
 - As value of `app` matches with setter values of `image` and `tag`, `# kpt-set: ${image}:${tag}` comment is added.
 
 ### Setting comments for array values
@@ -163,7 +166,9 @@ environments: # kpt-set: ${env}
   - dev # kpt-set: ${role}
   - stage
 ```
+
 Explanation for the changes:
 - As all the values in `environments` matches the setter values of `env`, `# kpt-set: ${env}` comment is added.
 - As the array value `dev` matches with the setter value of `role`, `# kpt-set: ${role}` comment is added.
+
 <!--mdtogo-->
