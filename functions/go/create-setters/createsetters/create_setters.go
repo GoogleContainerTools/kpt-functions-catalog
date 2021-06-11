@@ -19,8 +19,9 @@ type CreateSetters struct {
 	// ScalarSetters holds the user provided values for simple scalar setters
 	ScalarSetters []ScalarSetter
 
-	// Replacer is used to replace the setter values
-	Replacer *strings.Replacer
+	// replacer holds the scalar setters info and used to
+	// efficiently generate scalar setter comments.
+	replacer *strings.Replacer
 
 	// ArraySetters holds the user provided values for array setters
 	ArraySetters []ArraySetter
@@ -90,12 +91,30 @@ func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 			return nodes, err
 		}
 		cs.filePath = filePath
+		cs.preProcessScalarSetters()
 		err = accept(cs, nodes[i])
 		if err != nil {
 			return nil, errors.Wrap(err)
 		}
 	}
 	return nodes, nil
+}
+
+/**
+preProcessScalarSetters simplifies the process of setting comments for
+scalar values by creating a *strings.Replacer
+e.g., For Scalar Setters [[name: image, value: nginx], [name: env, value: dev]].,
+sets up args as [nginx, ${image}, dev, ${env}]
+Using strings.NewReplacer and the args, creates *strings.Replacer
+*/
+func (cs *CreateSetters) preProcessScalarSetters() {
+	// replacerArgs contains the setter values with parameter as pairs
+	replacerArgs := []string{}
+	for _, setter := range cs.ScalarSetters {
+		replacerArgs = append(replacerArgs, setter.Value)
+		replacerArgs = append(replacerArgs, fmt.Sprintf("${%s}", setter.Name))
+	}
+	cs.replacer = strings.NewReplacer(replacerArgs...)
 }
 
 /**
@@ -230,7 +249,7 @@ func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 		return nil
 	}
 
-	linecomment, valueMatch := getLineComment(object.YNode().Value, cs.Replacer)
+	linecomment, valueMatch := getLineComment(object.YNode().Value, cs.replacer)
 
 	// sets the linecomment if the match is found
 	if valueMatch {
@@ -277,6 +296,7 @@ func getArraySetter(input *yaml.RNode) []string {
 	return output
 }
 
+// hasMultipleLines checks if a string is split into multiple lines
 func hasMultipleLines(value string) bool {
 	return strings.Contains(value, "\n")
 }
@@ -356,15 +376,8 @@ func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
 		}
 	}
 
-	// sorts all the Setters
+	// sorts all the Scalar Setters in lexicographically
+	// decreasing order of it's Value
 	sort.Sort(CompareSetters(fcd.ScalarSetters))
-
-	// replacerArgs contains the setter values with parameter as pairs
-	replacerArgs := []string{}
-	for _, setter := range fcd.ScalarSetters {
-		replacerArgs = append(replacerArgs, setter.Value)
-		replacerArgs = append(replacerArgs, fmt.Sprintf("${%s}", setter.Name))
-	}
-	fcd.Replacer = strings.NewReplacer(replacerArgs...)
 	return nil
 }

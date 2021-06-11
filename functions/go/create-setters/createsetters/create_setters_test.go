@@ -92,6 +92,38 @@ env: # kpt-set: ${env}
   - bar
 `,
 		},
+		{
+			name: "all scalar cases",
+			input: `apiVersion: v1
+kind: Deployment
+metadata:
+  name: ubuntu-deployment-1
+spec:
+  image: ubuntu
+  app: "nginx:1.1.2"
+  os:
+    - ubuntu
+    - mac
+`,
+			config: `
+data:
+  deploy: ubuntu-deployment
+  env: ubuntu
+  image: ngnix
+  tag: 1.1.2
+`,
+			expectedResources: `apiVersion: v1
+kind: Deployment
+metadata:
+  name: ubuntu-deployment-1 # kpt-set: ${deploy}-1
+spec:
+  image: ubuntu # kpt-set: ${env}
+  app: "nginx:1.1.2" # kpt-set: nginx:${tag}
+  os:
+    - ubuntu # kpt-set: ${env}
+    - mac
+`,
+		},
 
 		{
 			name: "scalar setter donot match",
@@ -594,17 +626,17 @@ type lineCommentTest struct {
 
 var resolveLineCommentCases = []lineCommentTest{
 	{
-		name:    "matches multiple setters",
+		name:    "value matches multiple setters",
 		value:   "foo-dev-bar-us-east-baz",
 		comment: `foo-${role}-bar-${region}-baz`,
 	},
 	{
-		name:    "matches part of a string",
+		name:    "setter matches part of a string",
 		value:   "nginx:1.2.1",
 		comment: `${app}:1.2.1`,
 	},
 	{
-		name:    "matches multiple setters",
+		name:    "value matches multiple setters",
 		value:   "nginx:1.1.2",
 		comment: `${app}:${tag}`,
 	},
@@ -619,7 +651,7 @@ var resolveLineCommentCases = []lineCommentTest{
 		comment: ``,
 	},
 	{
-		name:    "matches the maximum length setter",
+		name:    "longest length match",
 		value:   "nginx-abc",
 		comment: `${image}`,
 	},
@@ -629,7 +661,7 @@ var resolveLineCommentCases = []lineCommentTest{
 		comment: `${app}-base`,
 	},
 	{
-		name:    "overlap case",
+		name:    "overlap case of setters",
 		value:   "dev",
 		comment: `${role}`,
 	},

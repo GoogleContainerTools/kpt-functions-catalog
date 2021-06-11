@@ -5,7 +5,7 @@
 <!--mdtogo:Short-->
 
 Add setter comments to matching resource fields. Setters serve as
-parameters for template-free setting of field values.
+parameters for the template-free setting of field values.
 
 Setters are a safer alternative to other substitution techniques which do not
 have the context of the structured data. Setter comments can be added to
@@ -19,7 +19,7 @@ parameterize the field values of resources using this function.
 
 We use `ConfigMap` to configure the `create-setters` function. The desired setter
 values are provided as key-value pairs using `data` field.
-Here, the key is the name of the setter used as parameter and
+Here, the key is the name of the setter used as a parameter and
 value is the field value to parameterize.
 
 ```yaml
@@ -33,14 +33,14 @@ data:
 ```
 
 On invoking `create-setters`, it performs the following steps:
-1. Searches for the values to be parameterized in each of the resource fields.
-2. Checks if there is a match considering following cases.,
-   - Scalar value matching atleast one of the setter values as a substring.
-   - Array values matching all of the values in a setter_value.
-3. If there are two or more setter values with similar substrings matching the resource field, then longest length matched setter_value is considered.
+1. Segregates the input setters into scalar-setters and array-setters.
+2. Searches for the resource field values to be parameterized.
+3. Checks if there is any match considering the following cases.,
+   - For a scalar node, performs substring match with scalar setters.
+   - For an array node, checks if all values match with any of the array setters.
 4. Adds comments to the fields matching the setter values using setter names as parameters.
 
->? Doesn't support adding comment to the resource field whose value is split into multiple lines.
+>? Doesn't support adding comment to the scalar node whose value is split into multiple lines.
 If this function adds setter comments to fields for which you didn't intend to parameterize,
 you can simply review and delete/modify those comments manually.
 
@@ -50,7 +50,7 @@ you can simply review and delete/modify those comments manually.
 
 <!--mdtogo:Examples-->
 
-### Setting comments for scalar values
+### Setting comments for scalar nodes
 
 Let's start with the input resource in a package
 
@@ -59,10 +59,13 @@ Let's start with the input resource in a package
 apiVersion: v1
 kind: Deployment
 metadata:
-  name: ubuntu-deployment 
+  name: ubuntu-deployment-1
 spec:
   image: ubuntu
-  app: nginx:1.1.2
+  app: "nginx:1.1.2"
+  os:
+    - ubuntu
+    - mac
 ```
 
 Declare the name of the setter with the value which need to be parameterized.
@@ -76,7 +79,7 @@ metadata:
 data:
   deploy: ubuntu-deployment
   env: ubuntu
-  image: ngnix
+  image: nginx
   tag: 1.1.2
 ```
 
@@ -89,7 +92,7 @@ $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- deploy:ubuntu-deployment env:ubuntu image:ngnix tag:1.1.2
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- deploy=ubuntu-deployment env=ubuntu image=nginx tag=1.1.2
 ```
 
 Rendered resource looks like the following:
@@ -102,19 +105,27 @@ metadata:
   name: ubuntu-deployment-1 # kpt-set: ${deploy}-1
 spec:
   image: ubuntu # kpt-set: ${env}
-  app: nginx:1.1.2 # kpt-set: ${image}:${tag}
+  app: "nginx:1.1.2" # kpt-set: ${image}:${tag}
+  os:
+    - ubuntu # kpt-set: ${env}
+    - mac
 ```
 
 Explanation for the changes:
-- Value of `metadata.name` matches with setter values of `env` and `deploy` which have same substring `ubuntu`.
-As `ubuntu-deployment` has the longest length match, `# kpt-set: ${deploy}-1` comment is added.
-- As value of `image` matches with the setter value of `env`, `# kpt-set: ${env}` comment is added.
-- As value of `app` matches with setter values of `image` and `tag`, `# kpt-set: ${image}:${tag}` comment is added.
 
-### Setting comments for array values
+`Comment` is added to the `Resources` field value node when they match the `Scalar Setters`.
+
+| Scalar Setters            | Resource Field                | Comment                            | Description     |
+|---------------------------|---------------------------|------------------------------------|-----------------|
+| <pre>env: ubuntu</pre>    | <pre>image: ubuntu</pre>  | `# kpt-set: ${env}`    | Setter value of `env` matches with value of `image`  |
+| <pre>env: ubuntu</pre>    | <pre>  - ubuntu</pre>     | `# kpt-set: ${env}`    | Scalar value of the array node `os` matches with the setter value  of `env` |
+| <pre>image: nginx<br>tag: 1.1.2</pre> | <pre>app: "nginx:1.1.2"</pre> | `# kpt-set: ${image}:${tag}`       | Non-overlapping substrings of resource field matches with the mentioned setter values. Resource field is parameterized with corresponding setter names.    |
+| <pre>deploy: ubuntu-deployment</pre>  | <pre>name: ubuntu-deployment-1</pre> | `# kpt-set: ${deploy}-1`  | Overlapping substrings of resource value matches with the setter values of `deploy`  and `env`. Setter with longest length match `deploy` is considered.         |
+
+### Setting comments for array nodes
 
 Fields with array values can also be parameterized using setters. Since the values of `ConfigMap`
-in pipeline definition must be of string type, the array values must be wrapped into
+in the pipeline definition must be of string type, the array values must be wrapped into
 string.
 
 Let's start with the input resource
@@ -128,6 +139,7 @@ metadata:
 environments:
   - dev
   - stage
+role: [stage, dev]
 ```
 
 Declare the array values, wrapped into string. Here the order of the array values
@@ -140,7 +152,6 @@ kind: ConfigMap
 metadata:
   name: create-setters-fn-config
 data:
-  role: dev
   env: |
     - dev
     - stage
@@ -161,12 +172,15 @@ kind: MyKind
 metadata:
   name: foo
 environments: # kpt-set: ${env}
-  - dev # kpt-set: ${role}
+  - dev
   - stage
+role: [stage, dev] # kpt-set: ${env}
 ```
 
 Explanation for the changes:
-- As all the values in `environments` matches the setter values of `env`, `# kpt-set: ${env}` comment is added.
-- As the array value `dev` matches with the setter value of `role`, `# kpt-set: ${role}` comment is added.
-
+- As all the values in `environments` match the setter values of `env`, `# kpt-set: ${env}` comment is added.
+Here, the comment is added to the key node as it is an array node with folded style.
+- As all the values in `role` match the setter values of `env`, `# kpt-set: ${env}` comment is added.
+Here, the order of the array values is not considered, and the comment is added to the key node as it 
+is an array node with flow style.
 <!--mdtogo-->
