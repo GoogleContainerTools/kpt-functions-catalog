@@ -310,16 +310,13 @@ apiVersion: v1
 image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 */
 func getLineComment(nodeValue string, replacer *strings.Replacer) (string, bool) {
-	output := nodeValue
 	valueMatch := false
 
-	// replaces the strings
-	output = replacer.Replace(nodeValue)
-
+	// replaces the substrings in nodeValue with setter parameters
+	output := replacer.Replace(nodeValue)
 	if output != nodeValue {
 		valueMatch = true
 	}
-
 	return output, valueMatch
 }
 
