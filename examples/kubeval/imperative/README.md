@@ -5,35 +5,58 @@
 This example demonstrates how to imperatively invoke [`kubeval`] function to
 validate KRM resources.
 
+We have a `ReplicationController` in `app.yaml` that has 2 schema violations:
+- `.spec.templates` is unknown, since it should be `.spec.template`.
+- `spec.replicas` must not be a string.
+
 ### Function invocation
 
 Get this example and try it out by running the following commands:
 
 ```sh
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval/imperative
-kpt fn eval imperative --image=gcr.io/kpt-fn/kubeval:unstable -- strict=true skip_kinds=MyCustom,MyOtherCustom
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval/imperative
+# We set `strict=true` to disallow unknown field and `skip_kinds=MyCustom,MyOtherCustom` to skip 2 kinds that we don't have schemas.
+$ kpt fn eval imperative --image=gcr.io/kpt-fn/kubeval:unstable --results-dir=results -- strict=true skip_kinds=MyCustom,MyOtherCustom
 ```
 
 The key-value pair(s) provided after `--` will be converted to `ConfigMap` by
 kpt and used as the function configuration.
 
-We set `strict=true` to disallow unknown fields, and we set
-`skip_kinds=MyCustom,MyOtherCustom` to skip 2 kinds that we don't have schemas.
-
 ### Expected Results
 
-This should give the following output:
+Let's look at the structured results in `results/results.yaml`:
 
-```sh
-  Stderr:
-    "[ERROR] Additional property templates is not allowed in object 'v1/ReplicationController//bob' in file resources.yaml in field templates"
-    "[ERROR] Invalid type. Expected: [integer,null], given: string in object 'v1/ReplicationController//bob' in file resources.yaml in field spec.replicas"
-    ""
-  Exit Code: 1
+```yaml
+apiVersion: kpt.dev/v1alpha2
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 1
+items:
+  - image: gcr.io/kpt-fn/kubeval:unstable
+    exitCode: 1
+    results:
+      - message: Additional property templates is not allowed
+        severity: error
+        resourceRef:
+          apiVersion: v1
+          kind: ReplicationController
+          name: bob
+        field:
+          path: templates
+        file:
+          path: app.yaml
+      - message: 'Invalid type. Expected: [integer,null], given: string'
+        severity: error
+        resourceRef:
+          apiVersion: v1
+          kind: ReplicationController
+          name: bob
+        field:
+          path: spec.replicas
+        file:
+          path: app.yaml
 ```
-
-You should see 2 errors. One is complaining about `templates` is unknown. The
-other is about `spec.replicas` is not valid.
 
 To fix them:
 
