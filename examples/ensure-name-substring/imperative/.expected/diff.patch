@@ -1,0 +1,38 @@
+diff --git a/app.yaml b/app.yaml
+index 0a4ac04..54eabea 100644
+--- a/app.yaml
++++ b/app.yaml
+@@ -1,7 +1,7 @@
+ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+-  name: the-map
++  name: prod-the-map
+   namespace: the-namespace
+ data:
+   some-key: some-value
+@@ -9,7 +9,7 @@ data:
+ apiVersion: v1
+ kind: Pod
+ metadata:
+-  name: the-pod
++  name: prod-the-pod
+   namespace: the-namespace
+ spec:
+   containers:
+@@ -23,13 +23,13 @@ spec:
+         - name: SOME_KEY
+           valueFrom:
+             configMapKeyRef:
+-              name: the-map
++              name: prod-the-map
+               key: some-key
+ ---
+ apiVersion: v1
+ kind: Service
+ metadata:
+-  name: the-service
++  name: prod-the-service
+   namespace: the-namespace
+ spec:
+   ports:
