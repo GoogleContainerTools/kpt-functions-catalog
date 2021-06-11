@@ -11,8 +11,6 @@ Setters are a safer alternative to other substitution techniques which do not
 have the context of the structured data. Setter comments can be added to
 parameterize the field values of resources using this function.
 
->? Refer to `apply-setters` for easy understanding of setters.
-
 <!--mdtogo-->
 
 ### FunctionConfig
