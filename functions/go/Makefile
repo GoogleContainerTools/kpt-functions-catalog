@@ -103,7 +103,7 @@ GO_LICENSES=$(shell which go-licenses)
 endif
 
 install-mdtogo:
-	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo@next
+	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
