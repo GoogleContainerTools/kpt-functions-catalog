@@ -4,17 +4,21 @@
 
 <!--mdtogo:Short-->
 
-The `gatekeeper` function wraps the [`Gatekeeper`] policy enforcement engine to
-evaluate [Gatekeeper] constraints to validate the KRM resources.
+The `gatekeeper` function enforces policies on the package resources. You can
+define policies for governance and legal requirements or to enforce best
+practices and organizational conventions.
+
+For example, you can enforce policies like:
+
+- `ConfigMap` must not contain fields with `private_key` name
+- All `pods` must have resource limits
+- All `namespaces` must have a label that lists a point-of-contact
 
 <!--mdtogo-->
 
-It provides a very flexible and powerful way to validate KRM resources against
-custom policies.
-
-You can learn more about how to use the `Gatekeeper` project [here][howto]. The
-concept document about the `OPA Constraint Framework` can be found
-[here][concept].
+You can learn more about how to use the [`Gatekeeper`] project [here][howto].
+The policies are expressed using the `OPA Constraint Framework`, you can read
+more about it [here][concept].
 
 <!--mdtogo:Long-->
 
@@ -29,9 +33,8 @@ using `input items` along with other KRM resources to be validated.
 - [Constraint]: Signal the Gatekeeper the corresponding constraints need to be
   enforced. Every Constraint must be backed by a Constraint Template.
 
-The constraint templates and the constraints must be provided using
-`input items` along with other KRM resources to be validated. Nothing need to be
-provided in `input functionConfig`.
+The constraint templates and the constraints resources should be in the same
+package containing the KRM resources.
 
 The following is a `ConstraintTemplate` and a `Constraint`:
 
@@ -83,7 +86,7 @@ spec:
 
 <!--mdtogo-->
 
-[Gatekeeper]: https://open-policy-agent.github.io/gatekeeper/website/docs/
+[`Gatekeeper`]: https://open-policy-agent.github.io/gatekeeper/website/docs/
 
 [Constraint Template]: https://open-policy-agent.github.io/gatekeeper/website/docs/howto#constraint-templates
 
