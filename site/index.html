@@ -82,14 +82,14 @@
                 "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/site";
 
               const container = document.createElement("div");
-              container.classList.add(
-                "github-widget",
-                "docsify-pagination-container"
-              );
+              container.classList.add("github-widget");
               container.appendChild(createIssue);
               container.appendChild(editPage);
 
-              html += container.outerHTML;
+              const wrapper = document.createElement("div");
+              wrapper.classList.add("docsify-pagination-container");
+              wrapper.appendChild(container);
+              html += wrapper.outerHTML;
               next(html);
             }),
               hook.afterEach(async function (html, next) {
@@ -243,10 +243,8 @@
       justify-content: space-between;
     }
 
-    .github-widget {
+    .docsify-pagination-container {
       margin: 5em 0 1em;
-      padding-top: 2.5em;
-      width: 100%;
     }
 
     .sidebar {
