@@ -1,20 +1,20 @@
 apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
-    name: fnresults
+  name: fnresults
 exitCode: 0
 items:
-    - image: gcr.io/kpt-fn/gatekeeper:unstable
-      exitCode: 0
-      results:
-        - message: |-
-            The following banned keys are being used in the ConfigMap: {"private_key"}
-            violatedConstraint: no-secrets-in-configmap
-          severity: warning
-          resourceRef:
-            apiVersion: v1
-            kind: ConfigMap
-            name: super-secret
-            namespace: default
-          file:
-            path: config-map.yaml
+  - image: gcr.io/kpt-fn/gatekeeper:unstable
+    exitCode: 0
+    results:
+      - message: |-
+          The following banned keys are being used in the ConfigMap: {"private_key"}
+          violatedConstraint: no-secrets-in-configmap
+        severity: warning
+        resourceRef:
+          apiVersion: v1
+          kind: ConfigMap
+          name: super-secret
+          namespace: default
+        file:
+          path: config-map.yaml

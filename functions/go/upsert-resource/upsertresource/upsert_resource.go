@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil"
-	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -72,10 +71,10 @@ func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode,
 	if err != nil {
 		return nodes, err
 	}
-	// remove local, function, path and index annotations from the result
+	// remove function, path and index annotations from the result
 	// removing path and index annotations makes orchestrator write resource
 	// to a new file
-	removeLocalFnPathIndexAnnotations(meta.Annotations)
+	removeFnPathIndexAnnotations(meta.Annotations)
 	err = new.SetAnnotations(meta.Annotations)
 	if err != nil {
 		return nodes, err
@@ -121,23 +120,22 @@ func combineInputAndMatchedAnnotations(inputResourceAnno, matchedResourceAnno ma
 	// retain the path and index annotation from matched resource to result
 	res[kioutil.PathAnnotation] = matchedResourceAnno[kioutil.PathAnnotation]
 	res[kioutil.IndexAnnotation] = matchedResourceAnno[kioutil.IndexAnnotation]
-	// remove local and function meta annotations from the result as they should
+	// remove function meta annotations from the result as they should
 	// not be written to output resource
-	removeLocalAndFnAnnotations(res)
+	removeFnAnnotations(res)
 	return res
 }
 
-// removeLocalFnPathIndexAnnotations removes index, path, local and fn annotations
-func removeLocalFnPathIndexAnnotations(a map[string]string) {
-	removeLocalAndFnAnnotations(a)
+// removeFnPathIndexAnnotations removes index, path and fn annotations
+func removeFnPathIndexAnnotations(a map[string]string) {
+	removeFnAnnotations(a)
 	delete(a, kioutil.PathAnnotation)
 	delete(a, kioutil.IndexAnnotation)
 }
 
-// removeLocalAndFnAnnotations removes local and fn annotations
+// removeFnAnnotations removes fn annotations
 // TODO: phanimarupaka remove this method after we drop support for kpt 0.X
-func removeLocalAndFnAnnotations(a map[string]string) {
-	delete(a, filters.LocalConfigAnnotation)
+func removeFnAnnotations(a map[string]string) {
 	delete(a, runtimeutil.FunctionAnnotationKey)
 	// using hard coded key as this annotation is deprecated and not exposed by kyaml
 	delete(a, "config.k8s.io/function")

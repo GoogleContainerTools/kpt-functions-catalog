@@ -23,7 +23,7 @@ func main() {
 	cmd.Example = generated.FixExamples
 
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -39,7 +39,7 @@ func (fp *FixProcessor) Process(resourceList *framework.ResourceList) error {
 	resourceList.Items, err = s.Filter(resourceList.Items)
 	if err != nil {
 		resourceList.Result.Items = getErrorItem(err.Error())
-		return nil
+		return err
 	}
 	resourceList.Result.Items = resultsToItems(s)
 	return nil

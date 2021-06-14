@@ -18,6 +18,11 @@
       href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
     />
     <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://kpt.dev/static/css/site.css" />
+    <link
       rel="icon"
       href="https://raw.githubusercontent.com/GoogleContainerTools/kpt/next/site/static/images/logo.svg"
       type="image/x-icon"
@@ -34,7 +39,6 @@
           placeholder: "Search",
         },
         crossOriginLinks: ["https://kpt.dev/?id=overview"],
-        externalLinkTarget: "_self",
         alias: {
           "/.*/sidebar.md": "/sidebar.md",
         },
@@ -53,87 +57,145 @@
         plugins: [
           function (hook, vm) {
             hook.afterEach(async function (html, next) {
-              const functionName = vm.route.path.split("/")[1];
-              if (!functionName) {
-                next(html);
-                return;
-              }
+              const issueIcon = document.createElement("span");
+              issueIcon.innerText = "bug_report";
+              issueIcon.classList.add("material-icons-outlined");
+              const createIssue = document.createElement("a");
+              createIssue.target = "_blank";
+              createIssue.title = "Create documentation issue";
+              createIssue.id = "create-issue";
+              createIssue.appendChild(issueIcon);
 
-              try {
-                const catalogResponse = await window.Docsify.get(
-                  `/catalog.json`
-                );
-                const catalog = JSON.parse(catalogResponse);
-                const versions = catalog[functionName];
-                let versionDropdown = "";
+              const editIcon = document.createElement("span");
+              editIcon.innerText = "edit";
+              editIcon.classList.add("material-icons-outlined");
+              const editPage = document.createElement("a");
+              editPage.target = "_blank";
+              editPage.title = "Edit this page";
+              editPage.id = "edit-page";
+              editPage.appendChild(editIcon);
 
-                const versionName = vm.route.path.split("/")[2];
-                const currentVersion = versionName.replaceAll("v", "");
-                const sortedSemvers = Object.keys(versions)
-                  .sort((a, b) => compareVersions(a, b))
-                  .reverse();
-                versionDropdown += `
+              // Fallback links for generated pages.
+              createIssue.href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Functions Catalog`;
+              editPage.href =
+                "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/site";
+
+              const container = document.createElement("div");
+              container.classList.add("github-widget");
+              container.appendChild(createIssue);
+              container.appendChild(editPage);
+
+              const wrapper = document.createElement("div");
+              wrapper.classList.add("docsify-pagination-container");
+              wrapper.appendChild(container);
+              html += wrapper.outerHTML;
+              next(html);
+            }),
+              hook.afterEach(async function (html, next) {
+                const functionName = vm.route.path.split("/")[1];
+                if (!functionName) {
+                  next(html);
+                  return;
+                }
+
+                try {
+                  const catalogResponse = await window.Docsify.get(
+                    `/catalog.json`
+                  );
+                  const catalog = JSON.parse(catalogResponse);
+                  const versions = catalog[functionName];
+                  let versionDropdown = "";
+
+                  const versionName = vm.route.path.split("/")[2];
+                  const currentVersion = versionName.replaceAll("v", "");
+                  const sortedSemvers = Object.keys(versions)
+                    .sort((a, b) => compareVersions(a, b))
+                    .reverse();
+                  versionDropdown += `
               <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${currentVersion}
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
-                sortedSemvers.forEach(
-                  (ver, ix) =>
-                    (versionDropdown += `<li><a href="/${functionName}/${ver}/">${ver.replace(
-                      "v",
-                      ""
-                    )}${ix ? "" : " (latest)"}</a></li>`)
-                );
-                versionDropdown += `
+                  sortedSemvers.forEach(
+                    (ver, ix) =>
+                      (versionDropdown += `<li><a href="/${functionName}/${ver}/">${ver.replace(
+                        "v",
+                        ""
+                      )}${ix ? "" : " (latest)"}</a></li>`)
+                  );
+                  versionDropdown += `
                 </ol>
               </div>`;
 
-                const examples = catalog[functionName][versionName];
-                const exampleNames = Object.keys(examples).sort();
-                let examplesDropdown = `
+                  const examples = catalog[functionName][versionName];
+                  const exampleNames = Object.keys(examples).sort();
+                  let examplesDropdown = `
               <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Examples
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
-                exampleNames.forEach(
-                  (ex, _) =>
-                    (examplesDropdown += `<li><a href="${examples[ex].LocalExamplePath}/">
+                  exampleNames.forEach(
+                    (ex, _) =>
+                      (examplesDropdown += `<li><a href="${examples[ex].LocalExamplePath}/">
                       ${ex}</a></li>`)
-                );
-                examplesDropdown += `
+                  );
+                  examplesDropdown += `
                 </ol>
               </div>`;
-                const dropdowns =
-                  `<div class="dropdown-container">` +
-                  versionDropdown +
-                  examplesDropdown +
-                  "</div>";
+                  const dropdowns =
+                    `<div class="dropdown-container">` +
+                    versionDropdown +
+                    examplesDropdown +
+                    "</div>";
 
-                const ghElement = document
-                  .getElementsByClassName("github-corner")
-                  .item(0);
-                const currentEx = vm.route.path.split("/")[3];
-                // Change the GH icon to point to the current example if it exists.
-                if (currentEx) {
-                  ghElement.href = examples[currentEx].RemoteExamplePath;
-                }
-                // If not on an example, change the GH icon to point to the current version if it exists.
-                else if (versionName) {
-                  const exampleSuffix = /examples\/.+/;
-                  ghElement.href = examples[exampleNames[0]].RemoteSourcePath;
-                }
-                // On every other page, point to the main catalog repo.
-                else {
-                  ghElement.href = window.$docsify.corner.url;
+                  const ghElement = document
+                    .getElementsByClassName("github-corner")
+                    .item(0);
+                  const currentEx = vm.route.path.split("/")[3];
+                  // Change the GH icon to point to the current example if it exists.
+                  if (currentEx) {
+                    ghElement.href = examples[currentEx].RemoteExamplePath;
+                  }
+                  // If not on an example, change the GH icon to point to the current version if it exists.
+                  else if (versionName) {
+                    const exampleSuffix = /examples\/.+/;
+                    ghElement.href = examples[exampleNames[0]].RemoteSourcePath;
+                  }
+                  // On every other page, point to the main catalog repo.
+                  else {
+                    ghElement.href = window.$docsify.corner.url;
+                  }
+
+                  html = dropdowns + html;
+                  const doc = new DOMParser().parseFromString(
+                    html,
+                    "text/html"
+                  );
+
+                  // Update title of page to title of document.
+                  const title = doc
+                    .getElementsByTagName("h1")
+                    .item(0)?.textContent;
+                  if (title) {
+                    document.title = title;
+                  }
+
+                  doc.getElementById(
+                    "create-issue"
+                  ).href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Function Catalog - ${document.title}`;
+                  doc.getElementById("edit-page").href =
+                    ghElement.href.replace(
+                      "kpt-functions-catalog/tree",
+                      "kpt-functions-catalog/edit"
+                    ) + "/README.md";
+
+                  html = doc.body.innerHTML;
+                } catch (err) {
+                  console.error(err);
                 }
 
-                html = dropdowns + html;
-              } catch (err) {
-                console.error(err);
-              }
-
-              next(html);
-            });
+                next(html);
+              });
           },
         ],
       };
@@ -148,6 +210,7 @@
     <script src="//cdn.jsdelivr.net/npm/compare-versions@3.6.0/index.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="//kpt.dev/static/js/plugins/copy_buttons.js"></script>
   </body>
   <style>
     :root {
@@ -180,6 +243,10 @@
       justify-content: space-between;
     }
 
+    .docsify-pagination-container {
+      margin: 5em 0 1em;
+    }
+
     .sidebar {
       color: rgba(255, 255, 255, 0.75);
       font-size: 16px;
@@ -189,9 +256,6 @@
     }
     .sidebar > h1 img {
       height: 32px;
-    }
-    .sidebar-toggle {
-      display: none;
     }
   </style>
 </html>

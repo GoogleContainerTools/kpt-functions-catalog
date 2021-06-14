@@ -26,7 +26,7 @@ spec:
 Get the config example:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/create-setters .
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace/create-setters
 ```
 
 Suppose you want to expose the values of `image` and `tag` as parameters.

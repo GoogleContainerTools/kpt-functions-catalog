@@ -1,14 +1,15 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: the-map # kpt-set: ${name}
+  name: ubuntu-development # kpt-set: ${image}-development
 data:
   some-key: some-value
 ---
 apiVersion: v1
 kind: MyKind
 metadata:
-  name: ns
-environments: # kpt-set: ${env}
+  name: ubuntu # kpt-set: ${image}
+image: nginx:1.1.2 # kpt-set: ${app}:${tag}
+roles: # kpt-set: ${role}
   - dev
-  - stage
+  - pro

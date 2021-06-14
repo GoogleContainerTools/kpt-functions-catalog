@@ -20,6 +20,7 @@ GOBIN := $(shell go env GOPATH)/bin
 # Edit this list to contain all go functions
 FUNCTIONS := \
 	apply-setters \
+	create-setters \
 	ensure-name-substring \
 	fix \
 	format \
@@ -102,7 +103,7 @@ GO_LICENSES=$(shell which go-licenses)
 endif
 
 install-mdtogo:
-	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo
+	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo@main
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \

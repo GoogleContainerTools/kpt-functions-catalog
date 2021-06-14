@@ -6,7 +6,8 @@ pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:unstable
       configMap:
-        env: |
-          - prod
-          - stage
-        name: my-new-map
+        image: darwin
+        role: |
+          - dev
+          - intermediate
+        tag: 2.1.2
