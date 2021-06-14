@@ -20,7 +20,8 @@ const (
 	fnConfigGroup      = "fn.kpt.dev"
 	fnConfigVersion    = "v1alpha1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
-	fnConfigKind       = "SetLabelConfig"
+	legacyFnConfigKind = "SetLabelConfig"
+	fnConfigKind       = "SetLabels"
 )
 
 //nolint
@@ -68,14 +69,16 @@ func (f *setLabelFunction) Config(rn *kyaml.RNode) error {
 	case f.validGVK(rn, "v1", "ConfigMap"):
 		f.plugin.Labels = rn.GetDataMap()
 	case f.validGVK(rn, fnConfigAPIVersion, fnConfigKind):
+		fallthrough
+	case f.validGVK(rn, fnConfigAPIVersion, legacyFnConfigKind):
 		// input config is a CRD
 		y, err := rn.String()
 		if err != nil {
 			return fmt.Errorf("cannot get YAML from RNode: %w", err)
 		}
-		err = yaml.Unmarshal([]byte(y), &f.plugin)
+		err = f.plugin.Config(nil, []byte(y))
 		if err != nil {
-			return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+			return err
 		}
 	default:
 		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
@@ -89,7 +92,7 @@ func (f *setLabelFunction) Config(rn *kyaml.RNode) error {
 		return err
 	}
 	// append default field specs
-	f.plugin.FieldSpecs = append(f.plugin.FieldSpecs, tc.FieldSpecs...)
+	f.plugin.AdditionalLabelFields = append(f.plugin.AdditionalLabelFields, tc.FieldSpecs...)
 	return nil
 }
 

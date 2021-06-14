@@ -1,11 +1,13 @@
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetLabels
+kind: SetLabelConfig
 metadata:
   name: my-config
+labels:
+  color: orange
+  fruit: apple
 fieldSpecs:
   - kind: MyResource
-    group: dev.example.com
-    version: v1
     create: true
+    group: dev.example.com
     path: spec/selector/labels
-labels: {}
+    version: v1

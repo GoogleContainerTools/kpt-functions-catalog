@@ -21,7 +21,7 @@ pipeline:
 ```yaml
 # fn-config.yaml
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetLabelConfig
+kind: SetLabels
 metadata:
   name: my-config
 labels:
@@ -51,6 +51,7 @@ $ kpt fn render advanced
 
 ### Expected result
 
-Check all resources have 2 labels: `color: orange` and `fruit: apple`.
+Check all resources have 2 labels: `color: orange` and `fruit: apple`. And the
+resource of kind `MyResource` also has these 2 labels in `spec.selector.labels`.
 
 [`set-labels`]: https://catalog.kpt.dev/set-labels/v0.1/
