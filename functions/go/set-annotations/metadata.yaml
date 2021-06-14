@@ -4,9 +4,9 @@ tags:
   - mutator
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/set-annotations
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotations/simple
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotations/advanced
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotations/imperative
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotations/set-annotations-simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotations/set-annotations-advanced
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-annotations/set-annotations-imperative
 emails:
   - kpt-team@google.com
 license: Apache-2.0

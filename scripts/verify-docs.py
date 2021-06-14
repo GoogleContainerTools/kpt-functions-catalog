@@ -112,14 +112,20 @@ def validate_example_md(fn_name, dir_name, example_name, branch):
     example_path = os.path.join(dir_name, example_name)
     md_file_path = os.path.join(example_path, 'README.md')
 
+    if (fn_name + "-") not in example_name:
+        raise Exception(f'example directory "{example_name}" must have the function name "{fn_name}-" as prefix')
+
     with open(md_file_path) as f:
         first_line = f.readline().strip()
         if not first_line.startswith('# '):
             raise Exception(f'title must be in the 1st line and starts with one "#"')
         if fn_name not in first_line:
             raise Exception(f'title "{first_line}" must be in format "<fn-name>: Example Name" and contains "{fn_name}"')
-        if example_name.replace('-', ' ') not in first_line.lower():
-            raise Exception(f'title "{first_line}" must be in format "<fn-name>: Example Name" and contains "{example_name.replace("-", " ")}"')
+        shorter_example_name = example_name
+        if example_name.startswith(fn_name):
+            shorter_example_name = example_name[len(fn_name):]
+        if shorter_example_name.replace('-', ' ') not in first_line.lower():
+            raise Exception(f'title "{first_line}" must be in format "<fn-name>: Example Name" and contains "{shorter_example_name.replace("-", " ")}"')
 
     process = subprocess.Popen(['mdrip', md_file_path],
                                stdout=subprocess.PIPE,
