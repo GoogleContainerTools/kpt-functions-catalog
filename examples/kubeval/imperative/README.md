@@ -13,7 +13,7 @@ We have a `ReplicationController` in `app.yaml` that has 2 schema violations:
 
 Get this example and try it out by running the following commands:
 
-```sh
+```shell
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval/imperative
 # We set `strict=true` to disallow unknown field and `skip_kinds=MyCustom,MyOtherCustom` to skip 2 kinds that we don't have schemas.
 $ kpt fn eval imperative --image=gcr.io/kpt-fn/kubeval:unstable --results-dir=results -- strict=true skip_kinds=MyCustom,MyOtherCustom

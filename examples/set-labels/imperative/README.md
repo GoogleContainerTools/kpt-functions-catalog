@@ -9,7 +9,7 @@ all resources by running [`set-labels`] function imperatively.
 
 Get the example config and try it out by running the following commands:
 
-```sh
+```shell
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels/imperative
 $ kpt fn eval imperative --image=gcr.io/kpt-fn/set-labels:unstable -- color=orange fruit=apple
 ```

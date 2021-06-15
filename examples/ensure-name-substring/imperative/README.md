@@ -9,7 +9,7 @@ running [`ensure-name-substring`] function imperatively.
 
 Get the config example and try it out by running the following commands:
 
-```sh
+```shell
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring/imperative
 $ kpt fn eval imperative --image=gcr.io/kpt-fn/ensure-name-substring:unstable -- prepend=prod
 ```
