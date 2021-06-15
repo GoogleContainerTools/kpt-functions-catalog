@@ -1,7 +1,7 @@
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetAnnotations
+kind: SetAnnotationConfig
 metadata:
-  name: my-func-config
+  name: my-config
   annotations:
     config.kubernetes.io/local-config: "true"
 annotations:

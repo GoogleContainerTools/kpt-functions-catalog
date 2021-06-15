@@ -21,13 +21,13 @@ pipeline:
 ```yaml
 # fn-config.yaml
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetAnnotationConfig
+kind: SetAnnotations
 metadata:
   name: my-func-config
 annotations:
   fruit: apple
   color: orange
-fieldSpecs:
+additionalAnnotationFields:
   - kind: MyResource
     group: dev.example.com
     version: v1
@@ -38,7 +38,7 @@ fieldSpecs:
 The desired annotations are provided using the `annotations` field. We have a
 CRD with group `dev.example.com`, version `v1` and kind `MyResource`. We want
 the annotations to be added to field `.spec.selector.annotations` as well. We
-specify it in field `fieldSpecs`.
+specify it in field `additionalAnnotationFields`.
 
 ### Function invocation
 
@@ -51,7 +51,8 @@ $ kpt fn render advanced
 
 ### Expected result
 
-Check the 2 annotations have been added to both the k8s built-in resources and
-the custom resources.
+Check all resources have 2 annotations: `color: orange` and `fruit: apple`. And
+the resource of kind `MyResource` also has these 2 annotations in
+`spec.selector.annotations`.
 
 [`set-annotations`]: https://catalog.kpt.dev/set-annotations/v0.1/
