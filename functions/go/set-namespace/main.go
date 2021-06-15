@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-namespace/generated"
-	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
+	"sigs.k8s.io/kustomize/api/hasher"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
@@ -25,8 +25,6 @@ const (
 
 //nolint
 func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = &kyaml.RNode{}
 	asp := SetNamespaceProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 
@@ -105,7 +103,7 @@ func (f *setNamespaceFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run transformer: %w", err)
 	}
-	return resMap.ToRNodeSlice()
+	return resMap.ToRNodeSlice(), nil
 }
 
 func (f *setNamespaceFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bool {
@@ -129,8 +127,9 @@ func getDefaultConfig() (transformerConfig, error) {
 
 //nolint
 func newResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
-	return resmap.NewFactory(resourceFactory, nil)
+	resourceFactory := resource.NewFactory(&hasher.Hasher{})
+	resourceFactory.IncludeLocalConfigs = true
+	return resmap.NewFactory(resourceFactory)
 }
 
 func run(resourceList *framework.ResourceList) error {

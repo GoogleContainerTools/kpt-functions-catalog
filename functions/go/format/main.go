@@ -8,13 +8,10 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
-	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 //nolint
 func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = &kyaml.RNode{}
 	asp := FormatProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 

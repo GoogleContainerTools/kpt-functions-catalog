@@ -171,7 +171,7 @@ func (cs *CreateSetters) visitMapping(object *yaml.RNode, path string) error {
 				// adds the comment to the key for the FoldedStyle value node
 				nodeToAddComment = node.Key
 			}
-		}else{
+		} else {
 			// adds comment to the key for the FoldedStyle value node
 			nodeToAddComment = node.Key
 		}

@@ -8,13 +8,10 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/upsert-resource/upsertresource"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
-	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 //nolint
 func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = &kyaml.RNode{}
 	asp := UpsertResourceProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 

@@ -5,7 +5,7 @@ metadata:
 exitCode: 1
 items:
   - image: gcr.io/kpt-fn/set-labels:unstable
-    stderr: '[error] /// : failed to configure function: function config must be a ConfigMap or SetLabelConfig'
+    stderr: '[error] : failed to configure function: function config must be a ConfigMap or SetLabelConfig'
     exitCode: 1
     results:
       - message: 'failed to configure function: function config must be a ConfigMap or SetLabelConfig'
