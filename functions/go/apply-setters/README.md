@@ -118,7 +118,7 @@ data:
 
 Render the declared values by invoking:
 
-```
+```shell
 $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
 ```
 

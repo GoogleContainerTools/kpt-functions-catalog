@@ -17,7 +17,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 
 Invoke the function by running the following commands:
 
-```sh
+```shell
 $ kpt fn eval ensure-name-substring-imperative --image=gcr.io/kpt-fn/ensure-name-substring:unstable -- prepend=prod
 ```
 

@@ -18,7 +18,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 
 Invoke the function by running the following commands:
 
-```sh
+```shell
 $ kpt fn eval set-namespace-imperative --image=gcr.io/kpt-fn/set-namespace:unstable -- namespace=example-ns
 ```
 

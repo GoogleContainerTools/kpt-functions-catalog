@@ -17,7 +17,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 
 Invoke the function by running the following commands:
 
-```sh
+```shell
 $ kpt fn eval set-labels-imperative --image=gcr.io/kpt-fn/set-labels:unstable -- color=orange fruit=apple
 ```
 
