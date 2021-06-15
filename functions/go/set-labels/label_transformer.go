@@ -36,7 +36,7 @@ func (p *plugin) Config(
 		return fmt.Errorf("failed to unmarshal config %#v: %w", string(c), err)
 	}
 	if p.AdditionalLabelFields != nil && p.FieldSpecs != nil {
-		return fmt.Errorf("fieldSpecs has been deprecated, please rename it to additionalLabelFields")
+		return fmt.Errorf("`fieldSpecs` has been deprecated, please rename it to `additionalLabelFields`")
 	}
 	if p.AdditionalLabelFields == nil && p.FieldSpecs != nil {
 		p.AdditionalLabelFields = p.FieldSpecs

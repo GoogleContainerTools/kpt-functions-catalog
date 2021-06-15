@@ -81,7 +81,7 @@ func (f *setLabelFunction) Config(rn *kyaml.RNode) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
+		return fmt.Errorf("function config must be a `ConfigMap` or `%s`", fnConfigKind)
 	}
 
 	if len(f.plugin.Labels) == 0 {

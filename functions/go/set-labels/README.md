@@ -4,9 +4,9 @@
 
 <!--mdtogo:Short-->
 
-The set-labels function adds a list of labels to all resources. By default, the
-function will not only set the labels in `metadata.labels` but also a bunch of
-different places where have references to the labels. These settings are
+The `set-labels` function adds a list of labels to all resources. By default,
+the function will not only set the labels in `metadata.labels` but also a bunch
+of different places where have references to the labels. These settings are
 defined [here][commonlabels].
 
 <!--mdtogo-->
