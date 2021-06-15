@@ -54,4 +54,4 @@ $ kpt fn render simple
 
 ### Expected result
 
-Check the value of deployment `the-deloyment` is changed to `my-deloyment`.
+Check the value of deployment `the-deployment` is changed to `my-deployment`.
