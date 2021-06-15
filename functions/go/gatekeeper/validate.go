@@ -135,16 +135,14 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 
 		item := framework.ResultItem{
 			Message: fmt.Sprintf("%s\nviolatedConstraint: %s", r.Msg, r.Constraint.GetName()),
-			ResourceRef: yaml.ResourceMeta{
+			ResourceRef: yaml.ResourceIdentifier{
 				TypeMeta: yaml.TypeMeta{
 					APIVersion: u.GetAPIVersion(),
 					Kind:       u.GetKind(),
 				},
-				ObjectMeta: yaml.ObjectMeta{
-					NameMeta: yaml.NameMeta{
-						Name:      u.GetName(),
-						Namespace: u.GetNamespace(),
-					},
+				NameMeta: yaml.NameMeta{
+					Name:      u.GetName(),
+					Namespace: u.GetNamespace(),
 				},
 			},
 		}
@@ -228,5 +226,5 @@ func fileLess(items []framework.ResultItem, i, j int) int {
 
 func resultItemToString(item framework.ResultItem) string {
 	return fmt.Sprintf("resource-ref:%s,field:%s,message:%s",
-		item.ResourceRef.GetIdentifier(), item.Field, item.Message)
+		item.ResourceRef, item.Field, item.Message)
 }

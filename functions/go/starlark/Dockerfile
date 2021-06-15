@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine3.12
+FROM golang:1.16-alpine3.13
 ENV CGO_ENABLED=0
 WORKDIR /go/src/
 
@@ -10,6 +10,6 @@ RUN go build -o /usr/local/bin/star ./
 
 #############################################
 
-FROM alpine:3.12
+FROM alpine:3.13
 COPY --from=0 /usr/local/bin/star /usr/local/bin/star
 ENTRYPOINT ["star"]

@@ -115,16 +115,14 @@ func TestSortResultItems(t *testing.T) {
 				{
 					Message:  "Error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceMeta{
+					ResourceRef: yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
 						},
-						ObjectMeta: yaml.ObjectMeta{
-							NameMeta: yaml.NameMeta{
-								Namespace: "foo-ns",
-								Name:      "bar",
-							},
+						NameMeta: yaml.NameMeta{
+							Namespace: "foo-ns",
+							Name:      "bar",
 						},
 					},
 					Field: framework.Field{
@@ -134,16 +132,14 @@ func TestSortResultItems(t *testing.T) {
 				{
 					Message:  "Error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceMeta{
+					ResourceRef: yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
 						},
-						ObjectMeta: yaml.ObjectMeta{
-							NameMeta: yaml.NameMeta{
-								Namespace: "foo-ns",
-								Name:      "bar",
-							},
+						NameMeta: yaml.NameMeta{
+							Namespace: "foo-ns",
+							Name:      "bar",
 						},
 					},
 					Field: framework.Field{
@@ -153,16 +149,14 @@ func TestSortResultItems(t *testing.T) {
 				{
 					Message:  "Another error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceMeta{
+					ResourceRef: yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
 						},
-						ObjectMeta: yaml.ObjectMeta{
-							NameMeta: yaml.NameMeta{
-								Namespace: "foo-ns",
-								Name:      "bar",
-							},
+						NameMeta: yaml.NameMeta{
+							Namespace: "foo-ns",
+							Name:      "bar",
 						},
 					},
 					Field: framework.Field{
@@ -172,16 +166,14 @@ func TestSortResultItems(t *testing.T) {
 				{
 					Message:  "Another error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceMeta{
+					ResourceRef: yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "ConfigMap",
 						},
-						ObjectMeta: yaml.ObjectMeta{
-							NameMeta: yaml.NameMeta{
-								Namespace: "foo-ns",
-								Name:      "bar",
-							},
+						NameMeta: yaml.NameMeta{
+							Namespace: "foo-ns",
+							Name:      "bar",
 						},
 					},
 					Field: framework.Field{
@@ -193,16 +185,14 @@ func TestSortResultItems(t *testing.T) {
 				{
 					Message:  "Another error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceMeta{
+					ResourceRef: yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "ConfigMap",
 						},
-						ObjectMeta: yaml.ObjectMeta{
-							NameMeta: yaml.NameMeta{
-								Namespace: "foo-ns",
-								Name:      "bar",
-							},
+						NameMeta: yaml.NameMeta{
+							Namespace: "foo-ns",
+							Name:      "bar",
 						},
 					},
 					Field: framework.Field{
@@ -212,16 +202,14 @@ func TestSortResultItems(t *testing.T) {
 				{
 					Message:  "Another error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceMeta{
+					ResourceRef: yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
 						},
-						ObjectMeta: yaml.ObjectMeta{
-							NameMeta: yaml.NameMeta{
-								Namespace: "foo-ns",
-								Name:      "bar",
-							},
+						NameMeta: yaml.NameMeta{
+							Namespace: "foo-ns",
+							Name:      "bar",
 						},
 					},
 					Field: framework.Field{
@@ -231,16 +219,14 @@ func TestSortResultItems(t *testing.T) {
 				{
 					Message:  "Error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceMeta{
+					ResourceRef: yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
 						},
-						ObjectMeta: yaml.ObjectMeta{
-							NameMeta: yaml.NameMeta{
-								Namespace: "foo-ns",
-								Name:      "bar",
-							},
+						NameMeta: yaml.NameMeta{
+							Namespace: "foo-ns",
+							Name:      "bar",
 						},
 					},
 					Field: framework.Field{
@@ -250,16 +236,14 @@ func TestSortResultItems(t *testing.T) {
 				{
 					Message:  "Error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceMeta{
+					ResourceRef: yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
 						},
-						ObjectMeta: yaml.ObjectMeta{
-							NameMeta: yaml.NameMeta{
-								Namespace: "foo-ns",
-								Name:      "bar",
-							},
+						NameMeta: yaml.NameMeta{
+							Namespace: "foo-ns",
+							Name:      "bar",
 						},
 					},
 					Field: framework.Field{

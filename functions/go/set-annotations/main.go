@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"os"
 
-	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-annotations/generated"
+	"sigs.k8s.io/kustomize/api/hasher"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
-
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-annotations/generated"
 )
 
 const (
@@ -24,6 +24,25 @@ const (
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
 	fnConfigKind       = "SetAnnotationConfig"
 )
+
+type SetAnnotationsProcessor struct{}
+
+func (sap *SetAnnotationsProcessor) Process(resourceList *framework.ResourceList) error {
+	err := run(resourceList)
+	if err != nil {
+		resourceList.Result = &framework.Result{
+			Name: "set-annotations",
+			Items: []framework.ResultItem{
+				{
+					Message:  err.Error(),
+					Severity: framework.Error,
+				},
+			},
+		}
+		return resourceList.Result
+	}
+	return nil
+}
 
 type transformerConfig struct {
 	FieldSpecs types.FsSlice `json:"commonAnnotations,omitempty" yaml:"commonAnnotations,omitempty"`
@@ -34,15 +53,7 @@ type setAnnotationFunction struct {
 	plugin             `json:",inline" yaml:",inline"`
 }
 
-func (f *setAnnotationFunction) Config(fnConfig interface{}) error {
-	configMap, ok := fnConfig.(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("function config %#v is not valid", fnConfig)
-	}
-	rn, err := kyaml.FromMap(configMap)
-	if err != nil {
-		return fmt.Errorf("failed to construct RNode from %#v: %w", configMap, err)
-	}
+func (f *setAnnotationFunction) Config(rn *kyaml.RNode) error {
 	switch {
 	case f.validGVK(rn, "v1", "ConfigMap"):
 		f.plugin.Annotations = rn.GetDataMap()
@@ -82,7 +93,7 @@ func (f *setAnnotationFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error
 	if err != nil {
 		return nil, fmt.Errorf("failed to run transformer: %w", err)
 	}
-	return resMap.ToRNodeSlice()
+	return resMap.ToRNodeSlice(), nil
 }
 
 func (f *setAnnotationFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bool {
@@ -104,31 +115,15 @@ func getDefaultConfig() (transformerConfig, error) {
 }
 
 func newResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
-	return resmap.NewFactory(resourceFactory, nil)
+	resourceFactory := resource.NewFactory(&hasher.Hasher{})
+	resourceFactory.IncludeLocalConfigs = true
+	return resmap.NewFactory(resourceFactory)
 }
 
 //nolint
 func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = map[string]interface{}{}
-
-	cmd := framework.Command(resourceList, func() error {
-		err := run(resourceList)
-		if err != nil {
-			resourceList.Result = &framework.Result{
-				Name: "set-annotations",
-				Items: []framework.Item{
-					{
-						Message:  err.Error(),
-						Severity: framework.Error,
-					},
-				},
-			}
-			return resourceList.Result
-		}
-		return nil
-	})
+	asp := SetAnnotationsProcessor{}
+	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 
 	cmd.Short = generated.SetAnnotationsShort
 	cmd.Long = generated.SetAnnotationsLong

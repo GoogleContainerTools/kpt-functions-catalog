@@ -1,4 +1,4 @@
-FROM node:14.15-alpine3.12 as builder
+FROM node:14.15-alpine3.13 as builder
 
 ARG KUBEVAL_VERSION="v0.16.1"
 RUN apk add curl && \
@@ -25,7 +25,7 @@ RUN npm run build && \
 
 #############################################
 
-FROM node:14.15-alpine3.12
+FROM node:14.15-alpine3.13
 
 RUN apk add --update --no-cache python3 py3-pip && ln -sf python3 /usr/bin/python
 RUN pip install pyyaml jsonref click

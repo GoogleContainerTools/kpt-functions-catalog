@@ -1,4 +1,4 @@
-FROM node:14.15-alpine3.12 as builder
+FROM node:14.15-alpine3.13 as builder
 
 RUN apk add bash curl git && apk update
 
@@ -34,7 +34,7 @@ RUN npm run build && \
 
 #############################################
 
-FROM node:14.15-alpine3.12
+FROM node:14.15-alpine3.13
 
 RUN apk add git gnupg
 

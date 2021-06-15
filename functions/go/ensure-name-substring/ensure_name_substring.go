@@ -7,10 +7,10 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/api/filters/prefixsuffix"
-	"sigs.k8s.io/kustomize/api/resid"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
+	"sigs.k8s.io/kustomize/kyaml/resid"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 	k8syaml "sigs.k8s.io/yaml"
 )
@@ -185,7 +185,11 @@ func resourceContainsSubstring(r *resource.Resource, substring string, fs types.
 		return strings.Contains(r.GetName(), substring), nil
 	}
 
-	rn, err := yaml.FromMap(r.Map())
+	m, err := r.Map()
+	if err != nil {
+		return false, fmt.Errorf("unable to convert resource for %v: %w", r.OrgId().String(), err)
+	}
+	rn, err := yaml.FromMap(m)
 	if err != nil {
 		return false, fmt.Errorf("unable to check if the substring exsits in %v: %w", r.OrgId().String(), err)
 	}

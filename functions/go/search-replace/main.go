@@ -13,8 +13,6 @@ import (
 
 //nolint
 func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = &kyaml.RNode{}
 	srp := SearchReplaceProcessor{}
 	cmd := command.Build(&srp, command.StandaloneEnabled, false)
 
