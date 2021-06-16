@@ -16,7 +16,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/starlark:unstable
+    - image: gcr.io/kpt-fn/starlark:v0.1
       configPath: fn-config.yaml
 ```
 
@@ -45,7 +45,7 @@ keys in the `ConfigMap`.
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/validation
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/validation@starlark/v0.1
 $ kpt fn render validation
 ```
 
@@ -60,7 +60,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/starlark:unstable
+  - image: gcr.io/kpt-fn/starlark:v0.1
     stderr: 'fail: it is prohibited to have private key in a configmap'
     exitCode: 1
     results:
