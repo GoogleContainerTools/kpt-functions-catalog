@@ -16,7 +16,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/starlark:unstable
+    - image: gcr.io/kpt-fn/starlark:v0.1
       configPath: fn-config.yaml
 ```
 
@@ -53,7 +53,7 @@ container in the `Deployment`.
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/inject-sidecar
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/inject-sidecar@starlark/v0.1
 $ kpt fn render inject-sidecar
 ```
 

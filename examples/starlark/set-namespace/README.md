@@ -16,7 +16,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/starlark:unstable
+    - image: gcr.io/kpt-fn/starlark:v0.1
       configPath: fn-config.yaml
 ```
 
@@ -45,7 +45,7 @@ to `prod` for all resources.
 Get the config example and try it out by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/set-namespace
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark/set-namespace@starlark/v0.1
 $ kpt fn render set-namespace
 ```
 
