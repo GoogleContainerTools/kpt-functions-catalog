@@ -17,7 +17,7 @@ metadata:
   name: example
 pipeline:
   validators:
-    - image: gcr.io/kpt-fn/gatekeeper:unstable
+    - image: gcr.io/kpt-fn/gatekeeper:v0.1
 ```
 
 ### Function invocation
@@ -25,7 +25,7 @@ pipeline:
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/invalid-configmap
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/invalid-configmap@gatekeeper/v0.1
 ```
 
 Run the function:
@@ -45,7 +45,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/gatekeeper:unstable
+  - image: gcr.io/kpt-fn/gatekeeper:v0.1
     stderr: |-
       The following banned keys are being used in the ConfigMap: {"private_key"}
       violatedConstraint: no-secrets-in-configmap

@@ -15,7 +15,7 @@ metadata:
   name: example
 pipeline:
   validators:
-    - image: gcr.io/kpt-fn/gatekeeper:unstable
+    - image: gcr.io/kpt-fn/gatekeeper:v0.1
 ```
 
 In the constraint, we use `enforcementAction: warn` instead of
@@ -36,7 +36,7 @@ spec:
 Get the package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/warning-only
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper/warning-only@gatekeeper/v0.1
 ```
 
 Run the function:
@@ -56,7 +56,7 @@ metadata:
   name: fnresults
 exitCode: 0
 items:
-  - image: gcr.io/kpt-fn/gatekeeper:unstable
+  - image: gcr.io/kpt-fn/gatekeeper:v0.1
     exitCode: 0
     results:
       - message: |-
