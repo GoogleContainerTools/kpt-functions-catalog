@@ -4,14 +4,32 @@
 
 <!--mdtogo:Short-->
 
-The `set-labels` function adds a list of labels to all resources. By default,
-the function will not only set the labels in `metadata.labels` but also a bunch
-of different places where have references to the labels. These settings are
-defined [here][commonlabels].
+The `set-labels` function adds a list of [labels] to all resources. It's a
+common practice to add a set of labels for all the resource in a package.
+Kubernetes has some [recommended labels].
+
+For example, labels can be used in the following scenarios:
+
+- Identify the KRM resources by querying their labels.
+- Set labels for all resources within a package (e.g. environment=staging).
 
 <!--mdtogo-->
 
-### FunctionConfig
+### Usage
+
+This function can be used with any KRM function orchestrators (e.g. kpt).
+
+For each label, the function adds it if it doesn't exist. Otherwise, it replaces
+the existing label with the same name.
+
+In addition to updating the `metadata.labels` field for each resource, the
+function will also update the [selectors][commonlabels] that target the labels
+by default. e.g. the selectors for `Service` will be updated to include the
+desired labels.
+
+This function can be used both declaratively and imperatively.
+
+#### FunctionConfig
 
 <!--mdtogo:Long-->
 
@@ -72,5 +90,9 @@ additionalLabelFields:
 ```
 
 <!--mdtogo-->
+
+[labels]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+
+[recommended labels]: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
 
 [commonlabels]: https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/commonlabels.go#L6
