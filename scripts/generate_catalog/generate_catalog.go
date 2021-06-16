@@ -144,21 +144,21 @@ func getFunctions(branches []string, source string, dest string) []function {
 		metadataPath := strings.TrimSpace(fmt.Sprintf("%v:%v", b, filepath.Join(relativeFuncPath, "metadata.yaml")))
 		md, err := getMetadata(metadataPath)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error getting metadata for %q in %q: %v\n", funcName, b, err)
+			fmt.Fprintf(os.Stderr, "Error getting metadata for %q from %q: %v\n", funcName, b, err)
 			os.Exit(1)
 		}
 		if md.Hidden {
 			continue
 		}
-		err = copyExamples(b, funcName, funcDest, versionDest)
+		err = copyExamples(b, md.ExamplePackageUrls, versionDest, minorVersion)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error getting examples for %q in %q: %v\n", funcName, b, err)
+			fmt.Fprintf(os.Stderr, "Error getting examples for %q from %q: %v\n", funcName, b, err)
 			os.Exit(1)
 		}
 
 		err = copyReadme(b, funcName, relativeFuncPath, versionDest)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error getting README for %q in %q: %v\n", funcName, b, err)
+			fmt.Fprintf(os.Stderr, "Error getting README for %q from %q: %v\n", funcName, b, err)
 			os.Exit(1)
 		}
 
@@ -181,30 +181,38 @@ func getFunctions(branches []string, source string, dest string) []function {
 	return flattenedFunctions
 }
 
-func copyExamples(b string, funcName string, funcDest string, versionDest string) error {
-	exampleSource := fmt.Sprintf("examples/%v", funcName)
-
-	// Prepare destination for versioned examples.
-	err := os.MkdirAll(funcDest, 0744)
-	if err != nil {
-		return err
-	}
-
+func copyExamples(b string, exampleSources []string, versionDest, minorVersion string) error {
 	// Copy examples for the function's version to a temporary directory.
 	tempDir, err := ioutil.TempDir("", "examples")
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", exampleSource)
-	err = cmd.Run()
+
+	// Prepare destination for versioned examples.
+	err = os.MkdirAll(versionDest, 0744)
 	if err != nil {
 		return err
 	}
 
-	// Move example content to the site's example directory.
-	err = os.Rename(filepath.Join(tempDir, "examples", funcName), versionDest)
-	if err != nil {
-		return err
+	for _, exampleSource := range exampleSources {
+		relativePath := strings.SplitN(exampleSource, minorVersion+string(filepath.Separator), 2)[1]
+		// Fetch example into temporary directory.
+		cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", relativePath)
+		err = cmd.Run()
+		if err != nil {
+			return fmt.Errorf("Error running %v: %v", cmd, err)
+		}
+
+		exampleName := filepath.Base(relativePath)
+		src := filepath.Join(tempDir, relativePath)
+		dest := filepath.Join(versionDest, exampleName)
+
+		// Move example content to the site's example directory.
+		err = os.Rename(src, dest)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	return nil
