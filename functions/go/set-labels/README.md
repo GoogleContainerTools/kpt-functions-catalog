@@ -4,29 +4,47 @@
 
 <!--mdtogo:Short-->
 
-Add a list of labels to all resources.
+The `set-labels` function adds a list of labels to all resources. It's a common
+practice to add a set of labels for all the resources in a package. Kubernetes
+has some [recommended labels].
+
+For example, labels can be used in the following scenarios:
+
+- Identify the KRM resources by querying their labels.
+- Set labels for all resources within a package (e.g. environment=staging).
 
 <!--mdtogo-->
 
-### FunctionConfig
+You can learn more about labels [here][labels].
+
+### Usage
+
+This function can be used with any KRM function orchestrators (e.g. kpt).
+
+For each label, the function adds it if it doesn't exist. Otherwise, it replaces
+the existing label with the same name.
+
+In addition to updating the `metadata.labels` field for each resource, the
+function will also update the [selectors][commonlabels] that target the labels
+by default. e.g. the selectors for `Service` will be updated to include the
+desired labels.
+
+This function can be used both declaratively and imperatively.
+
+#### FunctionConfig
 
 <!--mdtogo:Long-->
 
-Configured using a ConfigMap with key-value pairs in `data` field in `ConfigMap`
-resource.
+There are 2 kinds of `functionConfig` supported by this function:
 
-For example: To add a label `color: orange` to all resources:
+- `ConfigMap`
+- A custom resource of kind `SetLabels`
 
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  color: orange
-```
+To use a `ConfigMap` as the `functionConfig`, the desired labels must be
+specified in the `data` field.
 
-To add 2 labels `color: orange` and `fruit: apple` to all resources:
+To add 2 labels `color: orange` and `fruit: apple` to all resources, we use the
+following `functionConfig`:
 
 ```yaml
 apiVersion: v1
@@ -38,47 +56,48 @@ data:
   fruit: apple
 ```
 
-You can use key `fieldSpecs` to specify the resource selector you want to use.
-By default, the function will not only add or update the labels in
-`metadata/labels` but also a bunch of different places where have references to
-the labels. These field specs are defined in
-https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/commonlabels.go#L6
+To use a `SetLabels` custom resource as the `functionConfig`, the desired labels
+must be specified in the `labels` field. Sometimes you have resources (
+especially custom resources) that have labels or selectors fields in fields
+other than the [defaults][commonlabels], you can specify such label fields using
+additionalLabelFields. It will be used jointly with the
+[defaults][commonlabels].
 
-You need to use a custom resource to specify additional information.
+`additionalLabelFields` has following fields:
 
-Example:
+- `group`: Select the resources by API version group. Will select all groups if
+  omitted.
+- `version`: Select the resources by API version. Will select all versions if
+  omitted.
+- `kind`: Select the resources by resource kind. Will select all kinds if
+  omitted.
+- `path`: Specify the path to the field that the value needs to be updated. This
+  field is required.
+- `create`: If it's set to true, the field specified will be created if it
+  doesn't exist. Otherwise, the function will only update the existing field.
 
-To add a label `color: orange` to path `data/selector` in MyOwnKind resource:
+To add 2 labels `color: orange` and `fruit: apple` to all built-in resources and
+the path `data.selector` in `MyOwnKind` resource, we use the
+following `functionConfig`:
 
 ```yaml
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetLabelConfig
+kind: SetLabels
 metadata:
   name: my-config
 labels:
   color: orange
-fieldSpecs:
-- path: data/selector
-  kind: MyOwnKind
-  create: true
+  fruit: apple
+additionalLabelFields:
+  - path: data/selector
+    kind: MyOwnKind
+    create: true
 ```
 
-To support your own CRDs you will need to add more items to fieldSpecs list.
-Your own specs will be used with the default ones.
-
-Field spec has following fields:
-
-- group: Select the resources by API version group. Will select all groups if
-  omitted.
-- version: Select the resources by API version. Will select all versions if
-  omitted.
-- kind: Select the resources by resource kind. Will select all kinds if omitted.
-- path: Specify the path to the field that the value will be updated. This field
-  is required.
-- create: If it's set to true, the field specified will be created if it doesn't
-  exist. Otherwise the function will only update the existing field.
-
-For more information about fieldSpecs, please see
-https://kubectl.docs.kubernetes.io/guides/extending_kustomize/builtins/#arguments-3
-
 <!--mdtogo-->
+
+[labels]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+
+[recommended labels]: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
+
+[commonlabels]: https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/commonlabels.go#L6
