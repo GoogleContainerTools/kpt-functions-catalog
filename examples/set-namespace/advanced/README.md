@@ -2,9 +2,9 @@
 
 ### Overview
 
-This example demonstrates how to declaratively run [`set-namespace`] function
-to add or replace the `.metadata.namespace` field on all resources except for
-those known to be cluster-scoped.
+This example demonstrates how to declaratively run [`set-namespace`] function to
+add or replace the `.metadata.namespace` field on all resources except for those
+known to be cluster-scoped.
 
 We use the following `Kptfile` and `fn-config.yaml` to configure the function.
 
@@ -34,14 +34,18 @@ additionalNamespaceFields:
     create: true
 ```
 
-`set-namespace` function not only support `ConfigMap` but also a CRD as the
-function configuration. We embed the CRD in the `Kptfile` in this example.
-The desired namespace is provided using `.namespace` field in the function
-configuration.
+`set-namespace` function not only support `ConfigMap` but also a custom resource
+of kind `SetNamespace` as the function configuration. In the `Kptfile`, we
+specify `configPath` to point to the `functionConfig` file. The desired
+namespace is provided using the `namespace` field in the function configuration.
 
-Suppose we have a CRD with group `dev.example.com`, version `v1` and kind
-`MyResource`. We want the namespace to be set in field
-`.spec.configmapRef.namespace` as well. We specify it in field `additionalNamespaceFields`.
+If you have a resource that uses namespace in fields other
+than `metadata.namespace`, you can use
+`additionalNamespaceFields` to update those namespace fields.
+
+In this example, we want the namespace to be set in
+field `spec.configmapRef.namespace` in resources of kind `MyResource` as well.
+We specify it in field `additionalNamespaceFields`.
 
 ### Function invocation
 
