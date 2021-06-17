@@ -5,8 +5,8 @@ metadata:
 exitCode: 1
 items:
   - image: gcr.io/kpt-fn/set-annotations:unstable
-    stderr: '[error] : failed to configure function: function config must be a ConfigMap or SetAnnotationConfig'
+    stderr: '[error] : failed to configure function: `functionConfig` must be a `ConfigMap` or `SetAnnotations`'
     exitCode: 1
     results:
-      - message: 'failed to configure function: function config must be a ConfigMap or SetAnnotationConfig'
+      - message: 'failed to configure function: `functionConfig` must be a `ConfigMap` or `SetAnnotations`'
         severity: error
