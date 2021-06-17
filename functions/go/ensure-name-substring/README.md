@@ -16,12 +16,10 @@ Note: This is an alpha function, and we are actively seeking feedback on the
 function config syntax and behavior. If you have suggestion or feedback, please
 file an issue [here](https://github.com/GoogleContainerTools/kpt/issues/new/choose).
 
-If the desired name substring is already part of the name, it takes no actions.
-Otherwise, it prepends or appends the name substring.
+The function prepends or appends the name substring.  In cases where the desired
+name substring is already a part of the name, it takes no actions.
 
-Note: If the original name of a resource happens to contain the desired
-substring, the desired substring will not be added again. Users need to ensure
-the name collisions don't happen.
+Note: Users need to ensure the name collisions don't happen.
 
 To configure it using a ConfigMap, only one key-value pair is allowed in `data`
 field. The key must be one of `prepend` and `append`, and the value is the
@@ -50,8 +48,7 @@ This function does Not process the following resources:
 
 You can optionally use key `fieldSpecs` to specify the resource selector you
 want to use. By default, the function will not only update the `metadata/name`
-but also a bunch of different places where have references to the names. These
-field specs are defined in
+but also a references to the names. These field specs are defined in
 https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/namereference.go
 
 To support your own CRDs you will need to add more items to fieldSpecs list.
