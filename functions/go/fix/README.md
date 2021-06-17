@@ -12,7 +12,7 @@ Fix resources and make them compatible with kpt 1.0.
 
 <!--mdtogo:Long-->
 
-`fix` helps you migrate the resources from `v1alpha1` format to `v1alpha2` format.
+`fix` helps you migrate the resources from `v1alpha1` format to `v1` format.
 This is an automated step to migrate kpt packages which are compatible with kpt v0.X.Y
 versions of kpt, and make them compatible with kpt 1.0
 
@@ -20,7 +20,7 @@ Here are the automated changes performed by `fix` function on `v1alpha1` kpt pac
 
 1. The `packageMetaData` section will be transformed to `info` section.
 2. `upstream` section(if present), in the `v1alpha1` Kptfile is converted to `upstream`
-   and `upstreamLock` sections in `v1alpha2` version of Kptfile.
+   and `upstreamLock` sections in `v1` version of Kptfile.
 3. `dependencies` section will be removed from the Kptfile.
 4. Setters no longer follow the OpenAPI format. The setters and substitutions will be converted
    to simple setter patterns. `apply-setters` function is declared in the `pipeline` section.
@@ -34,7 +34,7 @@ Limitations of `fix` function:
 1. All the functions are treated as mutators by the `fix` function while migrating and are added to
    the mutators section in the pipeline. Users must manually go through the functions
    and move the validator functions to the [validators] section in the pipeline section
-   of `v1alpha2` Kptfile.
+   of `v1` Kptfile.
 2. [Openapi validations] and [required setters] feature offered by v0.X.Y setters is
    no longer offered in v1.0 version of kpt. `fix` function will remove them.
    Users must write their own validation functions to achieve the functionality.
@@ -99,7 +99,7 @@ spec:
   replicas: 3 # kpt-set: ${replicas}
 ```
 
-Here is the transformed `v1alpha2` Kptfile:
+Here is the transformed `v1` Kptfile:
 
 ```yaml
 apiVersion: kpt.dev/v1alpha2
