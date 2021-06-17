@@ -20,7 +20,8 @@ const (
 	fnConfigGroup      = "fn.kpt.dev"
 	fnConfigVersion    = "v1alpha1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
-	fnConfigKind       = "SetNamespaceConfig"
+	legacyFnConfigKind = "SetNamespaceConfig"
+	fnConfigKind       = "SetNamespace"
 )
 
 //nolint
@@ -67,18 +68,20 @@ func (f *setNamespaceFunction) Config(rn *kyaml.RNode) error {
 	switch {
 	case f.validGVK(rn, "v1", "ConfigMap"):
 		f.plugin.Namespace = rn.GetDataMap()["namespace"]
+	case f.validGVK(rn, fnConfigAPIVersion, legacyFnConfigKind):
+		fallthrough
 	case f.validGVK(rn, fnConfigAPIVersion, fnConfigKind):
 		// input config is a CRD
 		y, err := rn.String()
 		if err != nil {
 			return fmt.Errorf("cannot get YAML from RNode: %w", err)
 		}
-		err = yaml.Unmarshal([]byte(y), &f.plugin)
+		err = f.plugin.Config(nil, []byte(y))
 		if err != nil {
-			return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+			return err
 		}
 	default:
-		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
+		return fmt.Errorf("`functionConfig` must be a `ConfigMap` or `%s`", fnConfigKind)
 	}
 
 	if f.plugin.Namespace == "" {
@@ -89,7 +92,7 @@ func (f *setNamespaceFunction) Config(rn *kyaml.RNode) error {
 		return err
 	}
 	// set default field specs
-	f.plugin.FieldSpecs = append(f.plugin.FieldSpecs, tc.FieldSpecs...)
+	f.plugin.AdditionalNamespaceFields = append(f.plugin.AdditionalNamespaceFields, tc.FieldSpecs...)
 	return nil
 }
 

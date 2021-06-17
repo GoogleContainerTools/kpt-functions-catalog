@@ -1,9 +1,9 @@
 namespace: test
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetNamespaceConfig
+kind: SetNamespace
 metadata:
   name: my-config
-fieldSpecs:
+additionalNamespaceFields:
   - kind: MyResource
     group: dev.example.com
     path: spec/selector/namespace

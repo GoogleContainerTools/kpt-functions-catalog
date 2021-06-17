@@ -1,0 +1,38 @@
+diff --git a/resources.yaml b/resources.yaml
+index 517a507..7dfa8c1 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,6 +2,7 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: the-map
++  namespace: example-ns
+ data:
+   some-key: some-value
+ ---
+@@ -9,7 +10,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: the-service
+-  namespace: the-namespace
++  namespace: example-ns
+ spec:
+   ports:
+     - name: etcd-server-ssl
+@@ -22,13 +23,14 @@ spec:
+ apiVersion: v1
+ kind: Namespace
+ metadata:
+-  name: old-name
++  name: example-ns
+ ---
+ apiVersion: dev.example.com/v1
+ kind: MyResource
+ metadata:
+   name: the-service
+-  namespace: the-namespace
++  namespace: example-ns
+ spec:
+   configmapRef:
+     name: the-map
++    namespace: example-ns
