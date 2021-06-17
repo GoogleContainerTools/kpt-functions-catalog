@@ -10,7 +10,7 @@ We are going to use the following `Kptfile` and `fn-config.yaml` to configure
 the function:
 
 ```yaml
-apiVersion: kpt.dev/v1alpha2
+apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: example
@@ -54,7 +54,7 @@ $ kpt fn render validation
 Let's take a look at the structured results in `/tmp/results.yaml`:
 
 ```yaml
-apiVersion: kpt.dev/v1alpha2
+apiVersion: kpt.dev/v1
 kind: FunctionResultList
 metadata:
   name: fnresults
