@@ -184,10 +184,13 @@
                     "create-issue"
                   ).href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Function Catalog - ${document.title}`;
                   doc.getElementById("edit-page").href =
-                    ghElement.href.replace(
-                      "kpt-functions-catalog/tree",
-                      "kpt-functions-catalog/edit"
-                    ) + "/README.md";
+                    ghElement.href
+                      .replace(
+                        "kpt-functions-catalog/tree",
+                        "kpt-functions-catalog/edit"
+                      )
+                      .replace(`${functionName}/${versionName}`, "master") +
+                    "/README.md";
 
                   html = doc.body.innerHTML;
                 } catch (err) {
