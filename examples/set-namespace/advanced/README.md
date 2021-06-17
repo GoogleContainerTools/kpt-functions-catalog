@@ -22,11 +22,11 @@ pipeline:
 ```yaml
 # fn-config.yaml
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetNamespaceConfig
+kind: SetNamespace
 metadata:
   name: my-config
 namespace: example-ns
-fieldSpecs:
+additionalNamespaceFields:
   - group: dev.example.com
     version: v1
     kind: MyResource
@@ -41,7 +41,7 @@ configuration.
 
 Suppose we have a CRD with group `dev.example.com`, version `v1` and kind
 `MyResource`. We want the namespace to be set in field
-`.spec.configmapRef.namespace` as well. We specify it in field `fieldSpecs`.
+`.spec.configmapRef.namespace` as well. We specify it in field `additionalNamespaceFields`.
 
 ### Function invocation
 

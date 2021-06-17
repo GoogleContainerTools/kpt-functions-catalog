@@ -21,8 +21,8 @@ func runNamespaceTransformerE(config, input string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if len(plugin.FieldSpecs) == 0 {
-		plugin.FieldSpecs = defaultConfig.FieldSpecs
+	if len(plugin.AdditionalNamespaceFields) == 0 {
+		plugin.AdditionalNamespaceFields = defaultConfig.FieldSpecs
 	}
 	err = plugin.Transform(resMap)
 	if err != nil {
