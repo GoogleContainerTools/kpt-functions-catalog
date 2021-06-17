@@ -4,9 +4,9 @@
 
 <!--mdtogo:Short-->
 
-The `set-labels` function adds a list of [labels] to all resources. It's a
-common practice to add a set of labels for all the resource in a package.
-Kubernetes has some [recommended labels].
+The `set-labels` function adds a list of labels to all resources. It's a common
+practice to add a set of labels for all the resources in a package. Kubernetes
+has some [recommended labels].
 
 For example, labels can be used in the following scenarios:
 
@@ -14,6 +14,8 @@ For example, labels can be used in the following scenarios:
 - Set labels for all resources within a package (e.g. environment=staging).
 
 <!--mdtogo-->
+
+You can learn more about labels [here][labels].
 
 ### Usage
 
@@ -55,9 +57,12 @@ data:
 ```
 
 To use a `SetLabels` custom resource as the `functionConfig`, the desired labels
-must be specified in the `labels` field. You can optionally
-use `additionalLabelFields` to specify the additional fields you want to update.
-It will be used jointly with the [defaults][commonlabels].
+must be specified in the `labels` field. Sometimes you have resources (
+especially custom resources) that have labels or selectors fields in fields
+other than the [defaults][commonlabels], you can specify such label fields using
+additionalLabelFields. It will be used jointly with the
+[defaults][commonlabels].
+
 `additionalLabelFields` has following fields:
 
 - `group`: Select the resources by API version group. Will select all groups if
