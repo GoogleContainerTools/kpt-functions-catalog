@@ -8,7 +8,7 @@ validate KRM resources.
 The following is the `Kptfile` in this example: 
 
 ```yaml
-apiVersion: kpt.dev/v1alpha2
+apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: example
@@ -38,7 +38,7 @@ $ kpt fn render simple --results-dir=/tmp
 Let's take a look at the structured results in `/tmp/results.yaml`:
 
 ```yaml
-apiVersion: kpt.dev/v1alpha2
+apiVersion: kpt.dev/v1
 kind: FunctionResultList
 metadata:
   name: fnresults

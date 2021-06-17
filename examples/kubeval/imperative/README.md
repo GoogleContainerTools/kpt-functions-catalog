@@ -27,7 +27,7 @@ kpt and used as the function configuration.
 Let's look at the structured results in `results/results.yaml`:
 
 ```yaml
-apiVersion: kpt.dev/v1alpha2
+apiVersion: kpt.dev/v1
 kind: FunctionResultList
 metadata:
   name: fnresults
