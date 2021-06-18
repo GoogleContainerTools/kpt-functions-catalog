@@ -102,7 +102,7 @@ spec:
 Here is the transformed `v1alpha2` Kptfile:
 
 ```yaml
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1alpha2
 kind: Kptfile
 metadata:
   name: nginx

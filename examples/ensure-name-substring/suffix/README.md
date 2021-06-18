@@ -8,7 +8,7 @@ function to append suffix in the resource names.
 We use the following `Kptfile` to run the function.
 
 ```yaml
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1alpha2
 kind: Kptfile
 metadata:
   name: example

@@ -2,14 +2,13 @@ package v1alpha2
 
 import (
 	"fmt"
-
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 const (
 	KptFileName       = "Kptfile"
 	KptFileGroup      = "kpt.dev"
-	KptFileVersion    = "v1"
+	KptFileVersion    = "v1alpha2"
 	KptFileAPIVersion = KptFileGroup + "/" + KptFileVersion
 )
 

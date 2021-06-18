@@ -11,7 +11,7 @@ The constraint disallows using `private_key` as a key in the `ConfigMap`.
 
 Here's an example Kptfile to run the function:
 ```yaml
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1alpha2
 kind: Kptfile
 metadata:
   name: example
@@ -39,7 +39,7 @@ $ kpt fn render invalid-configmap --results-dir=/tmp
 Let's take a look at the structured results in `/tmp/results.yaml`:
 
 ```yaml
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
   name: fnresults

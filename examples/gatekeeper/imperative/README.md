@@ -32,7 +32,7 @@ $ kpt fn eval --image=gcr.io/kpt-fn/gatekeeper:unstable --results-dir=results
 Let's take a look at the structured result:
 
 ```yaml
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1alpha2
 kind: FunctionResultList
 metadata:
   name: fnresults
