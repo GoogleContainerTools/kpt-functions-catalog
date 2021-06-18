@@ -27,7 +27,7 @@ metadata:
 labels:
   color: orange
   fruit: apple
-fieldSpecs:
+additionalLabelFields:
   - kind: MyResource
     group: dev.example.com
     version: v1
@@ -38,7 +38,7 @@ fieldSpecs:
 The desired labels is provided using `labels` field. We have a CRD with group
 `dev.example.com`, version `v1` and kind `MyResource`. We want the labels to be
 added to field `.spec.selector.labels` as well. We specify it in field
-`fieldSpecs`.
+`additionalLabelFields`.
 
 ### Function invocation
 
