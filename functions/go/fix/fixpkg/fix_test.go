@@ -27,7 +27,7 @@ func TestFix(t *testing.T) {
 		Outputs: []kio.Writer{inout},
 	}.Execute()
 	assert.NoError(t, err)
-	diff, err := copyutil.Diff(dir, "../../../../testdata/fix/nginx-v1")
+	diff, err := copyutil.Diff(dir, "../../../../testdata/fix/nginx-v1alpha2")
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(diff.List()))
 }
