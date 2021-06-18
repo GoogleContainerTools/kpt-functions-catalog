@@ -84,14 +84,13 @@ func (a CompareSetters) Swap(i, j int) {
 
 // Filter implements CreatSetters as a yaml.Filter
 func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-
+	cs.preProcessScalarSetters()
 	for i := range nodes {
 		filePath, _, err := kioutil.GetFileAnnotations(nodes[i])
 		if err != nil {
 			return nodes, err
 		}
 		cs.filePath = filePath
-		cs.preProcessScalarSetters()
 		err = accept(cs, nodes[i])
 		if err != nil {
 			return nil, errors.Wrap(err)

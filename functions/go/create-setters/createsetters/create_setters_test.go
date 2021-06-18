@@ -389,27 +389,6 @@ metadata:
 `,
 		},
 		{
-			name: "array setter with flow style donot match",
-			config: `
-data:
-  env: |
-    [foo, bar, pro]
-  name: nginx
-`,
-			input: `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-  env: [foo, bar]
- `,
-			expectedResources: `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment # kpt-set: ${name}-deployment
-  env: [foo, bar]
-`,
-		},
-		{
 			name: "setters donot match",
 			config: `
 data:

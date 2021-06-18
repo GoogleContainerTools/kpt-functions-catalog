@@ -2,8 +2,7 @@
 
 ### Overview
 
-The `create-setters` KRM config function adds comments to resource fields
-with setter references.
+The `create-setters` KRM config function adds setter comments to resource fields to be parameterized.
 
 In this example, we will see how to add setter comments declaratively to
 resource fields using `create-setters` function.
@@ -38,7 +37,7 @@ roles:
 We use `ConfigMap` to configure the `create-setters` function.
 The desired setter values are provided as key-value pairs using `data` field.
 Here, key is the name of the setter which is used to set the comment and value
-is the field value to parameterize.
+is the field value to be parameterized.
 
 ```yaml
 # create-setters-fn-config.yaml
@@ -86,7 +85,7 @@ $ kpt fn render create-setters-simple
 
 ### Expected result
 
-`Comment` is added to the resources with the `Values` given below as they match the `Setters`.
+`Comment` is added to the resource with the `Value` given below as they match the `Setters`.
 
 | Setters                                    | Value                        | Comment                               |
 |--------------------------------------------|------------------------------|---------------------------------------|

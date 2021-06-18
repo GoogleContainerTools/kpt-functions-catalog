@@ -20,7 +20,7 @@ parameterize the field values of resources using this function.
 We use `ConfigMap` to configure the `create-setters` function. The desired setter
 values are provided as key-value pairs using `data` field.
 Here, the key is the name of the setter used as a parameter and
-value is the field value to parameterize.
+value is the field value to be parameterized.
 
 ```yaml
 apiVersion: v1
@@ -40,8 +40,7 @@ On invoking `create-setters`, it performs the following steps:
    - For an array node, checks if all values match with any of the array setters.
 4. Adds comments to the fields matching the setter values using setter names as parameters.
 
->? Doesn't support adding comment to the scalar node whose value is split into multiple lines.
-If this function adds setter comments to fields for which you didn't intend to parameterize,
+>? If this function adds setter comments to fields for which you didn't intend to parameterize,
 you can simply review and delete/modify those comments manually.
 
 <!--mdtogo-->
@@ -71,7 +70,7 @@ spec:
 Declare the name of the setter with the value which need to be parameterized.
 
 ```yaml
-# create-setters-fn-config
+# create-setters-fn-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -83,10 +82,10 @@ data:
   tag: 1.1.2
 ```
 
-Render the declared values by invoking:
+Invoke the function using the input config:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config.yaml
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
@@ -95,7 +94,7 @@ Alternatively, setter values can be passed as key-value pairs in the CLI
 $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable -- deploy=ubuntu-deployment env=ubuntu image=nginx tag=1.1.2
 ```
 
-Rendered resource looks like the following:
+Modified resource looks like the following:
 
 ```yaml
 # resources.yaml
@@ -111,9 +110,11 @@ spec:
     - mac
 ```
 
+>? This function doesn't add comments to scalar nodes with multi-line values.
+
 Explanation for the changes:
 
-`Comment` is added to the `Resources` field value node when they match the `Scalar Setters`.
+`Comment` is added to the `Resource Field` value node when they match the `Scalar Setters`.
 
 | Scalar Setters            | Resource Field                | Comment                            | Description     |
 |---------------------------|---------------------------|------------------------------------|-----------------|
@@ -146,7 +147,7 @@ Declare the array values, wrapped into string. Here the order of the array value
 doesn't make a difference.
 
 ```yaml
-# create-setters-fn-config
+# create-setters-fn-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -160,7 +161,7 @@ data:
 Render the declared values by invoking:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config.yaml
 ```
 
 Rendered resource looks like the following:
@@ -174,13 +175,14 @@ metadata:
 environments: # kpt-set: ${env}
   - dev
   - stage
-role: [stage, dev] # kpt-set: ${env}
+role: # kpt-set: ${env}
+  - stage
+  - dev
 ```
 
 Explanation for the changes:
 - As all the values in `environments` match the setter values of `env`, `# kpt-set: ${env}` comment is added.
 Here, the comment is added to the key node as it is an array node with folded style.
-- As all the values in `role` match the setter values of `env`, `# kpt-set: ${env}` comment is added.
-Here, the order of the array values is not considered, and the comment is added to the key node as it 
-is an array node with flow style.
+- As all the values in `role` match the setter values of `env`, array node is converted to folded style and 
+`# kpt-set: ${env}` comment is added to the key node. Here, the order of the array values is not considered.
 <!--mdtogo-->
