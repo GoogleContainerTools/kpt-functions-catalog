@@ -9,7 +9,7 @@ those known to be cluster-scoped.
 We use the following `Kptfile` to configure the function.
 
 ```yaml
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1alpha2
 kind: Kptfile
 metadata:
   name: example

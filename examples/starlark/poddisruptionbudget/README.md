@@ -10,7 +10,7 @@ We are going to use the following `Kptfile` and `fn-config.yaml` to configure
 the function:
 
 ```yaml
-apiVersion: kpt.dev/v1
+apiVersion: kpt.dev/v1alpha2
 kind: Kptfile
 metadata:
   name: example
