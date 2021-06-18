@@ -53,8 +53,8 @@ type Result struct {
 
 // Filter implements Fix as a yaml.Filter
 func (s *Fix) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	// group the resources based on the packages they belong to
-	// and populate Fix struct maps
+	// group the resources based on the packages they belong to and
+	// populate Fix struct maps
 	if err := s.groupPathsInPkgs(nodes); err != nil {
 		return nodes, fmt.Errorf("unable to group resources by packages, %q", err.Error())
 	}
