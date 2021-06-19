@@ -248,6 +248,16 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 		return node, err
 	}
 
+	// just set the apiVersion to kpt.dev/v1 if the package is on v1alpha2
+	if strings.Contains(meta.APIVersion, "v1alpha2") {
+		node.SetApiVersion(v1.KptFileAPIVersion)
+		s.Results = append(s.Results, &Result{
+			FilePath: meta.Annotations[kioutil.PathAnnotation],
+			Message:  fmt.Sprintf("Updated apiVersion to %s", v1.KptFileAPIVersion),
+		})
+		return node, nil
+	}
+
 	// return if the package with this Kptfile is already fixed
 	if meta.APIVersion == v1.KptFileAPIVersion {
 		s.Results = append(s.Results, &Result{

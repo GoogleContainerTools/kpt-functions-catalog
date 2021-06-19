@@ -4,7 +4,7 @@ index a8e7f27..24aae1f 100644
 +++ b/Kptfile
 @@ -1,20 +1,24 @@
 -apiVersion: kpt.dev/v1alpha1
-+apiVersion: kpt.dev/v1alpha2
++apiVersion: kpt.dev/v1
  kind: Kptfile
  metadata:
    name: nginx
