@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1alpha1"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1alpha1"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/fieldmeta"
@@ -38,6 +39,9 @@ type Fix struct {
 	// interface methods have access to it
 	settersSchema *spec.Schema
 
+	// settersConfigs holds the newly created setter configs as part of migration
+	settersConfigs []*yaml.RNode
+
 	// Results are the results of fixing packages
 	Results []*Result
 }
@@ -50,6 +54,8 @@ type Result struct {
 	// Message is the result message
 	Message string
 }
+
+const SettersConfigFileName = "setters-config.yaml"
 
 // Filter implements Fix as a yaml.Filter
 func (s *Fix) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
@@ -116,6 +122,10 @@ func (s *Fix) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	if !kfFound {
 		return nodes, fmt.Errorf("Kptfile not found in directory tree, make sure you specify '--include-meta-resources' flag")
 	}
+
+	// add all the newly created setter configs
+	nodes = append(nodes, s.settersConfigs...)
+
 	return nodes, nil
 }
 
@@ -240,7 +250,7 @@ func (s *Fix) FunctionsInPkg(nodes []*yaml.RNode, pkgPath string) []v1.Function 
 	return res
 }
 
-// FixKptfile migrates the input Kptfile node from v1alpha1 to v1
+// FixKptfile migrates the input Kptfile node from v1alpha1 or v1alpha2 to v1
 func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode, error) {
 	var err error
 	meta, err := node.GetMeta()
@@ -248,14 +258,49 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 		return node, err
 	}
 
-	// just set the apiVersion to kpt.dev/v1 if the package is on v1alpha2
+	settersConfigFilePath := filepath.Join(filepath.Dir(meta.Annotations[kioutil.PathAnnotation]), SettersConfigFileName)
+
+	// v1alpha2 to v1 migration
 	if strings.Contains(meta.APIVersion, "v1alpha2") {
 		node.SetApiVersion(v1.KptFileAPIVersion)
 		s.Results = append(s.Results, &Result{
 			FilePath: meta.Annotations[kioutil.PathAnnotation],
 			Message:  fmt.Sprintf("Updated apiVersion to %s", v1.KptFileAPIVersion),
 		})
-		return node, nil
+
+		kf, err := v1.ReadFile(node)
+		if err != nil {
+			return node, err
+		}
+
+		// apply-setters function input should be moved to configPath option as it the
+		// best practice
+		if kf.Pipeline != nil {
+			for i, fn := range kf.Pipeline.Mutators {
+				if strings.Contains(fn.Image, "apply-setters:v0.1") && len(fn.ConfigMap) > 0 {
+					settersConfig := ConfigFromSetters(kf.Pipeline.Mutators[0].ConfigMap, settersConfigFilePath)
+					s.settersConfigs = append(s.settersConfigs, settersConfig)
+					kf.Pipeline.Mutators[i].ConfigMap = nil
+					kf.Pipeline.Mutators[i].ConfigPath = SettersConfigFileName
+					s.Results = append(s.Results, &Result{
+						FilePath: settersConfigFilePath,
+						Message:  `Moved setters from configMap to configPath`,
+					})
+				}
+			}
+		}
+
+		// convert updated kf to yaml node
+		b, err := yaml.Marshal(kf)
+		if err != nil {
+			return node, err
+		}
+		kNode, err := yaml.Parse(string(b))
+		if err != nil {
+			return node, err
+		}
+		err = kNode.SetAnnotations(meta.Annotations)
+		return kNode, err
 	}
 
 	// return if the package with this Kptfile is already fixed
@@ -267,6 +312,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 		return node, nil
 	}
 
+	// v1alpha1 to v1 migration
 	kfOld, err := v1alpha1.ReadFile(node)
 	if err != nil {
 		return node, err
@@ -313,6 +359,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 				Repo:      kfOld.Upstream.Git.Repo,
 				Directory: kfOld.Upstream.Git.Directory,
 				Ref:       kfOld.Upstream.Git.Ref,
+				Commit:    kfOld.Upstream.Git.Commit,
 			},
 		}
 
@@ -341,9 +388,10 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 
 	if len(setters) > 0 {
 		fn := v1.Function{
-			Image:     "gcr.io/kpt-fn/apply-setters:v0.1",
-			ConfigMap: setters,
+			Image:      "gcr.io/kpt-fn/apply-setters:v0.1",
+			ConfigPath: "setters-config.yaml",
 		}
+		s.settersConfigs = append(s.settersConfigs, ConfigFromSetters(setters, settersConfigFilePath))
 		pl.Mutators = append(pl.Mutators, fn)
 		s.Results = append(s.Results, &Result{
 			FilePath: meta.Annotations[kioutil.PathAnnotation],
@@ -374,6 +422,48 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 	}
 	err = kNode.SetAnnotations(meta.Annotations)
 	return kNode, err
+}
+
+// ConfigFromSetters returns the ConfigMap node with input setters in data field
+func ConfigFromSetters(setters map[string]string, path string) *yaml.RNode {
+	configNode, err := yaml.Parse(fmt.Sprintf(`apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters-config
+  annotations:
+    %s: %s
+    %s: "0"
+`, kioutil.PathAnnotation, path, kioutil.IndexAnnotation))
+	if err != nil {
+		return nil
+	}
+
+	var keys []string
+	for k := range setters {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		v := setters[k]
+		vNode, err := yaml.Parse(v)
+		if vNode.YNode().Kind == yaml.SequenceNode {
+			// standardize array values to folded style
+			vNode.YNode().Style = yaml.FoldedStyle
+			v, err = vNode.String()
+			if err != nil {
+				return nil
+			}
+		}
+
+		err = configNode.PipeE(
+			yaml.LookupCreate(yaml.ScalarNode, "data", k),
+			yaml.FieldSetter{Value: yaml.NewScalarRNode(v)})
+		if err != nil {
+			return nil
+		}
+	}
+	return configNode
 }
 
 // getPkgPathToSettersSchema returns the, map of pkgPath to the setters schema in Kptfile

@@ -15,15 +15,13 @@ upstreamLock:
     repo: https://github.com/GoogleContainerTools/kpt
     directory: /package-examples/helloworld-set
     ref: master
+    commit: 9b9a299effacf0f9b0619585916022a7be28544b
 info:
   description: kpt example
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
-      configMap:
-        http-port: "80"
-        image-tag: v0.3.0
-        replicas: "5"
+      configPath: setters-config.yaml
     - image: gcr.io/kpt-fn/set-annotations:v0.1
       configPath: fn-config.yaml
     - image: gcr.io/kpt-fn/set-namespace:v0.1

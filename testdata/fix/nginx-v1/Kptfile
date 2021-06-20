@@ -15,6 +15,7 @@ upstreamLock:
     repo: https://github.com/GoogleContainerTools/kpt
     directory: package-examples/nginx
     ref: v0.2
+    commit: 4d2aa98b45ddee4b5fa45fbca16f2ff887de9efb
 info:
   site: https://github.com/GoogleContainerTools/kpt
   emails:
@@ -28,11 +29,7 @@ info:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
-      configMap:
-        image: nginx
-        list: '[dev, stage]'
-        namespace: some-space
-        tag: 1.14.1
+      configPath: setters-config.yaml
     - image: gcr.io/kpt-fn/set-labels:v0.1
       configPath: fn-config.yaml
 inventory:

@@ -2,6 +2,8 @@ package v1
 
 import (
 	"fmt"
+	"strings"
+
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -278,4 +280,20 @@ type Inventory struct {
 	InventoryID string            `yaml:"inventoryID,omitempty"`
 	Labels      map[string]string `yaml:"labels,omitempty"`
 	Annotations map[string]string `yaml:"annotations,omitempty"`
+}
+
+// ReadFile reads the KptFile node
+func ReadFile(node *yaml.RNode) (*KptFile, error) {
+	kpgfile := &KptFile{ResourceMeta: TypeMeta}
+	s, err := node.String()
+	if err != nil {
+		return &KptFile{}, err
+	}
+	f := strings.NewReader(s)
+	d := yaml.NewDecoder(f)
+	d.KnownFields(true)
+	if err = d.Decode(&kpgfile); err != nil {
+		return &KptFile{}, fmt.Errorf("please make sure the package has a valid 'v1' Kptfile: %s", err)
+	}
+	return kpgfile, nil
 }
