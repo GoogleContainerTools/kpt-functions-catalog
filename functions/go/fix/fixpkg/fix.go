@@ -278,7 +278,10 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 		if kf.Pipeline != nil {
 			for i, fn := range kf.Pipeline.Mutators {
 				if strings.Contains(fn.Image, "apply-setters:v0.1") && len(fn.ConfigMap) > 0 {
-					settersConfig := ConfigFromSetters(kf.Pipeline.Mutators[0].ConfigMap, settersConfigFilePath)
+					settersConfig, err := ConfigFromSetters(kf.Pipeline.Mutators[0].ConfigMap, settersConfigFilePath)
+					if err != nil {
+						return node, err
+					}
 					s.settersConfigs = append(s.settersConfigs, settersConfig)
 					kf.Pipeline.Mutators[i].ConfigMap = nil
 					kf.Pipeline.Mutators[i].ConfigPath = SettersConfigFileName
@@ -391,7 +394,11 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 			Image:      "gcr.io/kpt-fn/apply-setters:v0.1",
 			ConfigPath: "setters-config.yaml",
 		}
-		s.settersConfigs = append(s.settersConfigs, ConfigFromSetters(setters, settersConfigFilePath))
+		settersConfig, err := ConfigFromSetters(setters, settersConfigFilePath)
+		if err != nil {
+			return node, err
+		}
+		s.settersConfigs = append(s.settersConfigs, settersConfig)
 		pl.Mutators = append(pl.Mutators, fn)
 		s.Results = append(s.Results, &Result{
 			FilePath: meta.Annotations[kioutil.PathAnnotation],
@@ -425,7 +432,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 }
 
 // ConfigFromSetters returns the ConfigMap node with input setters in data field
-func ConfigFromSetters(setters map[string]string, path string) *yaml.RNode {
+func ConfigFromSetters(setters map[string]string, path string) (*yaml.RNode, error) {
 	configNode, err := yaml.Parse(fmt.Sprintf(`apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -435,7 +442,7 @@ metadata:
     %s: "0"
 `, kioutil.PathAnnotation, path, kioutil.IndexAnnotation))
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	var keys []string
@@ -447,12 +454,15 @@ metadata:
 	for _, k := range keys {
 		v := setters[k]
 		vNode, err := yaml.Parse(v)
+		if err != nil {
+			return nil, err
+		}
 		if vNode.YNode().Kind == yaml.SequenceNode {
 			// standardize array values to folded style
 			vNode.YNode().Style = yaml.FoldedStyle
 			v, err = vNode.String()
 			if err != nil {
-				return nil
+				return nil, err
 			}
 		}
 
@@ -460,10 +470,10 @@ metadata:
 			yaml.LookupCreate(yaml.ScalarNode, "data", k),
 			yaml.FieldSetter{Value: yaml.NewScalarRNode(v)})
 		if err != nil {
-			return nil
+			return nil, err
 		}
 	}
-	return configNode
+	return configNode, nil
 }
 
 // getPkgPathToSettersSchema returns the, map of pkgPath to the setters schema in Kptfile
