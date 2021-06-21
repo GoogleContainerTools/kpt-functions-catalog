@@ -184,5 +184,5 @@ Explanation for the changes:
 - As all the values in `environments` match the setter values of `env`, `# kpt-set: ${env}` comment is added.
 Here, the comment is added to the key node as it is an array node with folded style.
 - As all the values in `role` match the setter values of `env`, array node is converted to folded style and 
-`# kpt-set: ${env}` comment is added to the key node. Here, the order of the array values is not considered.
+`# kpt-set: ${env}` comment is added to the key node. Here, the order of the array values doesn't matter.
 <!--mdtogo-->

@@ -108,7 +108,7 @@ Using strings.NewReplacer and the args, creates *strings.Replacer
 */
 func (cs *CreateSetters) preProcessScalarSetters() {
 	// replacerArgs contains the setter values with parameter as pairs
-	replacerArgs := []string{}
+	var replacerArgs []string
 	for _, setter := range cs.ScalarSetters {
 		replacerArgs = append(replacerArgs, setter.Value)
 		replacerArgs = append(replacerArgs, fmt.Sprintf("${%s}", setter.Name))
@@ -280,7 +280,7 @@ func checkEqual(nodeValues []string, arraySetters []string) bool {
 
 // getArraySetter parses the input and returns array setters
 func getArraySetter(input *yaml.RNode) []string {
-	output := []string{}
+	var output []string
 
 	elements, err := input.Elements()
 	if err != nil {
