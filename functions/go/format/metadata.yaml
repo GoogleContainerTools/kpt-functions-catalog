@@ -5,7 +5,7 @@ tags:
   - formatter
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/format
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/format/format-imperative
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/format-imperative
 emails:
   - kpt-team@google.com
 license: Apache-2.0

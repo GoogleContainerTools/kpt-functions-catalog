@@ -4,8 +4,8 @@ tags:
   - mutator
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/search-replace
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/search-replace/search-replace-simple
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/search-replace/search-replace-create-setters
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/search-replace-simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/search-replace-create-setters
 emails:
   - kpt-team@google.com
 license: Apache-2.0
