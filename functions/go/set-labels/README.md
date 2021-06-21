@@ -60,7 +60,7 @@ To use a `SetLabels` custom resource as the `functionConfig`, the desired labels
 must be specified in the `labels` field. Sometimes you have resources (
 especially custom resources) that have labels or selectors fields in fields
 other than the [defaults][commonlabels], you can specify such label fields using
-additionalLabelFields. It will be used jointly with the
+`additionalLabelFields`. It will be used jointly with the
 [defaults][commonlabels].
 
 `additionalLabelFields` has following fields:

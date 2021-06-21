@@ -26,7 +26,7 @@ metadata:
   name: my-config
 substring: prod-
 editMode: prepend
-fieldSpecs:
+additionalNameFields:
   - group: dev.example.com
     version: v1
     kind: MyResource
