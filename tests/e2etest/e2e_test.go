@@ -38,7 +38,7 @@ import (
 // Git is required to generate diff output.
 
 func TestE2E(t *testing.T) {
-	runTests(t, "../../examples/fix-simple")
+	runTests(t, "../..")
 }
 
 // runTests will scan test cases in 'path', run the command
