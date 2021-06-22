@@ -39,6 +39,7 @@ fn_ver=$(parse_git_tag version)
 
 if [ -d "${scripts_dir}/../functions/${fn_lang}/${fn_name}" ]; then
   cd "${scripts_dir}/../functions/${fn_lang}"
+  make install-mdtogo
   DEFAULT_GCR=gcr.io/kpt-fn
 fi
 
