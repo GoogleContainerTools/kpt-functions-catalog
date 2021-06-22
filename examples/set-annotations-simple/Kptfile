@@ -4,7 +4,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-annotations:unstable
+    - image: gcr.io/kpt-fn/set-annotations:v0.1
       configMap:
         color: orange
         fruit: apple
