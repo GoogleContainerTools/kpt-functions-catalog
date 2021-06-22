@@ -10,7 +10,7 @@ This is an end to end example depicting [setter] creation process using `search-
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace-create-setters
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace-create-setters@search-replace/v0.1
 ```
 
 Let's start with the input resource
@@ -35,11 +35,11 @@ Suppose you want to expose the values of `image` and `tag` as parameters.
 You can create [setters] by invoking `search-replace` function with following arguments:
 
 ```shell
-$ kpt fn eval search-replace-create-setters --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=spec.replicas' 'put-comment=kpt-set: ${replicas}'
+$ kpt fn eval search-replace-create-setters --image gcr.io/kpt-fn/search-replace:v0.1 -- 'by-path=spec.replicas' 'put-comment=kpt-set: ${replicas}'
 ```
 
 ```shell
-$ kpt fn eval search-replace-create-setters --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=spec.**.image' 'put-comment=kpt-set: gcr.io/${image}:${tag}'
+$ kpt fn eval search-replace-create-setters --image gcr.io/kpt-fn/search-replace:v0.1 -- 'by-path=spec.**.image' 'put-comment=kpt-set: gcr.io/${image}:${tag}'
 ```
 
 ### Expected result
@@ -65,7 +65,7 @@ you just created. For example:
 
 <!-- @skip -->
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/apply-setter:unstable -- replicas=3 image=nginx tag=1.14.2
+$ kpt fn eval --image gcr.io/kpt-fn/apply-setter:v0.1 -- replicas=3 image=nginx tag=1.14.2
 ```
 
 You should be able to see the values got updated by the [setters].
