@@ -10,7 +10,7 @@ function to append suffix in the resource names.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring-suffix
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring-suffix@ensure-name-substring/v0.1
 ```
 
 We use the following `Kptfile` to run the function.
@@ -22,7 +22,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/ensure-name-substring:unstable
+    - image: gcr.io/kpt-fn/ensure-name-substring:v0.1
       configMap:
         append: -prod
 ```
