@@ -44,7 +44,7 @@ spec:
 Run the function:
 
 ```shell
-$ kpt fn render gatekeeper-warning-only --results-dir=/tmp
+$ kpt fn render gatekeeper-warning-only --results-dir /tmp
 ```
 
 ### Expected result

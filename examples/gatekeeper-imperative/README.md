@@ -26,7 +26,7 @@ We have a `ConfigMap` in `config-map.yaml` that violates the policy.
 Run the function with `--results-dir` flag:
 
 ```shell
-$ kpt fn eval gatekeeper-imperative --image=gcr.io/kpt-fn/gatekeeper:unstable --results-dir=/tmp
+$ kpt fn eval gatekeeper-imperative --image gcr.io/kpt-fn/gatekeeper:unstable --results-dir /tmp
 ```
 
 ### Expected result

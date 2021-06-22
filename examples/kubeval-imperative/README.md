@@ -23,7 +23,7 @@ Get this example and try it out by running the following commands:
 
 ```shell
 # We set `strict=true` to disallow unknown field and `skip_kinds=MyCustom,MyOtherCustom` to skip 2 kinds that we don't have schemas.
-$ kpt fn eval kubeval-imperative --image=gcr.io/kpt-fn/kubeval:unstable --results-dir=/tmp -- strict=true skip_kinds=MyCustom,MyOtherCustom
+$ kpt fn eval kubeval-imperative --image gcr.io/kpt-fn/kubeval:unstable --results-dir /tmp -- strict=true skip_kinds=MyCustom,MyOtherCustom
 ```
 
 The key-value pair(s) provided after `--` will be converted to `ConfigMap` by

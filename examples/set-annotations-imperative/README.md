@@ -18,7 +18,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval set-annotations-imperative --image=gcr.io/kpt-fn/set-annotations:unstable -- color=orange fruit=apple
+$ kpt fn eval set-annotations-imperative --image gcr.io/kpt-fn/set-annotations:unstable -- color=orange fruit=apple
 ```
 
 The labels provided in key-value pairs after `--` will be converted to a

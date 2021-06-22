@@ -33,7 +33,7 @@ pipeline:
 Run the function:
 
 ```shell
-$ kpt fn render gatekeeper-invalid-configmap --results-dir=/tmp
+$ kpt fn render gatekeeper-invalid-configmap --results-dir /tmp
 ```
 
 ### Expected result

@@ -86,7 +86,7 @@ print(ctx.resource_list["items"][0]["metadata"]["name"])
 Then you can run the function:
 
 ```shell
-kpt fn render --results-dir=/tmp
+kpt fn render --results-dir /tmp
 ```
 
 You will find your debugging output in `functionResultList items.stderr`.

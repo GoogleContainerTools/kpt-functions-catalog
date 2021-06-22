@@ -18,7 +18,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval set-labels-imperative --image=gcr.io/kpt-fn/set-labels:unstable -- color=orange fruit=apple
+$ kpt fn eval set-labels-imperative --image gcr.io/kpt-fn/set-labels:unstable -- color=orange fruit=apple
 ```
 
 The key-value pair(s) provided after `--` will be converted to `ConfigMap` by
