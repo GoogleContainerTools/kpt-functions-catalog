@@ -1,3 +1,3 @@
 testType: eval
-image: gcr.io/kpt-fn/fix:unstable
+image: gcr.io/kpt-fn/fix:v0.2
 includeMetaResources: true

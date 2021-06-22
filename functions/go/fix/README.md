@@ -85,7 +85,7 @@ openAPI:
 Invoke `fix` function on the package:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/fix:unstable --include-meta-resources
+$ kpt fn eval --image gcr.io/kpt-fn/fix:v0.2 --include-meta-resources
 ```
 
 Here is the transformed resource
