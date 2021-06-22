@@ -11,7 +11,7 @@ those known to be cluster-scoped.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-simple
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-simple@set-namespace/v0.1
 ```
 
 We use the following `Kptfile` to configure the function.
@@ -23,7 +23,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-namespace:unstable
+    - image: gcr.io/kpt-fn/set-namespace:v0.1
       configMap:
         namespace: example-ns
 ```

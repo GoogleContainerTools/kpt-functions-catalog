@@ -1,4 +1,4 @@
 testType: eval
-image: gcr.io/kpt-fn/set-namespace:unstable
+image: gcr.io/kpt-fn/set-namespace:v0.1
 args:
   namespace: example-ns
