@@ -17,7 +17,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Here's an example `Kptfile` to run the function:
 
 ```yaml
-apiVersion: kpt.dev/v1alpha2
+apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: example
@@ -52,7 +52,7 @@ $ kpt fn render gatekeeper-warning-only --results-dir /tmp
 Let's take a look at the structured results in `/tmp/results.yaml`:
 
 ```shell
-apiVersion: kpt.dev/v1alpha2
+apiVersion: kpt.dev/v1
 kind: FunctionResultList
 metadata:
   name: fnresults
