@@ -1,6 +1,6 @@
 exitCode: 1
 testType: eval
-image: gcr.io/kpt-fn/kubeval:unstable
+image: gcr.io/kpt-fn/kubeval:v0.1
 args:
   strict: 'true'
   skip_kinds: MyCustom,MyOtherCustom

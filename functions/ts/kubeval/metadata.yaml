@@ -2,10 +2,10 @@ image: gcr.io/kpt-fn/kubeval
 description: Use kubeval to validate KRM resources against their json schemas.
 tags:
   - validator
-sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/ts/kubeval
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/kubeval/v0.1/functions/ts/kubeval
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/kubeval-simple
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/kubeval-imperative
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/kubeval/v0.1/examples/kubeval-simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/kubeval/v0.1/examples/kubeval-imperative
 emails:
   - kpt-team@google.com
 license: Apache-2.0
