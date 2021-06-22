@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1alpha1"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1alpha2"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/fieldmeta"
@@ -22,7 +23,7 @@ import (
 
 var _ kio.Filter = &Fix{}
 
-// Fix migrates the resources in v1alpha1 format to v1alpha2 format
+// Fix migrates the resources in v1alpha1 format to v1 format
 type Fix struct {
 	// pkgPathToPkgFilePaths key: package path relative to root package path
 	// value: list of file paths in the package, relative to root package
@@ -38,6 +39,9 @@ type Fix struct {
 	// interface methods have access to it
 	settersSchema *spec.Schema
 
+	// settersConfigs holds the newly created setter configs as part of migration
+	settersConfigs []*yaml.RNode
+
 	// Results are the results of fixing packages
 	Results []*Result
 }
@@ -51,10 +55,12 @@ type Result struct {
 	Message string
 }
 
+const SettersConfigFileName = "setters-config.yaml"
+
 // Filter implements Fix as a yaml.Filter
 func (s *Fix) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	// group the resources based on the packages they belong to
-	// and populate Fix struct maps
+	// group the resources based on the packages they belong to and
+	// populate Fix struct maps
 	if err := s.groupPathsInPkgs(nodes); err != nil {
 		return nodes, fmt.Errorf("unable to group resources by packages, %q", err.Error())
 	}
@@ -74,13 +80,13 @@ func (s *Fix) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 		}
 
 		// check if there is Kptfile in root package
-		if meta.Kind == v1alpha2.KptFileName {
+		if meta.Kind == v1.KptFileName {
 			kfFound = true
 		}
 
-		if meta.Kind == v1alpha2.KptFileName {
+		if meta.Kind == v1.KptFileName {
 			// this node is Kptfile node
-			// migrate Kptfile from v1alpha1 to v1alpha2
+			// migrate Kptfile from v1alpha1 to v1
 			pkgPath := filepath.Dir(meta.Annotations[kioutil.PathAnnotation])
 			functions := s.FunctionsInPkg(nodes, pkgPath)
 			kNode, err := s.FixKptfile(nodes[i], functions)
@@ -116,6 +122,10 @@ func (s *Fix) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	if !kfFound {
 		return nodes, fmt.Errorf("Kptfile not found in directory tree, make sure you specify '--include-meta-resources' flag")
 	}
+
+	// add all the newly created setter configs
+	nodes = append(nodes, s.settersConfigs...)
+
 	return nodes, nil
 }
 
@@ -152,7 +162,7 @@ func getNonKptFilesPaths(nodes []*yaml.RNode) (sets.String, error) {
 			return nil, err
 		}
 		path := meta.Annotations[kioutil.PathAnnotation]
-		if filepath.Base(path) != v1alpha2.KptFileName {
+		if filepath.Base(path) != v1.KptFileName {
 			paths.Insert(meta.Annotations[kioutil.PathAnnotation])
 		}
 	}
@@ -168,7 +178,7 @@ func getKptFilesPaths(nodes []*yaml.RNode) (sets.String, error) {
 			return nil, err
 		}
 		path := meta.Annotations[kioutil.PathAnnotation]
-		if filepath.Base(path) == v1alpha2.KptFileName {
+		if filepath.Base(path) == v1.KptFileName {
 			paths.Insert(meta.Annotations[kioutil.PathAnnotation])
 		}
 	}
@@ -183,7 +193,7 @@ func filesInPackage(pkgPath string, resourcesPaths, kptFilePaths sets.String) se
 		dirPath := filepath.Dir(resourcePath)
 		for {
 			// check if the input pkgPath is the immediate parent package for the resource
-			kfPath := filepath.Join(dirPath, v1alpha2.KptFileName)
+			kfPath := filepath.Join(dirPath, v1.KptFileName)
 			if kptFilePaths.Has(kfPath) {
 				if dirPath == pkgPath {
 					// this means the dirPath has a Kptfile and is a package
@@ -202,13 +212,13 @@ func filesInPackage(pkgPath string, resourcesPaths, kptFilePaths sets.String) se
 	return res
 }
 
-// FunctionsInPkg gets the v1alpha2 functions list for functions in package
+// FunctionsInPkg gets the v1 functions list for functions in package
 // nodes is list of input nodes which are sorted according to the package depth
 // i is the index of the Kptfile of the package, all the files till i hits next Kptfile
 // are the files of the package
 // pkgPath is the package path relative to the root package directory
-func (s *Fix) FunctionsInPkg(nodes []*yaml.RNode, pkgPath string) []v1alpha2.Function {
-	var res []v1alpha2.Function
+func (s *Fix) FunctionsInPkg(nodes []*yaml.RNode, pkgPath string) []v1.Function {
+	var res []v1.Function
 	for _, node := range nodes {
 		meta, err := node.GetMeta()
 		if err != nil {
@@ -220,10 +230,10 @@ func (s *Fix) FunctionsInPkg(nodes []*yaml.RNode, pkgPath string) []v1alpha2.Fun
 		}
 		fnSpec := runtimeutil.GetFunctionSpec(node)
 		if fnSpec != nil {
-			// in v1alpha2, fn-config must be present in the package directory
+			// in v1, fn-config must be present in the package directory
 			// so configPath must be just the file name
 			fnFileName := filepath.Base(meta.Annotations[kioutil.PathAnnotation])
-			res = append(res, v1alpha2.Function{
+			res = append(res, v1.Function{
 				Image:      fnSpec.Container.Image,
 				ConfigPath: fnFileName,
 			})
@@ -240,38 +250,87 @@ func (s *Fix) FunctionsInPkg(nodes []*yaml.RNode, pkgPath string) []v1alpha2.Fun
 	return res
 }
 
-// FixKptfile migrates the input Kptfile node from v1alpha1 to v1alpha2
-func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml.RNode, error) {
+// FixKptfile migrates the input Kptfile node from v1alpha1 or v1alpha2 to v1
+func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode, error) {
 	var err error
 	meta, err := node.GetMeta()
 	if err != nil {
 		return node, err
 	}
 
-	// return if the package with this Kptfile is already fixed
-	if meta.APIVersion == v1alpha2.KptFileAPIVersion {
+	settersConfigFilePath := filepath.Join(filepath.Dir(meta.Annotations[kioutil.PathAnnotation]), SettersConfigFileName)
+
+	// v1alpha2 to v1 migration
+	if strings.Contains(meta.APIVersion, "v1alpha2") {
+		node.SetApiVersion(v1.KptFileAPIVersion)
 		s.Results = append(s.Results, &Result{
 			FilePath: meta.Annotations[kioutil.PathAnnotation],
-			Message:  fmt.Sprintf("This package is already fixed as it is on latest apiVersion %s", v1alpha2.KptFileAPIVersion),
+			Message:  fmt.Sprintf("Updated apiVersion to %s", v1.KptFileAPIVersion),
+		})
+
+		kf, err := v1.ReadFile(node)
+		if err != nil {
+			return node, err
+		}
+
+		// apply-setters function input should be moved to configPath option as it the
+		// best practice
+		if kf.Pipeline != nil {
+			for i, fn := range kf.Pipeline.Mutators {
+				if strings.Contains(fn.Image, "apply-setters:v0.1") && len(fn.ConfigMap) > 0 {
+					settersConfig, err := ConfigFromSetters(kf.Pipeline.Mutators[0].ConfigMap, settersConfigFilePath)
+					if err != nil {
+						return node, err
+					}
+					s.settersConfigs = append(s.settersConfigs, settersConfig)
+					kf.Pipeline.Mutators[i].ConfigMap = nil
+					kf.Pipeline.Mutators[i].ConfigPath = SettersConfigFileName
+					s.Results = append(s.Results, &Result{
+						FilePath: settersConfigFilePath,
+						Message:  `Moved setters from configMap to configPath`,
+					})
+				}
+			}
+		}
+
+		// convert updated kf to yaml node
+		b, err := yaml.Marshal(kf)
+		if err != nil {
+			return node, err
+		}
+		kNode, err := yaml.Parse(string(b))
+		if err != nil {
+			return node, err
+		}
+		err = kNode.SetAnnotations(meta.Annotations)
+		return kNode, err
+	}
+
+	// return if the package with this Kptfile is already fixed
+	if meta.APIVersion == v1.KptFileAPIVersion {
+		s.Results = append(s.Results, &Result{
+			FilePath: meta.Annotations[kioutil.PathAnnotation],
+			Message:  fmt.Sprintf("This package is already fixed as it is on latest apiVersion %s", v1.KptFileAPIVersion),
 		})
 		return node, nil
 	}
 
+	// v1alpha1 to v1 migration
 	kfOld, err := v1alpha1.ReadFile(node)
 	if err != nil {
 		return node, err
 	}
 
-	kfNew := v1alpha2.KptFile{ResourceMeta: meta}
-	kfNew.APIVersion = v1alpha2.KptFileAPIVersion
+	kfNew := v1.KptFile{ResourceMeta: meta}
+	kfNew.APIVersion = v1.KptFileAPIVersion
 
-	// convert packageMetadata in v1alpha1 Kptfile to v1alpha2 info
+	// convert packageMetadata in v1alpha1 Kptfile to v1 info
 	if kfOld.PackageMeta != nil {
 		emails := []string{kfOld.PackageMeta.Email}
 		if kfOld.PackageMeta.Email == "" {
 			emails = nil
 		}
-		kfNew.Info = &v1alpha2.PackageInfo{
+		kfNew.Info = &v1.PackageInfo{
 			Site:        kfOld.PackageMeta.URL,
 			Emails:      emails,
 			License:     kfOld.PackageMeta.License,
@@ -287,22 +346,23 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 
 	// convert upstream section
 	if kfOld.Upstream != nil {
-		kfNew.Upstream = &v1alpha2.Upstream{
-			Type: v1alpha2.OriginType(kfOld.Upstream.Type),
-			Git: &v1alpha2.Git{
+		kfNew.Upstream = &v1.Upstream{
+			Type: v1.OriginType(kfOld.Upstream.Type),
+			Git: &v1.Git{
 				Repo:      kfOld.Upstream.Git.Repo,
 				Directory: kfOld.Upstream.Git.Directory,
 				Ref:       kfOld.Upstream.Git.Ref,
 			},
-			UpdateStrategy: v1alpha2.ResourceMerge,
+			UpdateStrategy: v1.ResourceMerge,
 		}
 
-		kfNew.UpstreamLock = &v1alpha2.UpstreamLock{
-			Type: v1alpha2.OriginType(kfOld.Upstream.Type),
-			Git: &v1alpha2.GitLock{
+		kfNew.UpstreamLock = &v1.UpstreamLock{
+			Type: v1.OriginType(kfOld.Upstream.Type),
+			Git: &v1.GitLock{
 				Repo:      kfOld.Upstream.Git.Repo,
 				Directory: kfOld.Upstream.Git.Directory,
 				Ref:       kfOld.Upstream.Git.Ref,
+				Commit:    kfOld.Upstream.Git.Commit,
 			},
 		}
 
@@ -320,7 +380,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 		return node, err
 	}
 
-	pl := &v1alpha2.Pipeline{}
+	pl := &v1.Pipeline{}
 	kfNew.Pipeline = pl
 	for _, fn := range functions {
 		s.Results = append(s.Results, &Result{
@@ -330,10 +390,15 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 	}
 
 	if len(setters) > 0 {
-		fn := v1alpha2.Function{
-			Image:     "gcr.io/kpt-fn/apply-setters:v0.1",
-			ConfigMap: setters,
+		fn := v1.Function{
+			Image:      "gcr.io/kpt-fn/apply-setters:v0.1",
+			ConfigPath: "setters-config.yaml",
 		}
+		settersConfig, err := ConfigFromSetters(setters, settersConfigFilePath)
+		if err != nil {
+			return node, err
+		}
+		s.settersConfigs = append(s.settersConfigs, settersConfig)
 		pl.Mutators = append(pl.Mutators, fn)
 		s.Results = append(s.Results, &Result{
 			FilePath: meta.Annotations[kioutil.PathAnnotation],
@@ -344,7 +409,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 
 	// convert inventory section
 	if kfOld.Inventory != nil {
-		kfNew.Inventory = &v1alpha2.Inventory{
+		kfNew.Inventory = &v1.Inventory{
 			Namespace:   kfOld.Inventory.Namespace,
 			Name:        kfOld.Inventory.Name,
 			InventoryID: kfOld.Inventory.InventoryID,
@@ -366,6 +431,51 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1alpha2.Function) (*yaml
 	return kNode, err
 }
 
+// ConfigFromSetters returns the ConfigMap node with input setters in data field
+func ConfigFromSetters(setters map[string]string, path string) (*yaml.RNode, error) {
+	configNode, err := yaml.Parse(fmt.Sprintf(`apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters-config
+  annotations:
+    %s: %s
+    %s: "0"
+`, kioutil.PathAnnotation, path, kioutil.IndexAnnotation))
+	if err != nil {
+		return nil, err
+	}
+
+	var keys []string
+	for k := range setters {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		v := setters[k]
+		vNode, err := yaml.Parse(v)
+		if err != nil {
+			return nil, err
+		}
+		if vNode.YNode().Kind == yaml.SequenceNode {
+			// standardize array values to folded style
+			vNode.YNode().Style = yaml.FoldedStyle
+			v, err = vNode.String()
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		err = configNode.PipeE(
+			yaml.LookupCreate(yaml.ScalarNode, "data", k),
+			yaml.FieldSetter{Value: yaml.NewScalarRNode(v)})
+		if err != nil {
+			return nil, err
+		}
+	}
+	return configNode, nil
+}
+
 // getPkgPathToSettersSchema returns the, map of pkgPath to the setters schema in Kptfile
 // of the package
 func getPkgPathToSettersSchema(nodes []*yaml.RNode) (map[string]*spec.Schema, error) {
@@ -375,7 +485,7 @@ func getPkgPathToSettersSchema(nodes []*yaml.RNode) (map[string]*spec.Schema, er
 		if err != nil {
 			return nil, err
 		}
-		if meta.Kind == v1alpha2.KptFileName {
+		if meta.Kind == v1.KptFileName {
 			// convert OpenAPI section in v1alpha1 Kptfile to apply-setters
 			schema, err := schemaUsingField(node, openapi.SupplementaryOpenAPIFieldName)
 			if err != nil {
@@ -409,7 +519,7 @@ func (s *Fix) visitMapping(object *yaml.RNode) error {
 	})
 }
 
-// visitScalar visits scalar nodes and converts the comments to v1alpha2 format
+// visitScalar visits scalar nodes and converts the comments to v1 format
 func (s *Fix) visitScalar(object *yaml.RNode, setterSchema *openapi.ResourceSchema) error {
 	ext, err := getExtFromComment(setterSchema)
 	if err != nil {
@@ -434,7 +544,7 @@ func (s *Fix) visitScalar(object *yaml.RNode, setterSchema *openapi.ResourceSche
 	return nil
 }
 
-// fixSetter converts the setter comment to v1alpha2 format
+// fixSetter converts the setter comment to v1 format
 func (s *Fix) fixSetter(field *yaml.RNode, ext *setters2.CliExtension) (bool, error) {
 	// check full setter
 	if ext == nil || ext.Setter == nil {

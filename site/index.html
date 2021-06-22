@@ -57,40 +57,46 @@
         plugins: [
           function (hook, vm) {
             hook.afterEach(async function (html, next) {
-              const issueIcon = document.createElement("span");
-              issueIcon.innerText = "bug_report";
-              issueIcon.classList.add("material-icons-outlined");
-              const createIssue = document.createElement("a");
-              createIssue.target = "_blank";
-              createIssue.title = "Create documentation issue";
-              createIssue.id = "create-issue";
-              createIssue.appendChild(issueIcon);
-
-              const editIcon = document.createElement("span");
-              editIcon.innerText = "edit";
-              editIcon.classList.add("material-icons-outlined");
-              const editPage = document.createElement("a");
-              editPage.target = "_blank";
-              editPage.title = "Edit this page";
-              editPage.id = "edit-page";
-              editPage.appendChild(editIcon);
-
-              // Fallback links for generated pages.
-              createIssue.href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Functions Catalog`;
-              editPage.href =
-                "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/site";
-
               const container = document.createElement("div");
-              container.classList.add("github-widget");
-              container.appendChild(createIssue);
-              container.appendChild(editPage);
-
-              const wrapper = document.createElement("div");
-              wrapper.classList.add("docsify-pagination-container");
-              wrapper.appendChild(container);
-              html += wrapper.outerHTML;
+              container.id = "examples-section";
+              html += container.outerHTML;
               next(html);
             }),
+              hook.afterEach(async function (html, next) {
+                const issueIcon = document.createElement("span");
+                issueIcon.innerText = "bug_report";
+                issueIcon.classList.add("material-icons-outlined");
+                const createIssue = document.createElement("a");
+                createIssue.target = "_blank";
+                createIssue.title = "Create documentation issue";
+                createIssue.id = "create-issue";
+                createIssue.appendChild(issueIcon);
+
+                const editIcon = document.createElement("span");
+                editIcon.innerText = "edit";
+                editIcon.classList.add("material-icons-outlined");
+                const editPage = document.createElement("a");
+                editPage.target = "_blank";
+                editPage.title = "Edit this page";
+                editPage.id = "edit-page";
+                editPage.appendChild(editIcon);
+
+                // Fallback links for generated pages.
+                createIssue.href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Functions Catalog`;
+                editPage.href =
+                  "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/site";
+
+                const container = document.createElement("div");
+                container.classList.add("github-widget");
+                container.appendChild(createIssue);
+                container.appendChild(editPage);
+
+                const wrapper = document.createElement("div");
+                wrapper.classList.add("docsify-pagination-container");
+                wrapper.appendChild(container);
+                html += wrapper.outerHTML;
+                next(html);
+              }),
               hook.afterEach(async function (html, next) {
                 const functionName = vm.route.path.split("/")[1];
                 if (!functionName) {
@@ -128,29 +134,10 @@
               </div>`;
 
                   const examples = catalog[functionName][versionName];
-                  const exampleNames = Object.keys(examples).sort();
-                  let examplesDropdown = `
-              <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Examples
-                <span class="caret"></span></button>
-                <ol class="dropdown-menu">`;
-                  exampleNames.forEach(
-                    (ex, _) =>
-                      (examplesDropdown += `<li><a href="${examples[ex].LocalExamplePath}/">
-                      ${ex}</a></li>`)
-                  );
-                  examplesDropdown += `
-                </ol>
-              </div>`;
-                  const dropdowns =
-                    `<div class="dropdown-container">` +
-                    versionDropdown +
-                    examplesDropdown +
-                    "</div>";
-
                   const ghElement = document
                     .getElementsByClassName("github-corner")
                     .item(0);
+                  const exampleNames = Object.keys(examples).sort();
                   const currentEx = vm.route.path.split("/")[3];
                   // Change the GH icon to point to the current example if it exists.
                   if (currentEx) {
@@ -166,7 +153,46 @@
                     ghElement.href = window.$docsify.corner.url;
                   }
 
+                  // Write Examples section to add to the bottom of every markdown page.
+                  let exampleItems = "";
+                  exampleNames.forEach((ex, _) => {
+                    if (currentEx != ex) {
+                      exampleItems += `<li><a href="${examples[ex].LocalExamplePath}/">
+                      ${ex}</a></li>`;
+                    }
+                  });
+                  let examplesInlineListSection = exampleItems
+                    ? `
+                  <h3 id="examples">${
+                    currentEx ? "More Examples" : "Examples"
+                  }</h3>
+                  <ul>
+                  ${exampleItems}
+                  </ul>`
+                    : "";
+
+                  let examplesDropdown = `
+              <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Examples
+                <span class="caret"></span></button>
+                <ol class="dropdown-menu">`;
+                  exampleNames.forEach(
+                    (ex, _) =>
+                      (examplesDropdown += `<li><a href="${examples[ex].LocalExamplePath}/">
+                      ${ex}</a></li>`)
+                  );
+                  examplesDropdown += `
+                </ol>
+              </div>`;
+
+                  const dropdowns =
+                    `<div class="dropdown-container">` +
+                    versionDropdown +
+                    examplesDropdown +
+                    "</div>";
+
                   html = dropdowns + html;
+
                   const doc = new DOMParser().parseFromString(
                     html,
                     "text/html"
@@ -180,14 +206,22 @@
                     document.title = title;
                   }
 
+                  // Update examples.
+                  doc.getElementById("examples-section").outerHTML =
+                    examplesInlineListSection;
+
+                  // Update buttons.
                   doc.getElementById(
                     "create-issue"
                   ).href = `https://github.com/GoogleContainerTools/kpt/issues/new?labels=documentation&title=Docs: Function Catalog - ${document.title}`;
                   doc.getElementById("edit-page").href =
-                    ghElement.href.replace(
-                      "kpt-functions-catalog/tree",
-                      "kpt-functions-catalog/edit"
-                    ) + "/README.md";
+                    ghElement.href
+                      .replace(
+                        "kpt-functions-catalog/tree",
+                        "kpt-functions-catalog/edit"
+                      )
+                      .replace(`${functionName}/${versionName}`, "master") +
+                    "/README.md";
 
                   html = doc.body.innerHTML;
                 } catch (err) {
@@ -200,6 +234,7 @@
         ],
       };
     </script>
+    <script src="//kpt.dev/static/js/plugins/copy_buttons.js"></script>
     <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/docsify-corner/dist/docsify-corner.min.js"></script>
@@ -210,7 +245,6 @@
     <script src="//cdn.jsdelivr.net/npm/compare-versions@3.6.0/index.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="//kpt.dev/static/js/plugins/copy_buttons.js"></script>
   </body>
   <style>
     :root {

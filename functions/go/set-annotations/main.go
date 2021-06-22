@@ -22,7 +22,8 @@ const (
 	fnConfigGroup      = "fn.kpt.dev"
 	fnConfigVersion    = "v1alpha1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
-	fnConfigKind       = "SetAnnotationConfig"
+	legacyFnConfigKind = "SetAnnotationConfig"
+	fnConfigKind       = "SetAnnotations"
 )
 
 type SetAnnotationsProcessor struct{}
@@ -57,18 +58,20 @@ func (f *setAnnotationFunction) Config(rn *kyaml.RNode) error {
 	switch {
 	case f.validGVK(rn, "v1", "ConfigMap"):
 		f.plugin.Annotations = rn.GetDataMap()
+	case f.validGVK(rn, fnConfigAPIVersion, legacyFnConfigKind):
+		fallthrough
 	case f.validGVK(rn, fnConfigAPIVersion, fnConfigKind):
 		// input config is a CRD
 		y, err := rn.String()
 		if err != nil {
 			return fmt.Errorf("cannot get YAML from RNode: %w", err)
 		}
-		err = yaml.Unmarshal([]byte(y), &f.plugin)
+		err = f.plugin.Config(nil, []byte(y))
 		if err != nil {
-			return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+			return err
 		}
 	default:
-		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
+		return fmt.Errorf("`functionConfig` must be a `ConfigMap` or `%s`", fnConfigKind)
 	}
 
 	if len(f.plugin.Annotations) == 0 {
@@ -79,7 +82,7 @@ func (f *setAnnotationFunction) Config(rn *kyaml.RNode) error {
 		return err
 	}
 	// append default field specs
-	f.plugin.FieldSpecs = append(f.plugin.FieldSpecs, tc.FieldSpecs...)
+	f.plugin.AdditionalAnnotationFields = append(f.plugin.AdditionalAnnotationFields, tc.FieldSpecs...)
 	return nil
 }
 
