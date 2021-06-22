@@ -1,8 +1,8 @@
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetLabelConfig
+kind: SetLabels
 metadata:
   name: my-config
-fieldSpecs:
+additionalLabelFields:
   - kind: MyResource
     group: dev.example.com
     version: v1

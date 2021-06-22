@@ -65,13 +65,13 @@ data:
 
 The function can be invoked using:
 
-```
+```shell
 $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable --fn-config /path/to/fn-config.yaml
 ```
 
 Alternatively, data can be passed as key-value pairs in the CLI
 
-```
+```shell
 $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=metadata.name' 'put-value=the-deployment'
 ```
 

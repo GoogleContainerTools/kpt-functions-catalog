@@ -53,7 +53,9 @@ func (ensp *EnsureNameSubstringProcessor) Process(resourceList *framework.Resour
 		return fmt.Errorf("failed to load the default configuration")
 	}
 
-	ens.FieldSpecs = append(ensp.tc.FieldSpecs, ens.FieldSpecs...)
+	ens.AdditionalNameFields = append(ensp.tc.FieldSpecs, ens.AdditionalNameFields...)
+
+	fmt.Fprintf(os.Stderr, "ens.AdditionalNameFields: %#v\n", ens.AdditionalNameFields)
 
 	resourceFactory := resource.NewFactory(&hasher.Hasher{})
 	resourceFactory.IncludeLocalConfigs = true
@@ -64,10 +66,6 @@ func (ensp *EnsureNameSubstringProcessor) Process(resourceList *framework.Resour
 		return fmt.Errorf("failed to convert items to resource map: %w", err)
 	}
 
-	ens.Defaults()
-	if err = ens.Validate(); err != nil {
-		return fmt.Errorf("failed validation: %w", err)
-	}
 	if err = ens.Transform(resMap); err != nil {
 		return fmt.Errorf("failed to transform name substring: %w", err)
 	}

@@ -36,27 +36,31 @@ gcr_prefix = 'gcr.io/kpt-fn/'
 git_url_prefix = 'https://github.com/GoogleContainerTools/kpt-functions-catalog.git'
 
 def validate_master_branch():
-    fn_name_to_examples = validate_examples_dir_for_master_branch()
-    validate_functions_dir_for_master_branch(fn_name_to_examples)
+    fn_name_to_examples = validate_functions_dir_for_master_branch()
+    validate_examples_dir_for_master_branch(fn_name_to_examples)
 
 
-def validate_examples_dir_for_master_branch():
-    fn_name_to_examples = {}
+def validate_examples_dir_for_master_branch(fn_name_to_examples):
+    examples_seen = set()
+    for fn_name, examples in fn_name_to_examples.items():
+        for example_name in examples:
+            examples_seen.add(example_name)
+            if not example_name.startswith(fn_name):
+                raise Exception(f'example name {example_name} must start with the function name {fn_name}')
+            validate_example_md(fn_name, examples_directory, example_name, 'master')
+            validate_example_kptfile(fn_name, examples_directory, example_name, 'master')
+
     for dir in os.listdir(examples_directory):
         dir_name = os.path.join(examples_directory, dir)
         if os.path.isdir(dir_name):
             if dir in examples_directories_to_skip:
                 continue
-            fn_name = dir
-            example_list = []
-            for example_name in os.listdir(dir_name):
-                example_list.append(example_name)
-                validate_example_md(fn_name, dir_name, example_name, 'master')
-            fn_name_to_examples[fn_name] = example_list
-    return fn_name_to_examples
+            if not dir in examples_seen:
+                raise Exception(f'directory {dir} is NOT in the metadata.yaml file of any functions')
 
 
-def validate_functions_dir_for_master_branch(fn_name_to_examples):
+def validate_functions_dir_for_master_branch():
+    fn_name_to_examples = {}
     for dir_to_scan in directories_to_scan:
         for file in os.listdir(dir_to_scan):
             path_name = os.path.join(dir_to_scan, file)
@@ -65,12 +69,13 @@ def validate_functions_dir_for_master_branch(fn_name_to_examples):
                     continue
                 fn_name = file
                 print(f'verifying {fn_name}')
-                if fn_name not in fn_name_to_examples:
-                    raise Exception(f'function {fn_name} must have at least one example in the examples/ directory')
                 if metadata_filename not in os.listdir(path_name):
                     raise Exception(f'function {fn_name} directory must contain a {metadata_filename} file')
                 meta = yaml.load(open(os.path.join(path_name, metadata_filename)), Loader=yaml.Loader)
-                validate_metadata(meta, 'master', path_name, fn_name, fn_name_to_examples[fn_name])
+                example_list = [eg.split('/')[-1] for eg in meta['examplePackageURLs']]
+                fn_name_to_examples[fn_name] = example_list
+                validate_metadata(meta, 'master', path_name, fn_name, example_list)
+    return fn_name_to_examples
 
 
 def validate_release_branch(branch_name):
@@ -78,24 +83,18 @@ def validate_release_branch(branch_name):
     if len(items) != 2:
         raise Exception(f'the release branch name must be in the format of <fn-name>/v<major>.<minor>')
     fn_name = items[0]
-    examples = validate_examples_dir_for_release_branch(branch_name, fn_name)
-    validate_functions_dir_for_release_branch(examples, branch_name, fn_name)
+    examples = validate_functions_dir_for_release_branch(branch_name, fn_name)
+    validate_examples_dir_for_release_branch(branch_name, fn_name, examples)
 
-
-def validate_examples_dir_for_release_branch(branch_name, fn_name):
+def validate_examples_dir_for_release_branch(branch_name, fn_name, examples):
     if fn_name in os.listdir(os.path.join(examples_directory, 'contrib')):
-        return None
-    if fn_name not in os.listdir(examples_directory):
-        raise Exception(f'{fn_name} must have at least one example in the examples/ directory')
-    examples = []
-    dir_name = os.path.join(examples_directory, fn_name)
-    for example_name in os.listdir(dir_name):
-        examples.append(example_name)
-        validate_example_md(fn_name, dir_name, example_name, branch_name)
-    return examples
+        return
+    for example_name in examples:
+        validate_example_md(fn_name, examples_directory, example_name, branch_name)
+        validate_example_kptfile(fn_name, examples_directory, example_name, branch_name)
 
 
-def validate_functions_dir_for_release_branch(examples, branch_name, fn_name):
+def validate_functions_dir_for_release_branch(branch_name, fn_name):
     fn_dir = None
     for dir_to_scan in directories_to_scan:
         if fn_name in os.listdir(dir_to_scan):
@@ -105,12 +104,50 @@ def validate_functions_dir_for_release_branch(examples, branch_name, fn_name):
     if metadata_filename not in os.listdir(path_name):
         raise Exception(f'function {fn_name} directory must contain a {metadata_filename} file')
     meta = yaml.load(open(os.path.join(path_name, metadata_filename)), Loader=yaml.Loader)
+    examples = [eg.split('/')[-1] for eg in meta['examplePackageURLs']]
     validate_metadata(meta, branch_name, path_name, fn_name, examples)
+    return examples
+
+
+def validate_example_kptfile(fn_name, dir_name, example_name, branch):
+    example_path = os.path.join(dir_name, example_name)
+    kptfile_path = os.path.join(example_path, 'Kptfile')
+    if not os.path.exists(kptfile_path):
+        return
+
+    tag = branch
+    if branch == 'master':
+        tag = 'unstable'
+    else:
+        splits = branch.split('/')
+        if len(splits) != 2:
+            raise Exception(f'the release branch {branch} must has format <fn-name>/vX.Y')
+        tag = splits[1]
+
+    kptfile = yaml.load(open(kptfile_path), Loader=yaml.Loader)
+    if kptfile['apiVersion'] != 'kpt.dev/v1alpha2' and kptfile['apiVersion'] != 'kpt.dev/v1':
+        return
+    pipeline = kptfile['pipeline']
+    if 'mutators' in pipeline:
+        for mutator in pipeline['mutators']:
+            actual_image = mutator['image']
+            desired_image_name = f'gcr.io/kpt-fn/{fn_name}:{tag}'
+            if actual_image != desired_image_name:
+                raise Exception(f'expect Kptfile to contain {desired_image_name} but find {actual_image}')
+    if 'validators' in pipeline:
+        for mutator in pipeline['validators']:
+            actual_image = mutator['image']
+            desired_image_name = f'gcr.io/kpt-fn/{fn_name}:{tag}'
+            if actual_image != desired_image_name:
+                raise Exception(f'expect Kptfile to contain {desired_image_name} but find {actual_image}')
 
 
 def validate_example_md(fn_name, dir_name, example_name, branch):
     example_path = os.path.join(dir_name, example_name)
     md_file_path = os.path.join(example_path, 'README.md')
+
+    if (fn_name + "-") not in example_name:
+        raise Exception(f'example directory "{example_name}" must have the function name "{fn_name}-" as prefix')
 
     with open(md_file_path) as f:
         first_line = f.readline().strip()
@@ -118,8 +155,11 @@ def validate_example_md(fn_name, dir_name, example_name, branch):
             raise Exception(f'title must be in the 1st line and starts with one "#"')
         if fn_name not in first_line:
             raise Exception(f'title "{first_line}" must be in format "<fn-name>: Example Name" and contains "{fn_name}"')
-        if example_name.replace('-', ' ') not in first_line.lower():
-            raise Exception(f'title "{first_line}" must be in format "<fn-name>: Example Name" and contains "{example_name.replace("-", " ")}"')
+        shorter_example_name = example_name
+        if example_name.startswith(fn_name):
+            shorter_example_name = example_name[len(fn_name):]
+        if shorter_example_name.replace('-', ' ') not in first_line.lower():
+            raise Exception(f'title "{first_line}" must be in format "<fn-name>: Example Name" and contains "{shorter_example_name.replace("-", " ")}"')
 
     process = subprocess.Popen(['mdrip', md_file_path],
                                stdout=subprocess.PIPE,
@@ -183,10 +223,10 @@ def validate_metadata(metadata, branch, path, fn, examples_list):
     desired_source_url = f'https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/{branch}/{path}'
     if metadata['sourceURL'] != desired_source_url:
         raise Exception(f'{fn}: "sourceURL" should be "{desired_source_url}"')
-    if len(metadata['examplePackageURLs']) != len(examples_list):
-        raise Exception(f"{fn}: examplePackageURLs have {len(metadata['examplePackageURLs'])} examples, but the examples directory has {len(examples_list)}")
+    if len(examples_list) == 0:
+        raise Exception(f'{fn}: there must be at least one example listed in metadata.yaml file')
     for example in examples_list:
-        desired_example_pkg_url = f'https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/{branch}/examples/{fn}/{example}'
+        desired_example_pkg_url = f'https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/{branch}/examples/{example}'
         if desired_example_pkg_url not in metadata['examplePackageURLs']:
             raise Exception(f'"{desired_example_pkg_url}" is not listed in examplePackageURLs')
     if metadata['emails'] is None or kpt_team_email not in metadata['emails']:

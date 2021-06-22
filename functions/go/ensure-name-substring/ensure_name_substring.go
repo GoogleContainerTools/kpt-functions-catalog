@@ -10,6 +10,7 @@ import (
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
+	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/resid"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 	k8syaml "sigs.k8s.io/yaml"
@@ -29,8 +30,10 @@ type EnsureNameSubstring struct {
 	// EditMode controls the desired action when the desired substring is not found in the name.
 	// If not specified, prepend will be the default.
 	EditMode EditMode `json:"editMode,omitempty" yaml:"editMode,omitempty"`
-
+	// FieldSpecs is deprecated, please use AdditionalNameFields instead.
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
+	// AdditionalNameFields is used to specify additional fields to modify name.
+	AdditionalNameFields []types.FieldSpec `json:"additionalNameFields,omitempty" yaml:"additionalNameFields,omitempty"`
 }
 
 type EditMode string
@@ -40,15 +43,28 @@ const (
 	Append  EditMode = "append"
 )
 
-func (ens *EnsureNameSubstring) Defaults() {
+var _ framework.Defaulter = &EnsureNameSubstring{}
+
+func (ens *EnsureNameSubstring) Default() error {
 	if ens.EditMode == "" {
 		ens.EditMode = Prepend
 	}
+	if ens.AdditionalNameFields == nil && ens.FieldSpecs != nil {
+		ens.AdditionalNameFields = ens.FieldSpecs
+		ens.FieldSpecs = nil
+	}
+	return nil
 }
+
+var _ framework.Validator = &EnsureNameSubstring{}
 
 func (ens *EnsureNameSubstring) Validate() error {
 	if len(ens.Substring) == 0 {
 		return fmt.Errorf("substring must not be empty")
+	}
+
+	if ens.AdditionalNameFields != nil && ens.FieldSpecs != nil {
+		return fmt.Errorf("`fieldSpecs` has been deprecated, please rename it to `additionalNameFields`")
 	}
 	return nil
 }
@@ -61,7 +77,7 @@ func (ens *EnsureNameSubstring) Transform(m resmap.ResMap) error {
 		id := r.OrgId()
 		// current default configuration contains
 		// only one entry: "metadata/name" with no GVK
-		for _, fs := range ens.FieldSpecs {
+		for _, fs := range ens.AdditionalNameFields {
 			if !id.IsSelected(&fs.Gvk) {
 				continue
 			}

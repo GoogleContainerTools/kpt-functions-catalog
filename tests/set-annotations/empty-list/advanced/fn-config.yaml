@@ -1,9 +1,9 @@
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetAnnotationConfig
+kind: SetAnnotations
 metadata:
   name: my-func-config
 annotations: {}
-fieldSpecs:
+additionalAnnotationFields:
 - kind: MyResource
   group: dev.example.com
   version: v1
