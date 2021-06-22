@@ -64,26 +64,26 @@ apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: nginx
+upstream:
+  type: git
+  git:
+    repo: https://github.com/GoogleContainerTools/kpt
+    directory: package-examples/nginx
+    ref: v0.2
+  updateStrategy: resource-merge
+upstreamLock:
+  type: git
+  git:
+    repo: https://github.com/GoogleContainerTools/kpt
+    directory: package-examples/nginx
+    ref: v0.2
+    commit: 4d2aa98b45ddee4b5fa45fbca16f2ff887de9efb
 info:
   description: describe this package
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:unstable
-      configMap:
-        name: the-map
-upstream:
-  type: git
-  updateStrategy: resource-merge
-  git:
-    directory: package-examples/nginx
-    ref: v0.2
-    repo: https://github.com/GoogleContainerTools/kpt
-upstreamLock:
-  type: git
-  git:
-    directory: package-examples/nginx
-    ref: v0.2
-    repo: https://github.com/GoogleContainerTools/kpt
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configPath: setters-config.yaml
 ```
 
 The transformed package is compatible with kpt 1.0 binary.

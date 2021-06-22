@@ -34,7 +34,7 @@ $ kpt fn eval gatekeeper-imperative --image gcr.io/kpt-fn/gatekeeper:v0.1 --resu
 Let's take a look at the structured result in `/tmp/results.yaml`:
 
 ```yaml
-apiVersion: kpt.dev/v1alpha2
+apiVersion: kpt.dev/v1
 kind: FunctionResultList
 metadata:
   name: fnresults
