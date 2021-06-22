@@ -8,13 +8,10 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
-	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 //nolint
 func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = &kyaml.RNode{}
 	fp := FixProcessor{}
 	cmd := command.Build(&fp, command.StandaloneEnabled, false)
 
@@ -23,7 +20,7 @@ func main() {
 	cmd.Example = generated.FixExamples
 
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -39,7 +36,7 @@ func (fp *FixProcessor) Process(resourceList *framework.ResourceList) error {
 	resourceList.Items, err = s.Filter(resourceList.Items)
 	if err != nil {
 		resourceList.Result.Items = getErrorItem(err.Error())
-		return nil
+		return err
 	}
 	resourceList.Result.Items = resultsToItems(s)
 	return nil

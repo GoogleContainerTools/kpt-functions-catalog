@@ -1,0 +1,11 @@
+namespace: example-ns
+apiVersion: fn.kpt.dev/v1alpha1
+kind: SetNamespace
+metadata:
+  name: my-config
+additionalNamespaceFields:
+  - kind: MyResource
+    create: true
+    group: dev.example.com
+    path: spec/configmapRef/namespace
+    version: v1

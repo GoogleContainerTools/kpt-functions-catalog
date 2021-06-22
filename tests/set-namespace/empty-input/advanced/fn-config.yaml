@@ -1,4 +1,4 @@
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetNamespaceConfig
+kind: SetNamespace
 metadata:
   name: my-config

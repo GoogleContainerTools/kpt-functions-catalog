@@ -51,14 +51,14 @@ help: ## Print this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: verify
-verify: $(FUNCTIONS) ## Verify all functions
+verify: generate $(FUNCTIONS) ## Verify all functions
 
 .PHONY: $(FUNCTIONS)
 $(FUNCTIONS):
 	$(MAKE) CURRENT_FUNCTION=$@ func-verify
 
 .PHONY: test
-test: $(FUNCTION_TESTS) ## Run unit tests for all functions
+test: generate $(FUNCTION_TESTS) ## Run unit tests for all functions
 
 .PHONY: $(FUNCTION_TESTS)
 $(FUNCTION_TESTS):
@@ -74,7 +74,7 @@ $(FUNCTION_GENERATE_DOCS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -GENERATE,,$@) docs-generate
 
 .PHONY: build
-build: $(FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
+build: generate $(FUNCTION_BUILDS) ## Build all function images. 'TAG' env is used to specify tag. 'dev' will be used if not set.
 
 .PHONY: $(FUNCTION_BUILDS)
 $(FUNCTION_BUILDS):
@@ -103,12 +103,12 @@ GO_LICENSES=$(shell which go-licenses)
 endif
 
 install-mdtogo:
-	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo
+	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo@main
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
 	func-build func-push func-verify func-check-licenses docs-generate
-func-verify: func-fix func-vet func-fmt func-test func-lint func-check-licenses
+func-verify: docs-generate func-fix func-vet func-fmt func-test func-lint func-check-licenses
 
 func-fix:
 	cd $(CURRENT_FUNCTION) && go fix ./...

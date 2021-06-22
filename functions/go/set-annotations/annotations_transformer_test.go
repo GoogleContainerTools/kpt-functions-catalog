@@ -24,7 +24,7 @@ func runAnnotationTransformerE(config, input string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	plugin.FieldSpecs = append(plugin.FieldSpecs, tc.FieldSpecs...)
+	plugin.AdditionalAnnotationFields = append(plugin.AdditionalAnnotationFields, tc.FieldSpecs...)
 	err = plugin.Transform(resMap)
 	if err != nil {
 		return "", err

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-namespace/generated"
-	"sigs.k8s.io/kustomize/api/k8sdeps/kunstruct"
+	"sigs.k8s.io/kustomize/api/hasher"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
@@ -20,13 +20,12 @@ const (
 	fnConfigGroup      = "fn.kpt.dev"
 	fnConfigVersion    = "v1alpha1"
 	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
-	fnConfigKind       = "SetNamespaceConfig"
+	legacyFnConfigKind = "SetNamespaceConfig"
+	fnConfigKind       = "SetNamespace"
 )
 
 //nolint
 func main() {
-	resourceList := &framework.ResourceList{}
-	resourceList.FunctionConfig = &kyaml.RNode{}
 	asp := SetNamespaceProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 
@@ -69,18 +68,20 @@ func (f *setNamespaceFunction) Config(rn *kyaml.RNode) error {
 	switch {
 	case f.validGVK(rn, "v1", "ConfigMap"):
 		f.plugin.Namespace = rn.GetDataMap()["namespace"]
+	case f.validGVK(rn, fnConfigAPIVersion, legacyFnConfigKind):
+		fallthrough
 	case f.validGVK(rn, fnConfigAPIVersion, fnConfigKind):
 		// input config is a CRD
 		y, err := rn.String()
 		if err != nil {
 			return fmt.Errorf("cannot get YAML from RNode: %w", err)
 		}
-		err = yaml.Unmarshal([]byte(y), &f.plugin)
+		err = f.plugin.Config(nil, []byte(y))
 		if err != nil {
-			return fmt.Errorf("failed to unmarshal config %#v: %w", y, err)
+			return err
 		}
 	default:
-		return fmt.Errorf("function config must be a ConfigMap or %s", fnConfigKind)
+		return fmt.Errorf("`functionConfig` must be a `ConfigMap` or `%s`", fnConfigKind)
 	}
 
 	if f.plugin.Namespace == "" {
@@ -91,7 +92,7 @@ func (f *setNamespaceFunction) Config(rn *kyaml.RNode) error {
 		return err
 	}
 	// set default field specs
-	f.plugin.FieldSpecs = append(f.plugin.FieldSpecs, tc.FieldSpecs...)
+	f.plugin.AdditionalNamespaceFields = append(f.plugin.AdditionalNamespaceFields, tc.FieldSpecs...)
 	return nil
 }
 
@@ -105,7 +106,7 @@ func (f *setNamespaceFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run transformer: %w", err)
 	}
-	return resMap.ToRNodeSlice()
+	return resMap.ToRNodeSlice(), nil
 }
 
 func (f *setNamespaceFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bool {
@@ -129,8 +130,9 @@ func getDefaultConfig() (transformerConfig, error) {
 
 //nolint
 func newResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(kunstruct.NewKunstructuredFactoryImpl())
-	return resmap.NewFactory(resourceFactory, nil)
+	resourceFactory := resource.NewFactory(&hasher.Hasher{})
+	resourceFactory.IncludeLocalConfigs = true
+	return resmap.NewFactory(resourceFactory)
 }
 
 func run(resourceList *framework.ResourceList) error {

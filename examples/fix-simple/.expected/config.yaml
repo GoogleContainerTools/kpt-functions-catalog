@@ -1,0 +1,3 @@
+testType: eval
+image: gcr.io/kpt-fn/fix:unstable
+includeMetaResources: true

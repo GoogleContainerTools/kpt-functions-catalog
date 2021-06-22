@@ -17,6 +17,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strconv"
 
 	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
@@ -124,9 +125,7 @@ func Validate(objects []runtime.Object) (*framework.Result, error) {
 }
 
 func parseResults(results []*opatypes.Result) (*framework.Result, error) {
-	out := &framework.Result{
-		Items: []framework.ResultItem{},
-	}
+	var items []framework.ResultItem
 
 	for _, r := range results {
 		u, ok := r.Resource.(*unstructured.Unstructured)
@@ -136,16 +135,14 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 
 		item := framework.ResultItem{
 			Message: fmt.Sprintf("%s\nviolatedConstraint: %s", r.Msg, r.Constraint.GetName()),
-			ResourceRef: yaml.ResourceMeta{
+			ResourceRef: yaml.ResourceIdentifier{
 				TypeMeta: yaml.TypeMeta{
 					APIVersion: u.GetAPIVersion(),
 					Kind:       u.GetKind(),
 				},
-				ObjectMeta: yaml.ObjectMeta{
-					NameMeta: yaml.NameMeta{
-						Name:      u.GetName(),
-						Namespace: u.GetNamespace(),
-					},
+				NameMeta: yaml.NameMeta{
+					Name:      u.GetName(),
+					Namespace: u.GetNamespace(),
 				},
 			},
 		}
@@ -176,7 +173,58 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 			}
 		}
 
-		out.Items = append(out.Items, item)
+		items = append(items, item)
 	}
-	return out, nil
+	sortResultItems(items)
+
+	return &framework.Result{
+		Items: items,
+	}, nil
+}
+
+// TODO(mengqiy): upstream this to the SDK
+func sortResultItems(items []framework.ResultItem) {
+	sort.SliceStable(items, func(i, j int) bool {
+		if fileLess(items, i, j) != 0 {
+			return fileLess(items, i, j) < 0
+		}
+		if severityLess(items, i, j) != 0 {
+			return severityLess(items, i, j) < 0
+		}
+		return resultItemToString(items[i]) < resultItemToString(items[j])
+	})
+}
+
+func severityLess(items []framework.ResultItem, i, j int) int {
+	severityToNumber := map[framework.Severity]int{
+		framework.Error:   0,
+		framework.Warning: 1,
+		framework.Info:    2,
+	}
+
+	severityLevelI, found := severityToNumber[items[i].Severity]
+	if !found {
+		severityLevelI = 3
+	}
+	severityLevelJ, found := severityToNumber[items[j].Severity]
+	if !found {
+		severityLevelJ = 3
+	}
+	return severityLevelI - severityLevelJ
+}
+
+func fileLess(items []framework.ResultItem, i, j int) int {
+	if items[i].File.Path != items[j].File.Path {
+		if items[i].File.Path < items[j].File.Path {
+			return -1
+		} else {
+			return 1
+		}
+	}
+	return items[i].File.Index - items[j].File.Index
+}
+
+func resultItemToString(item framework.ResultItem) string {
+	return fmt.Sprintf("resource-ref:%s,field:%s,message:%s",
+		item.ResourceRef, item.Field, item.Message)
 }
