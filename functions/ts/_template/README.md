@@ -4,12 +4,29 @@
 
 Explain what this function does in one or two sentences.
 
-### FunctionConfig
+Describe why the user should care about this function.
 
-Explain the function config and behavior for this function in detail.
+What problem does it solve?
+
+Provide some context (e.g. In the `gatekeeper` function, explain what's
+is `Gatekeeper` project)
+
+### Usage
+
+How do I use this function?
+
+Explain what does it do in details.
+
+Is this function meant to be used declaratively, imperatively or both?
+
+#### FunctionConfig
+
+Omit this section, if the function doesn't support any `functionConfigs`.
+Otherwise, explain the function config and behavior for this function in detail.
 For each field in the function config, specify:
- - An example value
- - Whether it is optional, and if so, the default value
+
+- An example value
+- Whether it is optional, and if so, the default value
 
 To decouple the function orchestrator (i.e. kpt) from the function, it's
 recommended to not show the kpt CLI or custom resources like the Kptfile.
