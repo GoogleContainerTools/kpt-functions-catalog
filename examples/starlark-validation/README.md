@@ -53,7 +53,7 @@ keys in the `ConfigMap`.
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn render starlark-validation -results-dir /tmp
+$ kpt fn render starlark-validation --results-dir /tmp
 ```
 
 ### Expected result
