@@ -57,9 +57,9 @@ Here's what you can do in the Starlark script:
 
 - Read resources from `ctx.resource_list`. The `ctx.resource_list` complies with
   the [KRM Functions Specification]. You can read the input resources from
-  `ctx.resource_list[items]` and the `functionConfig` from
-  `ctx.resource_list[functionConfig]`.
-- Write resources to `ctx.resource_list[items]`.
+  `ctx.resource_list["items"]` and the `functionConfig` from
+  `ctx.resource_list["functionConfig"]`.
+- Write resources to `ctx.resource_list["items"]`.
 - Return an error using [`fail`][fail].
 - Write error message to stderr using [`print`][print]
 
