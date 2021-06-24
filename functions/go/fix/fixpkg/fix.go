@@ -1,6 +1,7 @@
 package fixpkg
 
 import (
+	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
@@ -55,7 +56,7 @@ type Result struct {
 	Message string
 }
 
-const SettersConfigFileName = "setters-config.yaml"
+const SettersConfigFileName = "setters.yaml"
 
 // Filter implements Fix as a yaml.Filter
 func (s *Fix) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
@@ -230,15 +231,18 @@ func (s *Fix) FunctionsInPkg(nodes []*yaml.RNode, pkgPath string) []v1.Function 
 		}
 		fnSpec := runtimeutil.GetFunctionSpec(node)
 		if fnSpec != nil {
+			// in order to make sure there is only one function config per file,
+			// rename the file with the name(and hash(name)) of the function config resource
+			fnFileName := fmt.Sprintf("%s-%s.yaml", node.GetName(), GenerateShortHash(node.GetName()))
 			// in v1, fn-config must be present in the package directory
 			// so configPath must be just the file name
-			fnFileName := filepath.Base(meta.Annotations[kioutil.PathAnnotation])
+			fnFilePath := filepath.Join(pkgPath, fnFileName)
 			res = append(res, v1.Function{
 				Image:      fnSpec.Container.Image,
 				ConfigPath: fnFileName,
 			})
 			// move the fn-config to the top level directory of the package
-			meta.Annotations[kioutil.PathAnnotation] = filepath.Join(pkgPath, fnFileName)
+			meta.Annotations[kioutil.PathAnnotation] = fnFilePath
 			delete(meta.Annotations, runtimeutil.FunctionAnnotationKey)
 			delete(meta.Annotations, "config.k8s.io/function")
 			err = node.SetAnnotations(meta.Annotations)
@@ -392,7 +396,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 	if len(setters) > 0 {
 		fn := v1.Function{
 			Image:      "gcr.io/kpt-fn/apply-setters:v0.1",
-			ConfigPath: "setters-config.yaml",
+			ConfigPath: "setters.yaml",
 		}
 		settersConfig, err := ConfigFromSetters(setters, settersConfigFilePath)
 		if err != nil {
@@ -436,7 +440,7 @@ func ConfigFromSetters(setters map[string]string, path string) (*yaml.RNode, err
 	configNode, err := yaml.Parse(fmt.Sprintf(`apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: setters-config
+  name: setters
   annotations:
     %s: %s
     %s: "0"
@@ -747,4 +751,12 @@ func schemaUsingField(object *yaml.RNode, field string) (*spec.Schema, error) {
 	}
 
 	return &sc, nil
+}
+
+// GenerateShortHash returns the short hash for input string
+func GenerateShortHash(input string) string {
+	h := sha1.New()
+	h.Write([]byte(input))
+	bs := h.Sum(nil)
+	return fmt.Sprintf("%x", bs)[:5]
 }

@@ -33,10 +33,13 @@ func TestFixV1alpha1ToV1(t *testing.T) {
 	assert.Equal(t, 0, len(diff.List()))
 	results, err := yaml.Marshal(f.Results)
 	assert.NoError(t, err)
+	println(string(results))
 	assert.Equal(t, `- filepath: Kptfile
   message: Transformed "packageMetadata" to "info"
 - filepath: Kptfile
   message: Transformed "upstream" to "upstream" and "upstreamLock"
+- filepath: Kptfile
+  message: Added "gcr.io/kpt-fn/set-annotations:v0.1" to mutators list, please move it to validators section if it is a validator function
 - filepath: Kptfile
   message: Added "gcr.io/kpt-fn/set-labels:v0.1" to mutators list, please move it to validators section if it is a validator function
 - filepath: Kptfile
@@ -78,11 +81,11 @@ func TestFixV1alpha2ToV1(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, `- filepath: Kptfile
   message: Updated apiVersion to kpt.dev/v1
-- filepath: setters-config.yaml
+- filepath: setters.yaml
   message: Moved setters from configMap to configPath
 - filepath: hello-world/Kptfile
   message: Updated apiVersion to kpt.dev/v1
-- filepath: hello-world/setters-config.yaml
+- filepath: hello-world/setters.yaml
   message: Moved setters from configMap to configPath
 `, string(results))
 }
