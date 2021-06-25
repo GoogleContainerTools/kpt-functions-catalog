@@ -28,12 +28,12 @@ For each field in the function config, specify:
 - An example value
 - Whether it is optional, and if so, the default value
 
-To decouple the function orchestrator (i.e. kpt) from the function, it's
-recommended to not show the kpt CLI or custom resources like the Kptfile.
+If showing the function orchestrator (e.g. kpt) can make it clear about how to
+use the function, it's recommended to use it.
 
 ### Examples
 
-Omit this ection if you are poviding complete example kpt packages which
-are linked from the catalog site.
+Omit this ection if you are poviding complete example kpt packages which are
+linked from the catalog site.
 
 Otherwise, provide inline examples in this section.
