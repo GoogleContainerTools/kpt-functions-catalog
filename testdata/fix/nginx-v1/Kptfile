@@ -31,9 +31,9 @@ pipeline:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
       configPath: setters.yaml
     - image: gcr.io/kpt-fn/set-annotations:v0.1
-      configPath: my-annotations-b9c31.yaml
+      configPath: my-annotations.yaml
     - image: gcr.io/kpt-fn/set-labels:v0.1
-      configPath: set-labels-42381.yaml
+      configPath: set-labels.yaml
 inventory:
   namespace: some-space
   name: inventory-00933591

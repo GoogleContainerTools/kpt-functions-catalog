@@ -33,7 +33,6 @@ func TestFixV1alpha1ToV1(t *testing.T) {
 	assert.Equal(t, 0, len(diff.List()))
 	results, err := yaml.Marshal(f.Results)
 	assert.NoError(t, err)
-	println(string(results))
 	assert.Equal(t, `- filepath: Kptfile
   message: Transformed "packageMetadata" to "info"
 - filepath: Kptfile

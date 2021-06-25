@@ -1,7 +1,6 @@
 package fixpkg
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
@@ -233,7 +232,7 @@ func (s *Fix) FunctionsInPkg(nodes []*yaml.RNode, pkgPath string) []v1.Function 
 		if fnSpec != nil {
 			// in order to make sure there is only one function config per file,
 			// rename the file with the name(and hash(name)) of the function config resource
-			fnFileName := fmt.Sprintf("%s-%s.yaml", node.GetName(), GenerateShortHash(node.GetName()))
+			fnFileName := fmt.Sprintf("%s.yaml", node.GetName())
 			// in v1, fn-config must be present in the package directory
 			// so configPath must be just the file name
 			fnFilePath := filepath.Join(pkgPath, fnFileName)
@@ -396,7 +395,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 	if len(setters) > 0 {
 		fn := v1.Function{
 			Image:      "gcr.io/kpt-fn/apply-setters:v0.1",
-			ConfigPath: "setters.yaml",
+			ConfigPath: SettersConfigFileName,
 		}
 		settersConfig, err := ConfigFromSetters(setters, settersConfigFilePath)
 		if err != nil {
@@ -751,12 +750,4 @@ func schemaUsingField(object *yaml.RNode, field string) (*spec.Schema, error) {
 	}
 
 	return &sc, nil
-}
-
-// GenerateShortHash returns the short hash for input string
-func GenerateShortHash(input string) string {
-	h := sha1.New()
-	h.Write([]byte(input))
-	bs := h.Sum(nil)
-	return fmt.Sprintf("%x", bs)[:5]
 }

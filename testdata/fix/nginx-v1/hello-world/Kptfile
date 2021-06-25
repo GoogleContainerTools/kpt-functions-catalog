@@ -23,6 +23,6 @@ pipeline:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
       configPath: setters.yaml
     - image: gcr.io/kpt-fn/set-annotations:v0.1
-      configPath: set-annotations-ebd2a.yaml
+      configPath: set-annotations.yaml
     - image: gcr.io/kpt-fn/set-namespace:v0.1
-      configPath: set-namespace-b42e9.yaml
+      configPath: set-namespace.yaml
