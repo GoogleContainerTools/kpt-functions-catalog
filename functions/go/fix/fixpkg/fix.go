@@ -14,6 +14,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/fieldmeta"
 	"sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil"
 	"sigs.k8s.io/kustomize/kyaml/kio"
+	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/openapi"
 	"sigs.k8s.io/kustomize/kyaml/sets"
@@ -281,7 +282,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 		if kf.Pipeline != nil {
 			for i, fn := range kf.Pipeline.Mutators {
 				if strings.Contains(fn.Image, "apply-setters:v0.1") && len(fn.ConfigMap) > 0 {
-					settersConfig, err := ConfigFromSetters(kf.Pipeline.Mutators[0].ConfigMap, settersConfigFilePath)
+					settersConfig, err := SettersNodeFromSetters(kf.Pipeline.Mutators[0].ConfigMap, settersConfigFilePath)
 					if err != nil {
 						return node, err
 					}
@@ -397,7 +398,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 			Image:      "gcr.io/kpt-fn/apply-setters:v0.1",
 			ConfigPath: SettersConfigFileName,
 		}
-		settersConfig, err := ConfigFromSetters(setters, settersConfigFilePath)
+		settersConfig, err := SettersNodeFromSetters(setters, settersConfigFilePath)
 		if err != nil {
 			return node, err
 		}
@@ -434,8 +435,8 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 	return kNode, err
 }
 
-// ConfigFromSetters returns the ConfigMap node with input setters in data field
-func ConfigFromSetters(setters map[string]string, path string) (*yaml.RNode, error) {
+// SettersNodeFromSetters returns the ConfigMap node with input setters in data field
+func SettersNodeFromSetters(setters map[string]string, path string) (*yaml.RNode, error) {
 	configNode, err := yaml.Parse(fmt.Sprintf(`apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -455,28 +456,48 @@ metadata:
 	sort.Strings(keys)
 
 	for _, k := range keys {
-		v := setters[k]
-		vNode, err := yaml.Parse(v)
+		v, err := standardizeArrayValue(setters[k])
 		if err != nil {
 			return nil, err
 		}
-		if vNode.YNode().Kind == yaml.SequenceNode {
-			// standardize array values to folded style
-			vNode.YNode().Style = yaml.FoldedStyle
-			v, err = vNode.String()
-			if err != nil {
-				return nil, err
-			}
+		vNode := yaml.NewScalarRNode(v)
+		if v == "" {
+			vNode.YNode().Style = yaml.DoubleQuotedStyle
 		}
-
 		err = configNode.PipeE(
 			yaml.LookupCreate(yaml.ScalarNode, "data", k),
-			yaml.FieldSetter{Value: yaml.NewScalarRNode(v)})
+			yaml.FieldSetter{Value: vNode, OverrideStyle: true})
 		if err != nil {
 			return nil, err
 		}
 	}
-	return configNode, nil
+	// format the created resource
+	_, err = filters.FormatFilter{UseSchema: true}.Filter([]*yaml.RNode{configNode})
+	return configNode, err
+}
+
+// standardizeArrayValue returns the folded style array node string
+// e.g. for input value [foo, bar], it returns
+// - foo
+// - bar
+func standardizeArrayValue(val string) (string, error) {
+	if !strings.HasPrefix(val, "[") {
+		// the value is either standardized, or is not a sequence node value
+		return val, nil
+	}
+	vNode, err := yaml.Parse(val)
+	if err != nil {
+		return val, fmt.Errorf("failed to parse the array node value %q with error %q", val, err.Error())
+	}
+	if vNode.YNode().Kind == yaml.SequenceNode {
+		// standardize array values to folded style
+		vNode.YNode().Style = yaml.FoldedStyle
+		val, err = vNode.String()
+		if err != nil {
+			return val, fmt.Errorf("failed to serialize the array node value %q with error %q", val, err.Error())
+		}
+	}
+	return val, nil
 }
 
 // getPkgPathToSettersSchema returns the, map of pkgPath to the setters schema in Kptfile
@@ -510,13 +531,16 @@ func (s *Fix) visitMapping(object *yaml.RNode) error {
 			// return if it is not a sequence node
 			return nil
 		}
-
+		oldCommentPrefixes := []string{`# {"$kpt-set":"`, `# {"$ref":"#/definitions/io.k8s.cli.`}
 		comment := node.Key.YNode().LineComment
-		// # {"$kpt-set":"foo"} must be converted to # kpt-set: ${foo}
-		if strings.Contains(comment, "$kpt-set") {
-			comment := strings.TrimPrefix(comment, `# {"$kpt-set":"`)
-			comment = strings.TrimSuffix(comment, `"}`)
-			node.Key.YNode().LineComment = fmt.Sprintf("kpt-set: ${%s}", comment)
+		for _, cp := range oldCommentPrefixes {
+			// # {"$kpt-set":"foo"} must be converted to # kpt-set: ${foo}
+			// # {"$ref":"#/definitions/io.k8s.cli.list"} must be converted to # kpt-set: ${list}
+			if strings.Contains(comment, cp) {
+				comment := strings.TrimPrefix(comment, cp)
+				comment = strings.TrimSuffix(comment, `"}`)
+				node.Key.YNode().LineComment = fmt.Sprintf("kpt-set: ${%s}", comment)
+			}
 		}
 		return nil
 	})

@@ -3,9 +3,9 @@ kind: ConfigMap
 metadata:
   name: setters
 data:
+  namespace: some-space
   image: nginx
   list: |
     - dev
     - stage
-  namespace: some-space
   tag: 1.14.1
