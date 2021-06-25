@@ -1,10 +1,14 @@
 # some-function-name
 
-### Overview
+Note: Please ensure you follow the [kpt doc style guide].
+
+## Overview
 
 <!--mdtogo:Short-->
 
 Explain what this function does in one or two sentences.
+
+<!--mdtogo-->
 
 Describe why the user should care about this function.
 
@@ -16,9 +20,9 @@ is `Gatekeeper` project)
 [//]: <> (Note: The content between `<!--mdtogo:Short-->` and the following
 `<!--mdtogo-->` will be used as the short description for the command.)
 
-<!--mdtogo-->
+<!--mdtogo:Long-->
 
-### Usage
+## Usage
 
 How do I use this function?
 
@@ -26,9 +30,7 @@ Explain what does it do in details.
 
 Is this function meant to be used declaratively, imperatively or both?
 
-#### FunctionConfig
-
-<!--mdtogo:Long-->
+### FunctionConfig
 
 Omit this section, if the function doesn't support any `functionConfigs`.
 Otherwise, explain the function config and behavior for this function in detail.
@@ -45,7 +47,7 @@ use the function, it's recommended to use it.
 
 <!--mdtogo-->
 
-### Examples
+## Examples
 
 <!--mdtogo:Examples-->
 
@@ -58,3 +60,5 @@ Otherwise, provide inline examples in this section.
 `<!--mdtogo-->` will be used as the examples for the command.)
 
 <!--mdtogo-->
+
+[kpt doc style guide]: https://github.com/GoogleContainerTools/kpt/blob/main/docs/style-guides/docs.md
