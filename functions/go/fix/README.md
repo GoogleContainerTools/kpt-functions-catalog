@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Fix resources and make them compatible with kpt 1.0.
+Migrate resources to make them compatible with 1.0+ versions of kpt.
 
 <!--mdtogo-->
 
