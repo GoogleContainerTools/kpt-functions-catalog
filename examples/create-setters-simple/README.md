@@ -2,9 +2,9 @@
 
 ### Overview
 
-The `create-setters` KRM config function adds setter comments to resource fields to be parameterized.
+The `create-setters` function adds setter comments to resource fields to be parameterized.
 
-In this example, we will see how to add setter comments declaratively to
+In this example, we will see how to add setter comments to
 resource fields using `create-setters` function.
 
 ### Fetch the example package
@@ -13,25 +13,6 @@ Get the example package by running the following commands:
 
 ```shell
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/create-setters-simple
-```
-
-```yaml
-# resources.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ubuntu-development
-data:
-  some-key: some-value
----
-apiVersion: v1
-kind: MyKind
-metadata:
-  name: ubuntu
-image: nginx:1.1.2
-roles:
-  - dev
-  - pro
 ```
 
 We use `ConfigMap` to configure the `create-setters` function.
@@ -46,38 +27,16 @@ kind: ConfigMap
 metadata:
   name: create-setters-fn-config
 data:
-  app: nginx
-  image: ubuntu
-  role: |
+  nginx-replicas: "4"
+  env: |
     - dev
-    - pro
-  tag: 1.1.2
-```
-
-Invoking `create-setters` function would add the setter comments.
-
-```yaml
-# resources.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ubuntu-development # kpt-set: ${image}-development
-data:
-  some-key: some-value
----
-apiVersion: v1
-kind: MyKind
-metadata:
-  name: ubuntu # kpt-set: ${image}
-image: nginx:1.1.2 # kpt-set: ${app}:${tag}
-roles: # kpt-set: ${role}
-  - dev
-  - pro
+    - stage
+  tag: 1.16.1
 ```
 
 ### Function invocation
 
-Invoke the function by running the following commands:
+Invoke the function by running the following command:
 
 ```shell
 $ kpt fn render create-setters-simple
@@ -85,11 +44,10 @@ $ kpt fn render create-setters-simple
 
 ### Expected result
 
-`Comment` is added to the resource with the `Value` given below as they match the `Setters`.
+`Comment` is added to the resource with the `Value` given below as they match the `Setter`.
 
-| Setters                                    | Value                        | Comment                               |
+| Setter                                    | Value                        | Comment                               |
 |--------------------------------------------|------------------------------|---------------------------------------|
-| <pre>image: ubuntu</pre>                   | <pre>ubuntu</pre>            | `# kpt-set: ${image}`                 |
-| <pre>image: ubuntu</pre>                   | <pre>ubuntu-development</pre>| `# kpt-set: ${image}-development`     |
-| <pre>app: nginx<br>tag: 1.1.2</pre>        | <pre>nginx:1.1.2</pre>       | `# kpt-set: ${app}:${tag}`            |
-| <pre>role: \|<br>  - pro<br>  - dev</pre>  | <pre>- dev<br>- pro</pre>    | `# kpt-set: ${role}`                  |
+| <pre>nginx-replicas: "4"</pre>  | <pre>4</pre>            | `# kpt-set: ${nginx-replicas}`                 |
+| <pre>tag: 1.16.1</pre>        | <pre>nginx:1.16.1</pre>       | `# kpt-set: nginx:${tag}`            |
+| <pre>env: <br>  - dev<br>  - stage</pre>  | <pre>- dev<br>- stage</pre>    | `# kpt-set: ${env}`                  |

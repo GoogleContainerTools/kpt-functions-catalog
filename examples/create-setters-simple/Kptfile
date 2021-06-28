@@ -5,10 +5,4 @@ metadata:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/create-setters:unstable
-      configMap:
-        app: nginx
-        image: ubuntu
-        role: |
-          - dev
-          - pro
-        tag: 1.1.2
+      configPath: setters.yaml

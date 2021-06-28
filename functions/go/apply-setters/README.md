@@ -7,9 +7,9 @@
 Apply setter values on resource fields. Setters serve as parameters for template-free
 setting of field values.
 
-Setters are a safer alternative to other substitution techniques which do not
-have the context of the structured data. Setters may be invoked to modify the
-package resources using this function to set desired values.
+Setters are a safer alternative to parameterize field values as they
+have the context of the structured data. Setters can be invoked to modify the
+resources using this function to set desired values.
 
 <!--mdtogo-->
 
@@ -25,7 +25,7 @@ setter and value is the new desired value for the setter.
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: my-func-config
+  name: apply-setters-func-config
 data:
   setter_name1: setter_value1
   setter_name2: setter_value2
@@ -42,27 +42,43 @@ data:
 Let's start with the input resource in a package
 
 ```yaml
-apiVersion: v1
+# resources.yaml
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment # kpt-set: ${image}-deployment
+  name: my-nginx
 spec:
-  replicas: 1 # kpt-set: ${replicas}
+  replicas: 4 # kpt-set: ${nginx-replicas}
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: "nginx:1.16.1" # kpt-set: nginx:${tag}
+        ports:
+        - protocol: TCP
+          containerPort: 80
 ```
 
-Discover the names of setters in the function config file and declare desired values.
+Declare the new desired values for setters in the function config file.
 
 ```yaml
+# apply-setters-fn-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: apply-setters-fn-config
 data:
-  image: ubuntu
-  replicas: "3"
+  nginx-replicas: "3"
+  tag: 1.16.2
 ```
 
-Render the declared values by invoking:
+Invoke the function using the input config:
 
 ```shell
 $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
@@ -71,18 +87,33 @@ $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-s
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- 'image=ubuntu' 'replicas=3'
+$ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- image=ubuntu replicas=3
 ```
 
-Rendered resource looks like the following:
+Modified resource looks like the following:
 
 ```yaml
-apiVersion: v1
+# resources.yaml
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubuntu-deployment # kpt-set: ${image}-deployment
+  name: my-nginx
 spec:
-  replicas: 3 # kpt-set: ${replicas}
+  replicas: 3 # kpt-set: ${nginx-replicas}
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: "nginx:1.16.2" # kpt-set: nginx:${tag}
+        ports:
+        - protocol: TCP
+          containerPort: 80
 ```
 
 #### Setting array values
@@ -116,13 +147,13 @@ data:
     - dev
 ```
 
-Render the declared values by invoking:
+Invoke the function using the input config:
 
 ```shell
 $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
 ```
 
-Rendered resource looks like the following:
+Modified resource looks like the following:
 
 ```yaml
 apiVersion: v1
