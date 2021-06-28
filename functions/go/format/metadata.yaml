@@ -1,5 +1,5 @@
 image: gcr.io/kpt-fn/format
-description: Sort resource fields, fix indentation and quote ambiguous string values.
+description: Format resources by sorting fields, fixing indentation and quoting ambiguous string values.
 tags:
   - mutator
   - formatter
