@@ -13,7 +13,7 @@ Format resources by sorting fields, fixing indentation and quoting ambiguous str
 This function sorts the resource fields. Field ordering follows the
 ordering defined in the OpenAPI document for Kubernetes resources,
 falling back on lexicographical sorting for unrecognized fields. 
-This function also performs other changes like fixing indentation, 
+This function also performs other changes like fixing indentation and
 adding quotes to ambiguous string values.
 
 <!--mdtogo-->
