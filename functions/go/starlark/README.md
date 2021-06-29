@@ -7,9 +7,9 @@
 The `starlark` function contains a Starlark interpreter to run a Starlark script
 to mutate or validate resources.
 
-The starlark script is so flexible to do many things such as:
+The starlark script can be used to:
 
-- Set namespace for all KRM resources.
+- Add an annotation on the basis of a condition
 - Inject a sidecar container in all KRM resources that contain a `PodTemplate`.
 - Validate all KRM resources that contain a `PodTemplate` to ensure no
   containers run as root.

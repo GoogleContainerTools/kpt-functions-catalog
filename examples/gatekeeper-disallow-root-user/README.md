@@ -1,19 +1,20 @@
-# gatekeeper: No Root
+# gatekeeper: Disallow Root User
 
 ### Overview
 
-This example demonstrates how to declaratively run the [gatekeeper]
-function to validate resources using gatekeeper constraints.
+This example demonstrates how to run [gatekeeper] function declaratively to
+enforce the policy `Containers must not run as root` on resources.
 
 ### Fetch the example package
 
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-no-root
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-disallow-root-user
 ```
 
-There are 3 resources: a `ConstraintTemplate`, a `NoRoot` and a `Deployment`.
+There are 3 resources: a `ConstraintTemplate`, a `DisallowRoot` and
+a `Deployment`.
 
 The following is the `ConstraintTemplate` we use:
 
@@ -21,16 +22,16 @@ The following is the `ConstraintTemplate` we use:
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: noroot
+  name: disallowroot
 spec:
   crd:
     spec:
       names:
-        kind: NoRoot
+        kind: DisallowRoot
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |-
-        package noroot
+        package disallowroot
         violation[{"msg": msg}] {
           not input.review.object.spec.template.spec.securityContext.runAsNonRoot
           msg := "Containers must not run as root"
@@ -46,9 +47,9 @@ the `ConstraintTemplate` above:
 
 ```yaml
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: NoRoot
+kind: DisallowRoot
 metadata:
-  name: noroot
+  name: disallowroot
 spec:
   match:
     kinds:
@@ -83,12 +84,12 @@ items:
   - image: gcr.io/kpt-fn/gatekeeper:unstable
     stderr: |-
       [error] apps/v1/Deployment/nginx-deploy : Containers must not run as root
-      violatedConstraint: noroot
+      violatedConstraint: disallowroot
     exitCode: 1
     results:
       - message: |-
           Containers must not run as root
-          violatedConstraint: noroot
+          violatedConstraint: disallowroot
         severity: error
         resourceRef:
           apiVersion: apps/v1
