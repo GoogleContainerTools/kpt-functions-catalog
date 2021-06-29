@@ -1,6 +1,6 @@
 # ensure-name-substring
 
-### Overview
+## Overview
 
 <!--mdtogo:Short-->
 
@@ -25,7 +25,7 @@ please file an [issue].
 
 <!--mdtogo:Long-->
 
-### Usage
+## Usage
 
 This function can be used with any KRM function orchestrators (e.g. kpt).
 
@@ -51,7 +51,7 @@ will also be updated.
 
 This function can be used both declaratively and imperatively.
 
-#### FunctionConfig
+### FunctionConfig
 
 There are 2 kinds of `functionConfig` supported by this function:
 

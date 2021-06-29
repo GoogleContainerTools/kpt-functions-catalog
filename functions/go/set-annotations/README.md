@@ -1,6 +1,6 @@
 # set-annotations
 
-### Overview
+## Overview
 
 <!--mdtogo:Short-->
 
@@ -21,7 +21,7 @@ For example, annotations can be used in the following scenarios:
 
 You can learn more about annotations [here][annotations].
 
-### Usage
+## Usage
 
 This function can be used with any KRM function orchestrators (e.g. kpt).
 
@@ -35,7 +35,7 @@ in `Deployment` will be updated to include the desired annotations.
 
 This function can be used both declaratively and imperatively.
 
-#### FunctionConfig
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
