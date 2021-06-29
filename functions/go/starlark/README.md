@@ -1,18 +1,25 @@
 # starlark
 
-### Overview
+## Overview
 
 <!--mdtogo:Short-->
 
 The `starlark` function contains a Starlark interpreter to run a Starlark script
 to mutate or validate resources.
 
+The starlark script can be used to:
+
+- Add an annotation on the basis of a condition
+- Inject a sidecar container in all KRM resources that contain a `PodTemplate`.
+- Validate all KRM resources that contain a `PodTemplate` to ensure no
+  containers run as root.
+
 It follows the [executable configuration] pattern. It makes writing simple
 function much easier.
 
 <!--mdtogo-->
 
-### Starlark Language
+## Starlark Language
 
 [Starlark] is a dialect of Python. It is commonly used as a configuration
 language. It is an untyped dynamic language with high-level data types,
@@ -21,6 +28,14 @@ the spec for the Starlark language [here][spec]. You can also find its API
 reference [here][apiref].
 
 <!--mdtogo:Long-->
+
+## Usage
+
+You need to put your starlark script source in the `functionConfig` of
+kind `StarlarkRun` and then the function will run the starlark script that you
+provide.
+
+This function can be used both declaratively and imperatively.
 
 ### FunctionConfig
 

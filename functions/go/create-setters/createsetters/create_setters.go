@@ -19,6 +19,10 @@ type CreateSetters struct {
 	// ScalarSetters holds the user provided values for simple scalar setters
 	ScalarSetters []ScalarSetter
 
+	// replacer holds the scalar setters info and used to
+	// efficiently generate scalar setter comments.
+	replacer *strings.Replacer
+
 	// ArraySetters holds the user provided values for array setters
 	ArraySetters []ArraySetter
 
@@ -69,10 +73,9 @@ func (a CompareSetters) Len() int {
 	return len(a)
 }
 
-// checks if the jth node's Name is a substring of ith node's Value
-// jth node is sorted first if the condition statisfies
+// node with value of maximum length is placed first
 func (a CompareSetters) Less(i, j int) bool {
-	return !strings.Contains(a[i].Value, a[j].Name)
+	return len(a[i].Value) > len(a[j].Value)
 }
 
 func (a CompareSetters) Swap(i, j int) {
@@ -81,7 +84,7 @@ func (a CompareSetters) Swap(i, j int) {
 
 // Filter implements CreatSetters as a yaml.Filter
 func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-
+	cs.preProcessScalarSetters()
 	for i := range nodes {
 		filePath, _, err := kioutil.GetFileAnnotations(nodes[i])
 		if err != nil {
@@ -94,6 +97,23 @@ func (cs *CreateSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 		}
 	}
 	return nodes, nil
+}
+
+/**
+preProcessScalarSetters simplifies the process of setting comments for
+scalar values by creating a *strings.Replacer
+e.g., For Scalar Setters [[name: image, value: nginx], [name: env, value: dev]].,
+sets up args as [nginx, ${image}, dev, ${env}]
+Using strings.NewReplacer and the args, creates *strings.Replacer
+*/
+func (cs *CreateSetters) preProcessScalarSetters() {
+	// replacerArgs contains the setter values with parameter as pairs
+	var replacerArgs []string
+	for _, setter := range cs.ScalarSetters {
+		replacerArgs = append(replacerArgs, setter.Value)
+		replacerArgs = append(replacerArgs, fmt.Sprintf("${%s}", setter.Name))
+	}
+	cs.replacer = strings.NewReplacer(replacerArgs...)
 }
 
 /**
@@ -223,7 +243,12 @@ func (cs *CreateSetters) visitScalar(object *yaml.RNode, path string) error {
 		return nil
 	}
 
-	linecomment, valueMatch := getLineComment(object.YNode().Value, cs.ScalarSetters)
+	// doesn't add the comment to the nodes with multiple line values
+	if hasMultipleLines(object.YNode().Value) {
+		return nil
+	}
+
+	linecomment, valueMatch := getLineComment(object.YNode().Value, cs.replacer)
 
 	// sets the linecomment if the match is found
 	if valueMatch {
@@ -255,7 +280,7 @@ func checkEqual(nodeValues []string, arraySetters []string) bool {
 
 // getArraySetter parses the input and returns array setters
 func getArraySetter(input *yaml.RNode) []string {
-	output := []string{}
+	var output []string
 
 	elements, err := input.Elements()
 	if err != nil {
@@ -268,6 +293,11 @@ func getArraySetter(input *yaml.RNode) []string {
 
 	sort.Strings(output)
 	return output
+}
+
+// hasMultipleLines checks if a string is split into multiple lines
+func hasMultipleLines(value string) bool {
+	return strings.Contains(value, "\n")
 }
 
 // hasMatchValue checks if any of the ScalarSetter value matches with the node value
@@ -298,21 +328,14 @@ apiVersion: v1
 ...
 image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 */
-func getLineComment(nodeValue string, setters []ScalarSetter) (string, bool) {
-	output := nodeValue
+func getLineComment(nodeValue string, replacer *strings.Replacer) (string, bool) {
 	valueMatch := false
 
-	for _, setter := range setters {
-		if strings.Contains(nodeValue, setter.Value) {
-			valueMatch = true
-			output = strings.ReplaceAll(
-				output,
-				setter.Value,
-				fmt.Sprintf("${%s}", setter.Name),
-			)
-		}
+	// replaces the substrings in nodeValue with setter parameters
+	output := replacer.Replace(nodeValue)
+	if output != nodeValue {
+		valueMatch = true
 	}
-
 	return output, valueMatch
 }
 
@@ -322,16 +345,16 @@ places the setter either in ScalarSetters or ArraySetters
 sorts the ScalarSetters using CompareSetters
 
 e.g.for input ScalarSetters
-	[[name: image, value: nginx], [name: ubuntu, value: image]]
+    [[name: image, value: nginx], [name: ubuntu, value: nginx-abc]]
 
 for scalar node:
-	spec: nginx-development
+    spec: nginx-development
 
-Sorts the ScalarSetters to avoid following case
-	spec: nginx-development # kpt-set: ${ubuntu}-development
+Sorts the ScalarSetters to avoid following case of substrings
+    spec: nginx-abc-development # kpt-set: ${image}-abc-development
 
 ScalarSetters array is transformed to
-	[[name: ubuntu, value: image], [name: image, value: nginx]]
+    [[name: ubuntu, value: nginx-abc], [name: image, value: nginx]]
 */
 func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
 	if len(rn.GetDataMap()) == 0 {
@@ -352,7 +375,8 @@ func Decode(rn *yaml.RNode, fcd *CreateSetters) error {
 		}
 	}
 
-	// sorts all the Setters
+	// sorts all the Scalar Setters in lexicographically
+	// decreasing order of it's Value
 	sort.Sort(CompareSetters(fcd.ScalarSetters))
 	return nil
 }

@@ -5,9 +5,4 @@ metadata:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:unstable
-      configMap:
-        image: darwin
-        role: |
-          - dev
-          - intermediate
-        tag: 2.1.2
+      configPath: setters.yaml

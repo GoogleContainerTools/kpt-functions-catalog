@@ -1,6 +1,6 @@
 # set-labels
 
-### Overview
+## Overview
 
 <!--mdtogo:Short-->
 
@@ -17,7 +17,7 @@ For example, labels can be used in the following scenarios:
 
 You can learn more about labels [here][labels].
 
-### Usage
+## Usage
 
 This function can be used with any KRM function orchestrators (e.g. kpt).
 
@@ -31,7 +31,7 @@ desired labels.
 
 This function can be used both declaratively and imperatively.
 
-#### FunctionConfig
+### FunctionConfig
 
 <!--mdtogo:Long-->
 
