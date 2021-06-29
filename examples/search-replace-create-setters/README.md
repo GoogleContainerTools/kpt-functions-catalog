@@ -63,4 +63,4 @@ Please refer to [apply-setters] documentation for information about applying des
 [setters]: https://catalog.kpt.dev/apply-setters/v0.1/
 [apply-setters]: https://catalog.kpt.dev/apply-setters/v0.1/
 [create-setters]: https://catalog.kpt.dev/create-setters/v0.1/
-[setter comments]: https://catalog.kpt.dev/apply-setters/v0.1/?id=setter-comment
+[setter comments]: https://catalog.kpt.dev/apply-setters/v0.1/?id=definitions

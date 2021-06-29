@@ -45,4 +45,4 @@ $ kpt fn render create-setters-simple
 2. Check the setter comment `kpt-set: nginx:${tag}` is added to `image` field value `nginx:1.16.1` in `Deployment` resource.
 3. Check the setter comment `kpt-set: ${env}` is added to `environment` field in `MyKind` resource.
 
-[setter]: https://catalog.kpt.dev/apply-setters/v0.1/?id=setters-definition
+[setter]: https://catalog.kpt.dev/apply-setters/v0.1/?id=definitions
