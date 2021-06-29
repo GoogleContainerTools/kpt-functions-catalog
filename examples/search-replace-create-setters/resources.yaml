@@ -1,11 +1,9 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: my-nginx
-spec:
-  replicas: 3
-  template:
-    spec:
-      containers:
-        - name: nginx
-          image: 'gcr.io/nginx:1.14.2'
+  name: nginx-urls
+data:
+  FQDN: nginx.com
+  MY_BAR_URL: https://nginx.com/bar
+  MY_BAZ_URL: https://nginx.com/baz
+  MY_FOO_URL: https://nginx.com/foo

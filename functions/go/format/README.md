@@ -4,18 +4,17 @@
 
 <!--mdtogo:Short-->
 
-Format the field ordering in resources.
+Format resources by sorting fields, fixing indentation and quoting ambiguous string values.
 
 <!--mdtogo-->
 
-### FunctionConfig
-
 <!--mdtogo:Long-->
 
-The `format` function formats the field ordering in YAML configuration files. Field
-ordering follows the ordering defined in the OpenAPI document for Kubernetes resources,
-falling back on lexicographical sorting for unrecognized fields. This function also performs
-other changes like fixing indentation, adding quotes to ambiguous string values.
+This function sorts the resource fields. Field ordering follows the
+ordering defined in the OpenAPI document for Kubernetes resources,
+falling back on lexicographical sorting for unrecognized fields. 
+This function also performs other changes like fixing indentation and
+adding quotes to ambiguous string values.
 
 <!--mdtogo-->
 
