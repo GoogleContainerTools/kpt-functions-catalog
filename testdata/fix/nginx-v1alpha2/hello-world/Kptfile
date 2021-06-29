@@ -26,6 +26,6 @@ pipeline:
         image-tag: v0.3.0
         replicas: "5"
     - image: gcr.io/kpt-fn/set-annotations:v0.1
-      configPath: fn-config.yaml
+      configPath: set-annotations.yaml
     - image: gcr.io/kpt-fn/set-namespace:v0.1
-      configPath: ns-config.yaml
+      configPath: set-namespace.yaml
