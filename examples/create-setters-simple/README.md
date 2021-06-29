@@ -2,8 +2,6 @@
 
 ### Overview
 
-The `create-setters` function adds setter comments to resource fields to be parameterized.
-
 In this example, we will see how to add setter comments to
 resource fields using `create-setters` function.
 

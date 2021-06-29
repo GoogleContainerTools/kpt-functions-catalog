@@ -4,12 +4,29 @@
 
 <!--mdtogo:Short-->
 
-Apply setter values on resource fields. Setters serve as parameters for template-free
-setting of field values.
+Update the field values parameterized by setters.
 
-Setters are a safer alternative to parameterize field values as they
-have the context of the structured data. Setters can be invoked to modify the
-resources using this function to set desired values.
+##### Setters Definition
+
+Setters serve as parameters for customizing field values.
+Setters are a safer alternative to parameterize field 
+values as they have the context of the structured data.
+
+##### Setter Name: 
+
+Name of the parameter.
+
+##### Setter Value
+
+Value of the parameter.
+
+##### Setter Comment
+
+A field value can be fully or partially parameterized using setter comments.
+A setter comment can be derived by replacing all the instances of setter values 
+in the field value, with the corresponding setter names along with 'kpt-set:' prefix.
+
+e.g. image: gcr.io/nginx:1.16.1 # kpt-set: gcr.io/${image}:${tag}
 
 <!--mdtogo-->
 
@@ -30,6 +47,10 @@ data:
   setter_name1: setter_value1
   setter_name2: setter_value2
 ```
+
+`apply-setters` function performs the following steps when invoked:
+1. Searches for the field values tagged by setter comments.
+2. Updates the field value fully or partially with the corresponding input setter values.
 
 <!--mdtogo-->
 

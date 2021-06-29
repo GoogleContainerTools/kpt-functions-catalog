@@ -4,12 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Add setter comments to matching resource fields. Setters serve as
-parameters for the template-free setting of field values.
-
-Setters are a safer alternative to parameterize field values as they
-have the context of the structured data. This function helps you with
-adding setter comments to field values you intend to parameterize.
+Parameterize the field values by adding [setter] comments.
 
 <!--mdtogo-->
 
@@ -193,3 +188,5 @@ Explanation for the changes:
 - As all the array values of `environments` field match the setter values of `env`, `# kpt-set: ${env}` comment is added.
 Here, the comment is added to the `environments` field as it is an array node, and the intent is to paremeterize entire array.
 <!--mdtogo-->
+
+[setters]: https://catalog.kpt.dev/apply-setters/v0.1/?id=setters-definition

@@ -33,8 +33,8 @@ data:
 
 Suppose you want to parameterize the value `nginx` in all the fields in `data` 
 section but not the value of `metadata.name` in the `ConfigMap` resource.
-You can pin-point the values using path expression and regex capture groups to
-add setter comments as per your intent.
+You can target specific values using path expression and regex capture groups, 
+and add setter comments as per your intent.
 
 ```shell
 $ kpt fn eval search-replace-create-setters --image gcr.io/kpt-fn/search-replace:unstable -- \

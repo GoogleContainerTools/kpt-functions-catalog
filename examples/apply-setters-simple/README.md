@@ -2,9 +2,6 @@
 
 ### Overview
 
-The `apply-setters` function applies setter values to resource fields
-with setter comments.
-
 In this example, we will see how to apply desired setter values to the 
 resource fields parameterized by `kpt-set` comments.
 
