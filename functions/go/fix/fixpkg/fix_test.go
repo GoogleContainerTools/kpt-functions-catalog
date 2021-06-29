@@ -38,6 +38,8 @@ func TestFixV1alpha1ToV1(t *testing.T) {
 - filepath: Kptfile
   message: Transformed "upstream" to "upstream" and "upstreamLock"
 - filepath: Kptfile
+  message: Added "gcr.io/kpt-fn/set-annotations:v0.1" to mutators list, please move it to validators section if it is a validator function
+- filepath: Kptfile
   message: Added "gcr.io/kpt-fn/set-labels:v0.1" to mutators list, please move it to validators section if it is a validator function
 - filepath: Kptfile
   message: Transformed "openAPI" definitions to "apply-setters" function
@@ -78,11 +80,86 @@ func TestFixV1alpha2ToV1(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, `- filepath: Kptfile
   message: Updated apiVersion to kpt.dev/v1
-- filepath: setters-config.yaml
+- filepath: setters.yaml
   message: Moved setters from configMap to configPath
 - filepath: hello-world/Kptfile
   message: Updated apiVersion to kpt.dev/v1
-- filepath: hello-world/setters-config.yaml
+- filepath: hello-world/setters.yaml
   message: Moved setters from configMap to configPath
 `, string(results))
+}
+
+type settersNodeTest struct {
+	name     string
+	setters  map[string]string
+	path     string
+	expected string
+	errMsg   string
+}
+
+var settersNodeFromSettersCases = []settersNodeTest{
+	{
+		name: "Create setters file with all types",
+		path: `foo/bar`,
+		setters: map[string]string{
+			"environment":         "",
+			"integer":             "10",
+			"number":              "1.1",
+			"boolean":             "true",
+			"string":              "foo",
+			"region":              "us-east-1",
+			"flow-style-setter":   "[dev, prod]",
+			"folded-style-setter": "- hi\n- hello",
+		},
+		expected: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters
+  annotations:
+    config.kubernetes.io/index: "0"
+    config.kubernetes.io/path: foo/bar
+data:
+  boolean: "true"
+  environment: ""
+  flow-style-setter: |
+    - dev
+    - prod
+  folded-style-setter: |-
+    - hi
+    - hello
+  integer: "10"
+  number: "1.1"
+  region: us-east-1
+  string: foo
+`,
+	},
+	{
+		name: "invalid flow-style sequence node",
+		path: `foo/bar`,
+		setters: map[string]string{
+			"setter": "[dev, prod,",
+		},
+		errMsg: `failed to parse the array node value "[dev, prod," with error "yaml: line 1: did not find expected node content"`,
+	},
+}
+
+func TestSettersNodeFromSetters(t *testing.T) {
+	for i := range settersNodeFromSettersCases {
+		test := settersNodeFromSettersCases[i]
+		t.Run(test.name, func(t *testing.T) {
+			res, err := SettersNodeFromSetters(test.setters, test.path)
+			if test.errMsg == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+				assert.Equal(t, test.errMsg, err.Error())
+				return
+			}
+			actual, err := res.String()
+			assert.NoError(t, err)
+			if !assert.Equal(t, test.expected, actual) {
+				t.FailNow()
+			}
+		})
+	}
 }
