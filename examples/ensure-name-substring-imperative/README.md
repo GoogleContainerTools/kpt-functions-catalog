@@ -18,7 +18,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval ensure-name-substring-imperative --image gcr.io/kpt-fn/ensure-name-substring:v0.1 -- prepend=prod
+$ kpt fn eval ensure-name-substring-imperative --image gcr.io/kpt-fn/ensure-name-substring:v0.1 -- prepend=prod-
 ```
 
 The key-value pair(s) provided after `--` will be converted to `ConfigMap` by

@@ -34,8 +34,10 @@ pipeline:
         list: '[dev, stage]'
         namespace: some-space
         tag: 1.14.1
+    - image: gcr.io/kpt-fn/set-annotations:v0.1
+      configPath: my-annotations.yaml
     - image: gcr.io/kpt-fn/set-labels:v0.1
-      configPath: fn-config.yaml
+      configPath: set-labels.yaml
 inventory:
   namespace: some-space
   name: inventory-00933591
