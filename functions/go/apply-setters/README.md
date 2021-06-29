@@ -9,10 +9,10 @@ Update the field values parameterized by setters.
 #### Definitions
 
 **Setters**: Setters serve as parameters for customizing field values.
-Setters are a safer way to parameterize field values because, the resource is 
-still valid, adhering to the KRM schema. Whereas, with other types of 
-templating tools, the resource no longer adheres to KRM schema and 
-cannot be easily consumed by other tools.
+Setters are a safer way to parameterize field values compared to common templating techniques.
+By using comments instead of interleaving templating directives, the resource is still
+valid, adheres to the KRM schema, and can be consumed by other tools. 
+
 
 **Setter Name**: Name of the parameter.
 
