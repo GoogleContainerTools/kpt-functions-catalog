@@ -1,6 +1,6 @@
 # set-namespace
 
-### Overview
+## Overview
 
 <!--mdtogo:Short-->
 
@@ -19,7 +19,7 @@ You can learn more about namespace [here][namespace].
 
 <!--mdtogo:Long-->
 
-### Usage
+## Usage
 
 This function can be used with any KRM function orchestrators (e.g. kpt).
 

@@ -1,7 +1,7 @@
 FROM node:14.15-alpine3.13 as builder
 
 ARG KUBEVAL_VERSION="v0.16.1"
-RUN apk add curl && \
+RUN apk update && apk add curl && \
     curl -sSLf https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_VERSION}/kubeval-linux-amd64.tar.gz | \
     tar xzf - -C /usr/local/bin
 

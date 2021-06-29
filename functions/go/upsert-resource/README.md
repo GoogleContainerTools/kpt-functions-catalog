@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Upsert a resource to the input list of resources.
+Insert a resource, or if the resource already exists, update the existing resource.
 
 <!--mdtogo-->
 
