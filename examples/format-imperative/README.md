@@ -11,7 +11,6 @@ Get the example package by running the following commands:
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/format-imperative@format/v0.1
 ```
 
-The `format` function formats the field ordering in YAML configuration files.
 This example depicts the functionality of `format` function by formatting a
 `Deployment` resource.
 
@@ -28,3 +27,6 @@ $ kpt fn eval format-imperative --image gcr.io/kpt-fn/format:v0.1
 The fields should be ordered as per OpenAPI schema definition of `Deployment`
 resource. For e.g. `metadata.name` field is placed before `metadata.labels`
 field. The keys in `metadata.labels` field are sorted alphabetically.
+
+
+[format]: https://catalog.kpt.dev/format/v0.1/
