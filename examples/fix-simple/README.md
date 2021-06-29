@@ -83,7 +83,7 @@ info:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
-      configPath: setters-config.yaml
+      configPath: setters.yaml
 ```
 
 The transformed package is compatible with kpt 1.0 binary.
