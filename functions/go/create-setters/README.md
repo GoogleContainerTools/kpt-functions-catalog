@@ -84,7 +84,7 @@ data:
   tag: 1.16.1
 ```
 
-Invoke the function using the input config:
+Invoke the function:
 
 ```shell
 $ kpt fn eval --image gcr.io/kpt-fn/create-setters:unstable --fn-config ./create-setters-fn-config.yaml

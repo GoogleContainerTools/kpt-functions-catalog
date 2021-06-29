@@ -41,12 +41,8 @@ $ kpt fn render create-setters-simple
 
 ### Expected result
 
-`Setter comment` is added to the resource with the `Value` given below as they match the `Setter`.
-
-| Setter                                    | Value                        | Setter comment                               |
-|--------------------------------------------|------------------------------|---------------------------------------|
-| <pre>nginx-replicas: "4"</pre>  | <pre>4</pre>            | `# kpt-set: ${nginx-replicas}`                 |
-| <pre>tag: 1.16.1</pre>        | <pre>nginx:1.16.1</pre>       | `# kpt-set: nginx:${tag}`            |
-| <pre>env: <br>  - dev<br>  - stage</pre>  | <pre>- dev<br>- stage</pre>    | `# kpt-set: ${env}`                  |
+1. Check the setter comment `kpt-set: ${nginx-replicas}` is added to `replicas` field value `4` in `Deployment` resource.
+2. Check the setter comment `kpt-set: nginx:${tag}` is added to `image` field value `nginx:1.16.1` in `Deployment` resource.
+3. Check the setter comment `kpt-set: ${env}` is added to `environment` field in `MyKind` resource.
 
 [setter]: https://catalog.kpt.dev/apply-setters/v0.1/?id=setters-definition

@@ -6,27 +6,23 @@
 
 Update the field values parameterized by setters.
 
-##### Setters Definition
+#### Definitions
 
-Setters serve as parameters for customizing field values.
-Setters are a safer alternative to parameterize field 
-values as they have the context of the structured data.
+**Setters**: Setters serve as parameters for customizing field values.
+Setters are a safer option to parameterize field values as they have 
+the context of the structured data.
 
-##### Setter Name: 
+**Setter Name**: Name of the parameter.
 
-Name of the parameter.
+**Setter Value**: Value of the parameter.
 
-##### Setter Value
-
-Value of the parameter.
-
-##### Setter Comment
-
-A field value can be fully or partially parameterized using setter comments.
+**Setter Comment**: A field value can be fully or partially parameterized using setter comments.
 A setter comment can be derived by replacing all the instances of setter values 
 in the field value, with the corresponding setter names along with 'kpt-set:' prefix.
 
+```shell
 e.g. image: gcr.io/nginx:1.16.1 # kpt-set: gcr.io/${image}:${tag}
+```
 
 <!--mdtogo-->
 
@@ -86,7 +82,7 @@ spec:
           containerPort: 80
 ```
 
-Declare the new desired values for setters in the function config file.
+Declare the new desired values for setters in the functionConfig file.
 
 ```yaml
 # apply-setters-fn-config.yaml
@@ -99,7 +95,7 @@ data:
   tag: 1.16.2
 ```
 
-Invoke the function using the input config:
+Invoke the function:
 
 ```shell
 $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config

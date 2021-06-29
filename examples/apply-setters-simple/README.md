@@ -33,7 +33,7 @@ data:
 
 ### Function invocation
 
-Invoke the function by running the following commands:
+Invoke the function by running the following command:
 
 ```shell
 $ kpt fn render apply-setters-simple
