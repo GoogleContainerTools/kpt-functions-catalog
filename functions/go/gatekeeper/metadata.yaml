@@ -4,6 +4,7 @@ tags:
   - validator
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/gatekeeper
 examplePackageURLs:
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/gatekeeper-no-root
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/gatekeeper-invalid-configmap
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/gatekeeper-warning-only
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/gatekeeper-imperative

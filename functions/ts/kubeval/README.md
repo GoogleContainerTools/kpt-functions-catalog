@@ -1,9 +1,23 @@
 # kubeval
 
-### Overview
+## Overview
 
 The `kubeval` function wraps the [`kubeval`] binary to validate KRM resources
 against their [json schemas].
+
+This function is often used in the following scenarios:
+
+- Validating KRM resources as part of the local development workflow.
+- Validating KRM resources in CI.
+
+## Usage
+
+This function validates each KRM resource using its json schema. If the json
+schema is not available for a KRM resource, the function will complain unless
+the `ignore_missing_schemas` field is `true` or the kind of this resource
+appears in the `skip_kinds` field.
+
+This function can be used both declaratively and imperatively.
 
 ### FunctionConfig
 
