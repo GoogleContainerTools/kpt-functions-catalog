@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters
+data:
+  env: |-
+    - prod
+    - dev
+  nginx-replicas: "3"
+  tag: 1.16.2
