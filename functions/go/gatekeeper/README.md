@@ -1,6 +1,6 @@
 # gatekeeper
 
-### Overview
+## Overview
 
 <!--mdtogo:Short-->
 
@@ -14,6 +14,8 @@ For example, you can enforce policies like:
 - All `pods` must have resource limits
 - All `namespaces` must have a label that lists a point-of-contact
 
+The `gatekeeper` function follows the [executable configuration] pattern.
+
 <!--mdtogo-->
 
 You can learn more about how to use the [`Gatekeeper`] project [here][howto].
@@ -22,11 +24,12 @@ more about it [here][concept].
 
 <!--mdtogo:Long-->
 
-### Authoring Policies
+## Usage
 
-The `gatekeeper` function follows the [executable configuration] pattern. There
-are 2 kinds of resources needed to define a policy and they need to be provided
-using `input items` along with other KRM resources to be validated.
+This function can be used both declaratively and imperatively.
+
+There are 2 kinds of resources needed to define a policy, and they need to be
+provided using `input items` along with other KRM resources to be validated.
 
 - [Constraint Template]: Define the schema and logic of a policy. The policy
   logic in a Constraint Template must be written in the [Rego] language.
@@ -36,52 +39,56 @@ using `input items` along with other KRM resources to be validated.
 The constraint templates and the constraints resources should be in the same
 package containing the KRM resources.
 
-The following is a `ConstraintTemplate` and a `Constraint`:
+The following is a `ConstraintTemplate`:
 
 ```yaml
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: k8sbannedconfigmapkeysv1
+  name: noroot
 spec:
   crd:
     spec:
       names:
-        kind: K8sBannedConfigMapKeysV1
-        validation:
-          openAPIV3Schema:
-            properties:
-              keys:
-                type: array
-                items:
-                  type: string
+        kind: NoRoot
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |-
-        package ban_keys
-
-        violation[{"msg": sprintf("%v", [val])}] {
-          keys = {key | input.review.object.data[key]}
-          banned = {key | input.parameters.keys[_] = key}
-          overlap = keys & banned
-          count(overlap) > 0
-          val := sprintf("The following banned keys are being used in the ConfigMap: %v", [overlap])
+        package noroot
+        violation[{"msg": msg}] {
+          not input.review.object.spec.template.spec.securityContext.runAsNonRoot
+          msg := "Containers must not run as root"
         }
----
+```
+
+This is a simple example of `ConstraintTemplate`, it contains several important
+pieces:
+
+- `targets`: What "target" the constraint applies to. You can learn more
+  about "target" [here][target].
+- `rego`: The logic that enforces the constraint.
+
+You can learn more about `ConstraintTemplate` [here][GHConstraintTemplate]. You will find
+
+- other fields commonly used in a `ConstraintTemplate` such as `validation`
+  and `libs`.
+- more detailed Rego semantics for defining your policies.
+
+The following is a `Constraint` that instantiates the `ConstraintTemplate`
+above.
+
+```yaml
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sBannedConfigMapKeysV1
+kind: NoRoot
 metadata:
-  name: no-secrets-in-configmap
+  name: noroot
 spec:
   match:
     kinds:
       - apiGroups:
-          - ''
+          - 'apps'
         kinds:
-          - ConfigMap
-  parameters:
-    keys:
-      - private_key
+          - Deployment
 ```
 
 <!--mdtogo-->
@@ -97,3 +104,7 @@ spec:
 [howto]: https://open-policy-agent.github.io/gatekeeper/website/docs/howto
 
 [concept]: https://github.com/open-policy-agent/frameworks/tree/master/constraint#opa-constraint-framework
+
+[target]: https://github.com/open-policy-agent/frameworks/tree/master/constraint#what-is-a-target
+
+[GHConstraintTemplate]: https://github.com/open-policy-agent/frameworks/tree/master/constraint#what-is-a-constraint-template
