@@ -1,5 +1,5 @@
 image: gcr.io/kpt-fn/format
-description: Format resources in a directory.
+description: Format resources by sorting fields, fixing indentation and quoting ambiguous string values.
 tags:
   - mutator
   - formatter
