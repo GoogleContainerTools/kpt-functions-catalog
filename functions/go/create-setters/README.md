@@ -189,4 +189,4 @@ Explanation for the changes:
 Here, the comment is added to the `environments` field as it is an array node, and the intent is to paremeterize entire array.
 <!--mdtogo-->
 
-[setters]: https://catalog.kpt.dev/apply-setters/v0.1/?id=setters-definition
+[setter]: https://catalog.kpt.dev/apply-setters/v0.1/?id=setters-definition

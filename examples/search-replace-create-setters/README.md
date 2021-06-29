@@ -1,7 +1,7 @@
 # search-replace: Create Setters Example
 
 The `search-replace` function can also be used to search for fields using available matchers
-and add setter patterns as line comments in the resources. Please refer to [create-setters] 
+and add [setter comments] to the resource fields. Please refer to [create-setters] 
 documentation to create setters for simple use-cases. This is an advanced example
 of creating fine-grained setter comments using path expressions, regex capture groups etc.
 
@@ -63,3 +63,4 @@ Please refer to [apply-setters] documentation for information about applying des
 [setters]: https://catalog.kpt.dev/apply-setters/v0.1/
 [apply-setters]: https://catalog.kpt.dev/apply-setters/v0.1/
 [create-setters]: https://catalog.kpt.dev/create-setters/v0.1/
+[setter comments]: https://catalog.kpt.dev/apply-setters/v0.1/?id=setter-comment
