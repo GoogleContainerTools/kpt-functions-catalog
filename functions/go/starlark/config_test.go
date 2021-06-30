@@ -33,7 +33,7 @@ source: |
       resource["metadata"]["namespace"] = ns_value
   run(ctx.resource_list["items"], "baz")
 `,
-			expectErrMsg: "`metadata.name` must be set in starlark function config",
+			expectErrMsg: "`metadata.name` must be set in the starlark `functionConfig`",
 		},
 		{
 			config: `apiVersion: fn.kpt.dev/v1alpha1
@@ -41,16 +41,59 @@ kind: StarlarkRun
 metadata:
   name: my-star-fn
 `,
-			expectErrMsg: "`source` must not be empty",
+			expectErrMsg: "`source` in `StarlarkRun` must not be empty",
+		},
+		{
+			config: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-star-fn
+data:
+  source: |
+    def run(r, ns_value):
+      for resource in r:
+        resource["metadata"]["namespace"] = ns_value
+    run(ctx.resource_list["items"], "baz")
+`,
+		},
+		{
+			config: `apiVersion: v1
+kind: ConfigMap
+data:
+  source: |
+    def run(r, ns_value):
+      for resource in r:
+        resource["metadata"]["namespace"] = ns_value
+    run(ctx.resource_list["items"], "baz")
+`,
+			expectErrMsg: "`metadata.name` must be set in the starlark `functionConfig`",
+		},
+		{
+			config: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-star-fn
+`,
+			expectErrMsg: "`data.source` must not be empty in `ConfigMap`",
+		},
+		{
+			config: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-star-fn
+data:
+  param1: foo
+`,
+			expectErrMsg: "`data.source` must not be empty in `ConfigMap`",
 		},
 	}
 	for _, tc := range testcases {
-		var sf StarlarkRun
-		if err := yaml.Unmarshal([]byte(tc.config), &sf); err != nil {
+		var sfc StarlarkFnConfig
+		if err := yaml.Unmarshal([]byte(tc.config), &sfc); err != nil {
 			t.Errorf("unexpcted error: %v", err)
 			continue
 		}
-		err := sf.Validate()
+		err := sfc.Validate()
 		switch {
 		case err != nil && tc.expectErrMsg == "":
 			t.Errorf("unexpected error: %v", err)
