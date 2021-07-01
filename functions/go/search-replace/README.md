@@ -4,23 +4,24 @@
 
 <!--mdtogo:Short-->
 
-Search and optionally replace fields across all resources.
+Search and optionally replace field values.
+
+There is a spectrum of configuration customization techniques as described in
+[this document]. One of the most basic and simplest customization techniques is Search and Replace.
+The user fetches a package of resources, searches all the files for fields matching
+a criteria, and replaces their values.
 
 <!--mdtogo-->
 
 ### FunctionConfig
 
-There is a spectrum of configuration customization techniques as described in
-[this document].
-
 <!--mdtogo:Long-->
 
-One of the most basic and simplest customization techniques is Search and Replace.
-The user fetches a package of resources, searches all the files for fields matching
-a criteria, and replaces their values.
-
 Search matchers are provided with `by-` prefix. When multiple matchers
-are provided they are AND’ed together. `put-` matchers are mutually exclusive.
+are provided they are AND’ed together.
+
+Mutators are provided with `put-` prefix. When multiple mutators
+are provided they are all applied.
 
 #### Matchers
 
@@ -44,7 +45,11 @@ by-file-path
 Match by file path expression. Input must be OS-agnostic Slash(/) separated file path
 relative to the directory on which the function is invoked. Please note that the
 file path expressions are not regular expressions.
+```
 
+#### Mutators
+
+```
 put-value
 Set or update the value of the matching fields. Input can be a pattern for which
 the numbered capture groups are resolved using --by-value-regex input.

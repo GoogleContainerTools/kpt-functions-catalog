@@ -1,5 +1,5 @@
 image: gcr.io/kpt-fn/search-replace
-description: Search and optionally replace fields across all resources.
+description: Search and optionally replace field values.
 tags:
   - mutator
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/search-replace
