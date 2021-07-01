@@ -1,13 +1,3 @@
-diff --git a/resources.yaml b/resources.yaml
-index 5ed432d..aafcb55 100644
---- a/resources.yaml
-+++ b/resources.yaml
-@@ -3,4 +3,4 @@ kind: Project
- metadata:
-   name: project-id
- spec:
--  project-id: project-id # kpt-set: ${project-id}
-+  project-id: new-project # kpt-set: ${project-id}
 diff --git a/setters.yaml b/setters.yaml
 index d9e8e53..56fcfb2 100644
 --- a/setters.yaml
@@ -18,16 +8,6 @@ index d9e8e53..56fcfb2 100644
  data:
 -  project-id: project-id
 +  project-id: new-project
-diff --git a/subpkg/resources.yaml b/subpkg/resources.yaml
-index 5ed432d..aafcb55 100644
---- a/subpkg/resources.yaml
-+++ b/subpkg/resources.yaml
-@@ -3,4 +3,4 @@ kind: Project
- metadata:
-   name: project-id
- spec:
--  project-id: project-id # kpt-set: ${project-id}
-+  project-id: new-project # kpt-set: ${project-id}
 diff --git a/subpkg/setters.yaml b/subpkg/setters.yaml
 index d9e8e53..56fcfb2 100644
 --- a/subpkg/setters.yaml
