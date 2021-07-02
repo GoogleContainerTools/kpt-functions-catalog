@@ -22,6 +22,8 @@ const (
 	configMapKind       fnConfigKind = "ConfigMap"
 
 	sourceKey = "source"
+
+	defaultProgramName = "stalark-function-run"
 )
 
 type fnConfigKind string
@@ -62,6 +64,25 @@ type StarlarkRun struct {
 	Params map[string]interface{} `json:"params,omitempty" yaml:"params,omitempty"`
 }
 
+var _ framework.Defaulter = &StarlarkFnConfig{}
+
+func (sfc *StarlarkFnConfig) Default() error {
+	switch sfc.kind {
+	case configMapKind:
+		if sfc.configMap.Name == "" {
+			sfc.configMap.Name = defaultProgramName
+		}
+		return nil
+	case starlarkRunKind:
+		if sfc.starlarkRun.Name == "" {
+			sfc.starlarkRun.Name = defaultProgramName
+		}
+		return nil
+	default:
+		return fmt.Errorf("unknown `functionConfig` kind: %v", sfc.kind)
+	}
+}
+
 var _ framework.Validator = &StarlarkFnConfig{}
 
 func (sfc *StarlarkFnConfig) Validate() error {
@@ -82,9 +103,6 @@ func validateConfigMap(cm *corev1.ConfigMap) error {
 	if cm.Kind != string(configMapKind) {
 		return fmt.Errorf("`kind` must be: %q when using `ConfigMap` as the `functionConfig`, but got %q", configMapKind, cm.Kind)
 	}
-	if cm.Name == "" {
-		return fmt.Errorf("`metadata.name` must be set in the starlark `functionConfig`")
-	}
 	if cm.Data == nil {
 		return fmt.Errorf("`data.source` must not be empty in `ConfigMap`")
 	}
@@ -100,9 +118,6 @@ func validateStarlarkRun(sr *StarlarkRun) error {
 	}
 	if sr.Kind != string(starlarkRunKind) {
 		return fmt.Errorf("`kind` must be: %q when using `StarlarkRun` as the `functionConfig`, but got %q", starlarkRunKind, sr.Kind)
-	}
-	if sr.Name == "" {
-		return fmt.Errorf("`metadata.name` must be set in the starlark `functionConfig`")
 	}
 	if sr.Source == "" {
 		return fmt.Errorf("`source` in `StarlarkRun` must not be empty")

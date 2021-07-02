@@ -27,17 +27,6 @@ source: |
 		{
 			config: `apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
-source: |
-  def run(r, ns_value):
-    for resource in r:
-      resource["metadata"]["namespace"] = ns_value
-  run(ctx.resource_list["items"], "baz")
-`,
-			expectErrMsg: "`metadata.name` must be set in the starlark `functionConfig`",
-		},
-		{
-			config: `apiVersion: fn.kpt.dev/v1alpha1
-kind: StarlarkRun
 metadata:
   name: my-star-fn
 `,
@@ -55,18 +44,6 @@ data:
         resource["metadata"]["namespace"] = ns_value
     run(ctx.resource_list["items"], "baz")
 `,
-		},
-		{
-			config: `apiVersion: v1
-kind: ConfigMap
-data:
-  source: |
-    def run(r, ns_value):
-      for resource in r:
-        resource["metadata"]["namespace"] = ns_value
-    run(ctx.resource_list["items"], "baz")
-`,
-			expectErrMsg: "`metadata.name` must be set in the starlark `functionConfig`",
 		},
 		{
 			config: `apiVersion: v1
