@@ -3,8 +3,9 @@
 ### Overview
 
 In this example, we are going to demonstrate how to declaratively run the
-[`starlark`] function with an inline starlark script as function configuration
-to create a `PodDisruptionBudget` object for the `Deployment`.
+[`starlark`] function with `StarlarkRun` as the `functionConfig`. And we will
+show how to access a parameter with complex data structure in
+the `functionConfig` and use it in the script.
 
 ### Fetch the example package
 
@@ -18,6 +19,7 @@ We are going to use the following `Kptfile` and `fn-config.yaml` to configure
 the function:
 
 ```yaml
+# Kptfile
 apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
@@ -34,35 +36,34 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
   name: pdb-for-depl
+params:
+  pdb:
+    apiVersion: policy/v1beta1
+    kind: PodDisruptionBudget
+    metadata:
+      name: nginx-pdb
+    spec:
+      selector:
+        matchLabels:
+          app: nginx
+      minAvailable: 1
 source: |
-  pdb = {
-    "apiVersion": "policy/v1beta1",
-    "kind": "PodDisruptionBudget",
-    "metadata": {
-      "name": "nginx-pdb",
-    },
-    "spec": {
-      "minAvailable": 1,
-      "selector": {
-        "matchLabels": {
-          "app": "nginx",
-        },
-      },
-    },
-  }
   def is_pdb(r):
     return r["apiVersion"] == "policy/v1beta1" and r["kind"] == "PodDisruptionBudget" and r["metadata"]["name"] == "nginx-pdb"
-  def ensure_pdb(resources):
+  def ensure_pdb(resources, pdb):
     for resource in resources:
       if is_pdb(resource):
         return
     resources.append(pdb)
-  ensure_pdb(ctx.resource_list["items"])
+  pdb = ctx.resource_list["functionConfig"]["params"]["pdb"]
+  ensure_pdb(ctx.resource_list["items"], pdb)
 ```
 
-The Starlark script is embedded in the `source` field. This script reads the
-input KRM resources from `ctx.resource_list` and ensures there is a
-`PodDisruptionBudget` object for the nginx `Deployment`.
+The Starlark script lives in the `source` field. This script reads the input
+resources from `ctx.resource_list` and the `PodDisruptionBudget` resource
+from `ctx.resource_list["functionConfig"]["params"]["pdb"]`. It will ensure
+there is a `PodDisruptionBudget` resource for the nginx `Deployment`. If not, it
+will create it with the `PodDisruptionBudget` resource provided in `params`. 
 
 ### Function invocation
 
