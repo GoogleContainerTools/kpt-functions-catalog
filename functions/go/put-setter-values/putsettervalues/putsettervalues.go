@@ -19,9 +19,6 @@ type PutSetterValues struct {
 
 	// Results are the results of putting setter values
 	Results []*Result
-
-	// filePath file path of resource
-	filePath string
 }
 
 type Setter struct {
