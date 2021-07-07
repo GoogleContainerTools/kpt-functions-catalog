@@ -22,26 +22,26 @@ Note: We do NOT support the `latest` tag, since we cannot provide any
 compatibility guarantee for it, and the pipeline won’t produce deterministic
 results.
 
-## Interfaces
+## User-facing Surfaces
 
 All functions in the catalog comply with the [function spec]. To learn more
 about the functions concept,
 see [here](http://kpt.dev/book/02-concepts/03-functions).
 
-There are 2 interfaces for a function:
+There are 2 user-facing surfaces for a function:
 
 - The `functionConfig`
 - The function itself
 
-### functionConfig as an interface
+### functionConfig Surface
 
 A `functionConfig` can be either a core resource (e.g. `ConfigMap`) or a custom
 resource. If the `functionConfig` is a CRD, it can be versioned independently as
 a normal CRD.
 
-### Function as an interface
+### Function Surface
 
-#### What are NOT part of the function interface
+#### What are NOT part of the function surface
 
 - The formatting of serialization for output items and results. e.g. yaml
   indentation and order of fields in a map.
@@ -49,7 +49,7 @@ a normal CRD.
 - The order of result items in the results.
 - The content of the unstructured messages in the results.
 
-#### What are part of the function interface
+#### What are part of the function surface
 
 - The supported fields in the ConfigMap as the `functionConfig`.
 - The supported versions of the CRD `functionConfigs`.
@@ -63,7 +63,7 @@ a normal CRD.
 
 We define a breaking change as: For any given input (including `input items`,
 `functionConfig` and OpenAPI), the function produces a different output
-(including output items, results) that are part of the interface.
+(including output items, results) that are part of the user-facing surface.
 
 ### Backwards Compatibility
 
