@@ -1,0 +1,3 @@
+runCount: 2
+exitCode: 1
+stdErr: 'failed to put setter values: "apply-setters" function declaration not found, please add "apply-setters" function to the list of mutators in the Kptfile and retry'
