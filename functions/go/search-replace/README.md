@@ -87,7 +87,12 @@ $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=metadata
 
 ### Field path patterns
 
-`--by-path` matcher supports the following patterns:
+`by-path` matcher supports the following patterns:
+
+| Special Terms | Meaning                     |
+| ------------- | --------------------------- |
+| `*`           | matches exactly one field   |
+| `**`          | matches zero or more fields |
 
 ```yaml
 a.b.c
@@ -156,19 +161,18 @@ a:
 
 ### File path patterns
 
-`--by-file-path` matcher supports the following special terms in the patterns:
+`by-file-path` matcher supports the following special terms in the patterns:
 
 | Special Terms | Meaning                                                                                                   |
 | ------------- | --------------------------------------------------------------------------------------------------------- |
 | `*`           | matches any sequence of non-path-separators                                                               |
-| `/**/`        | matches zero or more directories                                                                          |
+| `**`          | matches zero or more directories                                                                          |
 | `?`           | matches any single non-path-separator character                                                           |
 | `[class]`     | matches any single non-path-separator character against a class of characters ([see "character classes"]) |
 | `{alt1,...}`  | matches a sequence of characters if one of the comma-separated alternatives matches                       |
 
 Any character with a special meaning can be escaped with a backslash (`\`).
 
-A doublestar (`**`) should appear surrounded by path separators such as `/**/`.
 A mid-pattern doublestar (`**`) behaves like bash's globstar option: a pattern
 such as `path/to/**.txt` would return the same results as `path/to/*.txt`. The
 pattern you're looking for is `path/to/**/*.txt`.
@@ -183,6 +187,43 @@ Character classes support the following:
 | `[a-z]`    | matches any single character in the range                     |
 | `[^class]` | matches any single character which does _not_ match the class |
 | `[!class]` | same as `^`: negates the class                                |
+
+```shell
+**/baz.yaml
+
+foo/bar/baz.yaml # Matches
+bar/baz.yaml # Matches
+baz.yaml # Matches
+foo/bar/bat.yaml
+```
+
+```shell
+foo/**/baz.yaml
+
+foo/bar/baz.yaml # Matches
+bar/baz.yaml
+baz.yaml
+foo/bar/bor/baz.yaml # Matches
+```
+
+```shell
+foo/*/baz.yaml
+
+foo/bar/baz.yaml # Matches
+bar/baz.yaml
+baz.yaml
+foo/bar/bat.yaml
+foo/bar/bor/bat.yaml
+```
+
+```shell
+foo/bar/*.yaml
+
+foo/bar/baz.yaml # Matches
+foo/bar/bat.yaml # Matches
+bar/baz.yaml
+baz.yaml
+```
 
 <!--mdtogo-->
 
