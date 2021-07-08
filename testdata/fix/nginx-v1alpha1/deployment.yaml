@@ -18,3 +18,6 @@ spec:
       env: # {"$kpt-set":"list"}
         - dev
         - stage
+      clusters: # {"$ref":"#/definitions/io.k8s.cli.clusters"}
+        - cluster1
+        - cluster2

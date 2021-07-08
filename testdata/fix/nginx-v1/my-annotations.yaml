@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: my-config
+  name: my-annotations
   annotations:
     config.kubernetes.io/local-config: "true"
 data:
-  anno1: foo
-  anno2: bar
+  anno1: annoval1
+  anno2: annoval2
