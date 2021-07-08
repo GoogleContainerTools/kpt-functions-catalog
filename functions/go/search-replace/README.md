@@ -4,23 +4,24 @@
 
 <!--mdtogo:Short-->
 
-Search and optionally replace fields across all resources.
+Search and optionally replace field values.
+
+There is a spectrum of configuration customization techniques as described in
+[this document]. One of the most basic and simplest customization techniques is Search and Replace.
+The user fetches a package of resources, searches all the files for fields matching
+a criteria, and replaces their values.
 
 <!--mdtogo-->
 
 ### FunctionConfig
 
-There is a spectrum of configuration customization techniques as described in
-[this document].
-
 <!--mdtogo:Long-->
 
-One of the most basic and simplest customization techniques is Search and Replace.
-The user fetches a package of resources, searches all the files for fields matching
-a criteria, and replaces their values.
-
 Search matchers are provided with `by-` prefix. When multiple matchers
-are provided they are AND’ed together. `put-` matchers are mutually exclusive.
+are provided they are AND’ed together.
+
+Mutators are provided with `put-` prefix. When multiple mutators
+are provided they are all applied.
 
 #### Matchers
 
@@ -37,9 +38,18 @@ value of the field by default without requiring start (^) and end ($) characters
 
 by-path
 Match by path expression of a field. Path expressions are used to deeply navigate
-and match particular yaml nodes. Please note that the path expressions are not
+and match particular yaml nodes. Please note that the field path expressions are not
 regular expressions.
 
+by-file-path
+Match by file path expression. Input must be OS-agnostic Slash(/) separated file path
+relative to the directory on which the function is invoked. Please note that the
+file path expressions are not regular expressions.
+```
+
+#### Mutators
+
+```
 put-value
 Set or update the value of the matching fields. Input can be a pattern for which
 the numbered capture groups are resolved using --by-value-regex input.
@@ -75,7 +85,14 @@ Alternatively, data can be passed as key-value pairs in the CLI
 $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- 'by-path=metadata.name' 'put-value=the-deployment'
 ```
 
-Supported Path expressions:
+### Field path patterns
+
+`by-path` matcher supports the following patterns:
+
+| Special Terms | Meaning                     |
+| ------------- | --------------------------- |
+| `*`           | matches exactly one field   |
+| `**`          | matches zero or more fields |
 
 ```yaml
 a.b.c
@@ -142,6 +159,72 @@ a:
     f: thingamabob
 ```
 
+### File path patterns
+
+`by-file-path` matcher supports the following special terms in the patterns:
+
+| Special Terms | Meaning                                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------------------------- |
+| `*`           | matches any sequence of non-path-separators                                                               |
+| `**`          | matches zero or more directories                                                                          |
+| `?`           | matches any single non-path-separator character                                                           |
+| `[class]`     | matches any single non-path-separator character against a class of characters ([see "character classes"]) |
+| `{alt1,...}`  | matches a sequence of characters if one of the comma-separated alternatives matches                       |
+
+Any character with a special meaning can be escaped with a backslash (`\`).
+
+A mid-pattern doublestar (`**`) behaves like bash's globstar option: a pattern
+such as `path/to/**.txt` would return the same results as `path/to/*.txt`. The
+pattern you're looking for is `path/to/**/*.txt`.
+
+#### Character Classes
+
+Character classes support the following:
+
+| Class      | Meaning                                                       |
+| ---------- | ------------------------------------------------------------- |
+| `[abc]`    | matches any single character within the set                   |
+| `[a-z]`    | matches any single character in the range                     |
+| `[^class]` | matches any single character which does _not_ match the class |
+| `[!class]` | same as `^`: negates the class                                |
+
+```shell
+**/baz.yaml
+
+foo/bar/baz.yaml # Matches
+bar/baz.yaml # Matches
+baz.yaml # Matches
+foo/bar/bat.yaml
+```
+
+```shell
+foo/**/baz.yaml
+
+foo/bar/baz.yaml # Matches
+bar/baz.yaml
+baz.yaml
+foo/bar/bor/baz.yaml # Matches
+```
+
+```shell
+foo/*/baz.yaml
+
+foo/bar/baz.yaml # Matches
+bar/baz.yaml
+baz.yaml
+foo/bar/bat.yaml
+foo/bar/bor/bat.yaml
+```
+
+```shell
+foo/bar/*.yaml
+
+foo/bar/baz.yaml # Matches
+foo/bar/bat.yaml # Matches
+bar/baz.yaml
+baz.yaml
+```
+
 <!--mdtogo-->
 
 ### Examples
@@ -174,6 +257,12 @@ $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-path='metadata
 ```
 
 ```shell
+# Update the setter value "project-id" to value "new-project" in all "setters.yaml" files in the current directory tree:
+kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable --include-meta-resources -- \
+by-value=project-id by-file-path='**/setters.yaml' put-value=new-project
+```
+
+```shell
 # Search and Set multiple values using regex numbered capture groups
 $ kpt fn eval --image gcr.io/kpt-fn/search-replace:unstable -- by-value-regex='something-(.*)' put-value='my-project-id-${1}'
 metadata:
@@ -203,3 +292,4 @@ metadata:
 <!--mdtogo-->
 
 [this document]: https://github.com/kubernetes/community/blob/master/contributors/design-proposals/architecture/declarative-application-management.md#declarative-configuration
+[see "character classes"]: #character-classes

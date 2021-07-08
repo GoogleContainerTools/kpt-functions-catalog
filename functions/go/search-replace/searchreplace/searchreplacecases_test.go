@@ -728,7 +728,7 @@ spec:
 		errMsg: `only one of ["by-value", "by-value-regex"] can be provided`,
 	},
 	{
-		name: "error when none of the search matchers are provided",
+		name: "do not error when none of the search matchers are provided",
 		config: `
 data: ~
 `,
@@ -748,10 +748,11 @@ metadata:
 spec:
   replicas: 3
  `,
-		errMsg: `at least one of ["by-value", "by-value-regex", "by-path"] must be provided`,
+		out: `Matched 0 field(s)
+`,
 	},
 	{
-		name: "error when none of the required search matchers are provided",
+		name: "do not error when none of the required search matchers are provided",
 		config: `
 data:
   put-value: foo
@@ -772,6 +773,7 @@ metadata:
 spec:
   replicas: 3
  `,
-		errMsg: `at least one of ["by-value", "by-value-regex", "by-path"] must be provided`,
+		out: `Mutated 0 field(s)
+`,
 	},
 }

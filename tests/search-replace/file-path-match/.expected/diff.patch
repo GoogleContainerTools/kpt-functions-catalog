@@ -1,0 +1,20 @@
+diff --git a/setters.yaml b/setters.yaml
+index d9e8e53..56fcfb2 100644
+--- a/setters.yaml
++++ b/setters.yaml
+@@ -3,4 +3,4 @@ kind: ConfigMap
+ metadata:
+   name: setters
+ data:
+-  project-id: project-id
++  project-id: new-project
+diff --git a/subpkg/setters.yaml b/subpkg/setters.yaml
+index d9e8e53..56fcfb2 100644
+--- a/subpkg/setters.yaml
++++ b/subpkg/setters.yaml
+@@ -3,4 +3,4 @@ kind: ConfigMap
+ metadata:
+   name: setters
+ data:
+-  project-id: project-id
++  project-id: new-project
