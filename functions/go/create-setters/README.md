@@ -4,12 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Add setter comments to resource fields. Setters serve as parameters 
-for template-free setting of comments.
-
-Setters are a safer alternative to other substitution techniques which do not
-have the context of the structured data. Setter comments can be added to
-parameterize the field values of resources using this function.
+Parameterize the field values by adding [setter] comments.
 
 <!--mdtogo-->
 
@@ -17,10 +12,9 @@ parameterize the field values of resources using this function.
 
 <!--mdtogo:Long-->
 
-We use `ConfigMap` to configure the `create-setters` function. The desired setter
-values are provided as key-value pairs using `data` field.
-Here, the key is the name of the setter which is used to set the comment and
-value is the field value to parameterize.
+We use `ConfigMap` to configure the `create-setters` function. Setters information
+is provided as key-value pairs using `data` field.
+Here, the key is the name of the setter, and value is the field value to be parameterized.
 
 ```yaml
 apiVersion: v1
@@ -32,6 +26,17 @@ data:
   setter_name2: setter_value2
 ```
 
+`create-setters` function performs the following steps:
+1. Segregates the input setters into scalar-setters and array-setters.
+2. Searches for the resource field values to be parameterized.
+3. Checks if there is any match considering the following cases.,
+   - For a scalar node, performs substring match with scalar setters.
+   - For an array node, checks if all values match with any of the array setters.
+4. Adds comments to the fields matching the setter values using setter names as parameters.
+
+>? If this function adds setter comments to the fields for which you didn't intend to parameterize,
+you can simply review and delete/modify those comments manually.
+
 <!--mdtogo-->
 
 ?> If this function adds setter comments to fields for which you didn't intend 
@@ -41,63 +46,106 @@ to parameterize, you can simply review and delete/modify those comments manually
 
 <!--mdtogo:Examples-->
 
-#### Setting comment for scalar values
+### Setting comments for scalar nodes
 
 Let's start with the input resource in a package
 
 ```yaml
-apiVersion: v1
+# resources.yaml
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubuntu-deployment 
+   name: my-nginx
 spec:
-  replicas: 3 
+   replicas: 4
+   selector:
+      matchLabels:
+         app: nginx
+   template:
+      metadata:
+         labels:
+            app: nginx
+      spec:
+         containers:
+         - name: nginx
+           image: "nginx:1.16.1"
+           ports:
+           - protocol: TCP
+             containerPort: 80
 ```
 
-Declare the name of the setter with the value for which comments should be added.
+Declare the name of the setter with the value which need to be parameterized.
 
 ```yaml
+# create-setters-fn-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: create-setters-fn-config
 data:
-  image: ubuntu
-  replicas: "3"
+  nginx-replicas: "4"
+  tag: 1.16.1
 ```
 
-Render the declared values by invoking:
+Invoke the function:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config.yaml
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 -- image=ubuntu replicas=3
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 -- replicas=4 tag=1.1.2
 ```
 
-Rendered resource looks like the following:
+Modified resource looks like the following:
 
 ```yaml
-apiVersion: v1
+# resources.yaml
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubuntu-deployment # kpt-set: ${image}-deployment
+   name: my-nginx
 spec:
-  replicas: 3 # kpt-set: ${replicas}
+   replicas: 4 # kpt-set: ${nginx-replicas}
+   selector:
+      matchLabels:
+         app: nginx
+   template:
+      metadata:
+         labels:
+            app: nginx
+      spec:
+         containers:
+         - name: nginx
+           image: "nginx:1.16.1" # kpt-set: nginx:${tag}
+           ports:
+           - protocol: TCP
+             containerPort: 80
 ```
 
-#### Setting comment for array values
+>? This function doesn't add comments to scalar nodes with multi-line values.
 
-Array values can also be parameterized using setters. Since the values of `ConfigMap`
-in pipeline definition must be of string type, the array values must be wrapped into
+Explanation for the changes:
+
+`Comment` is added to the `Resource Field` value node when they match the `Scalar Setters`.
+
+| Scalar Setters            | Resource Field                | Comment                            | Description     |
+|---------------------------|---------------------------|------------------------------------|-----------------|
+| <pre>replicas: 4</pre>    | <pre>nginx-replicas: 4</pre>  | `# kpt-set: ${nginx-replicas}`    | Setter value of `nginx-replicas` matches with value of `replicas` field  |
+| <pre>tag: 1.1.2</pre> | <pre>app: "nginx:1.16.1"</pre> | `# kpt-set: nginx:${tag}`       | Setter value of `tag` matches the substring of field value `nginx:1.16.1`   |
+
+### Setting comments for array nodes
+
+Fields with array values can also be parameterized using setters. Since the values of `ConfigMap`
+in the pipeline definition must be of string type, the array values must be wrapped into
 string.
 
 Let's start with the input resource
 
 ```yaml
+# resources.yaml
 apiVersion: v1
 kind: MyKind
 metadata:
@@ -108,28 +156,28 @@ environments:
 ```
 
 Declare the array values, wrapped into string. Here the order of the array values
-doesn't make a difference.
+doesn't matter.
 
 ```yaml
+# create-setters-fn-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: create-setters-fn-config
 data:
   env: |
-    - dev
     - stage
+    - dev
 ```
-
-Render the declared values by invoking:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config.yaml
 ```
 
-Rendered resource looks like the following:
+Modified resource looks like the following:
 
 ```yaml
+# resources.yaml
 apiVersion: v1
 kind: MyKind
 metadata:
@@ -138,4 +186,10 @@ environments: # kpt-set: ${env}
   - dev
   - stage
 ```
+
+Explanation for the changes:
+- As all the array values of `environments` field match the setter values of `env`, `# kpt-set: ${env}` comment is added.
+Here, the comment is added to the `environments` field as it is an array node, and the intent is to paremeterize entire array.
 <!--mdtogo-->
+
+[setter]: https://catalog.kpt.dev/apply-setters/v0.1/?id=definitions
