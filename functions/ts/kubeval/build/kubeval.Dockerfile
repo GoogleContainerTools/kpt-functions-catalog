@@ -1,7 +1,7 @@
-FROM node:14.15-alpine3.13 as builder
+FROM node:14.17-alpine3.13 as builder
 
 ARG KUBEVAL_VERSION="v0.16.1"
-RUN apk add curl && \
+RUN apk update && apk add curl && \
     curl -sSLf https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_VERSION}/kubeval-linux-amd64.tar.gz | \
     tar xzf - -C /usr/local/bin
 
@@ -25,7 +25,7 @@ RUN npm run build && \
 
 #############################################
 
-FROM node:14.15-alpine3.13
+FROM node:14.17-alpine3.13
 
 RUN apk add --update --no-cache python3 py3-pip && ln -sf python3 /usr/bin/python
 RUN pip install pyyaml jsonref click

@@ -12,14 +12,11 @@ type StarlarkProcessor struct{}
 
 func (gkp *StarlarkProcessor) Process(resourceList *framework.ResourceList) error {
 	err := func() error {
-		sf := StarlarkRun{}
-		if err := framework.LoadFunctionConfig(resourceList.FunctionConfig, &sf); err != nil {
+		sfc := StarlarkFnConfig{}
+		if err := framework.LoadFunctionConfig(resourceList.FunctionConfig, &sfc); err != nil {
 			return err
 		}
-		if ve := sf.Validate(); ve != nil {
-			return ve
-		}
-		if te := sf.Transform(resourceList); te != nil {
+		if te := sfc.Transform(resourceList); te != nil {
 			return te
 		}
 		return nil
