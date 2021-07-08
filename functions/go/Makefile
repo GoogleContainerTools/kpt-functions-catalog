@@ -25,6 +25,7 @@ FUNCTIONS := \
 	fix \
 	format \
 	gatekeeper \
+	put-setter-values \
 	search-replace \
 	set-annotations \
 	set-labels \
