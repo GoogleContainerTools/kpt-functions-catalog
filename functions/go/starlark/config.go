@@ -6,7 +6,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
-	"sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil"
 	"sigs.k8s.io/kustomize/kyaml/fn/runtime/starlark"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 	k8syaml "sigs.k8s.io/yaml"
@@ -131,14 +130,11 @@ func (sfc *StarlarkFnConfig) Transform(rl *framework.ResourceList) error {
 		return err
 	}
 
-	starFltr := &starlark.Filter{
+	starFltr := &starlark.SimpleFilter{
 		Name:    sfc.GetName(),
 		Program: sfc.GetSource(),
-		FunctionFilter: runtimeutil.FunctionFilter{
-			FunctionConfig: rl.FunctionConfig,
-		},
 	}
-	rl.Items, err = starFltr.Filter(rl.Items)
+	rl.Items, err = starFltr.FunctionConfig(rl.FunctionConfig).Filter(rl.Items)
 	return err
 }
 
