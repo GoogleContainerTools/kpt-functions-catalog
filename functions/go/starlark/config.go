@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/starlark/third_party/sigs.k8s.io/kustomize/kyaml/fn/runtime/starlark"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
-	"sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil"
-	"sigs.k8s.io/kustomize/kyaml/fn/runtime/starlark"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 	k8syaml "sigs.k8s.io/yaml"
 )
@@ -127,12 +126,10 @@ func validateStarlarkRun(sr *StarlarkRun) error {
 
 func (sfc *StarlarkFnConfig) Transform(rl *framework.ResourceList) error {
 	var err error
-	starFltr := &starlark.Filter{
-		Name:    sfc.GetName(),
-		Program: sfc.GetSource(),
-		FunctionFilter: runtimeutil.FunctionFilter{
-			FunctionConfig: rl.FunctionConfig,
-		},
+	starFltr := &starlark.SimpleFilter{
+		Name:           sfc.GetName(),
+		Program:        sfc.GetSource(),
+		FunctionConfig: rl.FunctionConfig,
 	}
 	rl.Items, err = starFltr.Filter(rl.Items)
 	return err
