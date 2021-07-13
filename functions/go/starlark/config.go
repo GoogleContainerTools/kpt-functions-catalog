@@ -126,11 +126,7 @@ func validateStarlarkRun(sr *StarlarkRun) error {
 }
 
 func (sfc *StarlarkFnConfig) Transform(rl *framework.ResourceList) error {
-	err := sfc.filterStarlarkFunctionKind(rl)
-	if err != nil {
-		return err
-	}
-
+	var err error
 	starFltr := &starlark.Filter{
 		Name:    sfc.GetName(),
 		Program: sfc.GetSource(),
@@ -140,22 +136,6 @@ func (sfc *StarlarkFnConfig) Transform(rl *framework.ResourceList) error {
 	}
 	rl.Items, err = starFltr.Filter(rl.Items)
 	return err
-}
-
-func (sfc *StarlarkFnConfig) filterStarlarkFunctionKind(rl *framework.ResourceList) error {
-	var updated []*yaml.RNode
-	for i, item := range rl.Items {
-		rm, err := item.GetMeta()
-		if err != nil {
-			return err
-		}
-		if rm.Kind == string(starlarkRunKind) {
-			continue
-		}
-		updated = append(updated, rl.Items[i])
-	}
-	rl.Items = updated
-	return nil
 }
 
 func (sfc *StarlarkFnConfig) UnmarshalYAML(value *yaml.Node) error {
