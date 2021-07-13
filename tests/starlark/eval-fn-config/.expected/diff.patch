@@ -17,10 +17,10 @@ index 280e700..42255a0 100644
 +  namespace: prod
  spec:
    featureA: true
-diff --git a/set-ns.yaml b/set-ns.yaml
+diff --git a/fn-config.yaml b/fn-config.yaml
 index 552a63f..1593bc2 100644
---- a/set-ns.yaml
-+++ b/set-ns.yaml
+--- a/fn-config.yaml
++++ b/fn-config.yaml
 @@ -2,6 +2,7 @@ apiVersion: fn.kpt.dev/v1alpha1
  kind: StarlarkRun
  metadata:
