@@ -1,13 +1,12 @@
 diff --git a/local-config.yaml b/local-config.yaml
-index b8d83d1..a24903d 100644
+index b8d83d1..b233e64 100644
 --- a/local-config.yaml
 +++ b/local-config.yaml
-@@ -3,6 +3,8 @@ kind: ConfigMap
- metadata:
+@@ -4,5 +4,7 @@ metadata:
    name: local-config-map
    annotations:
-+    color: orange
      config.kubernetes.io/local-config: "true"
++    color: orange
 +    fruit: apple
  data:
    some-key: some-value
