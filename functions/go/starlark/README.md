@@ -157,8 +157,6 @@ Here's what you currently cannot do in the Starlark script:
 
 ### Debugging
 
-<!-- TODO: fix https://github.com/GoogleContainerTools/kpt/issues/2200 -->
-
 It is possible to debug the `starlark` functions using [`print`][print].
 
 For example, you can add something like the following in your Starlark script:
