@@ -31,7 +31,7 @@ see [here](http://kpt.dev/book/02-concepts/03-functions).
 There are 2 user-facing surfaces for a function:
 
 - The `functionConfig`
-- The function itself
+- The function behavior
 
 ### functionConfig Surface
 
@@ -39,9 +39,9 @@ A `functionConfig` can be either a core resource (e.g. `ConfigMap`) or a custom
 resource. If the `functionConfig` is a CRD, it can be versioned independently as
 a normal CRD.
 
-### Function Surface
+### Function Behavior Surface
 
-#### What are NOT part of the function surface
+#### What are NOT part of the function behavior surface
 
 - The formatting of serialization for output items and results. e.g. yaml
   indentation and order of fields in a map.
@@ -49,15 +49,26 @@ a normal CRD.
 - The order of result items in the results.
 - The content of the unstructured messages in the results.
 
-#### What are part of the function surface
+#### What are part of the function behavior surface
 
-- The supported fields in the ConfigMap as the `functionConfig`.
-- The supported versions of the CRD `functionConfigs`.
+- The supported `functionConfig`:
+    - If the function supports `ConfigMap` as `functionConfig`, the supported
+      fields in the `ConfigMap`.
+    - If the function supports a custom resource as `functionConfig`, the
+      supported versions of the custom resource.
 - How the function behave given the input items and `functionConfig`:
-    - The reminder aspects of the output items that are not mentioned in the
+    - The remaining aspects of the output items that are not mentioned in the
       previous section.
-    - The reminder aspects of the results that are not mentioned in the previous
-      section.
+    - The remaining aspects of the results that are not mentioned in the
+      previous section.
+
+For example, if the `kubeval` function stops supporting
+the `ignore_missing_schemas` option in the `ConfigMap`, it will be a breaking
+change.
+
+Another example, if the `set-namespace` function stops supporting custom
+resource of apiVersion `fn.kpt.dev/v1alpha1` and kind `SetNamespace`, it will be
+a breaking change.
 
 ### Breaking Changes
 
@@ -67,7 +78,7 @@ We define a breaking change as: For any given input (including `input items`,
 
 ### Backwards Compatibility
 
-For versions after v1.0.0, we will:
+For post v1.0.0 versions, we will:
 
 - Bump major version: There are breaking changes.
 
@@ -77,27 +88,26 @@ For versions after v1.0.0, we will:
   dependency package non-breaking version bump and base image non-breaking
   version bump).
 
-For versions before v1.0.0, the major version is always `0` and we will:
+For pre v1.0.0 versions, the major version is always `0` and we will:
 
 - Bumping minor version: There are breaking changes.
 
 - Bumping patch version: In all other cases, including backward-compatible
   features, bug fixes and security fixes.
 
-Users won’t observe breaking changes if they are using the shorter semantic
-versions (e.g. `v1.2` and `v1`) and they can automatically get the latest secure
-patch version for free.
-
 ## Best Practices
 
-- It is recommended to use shorter semantic versions (e.g. `v1.2` and `v1`) in
-  your hydration pipeline.
-    - Use `vX.Y` (e.g. `v0.1`) for pre-v1 functions that haven't reached a v1
-      milestone.
-    - Use `vX` (e.g. `v1`) for post-v1 functions.
-- Don't use `latest` tag if you use your own function images, since
-  it’s [not a best practice] for production and also it
-  is [not recommended by kubernetes].
+There are 2 ways to specify your desired version:
+
+- You can fully specify the whole SemVer: The benefits are that you get
+  immutable infrastructure, and you control when to upgrade functions.
+- You can use floating tags (e.g. `vX.Y` and `vX`): The benefits are that there
+  are less maintenance toil, since it automatically pick up the security and bug
+  fixes.
+
+Don't use `latest` tag if you use your own function images, since
+it’s [not a best practice] for production and also it
+is [not recommended by kubernetes].
 
 [not a best practice]: https://vsupalov.com/docker-latest-tag/
 
