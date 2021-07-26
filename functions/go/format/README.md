@@ -2,6 +2,9 @@
 
 ### Overview
 
+>? This function works well with 1.0.0-beta.1 or lower versions of kpt. Starting
+>  from 1.0.0-beta.2, the order of the fields is preserved by kpt CLI.
+
 <!--mdtogo:Short-->
 
 Format resources by sorting fields, fixing indentation and quoting ambiguous string values.
