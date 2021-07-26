@@ -1,26 +1,34 @@
 # list-setters
 
-### Overview
+## Overview
 
 <!--mdtogo:Short-->
 
-List [setters] in config.
+Lists information about [setters] like setter name, values and count.
+
+Refer to the create-setters function documentation for information about creating new setters or apply-setters function documentation for information about parameterizing field values using setters.
 
 <!--mdtogo-->
 
-### FunctionConfig
-
 <!--mdtogo:Long-->
+
+## Usage
+
+`list-setters` function is expected to be executed imperatively like
+
+```shell
+$ kpt fn eval -i list-setters:unstable --include-meta-resources
+```
 
 `list-setters` function performs the following steps:
 
 1. Searches for apply-setters functionConfig in the Kptfile (if present) for setter information.
 1. Searches for setter comments in input list of resources.
-1. Lists discovered setters.
+1. Lists discovered setters and related information.
 
 <!--mdtogo-->
 
-### Examples
+## Examples
 
 <!--mdtogo:Examples-->
 

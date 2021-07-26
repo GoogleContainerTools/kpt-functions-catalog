@@ -113,7 +113,7 @@ func FindSettersFromKptfile(nodes []*yaml.RNode) (map[string]string, error) {
 			}
 			return settersConfig.GetDataMap(), nil
 		} else {
-			return nil, &ErrSetterDiscovery{"unable to find ConfigMap or ConfigPath fn config for apply-setters"}
+			return nil, &ErrSetterDiscovery{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}
 		}
 
 	}
@@ -131,7 +131,7 @@ func findSetterNode(nodes []*yaml.RNode, path string) (*yaml.RNode, error) {
 	return nil, fmt.Errorf(`file %s doesn't exist, please ensure the file specified in "configPath" exists and retry`, path)
 }
 
-// getArraySetterValues attempts to parse a array setter value
+// getArraySetterValues attempts to parse an array setter value
 // wrapped as string to a slice of strings
 func getArraySetterValues(sv string) ([]string, error) {
 	rn, err := yaml.Parse(sv)
@@ -170,7 +170,6 @@ func (ls *ListSetters) addKptfileSetters(s map[string]string) {
 			ls.ScalarSetters[setterName] = &ScalarSetter{Name: setterName, Value: setterValue, Count: 0}
 		}
 	}
-
 }
 
 // GetResults returns sorted slice of all listsetter results

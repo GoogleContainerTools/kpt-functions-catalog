@@ -12,13 +12,13 @@ import (
 
 func TestListSettersFilter(t *testing.T) {
 	var tests = []struct {
-		name              string
-		input             string
-		kf                string
-		setterYml         string
-		expectedResources []*Result
-		errMsg            string
-		warnings          []*ErrSetterDiscovery
+		name           string
+		input          string
+		kf             string
+		setterYml      string
+		expectedResult []*Result
+		errMsg         string
+		warnings       []*ErrSetterDiscovery
 	}{
 		{
 			name: "No setters",
@@ -33,8 +33,8 @@ metadata:
   labels:
     app: my-app
   name: mungebot`,
-			expectedResources: []*Result{},
-			warnings:          []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
+			expectedResult: []*Result{},
+			warnings:       []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "Scalar Simple",
@@ -58,7 +58,7 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`,
-			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
 		},
 		{
 			name: "Scalar Simple invalid kf",
@@ -102,8 +102,8 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`,
-			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
-			warnings:          []*ErrSetterDiscovery{{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			warnings:       []*ErrSetterDiscovery{{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}},
 		},
 		{
 			name: "Scalar Simple missing kf pipeline",
@@ -122,11 +122,11 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`,
-			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
-			warnings:          []*ErrSetterDiscovery{{"unable to find Pipeline declaration in Kptfile"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			warnings:       []*ErrSetterDiscovery{{"unable to find Pipeline declaration in Kptfile"}},
 		},
 		{
-			name: "Scalar Simple no apply-setter fn config",
+			name: "Scalar Simple no apply-setter fnConfig",
 			kf: `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
@@ -145,8 +145,8 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`,
-			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
-			warnings:          []*ErrSetterDiscovery{{"unable to find ConfigMap or ConfigPath fn config for apply-setters"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			warnings:       []*ErrSetterDiscovery{{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}},
 		},
 		{
 			name: "Scalar Simple missing apply-setter configPath file",
@@ -169,8 +169,8 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`,
-			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
-			errMsg:            "file setters.yaml doesn't exist, please ensure the file specified in \"configPath\" exists and retry",
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			errMsg:         "file setters.yaml doesn't exist, please ensure the file specified in \"configPath\" exists and retry",
 		},
 		{
 			name: "Scalar with zero count setter",
@@ -197,7 +197,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot			
 `,
-			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}, {Name: "foo", Value: "bar", Count: 0, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}, {Name: "foo", Value: "bar", Count: 0, Type: "string"}},
 		},
 		{
 			name: "Mapping Simple",
@@ -210,8 +210,8 @@ spec:
     - ubuntu
     - hbase
  `,
-			expectedResources: []*Result{{Name: "images", Value: "[hbase ubuntu]", Count: 1, Type: "list"}},
-			warnings:          []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
+			expectedResult: []*Result{{Name: "images", Value: "[hbase ubuntu]", Count: 1, Type: "list"}},
+			warnings:       []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "Mapping with kptfile and setterYml",
@@ -241,7 +241,7 @@ spec:
     - ubuntu
     - hbase
  `,
-			expectedResources: []*Result{{Name: "images", Value: "[ubuntu hbase]", Count: 1, Type: "list"}},
+			expectedResult: []*Result{{Name: "images", Value: "[ubuntu hbase]", Count: 1, Type: "list"}},
 		},
 		{
 			name: "Scalar and Mapping",
@@ -264,7 +264,7 @@ spec:
     - "10 alt3.gmr-stmp-in.l.google.com."
     - "10 alt4.gmr-stmp-in.l.google.com."
 `,
-			expectedResources: []*Result{
+			expectedResult: []*Result{
 				{Name: "record-set-name", Value: "dnsrecordset-sample-mx", Count: 1, Type: "string"},
 				{Name: "type", Value: "MX", Count: 2, Type: "string"},
 				{Name: "domain", Value: "mail.example.com.", Count: 1, Type: "string"},
@@ -300,7 +300,7 @@ spec:
 				require.NoError(err)
 				require.ElementsMatch(ls.Warnings, test.warnings)
 				actualResources := ls.GetResults()
-				require.ElementsMatch(actualResources, test.expectedResources)
+				require.ElementsMatch(actualResources, test.expectedResult)
 			}
 
 		})
