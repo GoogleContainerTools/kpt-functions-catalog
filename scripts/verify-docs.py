@@ -17,6 +17,18 @@
 # This script does the following things:
 # - Enforce several rules (e.g. required fields) in metadata.yaml for each curated function.
 # - Ensure the URLs in the examples are correct.
+#
+# To skip processing a file, you can add the filename in the verify-docs-config.yaml.
+# For example, to skip process a Kptfile, you can add something like:
+# skip:
+#   - Kptfile
+#
+# To skip process a code block in a markdown file, you can add <!-- @skip -->
+# before the code block. For example:
+# <!-- @skip -->
+# ```
+# something here...
+# ```
 
 
 import os
@@ -34,6 +46,7 @@ kpt_team_email = 'kpt-team@google.com'
 disallowed_kpt_commands = ['kpt fn run', 'kpt cfg', 'kpt pkg cat']
 gcr_prefix = 'gcr.io/kpt-fn/'
 git_url_prefix = 'https://github.com/GoogleContainerTools/kpt-functions-catalog.git'
+verify_docs_config_filename = 'verify-docs-config.yaml'
 
 def validate_master_branch():
     fn_name_to_examples = validate_functions_dir_for_master_branch()
@@ -112,6 +125,11 @@ def validate_functions_dir_for_release_branch(branch_name, fn_name):
 def validate_example_kptfile(fn_name, dir_name, example_name, branch):
     example_path = os.path.join(dir_name, example_name)
     kptfile_path = os.path.join(example_path, 'Kptfile')
+    verify_docs_skip_path = os.path.join(example_path, '.expected', verify_docs_config_filename)
+    if os.path.exists(verify_docs_skip_path):
+        verify_docs_skip_file = yaml.load(open(verify_docs_skip_path), Loader=yaml.Loader)
+        if "Kptfile" in verify_docs_skip_file['skip']:
+            return
     if not os.path.exists(kptfile_path):
         return
 
