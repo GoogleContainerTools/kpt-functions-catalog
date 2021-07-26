@@ -18,6 +18,7 @@ func TestListSettersFilter(t *testing.T) {
 		setterYml         string
 		expectedResources []*Result
 		errMsg            string
+		warnings          []*ErrSetterDiscovery
 	}{
 		{
 			name: "No setters",
@@ -33,6 +34,7 @@ metadata:
     app: my-app
   name: mungebot`,
 			expectedResources: []*Result{},
+			warnings:          []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "Scalar Simple",
@@ -57,6 +59,118 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot`,
 			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+		},
+		{
+			name: "Scalar Simple invalid kf",
+			kf: `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: test
+foo: bar`,
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app # kpt-set: ${app}
+  name: mungebot`,
+			errMsg: "unable to read Kptfile: please make sure the package has a valid 'v1' Kptfile: yaml: unmarshal errors:\n  line 8: field foo not found in type v1.KptFile",
+		},
+		{
+			name: "Scalar Simple missing apply-setters",
+			kf: `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: test
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/foo:v0.1
+      configMap:
+        app: my-app`,
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app # kpt-set: ${app}
+  name: mungebot`,
+			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			warnings:          []*ErrSetterDiscovery{{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}},
+		},
+		{
+			name: "Scalar Simple missing kf pipeline",
+			kf: `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: test`,
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app # kpt-set: ${app}
+  name: mungebot`,
+			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			warnings:          []*ErrSetterDiscovery{{"unable to find Pipeline declaration in Kptfile"}},
+		},
+		{
+			name: "Scalar Simple no apply-setter fn config",
+			kf: `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: test
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.1`,
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app # kpt-set: ${app}
+  name: mungebot`,
+			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			warnings:          []*ErrSetterDiscovery{{"unable to find ConfigMap or ConfigPath fn config for apply-setters"}},
+		},
+		{
+			name: "Scalar Simple missing apply-setter configPath file",
+			kf: `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: test
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configPath: setters.yaml`,
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app # kpt-set: ${app}
+  name: mungebot`,
+			expectedResources: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			errMsg:            "file setters.yaml doesn't exist, please ensure the file specified in \"configPath\" exists and retry",
 		},
 		{
 			name: "Scalar with zero count setter",
@@ -97,6 +211,7 @@ spec:
     - hbase
  `,
 			expectedResources: []*Result{{Name: "images", Value: "[hbase ubuntu]", Count: 1, Type: "list"}},
+			warnings:          []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "Mapping with kptfile and setterYml",
@@ -157,6 +272,7 @@ spec:
 				{Name: "ttl", Value: "300", Count: 2, Type: "string"},
 				{Name: "records", Value: "[10 alt1.gmr-stmp-in.l.google.com. 10 alt2.gmr-stmp-in.l.google.com. 10 alt3.gmr-stmp-in.l.google.com. 10 alt4.gmr-stmp-in.l.google.com. 5 gmr-stmp-in.l.google.com.]", Count: 1, Type: "list"},
 			},
+			warnings: []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 	}
 	for _, test := range tests {
@@ -182,6 +298,7 @@ spec:
 				require.Contains(err.Error(), test.errMsg)
 			} else {
 				require.NoError(err)
+				require.ElementsMatch(ls.Warnings, test.warnings)
 				actualResources := ls.GetResults()
 				require.ElementsMatch(actualResources, test.expectedResources)
 			}
