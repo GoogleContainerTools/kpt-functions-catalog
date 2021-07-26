@@ -195,7 +195,11 @@ func copyExamples(b string, exampleSources []string, versionDest, minorVersion s
 	}
 
 	for _, exampleSource := range exampleSources {
-		relativePath := strings.SplitN(exampleSource, minorVersion+string(filepath.Separator), 2)[1]
+		splitedPaths := strings.SplitN(exampleSource, minorVersion+string(filepath.Separator), 2)
+		if len(splitedPaths) != 2 {
+			return fmt.Errorf("expect 2 substring after spliting %q by %q", exampleSource, minorVersion+string(filepath.Separator))
+		}
+		relativePath := splitedPaths[1]
 		// Fetch example into temporary directory.
 		cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", relativePath)
 		err = cmd.Run()
