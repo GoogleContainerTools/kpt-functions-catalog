@@ -1,0 +1,10 @@
+image: gcr.io/kpt-fn/list-setters
+description: List setters on resource fields.
+tags:
+  - TODO
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/list-setters
+examplePackageURLs:
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/list-setters-simple
+emails:
+  - kpt-team@google.com
+license: Apache-2.0
