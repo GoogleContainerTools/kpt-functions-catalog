@@ -1,0 +1,4 @@
+exitCode: 0
+testType: eval
+image: gcr.io/kpt-fn/list-setters:unstable
+includeMetaResources: true
