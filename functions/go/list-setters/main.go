@@ -12,8 +12,8 @@ import (
 
 //nolint
 func main() {
-	asp := ListSettersProcessor{}
-	cmd := command.Build(&asp, command.StandaloneEnabled, false)
+	lsp := ListSettersProcessor{}
+	cmd := command.Build(&lsp, command.StandaloneEnabled, false)
 
 	cmd.Short = generated.ListSettersShort
 	cmd.Long = generated.ListSettersLong
