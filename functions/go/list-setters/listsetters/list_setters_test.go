@@ -13,16 +13,14 @@ import (
 func TestListSettersFilter(t *testing.T) {
 	var tests = []struct {
 		name           string
-		input          string
-		kf             string
-		setterYml      string
+		resourceMap    map[string]string
 		expectedResult []*Result
 		errMsg         string
 		warnings       []*ErrSetterDiscovery
 	}{
 		{
 			name: "No setters",
-			input: `apiVersion: v1
+			resourceMap: map[string]string{"test.yaml": `apiVersion: v1
 kind: Service
 metadata:
   name: my-app
@@ -32,13 +30,13 @@ kind: Deployment
 metadata:
   labels:
     app: my-app
-  name: mungebot`,
+  name: mungebot`},
 			expectedResult: []*Result{},
 			warnings:       []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "Scalar Simple",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: test
@@ -46,8 +44,8 @@ pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
       configMap:
-        app: my-app`,
-			input: `apiVersion: v1
+        app: my-app
+`, "test.yaml": `apiVersion: v1
 kind: Service
 metadata:
   name: my-app # kpt-set: ${app}
@@ -57,17 +55,18 @@ kind: Deployment
 metadata:
   labels:
     app: my-app # kpt-set: ${app}
-  name: mungebot`,
+  name: mungebot
+`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
 		},
 		{
 			name: "Scalar Simple invalid kf",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: test
-foo: bar`,
-			input: `apiVersion: v1
+foo: bar
+`, "test.yaml": `apiVersion: v1
 kind: Service
 metadata:
   name: my-app # kpt-set: ${app}
@@ -77,12 +76,13 @@ kind: Deployment
 metadata:
   labels:
     app: my-app # kpt-set: ${app}
-  name: mungebot`,
+  name: mungebot
+`},
 			errMsg: "unable to read Kptfile: please make sure the package has a valid 'v1' Kptfile: yaml: unmarshal errors:\n  line 8: field foo not found in type v1.KptFile",
 		},
 		{
 			name: "Scalar Simple missing apply-setters",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: test
@@ -90,8 +90,8 @@ pipeline:
   mutators:
     - image: gcr.io/kpt-fn/foo:v0.1
       configMap:
-        app: my-app`,
-			input: `apiVersion: v1
+        app: my-app
+`, "test.yaml": `apiVersion: v1
 kind: Service
 metadata:
   name: my-app # kpt-set: ${app}
@@ -101,17 +101,17 @@ kind: Deployment
 metadata:
   labels:
     app: my-app # kpt-set: ${app}
-  name: mungebot`,
+  name: mungebot`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
 			warnings:       []*ErrSetterDiscovery{{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}},
 		},
 		{
 			name: "Scalar Simple missing kf pipeline",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
-  name: test`,
-			input: `apiVersion: v1
+  name: test
+`, "test.yaml": `apiVersion: v1
 kind: Service
 metadata:
   name: my-app # kpt-set: ${app}
@@ -121,44 +121,20 @@ kind: Deployment
 metadata:
   labels:
     app: my-app # kpt-set: ${app}
-  name: mungebot`,
+  name: mungebot`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
 			warnings:       []*ErrSetterDiscovery{{"unable to find Pipeline declaration in Kptfile"}},
 		},
 		{
 			name: "Scalar Simple no apply-setter fnConfig",
-			kf: `apiVersion: kpt.dev/v1
-kind: Kptfile
-metadata:
-  name: test
-pipeline:
-  mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1`,
-			input: `apiVersion: v1
-kind: Service
-metadata:
-  name: my-app # kpt-set: ${app}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: my-app # kpt-set: ${app}
-  name: mungebot`,
-			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
-			warnings:       []*ErrSetterDiscovery{{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}},
-		},
-		{
-			name: "Scalar Simple missing apply-setter configPath file",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: test
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
-      configPath: setters.yaml`,
-			input: `apiVersion: v1
+`, "test.yaml": `apiVersion: v1
 kind: Service
 metadata:
   name: my-app # kpt-set: ${app}
@@ -168,13 +144,37 @@ kind: Deployment
 metadata:
   labels:
     app: my-app # kpt-set: ${app}
-  name: mungebot`,
+  name: mungebot`},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			warnings:       []*ErrSetterDiscovery{{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}},
+		},
+		{
+			name: "Scalar Simple missing apply-setter configPath file",
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: test
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configPath: setters.yaml
+`, "test.yaml": `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app # kpt-set: ${app}
+  name: mungebot`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
 			errMsg:         "file setters.yaml doesn't exist, please ensure the file specified in \"configPath\" exists and retry",
 		},
 		{
 			name: "Scalar with zero count setter",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: test
@@ -184,8 +184,7 @@ pipeline:
       configMap:
         app: my-app
         foo: bar
-`,
-			input: `apiVersion: v1
+`, "test.yaml": `apiVersion: v1
 kind: Service
 metadata:
   name: my-app # kpt-set: ${app}
@@ -196,12 +195,12 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot			
-`,
+`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}, {Name: "foo", Value: "bar", Count: 0, Type: "string"}},
 		},
 		{
 			name: "Scalar with two apply-setter configMap declarations",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: test
@@ -215,8 +214,7 @@ pipeline:
       configMap:
         app: my-app
         baz: qux
-`,
-			input: `apiVersion: v1
+`, "test.yaml": `apiVersion: v1
 kind: Service
 metadata:
   name: my-app # kpt-set: ${app}
@@ -227,12 +225,12 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot			
-`,
+`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}, {Name: "foo", Value: "bar", Count: 0, Type: "string"}, {Name: "baz", Value: "qux", Count: 0, Type: "string"}},
 		},
 		{
 			name: "Mapping Simple",
-			input: `apiVersion: apps/v1
+			resourceMap: map[string]string{"test.yaml": `apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
@@ -240,21 +238,21 @@ spec:
   images: # kpt-set: ${images}
     - ubuntu
     - hbase
- `,
+ `},
 			expectedResult: []*Result{{Name: "images", Value: "[hbase, ubuntu]", Count: 1, Type: "list"}},
 			warnings:       []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "Mapping with kptfile and setterYml",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: test
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
-      configPath: setters.yaml`,
-			setterYml: `apiVersion: v1
+      configPath: setters.yaml
+`, "setters.yaml": `apiVersion: v1
 kind: ConfigMap
 metadata:
   name: apply-setters-fn-config
@@ -262,8 +260,7 @@ data:
   images: |
       - ubuntu
       - hbase
-`,
-			input: `apiVersion: apps/v1
+`, "test.yaml": `apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
@@ -271,12 +268,12 @@ spec:
   images: # kpt-set: ${images}
     - ubuntu
     - hbase
- `,
+ `},
 			expectedResult: []*Result{{Name: "images", Value: "[ubuntu, hbase]", Count: 1, Type: "list"}},
 		},
 		{
 			name: "Mapping with ConfigMap and ConfigPath apply-setter declarations",
-			kf: `apiVersion: kpt.dev/v1
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
 kind: Kptfile
 metadata:
   name: test
@@ -287,8 +284,7 @@ pipeline:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
       configMap:
         baz: qux
-`,
-			setterYml: `apiVersion: v1
+`, "setters.yaml": `apiVersion: v1
 kind: ConfigMap
 metadata:
   name: apply-setters-fn-config
@@ -296,8 +292,7 @@ data:
   images: |
       - ubuntu
       - hbase
-`,
-			input: `apiVersion: apps/v1
+`, "test.yaml": `apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
@@ -305,12 +300,12 @@ spec:
   images: # kpt-set: ${images}
     - ubuntu
     - hbase
- `,
+ `},
 			expectedResult: []*Result{{Name: "images", Value: "[ubuntu, hbase]", Count: 1, Type: "list"}, {Name: "baz", Value: "qux", Count: 0, Type: "string"}},
 		},
 		{
 			name: "Scalar and Mapping",
-			input: `apiVersion: dns.cnrm.cloud.google.com/v1beta1
+			resourceMap: map[string]string{"test.yaml": `apiVersion: dns.cnrm.cloud.google.com/v1beta1
 kind: DNSRecordSet
 metadata:
   name: dnsrecordset-sample-mx # kpt-set: ${record-set-name}
@@ -328,7 +323,7 @@ spec:
     - "10 alt2.gmr-stmp-in.l.google.com."
     - "10 alt3.gmr-stmp-in.l.google.com."
     - "10 alt4.gmr-stmp-in.l.google.com."
-`,
+`},
 			expectedResult: []*Result{
 				{Name: "record-set-name", Value: "dnsrecordset-sample-mx", Count: 1, Type: "string"},
 				{Name: "type", Value: "MX", Count: 2, Type: "string"},
@@ -339,19 +334,92 @@ spec:
 			},
 			warnings: []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
+		{
+			name: "with subpackages",
+			resourceMap: map[string]string{"Kptfile": `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: project-package
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configPath: setters.yaml
+`, "setters.yaml": `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apply-setters-fn-config
+data:
+  folder-name: name.of.folder
+  folder-namespace: hierarchy
+  networking-namespace: networking
+  project-id: project-id
+`, "test.yaml": `apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Project
+metadata:
+  name: project-id # kpt-set: ${project-id}
+  namespace: projects # kpt-set: ${projects-namespace}
+  annotations:
+    cnrm.cloud.google.com/auto-create-network: "false"
+spec:
+  name: project-id # kpt-set: ${project-id}
+  billingAccountRef:
+    external: "AAAAAA-BBBBBB-CCCCCC" # kpt-set: ${billing-account-id}
+  folderRef:
+    name: name.of.folder # kpt-set: ${folder-name}
+    namespace: hierarchy # kpt-set: ${folder-namespace}
+`, "subpkg/vpc.yaml": `apiVersion: compute.cnrm.cloud.google.com/v1beta1
+kind: ComputeNetwork
+metadata:
+  name: network-name # kpt-set: ${network-name}
+  namespace: networking # kpt-set: ${networking-namespace}
+  annotations:
+    cnrm.cloud.google.com/project-id: project-id # kpt-set: ${project-id}
+spec:
+  autoCreateSubnetworks: false
+  deleteDefaultRoutesOnCreate: false
+  routingMode: GLOBAL
+`, "subpkg/setters.yaml": `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters
+data:
+  foo: bar
+  network-name: network-name
+  networking-namespace: networking
+  project-id: project-id
+`, "subpkg/Kptfile": `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: vpc-package
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configPath: setters.yaml
+`},
+			expectedResult: []*Result{
+				{Name: "billing-account-id", Value: "AAAAAA-BBBBBB-CCCCCC", Count: 1, Type: "string"},
+				{Name: "folder-name", Value: "name.of.folder", Count: 1, Type: "string"},
+				{Name: "folder-namespace", Value: "hierarchy", Count: 1, Type: "string"},
+				{Name: "network-name", Value: "network-name", Count: 1, Type: "string"},
+				{Name: "networking-namespace", Value: "networking", Count: 1, Type: "string"},
+				{Name: "project-id", Value: "project-id", Count: 3, Type: "string"},
+				{Name: "projects-namespace", Value: "projects", Count: 1, Type: "string"},
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			require := require.New(t)
-			pkgDir := setupInputs(t, test.input, test.kf, test.setterYml)
+			pkgDir := setupInputs(t, test.resourceMap)
 			defer os.RemoveAll(pkgDir)
 
 			ls := New()
 			inout := &kio.LocalPackageReadWriter{
-				PackagePath:     pkgDir,
-				NoDeleteFiles:   true,
-				PackageFileName: "Kptfile",
-				MatchFilesGlob:  append(kio.DefaultMatch, "Kptfile"),
+				PackagePath:        pkgDir,
+				NoDeleteFiles:      true,
+				PackageFileName:    "Kptfile",
+				MatchFilesGlob:     append(kio.DefaultMatch, "Kptfile"),
+				IncludeSubpackages: true,
 			}
 			err := kio.Pipeline{
 				Inputs:  []kio.Reader{inout},
@@ -372,26 +440,19 @@ spec:
 	}
 }
 
-func setupInputs(t *testing.T, input, kf, setterYml string) string {
+func setupInputs(t *testing.T, resourceMap map[string]string) string {
 	t.Helper()
 	require := require.New(t)
 	baseDir, err := ioutil.TempDir("", "")
 	require.NoError(err)
 
-	r, err := ioutil.TempFile(baseDir, "k8s-cli-*.yaml")
-	require.NoError(err)
-	err = ioutil.WriteFile(r.Name(), []byte(input), 0600)
-
-	if kf != "" {
-		err = ioutil.WriteFile(path.Join(baseDir, "Kptfile"), []byte(kf), 0644)
+	for rpath, data := range resourceMap {
+		filePath := path.Join(baseDir, rpath)
+		err = os.MkdirAll(path.Dir(filePath), os.ModePerm)
+		require.NoError(err)
+		err = ioutil.WriteFile(path.Join(baseDir, rpath), []byte(data), 0644)
 		require.NoError(err)
 	}
-
-	if setterYml != "" {
-		err = ioutil.WriteFile(path.Join(baseDir, "setters.yaml"), []byte(setterYml), 0644)
-		require.NoError(err)
-	}
-	require.NoError(err)
 	return baseDir
 }
 
