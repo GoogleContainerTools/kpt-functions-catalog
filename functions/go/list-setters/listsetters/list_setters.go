@@ -24,7 +24,7 @@ type ListSetters struct {
 	ArraySetters map[string]*ArraySetter
 
 	// Warnings holds recoverable error info that occurred during setter discovery
-	Warnings []*ErrSetterDiscovery
+	Warnings []*WarnSetterDiscovery
 
 	// filePath file path of resource
 	filePath string
@@ -66,12 +66,12 @@ func (r Result) String() string {
 	return fmt.Sprintf("Name: %s, Value: %s, Type: %s, Count: %d", r.Name, r.Value, r.Type, r.Count)
 }
 
-// ErrSetterDiscovery represents a recoverable error that occurred during setter discovery
-type ErrSetterDiscovery struct {
+// WarnSetterDiscovery represents a recoverable error that occurred during setter discovery
+type WarnSetterDiscovery struct {
 	message string
 }
 
-func (e *ErrSetterDiscovery) Error() string {
+func (e *WarnSetterDiscovery) Error() string {
 	return e.message
 }
 
@@ -88,7 +88,7 @@ func FindKptfile(nodes []*yaml.RNode) (*kptv1.KptFile, error) {
 			return kf, errors.WrapPrefixf(err, "unable to read Kptfile")
 		}
 	}
-	return nil, &ErrSetterDiscovery{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}
+	return nil, &WarnSetterDiscovery{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}
 }
 
 // FindSettersFromKptfile discovers setters from kptfile if exists
@@ -98,7 +98,7 @@ func FindSettersFromKptfile(nodes []*yaml.RNode) (map[string]string, error) {
 		return nil, err
 	}
 	if kf.Pipeline == nil {
-		return nil, &ErrSetterDiscovery{"unable to find Pipeline declaration in Kptfile"}
+		return nil, &WarnSetterDiscovery{"unable to find Pipeline declaration in Kptfile"}
 	}
 
 	// kfSetters accumulates setters if there are multiple declarations of apply-setters function
@@ -116,7 +116,7 @@ func FindSettersFromKptfile(nodes []*yaml.RNode) (map[string]string, error) {
 			}
 			kfSetters = mergeSetters(kfSetters, settersConfig.GetDataMap())
 		} else {
-			return nil, &ErrSetterDiscovery{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}
+			return nil, &WarnSetterDiscovery{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}
 		}
 
 	}
@@ -124,7 +124,7 @@ func FindSettersFromKptfile(nodes []*yaml.RNode) (map[string]string, error) {
 	if len(kfSetters) > 0 {
 		return kfSetters, nil
 	}
-	return nil, &ErrSetterDiscovery{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}
+	return nil, &WarnSetterDiscovery{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}
 }
 
 // mergeSetters merges two setter maps a and b
@@ -210,9 +210,9 @@ func (ls *ListSetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	// attempt to discover setters from Kptfile
 	kfSetters, err := FindSettersFromKptfile(nodes)
 	if err != nil {
-		var discoveryErr *ErrSetterDiscovery
-		if ok := goerrors.As(err, &discoveryErr); ok {
-			ls.Warnings = append(ls.Warnings, discoveryErr)
+		var discoveryWarning *WarnSetterDiscovery
+		if ok := goerrors.As(err, &discoveryWarning); ok {
+			ls.Warnings = append(ls.Warnings, discoveryWarning)
 		} else {
 			return nodes, err
 		}

@@ -16,7 +16,7 @@ func TestListSettersFilter(t *testing.T) {
 		resourceMap    map[string]string
 		expectedResult []*Result
 		errMsg         string
-		warnings       []*ErrSetterDiscovery
+		warnings       []*WarnSetterDiscovery
 	}{
 		{
 			name: "No setters",
@@ -32,7 +32,7 @@ metadata:
     app: my-app
   name: mungebot`},
 			expectedResult: []*Result{},
-			warnings:       []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
+			warnings:       []*WarnSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "Scalar Simple",
@@ -103,7 +103,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
-			warnings:       []*ErrSetterDiscovery{{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}},
+			warnings:       []*WarnSetterDiscovery{{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}},
 		},
 		{
 			name: "Scalar Simple missing kf pipeline",
@@ -123,7 +123,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
-			warnings:       []*ErrSetterDiscovery{{"unable to find Pipeline declaration in Kptfile"}},
+			warnings:       []*WarnSetterDiscovery{{"unable to find Pipeline declaration in Kptfile"}},
 		},
 		{
 			name: "Scalar Simple no apply-setter fnConfig",
@@ -146,7 +146,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
-			warnings:       []*ErrSetterDiscovery{{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}},
+			warnings:       []*WarnSetterDiscovery{{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}},
 		},
 		{
 			name: "Scalar Simple missing apply-setter configPath file",
@@ -240,7 +240,7 @@ spec:
     - hbase
  `},
 			expectedResult: []*Result{{Name: "images", Value: "[hbase, ubuntu]", Count: 1, Type: "list"}},
-			warnings:       []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
+			warnings:       []*WarnSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "Mapping with kptfile and setterYml",
@@ -332,7 +332,7 @@ spec:
 				{Name: "ttl", Value: "300", Count: 2, Type: "string"},
 				{Name: "records", Value: "[10 alt1.gmr-stmp-in.l.google.com., 10 alt2.gmr-stmp-in.l.google.com., 10 alt3.gmr-stmp-in.l.google.com., 10 alt4.gmr-stmp-in.l.google.com., 5 gmr-stmp-in.l.google.com.]", Count: 1, Type: "list"},
 			},
-			warnings: []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
+			warnings: []*WarnSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
 			name: "with subpackages",
