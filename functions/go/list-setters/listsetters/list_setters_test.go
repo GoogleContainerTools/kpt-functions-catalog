@@ -210,7 +210,7 @@ spec:
     - ubuntu
     - hbase
  `,
-			expectedResult: []*Result{{Name: "images", Value: "[hbase ubuntu]", Count: 1, Type: "list"}},
+			expectedResult: []*Result{{Name: "images", Value: "[hbase, ubuntu]", Count: 1, Type: "list"}},
 			warnings:       []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 		{
@@ -241,7 +241,7 @@ spec:
     - ubuntu
     - hbase
  `,
-			expectedResult: []*Result{{Name: "images", Value: "[ubuntu hbase]", Count: 1, Type: "list"}},
+			expectedResult: []*Result{{Name: "images", Value: "[ubuntu, hbase]", Count: 1, Type: "list"}},
 		},
 		{
 			name: "Scalar and Mapping",
@@ -270,7 +270,7 @@ spec:
 				{Name: "domain", Value: "mail.example.com.", Count: 1, Type: "string"},
 				{Name: "managed-zone-name", Value: "dnsrecordset-dep-mx", Count: 1, Type: "string"},
 				{Name: "ttl", Value: "300", Count: 2, Type: "string"},
-				{Name: "records", Value: "[10 alt1.gmr-stmp-in.l.google.com. 10 alt2.gmr-stmp-in.l.google.com. 10 alt3.gmr-stmp-in.l.google.com. 10 alt4.gmr-stmp-in.l.google.com. 5 gmr-stmp-in.l.google.com.]", Count: 1, Type: "list"},
+				{Name: "records", Value: "[10 alt1.gmr-stmp-in.l.google.com., 10 alt2.gmr-stmp-in.l.google.com., 10 alt3.gmr-stmp-in.l.google.com., 10 alt4.gmr-stmp-in.l.google.com., 5 gmr-stmp-in.l.google.com.]", Count: 1, Type: "list"},
 			},
 			warnings: []*ErrSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},

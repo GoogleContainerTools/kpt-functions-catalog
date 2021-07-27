@@ -82,8 +82,8 @@ Output looks like the following:
 
 ```shell
   Results:
-    [INFO] Name: env, Value: [dev stage], Type list, Count 1
-    [INFO] Name: unused, Value: notused, Type string, Count 0
+    [INFO] Name: env, Value: [dev, stage], Type: list, Count: 1
+    [INFO] Name: unused, Value: notused, Type: string, Count: 0
 ```
 
 
@@ -126,8 +126,8 @@ Output looks like the following:
 ```shell
   Results:
     [WARNING] unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present
-    [INFO] Name: nginx-replicas, Value: 4, Type string, Count 1
-    [INFO] Name: tag, Value: 1.16.1, Type string, Count 1
+    [INFO] Name: nginx-replicas, Value: 4, Type: string, Count: 1
+    [INFO] Name: tag, Value: 1.16.1, Type: string, Count: 1
 ```
 
 <!--mdtogo-->

@@ -63,7 +63,7 @@ type Result struct {
 }
 
 func (r Result) String() string {
-	return fmt.Sprintf("Name: %s, Value: %s, Type %s, Count %d", r.Name, r.Value, r.Type, r.Count)
+	return fmt.Sprintf("Name: %s, Value: %s, Type: %s, Count: %d", r.Name, r.Value, r.Type, r.Count)
 }
 
 // ErrSetterDiscovery represents a recoverable error that occurred during setter discovery
@@ -176,7 +176,7 @@ func (ls *ListSetters) addKptfileSetters(s map[string]string) {
 func (ls *ListSetters) GetResults() []*Result {
 	var out []*Result
 	for _, v := range ls.ArraySetters {
-		out = append(out, &Result{Name: v.Name, Value: fmt.Sprint(v.Values), Count: v.Count, Type: ArraySetterType})
+		out = append(out, &Result{Name: v.Name, Value: fmt.Sprintf("[%s]", strings.Join(v.Values, ", ")), Count: v.Count, Type: ArraySetterType})
 	}
 	for _, v := range ls.ScalarSetters {
 		out = append(out, &Result{Name: v.Name, Value: v.Value, Count: v.Count, Type: ScalarSetterType})
