@@ -200,6 +200,37 @@ metadata:
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}, {Name: "foo", Value: "bar", Count: 0, Type: "string"}},
 		},
 		{
+			name: "Scalar with two apply-setter configMap declarations",
+			kf: `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: test
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configMap:
+        app: my-app-old
+        foo: bar
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configMap:
+        app: my-app
+        baz: qux
+`,
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app # kpt-set: ${app}
+  name: mungebot			
+`,
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}, {Name: "foo", Value: "bar", Count: 0, Type: "string"}, {Name: "baz", Value: "qux", Count: 0, Type: "string"}},
+		},
+		{
 			name: "Mapping Simple",
 			input: `apiVersion: apps/v1
 kind: Deployment
@@ -242,6 +273,40 @@ spec:
     - hbase
  `,
 			expectedResult: []*Result{{Name: "images", Value: "[ubuntu, hbase]", Count: 1, Type: "list"}},
+		},
+		{
+			name: "Mapping with ConfigMap and ConfigPath apply-setter declarations",
+			kf: `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: test
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configPath: setters.yaml
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configMap:
+        baz: qux
+`,
+			setterYml: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apply-setters-fn-config
+data:
+  images: |
+      - ubuntu
+      - hbase
+`,
+			input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  images: # kpt-set: ${images}
+    - ubuntu
+    - hbase
+ `,
+			expectedResult: []*Result{{Name: "images", Value: "[ubuntu, hbase]", Count: 1, Type: "list"}, {Name: "baz", Value: "qux", Count: 0, Type: "string"}},
 		},
 		{
 			name: "Scalar and Mapping",

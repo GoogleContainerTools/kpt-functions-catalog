@@ -80,7 +80,7 @@ const (
 	ScalarSetterType string = "string"
 )
 
-// FindKptfile discovers Kptfile from slice of nodes
+// FindKptfile discovers Kptfile of the root package from slice of nodes
 func FindKptfile(nodes []*yaml.RNode) (*kptv1.KptFile, error) {
 	for _, node := range nodes {
 		if node.GetAnnotations()[kioutil.PathAnnotation] == kptv1.KptFileName {
@@ -100,24 +100,44 @@ func FindSettersFromKptfile(nodes []*yaml.RNode) (map[string]string, error) {
 	if kf.Pipeline == nil {
 		return nil, &ErrSetterDiscovery{"unable to find Pipeline declaration in Kptfile"}
 	}
+
+	// kfSetters accumulates setters if there are multiple declarations of apply-setters function
+	var kfSetters map[string]string
 	for _, fn := range kf.Pipeline.Mutators {
 		if !strings.Contains(fn.Image, "apply-setters") {
 			continue
 		}
 		if fn.ConfigMap != nil {
-			return fn.ConfigMap, nil
+			kfSetters = mergeSetters(kfSetters, fn.ConfigMap)
 		} else if fn.ConfigPath != "" {
 			settersConfig, err := findSetterNode(nodes, fn.ConfigPath)
 			if err != nil {
 				return nil, err
 			}
-			return settersConfig.GetDataMap(), nil
+			kfSetters = mergeSetters(kfSetters, settersConfig.GetDataMap())
 		} else {
 			return nil, &ErrSetterDiscovery{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}
 		}
 
 	}
+
+	if len(kfSetters) > 0 {
+		return kfSetters, nil
+	}
 	return nil, &ErrSetterDiscovery{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}
+}
+
+// mergeSetters merges two setter maps a and b
+// if duplicate key map b takes precedence
+func mergeSetters(a, b map[string]string) map[string]string {
+	merged := make(map[string]string, len(a)+len(b))
+	for k, v := range a {
+		merged[k] = v
+	}
+	for k, v := range b {
+		merged[k] = v
+	}
+	return merged
 }
 
 //findSetterNode finds setter node from nodes
