@@ -17,7 +17,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following command:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/list-setters:unstable --include-meta-resources
+$ kpt fn eval --image gcr.io/kpt-fn/list-setters:unstable
 ```
 
 ### Expected result

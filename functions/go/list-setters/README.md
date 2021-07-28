@@ -17,12 +17,11 @@ Refer to the create-setters function documentation for information about creatin
 `list-setters` function is expected to be executed imperatively like
 
 ```shell
-$ kpt fn eval -i list-setters:unstable --include-meta-resources
+$ kpt fn eval -i list-setters:unstable
 ```
 
 `list-setters` function performs the following steps:
 
-1. Searches for apply-setters functionConfig in the Kptfile (if present) for setter information.
 1. Searches for setter comments in input list of resources.
 1. Lists discovered setters and related information.
 
@@ -32,64 +31,9 @@ $ kpt fn eval -i list-setters:unstable --include-meta-resources
 
 <!--mdtogo:Examples-->
 
-### Listing setters with Kptfile
+### Listing setters in a package
 
-Let's start with an input resource in a package with a Kptfile
-
-```yaml
-# Kptfile
-apiVersion: kpt.dev/v1
-kind: Kptfile
-metadata:
-  name: nginx
-pipeline:
-  mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
-      configPath: setters.yaml
-```
-
-```yaml
-# setters.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: apply-setters-fn-config
-data:
-  env: |
-      - dev
-      - stage
-  unused: notused
-```
-
-```yaml
-# resources.yaml
-apiVersion: v1
-kind: MyKind
-metadata:
-  name: foo
-environments: # kpt-set: ${env}
-  - dev
-  - stage
-```
-
-Invoke the function:
-
-```shell
-$ kpt fn eval --image gcr.io/kpt-fn/list-setters:unstable --include-meta-resources
-```
-
-Output looks like the following:
-
-```shell
-  Results:
-    [INFO] Name: env, Value: [dev, stage], Type: list, Count: 1
-    [INFO] Name: unused, Value: notused, Type: string, Count: 0
-```
-
-
-### Listing setters in simple config
-
-Let's start with the input resource in a package without a Kptfile
+Let's start with the input resource in a package
 
 ```yaml
 # resources.yaml
@@ -125,7 +69,6 @@ Output looks like the following:
 
 ```shell
   Results:
-    [WARNING] unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present
     [INFO] Name: nginx-replicas, Value: 4, Type: string, Count: 1
     [INFO] Name: tag, Value: 1.16.1, Type: string, Count: 1
 ```

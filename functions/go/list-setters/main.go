@@ -57,13 +57,6 @@ func run(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
 // equivalent items([]framework.Item)
 func resultsToItems(sr listsetters.ListSetters) ([]framework.ResultItem, error) {
 	var items []framework.ResultItem
-	// add any warnings that occurred during setter discovery
-	for _, w := range sr.Warnings {
-		items = append(items, framework.ResultItem{
-			Message:  w.Error(),
-			Severity: framework.Warning,
-		})
-	}
 	rs := sr.GetResults()
 	if len(rs) == 0 {
 		return nil, fmt.Errorf("no setters found")
