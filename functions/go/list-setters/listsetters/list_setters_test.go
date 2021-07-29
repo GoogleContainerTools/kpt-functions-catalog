@@ -461,6 +461,23 @@ metadata:
 				{Name: "replicas", Value: "3", Count: 3, Type: "int"}},
 			warnings: []*WarnSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
+		{
+			name: "ambiguous setter value picks first value",
+			resourceMap: map[string]string{"test.yaml": `apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: example-us-east4 # kpt-set: ${cluster-name}
+  annotations:
+    cnrm.cloud.google.com/project-id: platform-project-id # kpt-set: ${platform-project-id}
+spec:
+  subnetworkRef:
+    name: platform-project-id-example-us-east4 # kpt-set: ${platform-project-id}-${cluster-name}
+`},
+			expectedResult: []*Result{
+				{Name: "cluster-name", Value: "example-us-east4", Count: 2, Type: "str"},
+				{Name: "platform-project-id", Value: "platform-project-id", Count: 2, Type: "str"}},
+			warnings: []*WarnSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
