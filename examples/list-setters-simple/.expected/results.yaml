@@ -7,6 +7,6 @@ items:
   - image: gcr.io/kpt-fn/list-setters:unstable
     exitCode: 0
     results:
-      - message: 'Name: env, Value: [stage, dev], Type: list, Count: 1'
-      - message: 'Name: nginx-replicas, Value: 3, Type: string, Count: 1'
-      - message: 'Name: tag, Value: 1.16.2, Type: string, Count: 1'
+      - message: 'Name: env, Value: [dev, stage], Type: array, Count: 1'
+      - message: 'Name: nginx-replicas, Value: 3, Type: int, Count: 1'
+      - message: 'Name: tag, Value: 1.16.2, Type: str, Count: 1'

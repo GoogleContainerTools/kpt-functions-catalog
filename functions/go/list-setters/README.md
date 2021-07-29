@@ -6,7 +6,7 @@
 
 Lists information about [setters] like setter name, values and count.
 
-Refer to the create-setters function documentation for information about creating new setters or apply-setters function documentation for information about parameterizing field values using setters.
+Refer to the [create-setters] function documentation for information about creating new setters or [apply-setters] function documentation for information about parameterizing field values using setters.
 
 <!--mdtogo-->
 
@@ -69,10 +69,12 @@ Output looks like the following:
 
 ```shell
   Results:
-    [INFO] Name: nginx-replicas, Value: 4, Type: string, Count: 1
-    [INFO] Name: tag, Value: 1.16.1, Type: string, Count: 1
+    [INFO] Name: nginx-replicas, Value: 4, Type: str, Count: 1
+    [INFO] Name: tag, Value: 1.16.1, Type: str, Count: 1
 ```
 
 <!--mdtogo-->
 
 [setter]: https://catalog.kpt.dev/apply-setters/v0.1/?id=definitions
+[create-setters]: https://catalog.kpt.dev/create-setters/v0.1/
+[apply-setters]: https://catalog.kpt.dev/apply-setters/v0.1/
