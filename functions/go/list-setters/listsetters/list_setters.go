@@ -38,6 +38,9 @@ type ScalarSetter struct {
 	// Value is the value of the field set by the setter
 	Value string
 
+	// Type is the data type for the value
+	Type string
+
 	// Count is the number of fields set by the setter
 	Count int
 }
@@ -76,8 +79,8 @@ func (e *WarnSetterDiscovery) Error() string {
 }
 
 const (
-	ArraySetterType  string = "list"
-	ScalarSetterType string = "string"
+	ArraySetterType         string = "list"
+	ScalarSetterDefaultType string = "str"
 )
 
 // FindKptfile discovers Kptfile of the root package from slice of nodes
@@ -187,7 +190,7 @@ func (ls *ListSetters) addKptfileSetters(s map[string]string) {
 		if err == nil {
 			ls.ArraySetters[setterName] = &ArraySetter{Name: setterName, Values: v, Count: 0}
 		} else {
-			ls.ScalarSetters[setterName] = &ScalarSetter{Name: setterName, Value: setterValue, Count: 0}
+			ls.ScalarSetters[setterName] = &ScalarSetter{Name: setterName, Value: setterValue, Type: ScalarSetterDefaultType, Count: 0}
 		}
 	}
 }
@@ -199,7 +202,7 @@ func (ls *ListSetters) GetResults() []*Result {
 		out = append(out, &Result{Name: v.Name, Value: fmt.Sprintf("[%s]", strings.Join(v.Values, ", ")), Count: v.Count, Type: ArraySetterType})
 	}
 	for _, v := range ls.ScalarSetters {
-		out = append(out, &Result{Name: v.Name, Value: v.Value, Count: v.Count, Type: ScalarSetterType})
+		out = append(out, &Result{Name: v.Name, Value: v.Value, Count: v.Count, Type: v.Type})
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].Name < out[j].Name })
 	return out
@@ -314,14 +317,21 @@ func (ls *ListSetters) visitScalar(object *yaml.RNode, path string) error {
 		return nil
 	}
 	currentSetterValues := currentSetterValues(setterPattern, object.YNode().Value)
+	// data type for the current value
+	valueType := strings.TrimPrefix(object.YNode().Tag, "!!")
 
 	// add setters to discovered scalar setters or update count of existing setter
 	for setterName, setterValue := range currentSetterValues {
 		_, ok := ls.ScalarSetters[setterName]
 		if ok {
+			// if type is currently ScalarSetterDefaultType and another type is detected, that is more accurate
+			// this could be due to previous discovery from an interpolated setter or discovery from kptfile
+			if ls.ScalarSetters[setterName].Type == ScalarSetterDefaultType && valueType != ScalarSetterDefaultType {
+				ls.ScalarSetters[setterName].Type = valueType
+			}
 			ls.ScalarSetters[setterName].Count++
 		} else {
-			ls.ScalarSetters[setterName] = &ScalarSetter{Name: setterName, Value: setterValue, Count: 1}
+			ls.ScalarSetters[setterName] = &ScalarSetter{Name: setterName, Value: setterValue, Type: valueType, Count: 1}
 		}
 
 	}

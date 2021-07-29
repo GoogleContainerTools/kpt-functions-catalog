@@ -57,7 +57,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot
 `},
-			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}},
 		},
 		{
 			name: "Scalar Simple invalid kf",
@@ -102,7 +102,7 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`},
-			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}},
 			warnings:       []*WarnSetterDiscovery{{"unable to find apply-setters fn in Kptfile Pipeline.Mutators"}},
 		},
 		{
@@ -122,7 +122,7 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`},
-			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}},
 			warnings:       []*WarnSetterDiscovery{{"unable to find Pipeline declaration in Kptfile"}},
 		},
 		{
@@ -145,7 +145,7 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`},
-			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}},
 			warnings:       []*WarnSetterDiscovery{{"unable to find ConfigMap or ConfigPath fnConfig for apply-setters"}},
 		},
 		{
@@ -169,7 +169,7 @@ metadata:
   labels:
     app: my-app # kpt-set: ${app}
   name: mungebot`},
-			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}},
 			errMsg:         "file setters.yaml doesn't exist, please ensure the file specified in \"configPath\" exists and retry",
 		},
 		{
@@ -196,7 +196,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot			
 `},
-			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}, {Name: "foo", Value: "bar", Count: 0, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}, {Name: "foo", Value: "bar", Count: 0, Type: "str"}},
 		},
 		{
 			name: "Scalar with two apply-setter configMap declarations",
@@ -226,7 +226,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot			
 `},
-			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "string"}, {Name: "foo", Value: "bar", Count: 0, Type: "string"}, {Name: "baz", Value: "qux", Count: 0, Type: "string"}},
+			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}, {Name: "foo", Value: "bar", Count: 0, Type: "str"}, {Name: "baz", Value: "qux", Count: 0, Type: "str"}},
 		},
 		{
 			name: "Mapping Simple",
@@ -301,7 +301,7 @@ spec:
     - ubuntu
     - hbase
  `},
-			expectedResult: []*Result{{Name: "images", Value: "[ubuntu, hbase]", Count: 1, Type: "list"}, {Name: "baz", Value: "qux", Count: 0, Type: "string"}},
+			expectedResult: []*Result{{Name: "images", Value: "[ubuntu, hbase]", Count: 1, Type: "list"}, {Name: "baz", Value: "qux", Count: 0, Type: "str"}},
 		},
 		{
 			name: "Scalar and Mapping",
@@ -325,11 +325,11 @@ spec:
     - "10 alt4.gmr-stmp-in.l.google.com."
 `},
 			expectedResult: []*Result{
-				{Name: "record-set-name", Value: "dnsrecordset-sample-mx", Count: 1, Type: "string"},
-				{Name: "type", Value: "MX", Count: 2, Type: "string"},
-				{Name: "domain", Value: "mail.example.com.", Count: 1, Type: "string"},
-				{Name: "managed-zone-name", Value: "dnsrecordset-dep-mx", Count: 1, Type: "string"},
-				{Name: "ttl", Value: "300", Count: 2, Type: "string"},
+				{Name: "record-set-name", Value: "dnsrecordset-sample-mx", Count: 1, Type: "str"},
+				{Name: "type", Value: "MX", Count: 2, Type: "str"},
+				{Name: "domain", Value: "mail.example.com.", Count: 1, Type: "str"},
+				{Name: "managed-zone-name", Value: "dnsrecordset-dep-mx", Count: 1, Type: "str"},
+				{Name: "ttl", Value: "300", Count: 2, Type: "int"},
 				{Name: "records", Value: "[10 alt1.gmr-stmp-in.l.google.com., 10 alt2.gmr-stmp-in.l.google.com., 10 alt3.gmr-stmp-in.l.google.com., 10 alt4.gmr-stmp-in.l.google.com., 5 gmr-stmp-in.l.google.com.]", Count: 1, Type: "list"},
 			},
 			warnings: []*WarnSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
@@ -397,14 +397,69 @@ pipeline:
       configPath: setters.yaml
 `},
 			expectedResult: []*Result{
-				{Name: "billing-account-id", Value: "AAAAAA-BBBBBB-CCCCCC", Count: 1, Type: "string"},
-				{Name: "folder-name", Value: "name.of.folder", Count: 1, Type: "string"},
-				{Name: "folder-namespace", Value: "hierarchy", Count: 1, Type: "string"},
-				{Name: "network-name", Value: "network-name", Count: 1, Type: "string"},
-				{Name: "networking-namespace", Value: "networking", Count: 1, Type: "string"},
-				{Name: "project-id", Value: "project-id", Count: 3, Type: "string"},
-				{Name: "projects-namespace", Value: "projects", Count: 1, Type: "string"},
+				{Name: "billing-account-id", Value: "AAAAAA-BBBBBB-CCCCCC", Count: 1, Type: "str"},
+				{Name: "folder-name", Value: "name.of.folder", Count: 1, Type: "str"},
+				{Name: "folder-namespace", Value: "hierarchy", Count: 1, Type: "str"},
+				{Name: "network-name", Value: "network-name", Count: 1, Type: "str"},
+				{Name: "networking-namespace", Value: "networking", Count: 1, Type: "str"},
+				{Name: "project-id", Value: "project-id", Count: 3, Type: "str"},
+				{Name: "projects-namespace", Value: "projects", Count: 1, Type: "str"},
 			},
+		},
+		{
+			name: "multi type setters",
+			resourceMap: map[string]string{"test.yaml": `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app # kpt-set: ${app}
+    pi: 3.14 # kpt-set: ${pi}
+  name: mungebot
+spec:
+  replicas: 3 # kpt-set: ${replicas}
+  paused: true # kpt-set: ${paused}
+`},
+			expectedResult: []*Result{
+				{Name: "app", Value: "my-app", Count: 2, Type: "str"},
+				{Name: "paused", Value: "true", Count: 1, Type: "bool"},
+				{Name: "pi", Value: "3.14", Count: 1, Type: "float"},
+				{Name: "replicas", Value: "3", Count: 1, Type: "int"}},
+			warnings: []*WarnSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
+		},
+		{
+			name: "multiple interpolated type setters",
+			resourceMap: map[string]string{"test.yaml": `apiVersion: v1
+kind: Service
+metadata:
+  name: my-app # kpt-set: ${app}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app-3 # kpt-set: ${app}-${replicas}
+  name: mungebot
+spec:
+  replicas: 3 # kpt-set: ${replicas}
+  paused: true # kpt-set: ${paused}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app-3 # kpt-set: ${app}-${replicas}
+  name: mungebot2
+`},
+			expectedResult: []*Result{
+				{Name: "app", Value: "my-app", Count: 3, Type: "str"},
+				{Name: "paused", Value: "true", Count: 1, Type: "bool"},
+				{Name: "replicas", Value: "3", Count: 3, Type: "int"}},
+			warnings: []*WarnSetterDiscovery{{"unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present"}},
 		},
 	}
 	for _, test := range tests {
