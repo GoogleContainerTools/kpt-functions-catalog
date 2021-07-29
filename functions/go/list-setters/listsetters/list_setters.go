@@ -151,7 +151,7 @@ func findSetterNode(nodes []*yaml.RNode, path string) (*yaml.RNode, error) {
 			return node, nil
 		}
 	}
-	return nil, fmt.Errorf(`file %s doesn't exist, please ensure the file specified in "configPath" exists and retry`, path)
+	return nil, &WarnSetterDiscovery{fmt.Sprintf(`file %s doesn't exist, please ensure the file specified in "configPath" exists and retry`, path)}
 }
 
 // getArraySetterValues attempts to parse an array setter value

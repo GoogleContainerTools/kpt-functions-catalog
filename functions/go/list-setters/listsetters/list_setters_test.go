@@ -170,7 +170,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot`},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}},
-			errMsg:         "file setters.yaml doesn't exist, please ensure the file specified in \"configPath\" exists and retry",
+			warnings:       []*WarnSetterDiscovery{{"file setters.yaml doesn't exist, please ensure the file specified in \"configPath\" exists and retry"}},
 		},
 		{
 			name: "Scalar with zero count setter",
