@@ -26,9 +26,9 @@ $ kpt fn eval --image gcr.io/kpt-fn/list-setters:unstable
 [RUNNING] "gcr.io/kpt-fn/list-setters:unstable"
 [PASS] "gcr.io/kpt-fn/list-setters:unstable"
   Results:
-    [INFO] Name: env, Value: [stage, dev], Type: list, Count: 1
-    [INFO] Name: nginx-replicas, Value: 3, Type: string, Count: 1
-    [INFO] Name: tag, Value: 1.16.2, Type: string, Count: 1
+    [INFO] Name: env, Value: [stage, dev], Type: array, Count: 1
+    [INFO] Name: nginx-replicas, Value: 3, Type: str, Count: 1
+    [INFO] Name: tag, Value: 1.16.2, Type: str, Count: 1
 ```
 
 #### Note:
