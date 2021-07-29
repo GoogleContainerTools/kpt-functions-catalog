@@ -35,13 +35,13 @@ type ScalarSetter struct {
 	// Name is the name of the setter
 	Name string
 
-	// Value is the value of the field set by the setter
+	// Value is the value of the field parameterized by the setter
 	Value string
 
 	// Type is the data type for the value
 	Type string
 
-	// Count is the number of fields set by the setter
+	// Count is the number of fields parameterized by the setter
 	Count int
 }
 
@@ -50,10 +50,10 @@ type ArraySetter struct {
 	// Name is the name of the setter
 	Name string
 
-	// Values are the values of the field set by the setter
+	// Values are the values of the field parameterized by the setter
 	Values []string
 
-	// Count is the number of fields set by the setter
+	// Count is the number of fields parameterized by the setter
 	Count int
 }
 
@@ -79,7 +79,7 @@ func (e *WarnSetterDiscovery) Error() string {
 }
 
 const (
-	ArraySetterType         string = "list"
+	ArraySetterType         string = "array"
 	ScalarSetterDefaultType string = "str"
 )
 
