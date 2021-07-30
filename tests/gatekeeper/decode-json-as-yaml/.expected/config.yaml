@@ -1,0 +1,2 @@
+exitCode: 1
+stdErr: tried to parse JSON as YAML. Use --json flag.
