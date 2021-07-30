@@ -33,6 +33,6 @@ $ kpt fn eval --image gcr.io/kpt-fn/list-setters:unstable
 
 #### Note:
 
-Refer to the [apply-setters] function documentation for information about parameterizing field values using setters.
+Refer to the [apply-setters] function documentation for information about updating the field values parameterized by setters.
 
 [apply-setters]: https://catalog.kpt.dev/apply-setters/v0.1/

@@ -6,7 +6,7 @@
 
 Lists information about [setters] like setter name, values and count.
 
-Refer to the [create-setters] function documentation for information about creating new setters or [apply-setters] function documentation for information about parameterizing field values using setters.
+Refer to the [create-setters] function documentation for information about creating new setters or [apply-setters] function documentation for information about updating the field values parameterized by setters.
 
 <!--mdtogo-->
 
