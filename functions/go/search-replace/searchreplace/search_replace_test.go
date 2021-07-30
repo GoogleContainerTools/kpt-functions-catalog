@@ -106,7 +106,7 @@ func TestDecode(t *testing.T) {
 	if !assert.Error(t, err) {
 		t.FailNow()
 	}
-	expected := `invalid matcher "put-values", must be one of ["by-value" "by-value-regex" "by-path" "put-value" "put-comment"]`
+	expected := `invalid matcher "put-values", must be one of ["by-value" "by-file-path" "by-value-regex" "by-path" "put-value" "put-comment"]`
 	if !assert.Equal(t, expected, err.Error()) {
 		t.FailNow()
 	}

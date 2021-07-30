@@ -1,5 +1,8 @@
 # format: Imperative Example
 
+>? This example only works with 1.0.0-beta.1 or lower versions of kpt. Starting
+>  from 1.0.0-beta.2, the order of the fields is preserved by kpt CLI.
+
 This example demonstrates how to imperatively invoke the [format] function to
 format KRM resources.
 

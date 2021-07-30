@@ -1,15 +1,14 @@
 diff --git a/local-config.yaml b/local-config.yaml
-index b8d83d1..678cf9e 100644
+index b8d83d1..8ccd207 100644
 --- a/local-config.yaml
 +++ b/local-config.yaml
-@@ -2,6 +2,7 @@ apiVersion: v1
- kind: ConfigMap
- metadata:
+@@ -4,5 +4,6 @@ metadata:
    name: local-config-map
-+  namespace: test
    annotations:
      config.kubernetes.io/local-config: "true"
++  namespace: test
  data:
+   some-key: some-value
 diff --git a/resources.yaml b/resources.yaml
 index 3127bfa..bddef62 100644
 --- a/resources.yaml
