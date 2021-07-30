@@ -27,10 +27,12 @@ $ kpt fn eval --image gcr.io/kpt-fn/list-setters:unstable
 [PASS] "gcr.io/kpt-fn/list-setters:unstable"
   Results:
     [INFO] Name: env, Value: [stage, dev], Type: array, Count: 1
-    [INFO] Name: nginx-replicas, Value: 3, Type: str, Count: 1
+    [INFO] Name: nginx-replicas, Value: 3, Type: int, Count: 1
     [INFO] Name: tag, Value: 1.16.2, Type: str, Count: 1
 ```
 
 #### Note:
 
-Refer to the `create-setters` function documentation for information about creating setters.
+Refer to the [apply-setters] function documentation for information about parameterizing field values using setters.
+
+[apply-setters]: https://catalog.kpt.dev/apply-setters/v0.1/

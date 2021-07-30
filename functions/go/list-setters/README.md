@@ -69,7 +69,7 @@ Output looks like the following:
 
 ```shell
   Results:
-    [INFO] Name: nginx-replicas, Value: 4, Type: str, Count: 1
+    [INFO] Name: nginx-replicas, Value: 4, Type: int, Count: 1
     [INFO] Name: tag, Value: 1.16.1, Type: str, Count: 1
 ```
 
