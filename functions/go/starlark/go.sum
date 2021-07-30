@@ -349,6 +349,8 @@ k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e h1:KLHHjkdQFomZy8+06csTWZ
 k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e/go.mod h1:vHXdDvt9+2spS2Rx9ql3I8tycm3H9FDfdUoIuKCefvw=
 sigs.k8s.io/kustomize/kyaml v0.10.21 h1:KdoEgz3HzmcaLUTFqs6aaqFpsaA9MVRIwOZbi8vMaD0=
 sigs.k8s.io/kustomize/kyaml v0.10.21/go.mod h1:TYWhGwW9vjoRh3rWqBwB/ZOXyEGRVWe7Ggc3+KZIO+c=
+sigs.k8s.io/kustomize/kyaml v0.11.1-0.20210630191550-02d14d724aa6 h1:uc5vfXuZPwjYPtIJ9G7Q9Tt2Fqdq61g23n8nomjwSj8=
+sigs.k8s.io/kustomize/kyaml v0.11.1-0.20210630191550-02d14d724aa6/go.mod h1:GNMwjim4Ypgp/MueD3zXHLRJEjz7RvtPae0AwlvEMFM=
 sigs.k8s.io/structured-merge-diff/v4 v4.0.2/go.mod h1:bJZC9H9iH24zzfZ/41RGcq60oK1F7G282QMXDPYydCw=
 sigs.k8s.io/structured-merge-diff/v4 v4.1.0 h1:C4r9BgJ98vrKnnVCjwCSXcWjWe0NKcUQkmzDXZXGwH8=
 sigs.k8s.io/structured-merge-diff/v4 v4.1.0/go.mod h1:bJZC9H9iH24zzfZ/41RGcq60oK1F7G282QMXDPYydCw=

@@ -56,7 +56,6 @@ push: ## Push images to registry. WARN: This operation should only be done in CI
 
 site-generate: ## Collect function branches and generate a catalog of their examples and documentation using kpt next.
 	rm -rf ./site/*/
-	# GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt@next
 	(cd scripts/generate_catalog/ && go run . ../.. ../../site)
 
 site-run: ## Run the site locally.

@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/sets"
@@ -15,6 +16,7 @@ const (
 	ByValue       = "by-value"
 	ByValueRegex  = "by-value-regex"
 	ByPath        = "by-path"
+	ByFilePath    = "by-file-path"
 	PutValue      = "put-value"
 	PutComment    = "put-comment"
 	PathDelimiter = "."
@@ -22,7 +24,7 @@ const (
 
 // matchers returns the list of supported matchers
 func matchers() []string {
-	return []string{ByValue, ByValueRegex, ByPath, PutValue, PutComment}
+	return []string{ByValue, ByFilePath, ByValueRegex, ByPath, PutValue, PutComment}
 }
 
 // SearchReplace struct holds the input parameters and results for
@@ -36,6 +38,9 @@ type SearchReplace struct {
 
 	// ByPath is the path of the field to be matched
 	ByPath string
+
+	// ByFilePath is the filepath of the resource to be matched
+	ByFilePath string
 
 	// Count is the number of matches
 	Count int
@@ -101,6 +106,17 @@ func (sr *SearchReplace) Perform(object *yaml.RNode) (*yaml.RNode, error) {
 	if err != nil {
 		return object, err
 	}
+
+	if sr.ByFilePath != "" {
+		match, err := doublestar.Match(sr.ByFilePath, filePath)
+		if err != nil {
+			return object, err
+		}
+		if !match {
+			return object, nil
+		}
+	}
+
 	sr.filePath = filePath
 	if err != nil {
 		return object, err
@@ -375,6 +391,7 @@ func Decode(rn *yaml.RNode, fcd *SearchReplace) error {
 	fcd.ByValueRegex = dm[ByValueRegex]
 	fcd.PutValue = dm[PutValue]
 	fcd.PutComment = dm[PutComment]
+	fcd.ByFilePath = dm[ByFilePath]
 	return nil
 }
 
@@ -392,10 +409,6 @@ func validateMatcherNames(m map[string]string) error {
 
 // validateMatchers validates the input matchers in SearchReplace struct
 func (sr *SearchReplace) validateMatchers() error {
-	if sr.ByValue == "" && sr.ByValueRegex == "" && sr.ByPath == "" {
-		return errors.Errorf(`at least one of [%q, %q, %q] must be provided`, ByValue, ByValueRegex, ByPath)
-	}
-
 	if sr.ByValue != "" && sr.ByValueRegex != "" {
 		return errors.Errorf(`only one of [%q, %q] can be provided`, ByValue, ByValueRegex)
 	}
