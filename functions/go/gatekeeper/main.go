@@ -103,6 +103,13 @@ func (gkp *GatekeeperProcessor) ProcessInput() error {
 			return fmt.Errorf("unable to process input: %w", err)
 		}
 	}
+
+	if len(content) > 0 && content[0] == '{' {
+		// yaml.Unmarshal doesn't fail on trying to parse JSON, and will happily
+		// return something. This safeguards against that.
+		return fmt.Errorf("tried to parse JSON as YAML. Use --json flag.")
+	}
+
 	gkp.inputBuf = bytes.NewBuffer(content)
 	return nil
 }
@@ -156,8 +163,13 @@ func (gkp *GatekeeperProcessor) runGatekeeper() error {
 	}
 	// Process the error only after processing the output.
 	err := framework.Execute(gkp, &kio.ByteReadWriter{
-		Reader:                gkp,
-		Writer:                gkp,
+		Reader: gkp,
+		Writer: gkp,
+		// We should not set the id annotation in the function, since we should not
+		// overwrite what the orchestrator set.
+		OmitReaderAnnotations: true,
+		// We should not remove the id annotations in the function, since the
+		// orchestrator (e.g. kpt) may need them.
 		KeepReaderAnnotations: true,
 	})
 	err2 := gkp.ProcessOutput()
