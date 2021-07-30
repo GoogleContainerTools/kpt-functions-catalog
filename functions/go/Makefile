@@ -25,6 +25,7 @@ FUNCTIONS := \
 	fix \
 	format \
 	gatekeeper \
+	list-setters \
 	search-replace \
 	set-annotations \
 	set-labels \
