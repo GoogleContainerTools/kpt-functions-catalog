@@ -1,0 +1,155 @@
+# configmap-injector
+
+### Overview
+
+<!--mdtogo:Short-->
+
+Inject a set of values in to a config map using a template for substitutions.
+
+<!--mdtogo-->
+
+### Synopsis
+
+<!--mdtogo:Long-->
+
+Configured using a ConfigMapInjector config. A user can specify three properties.
+
+`target` specifies a ConfigMap reference. This is where the resultant config will be added.
+`values` specifies a ConfigMap reference. This is where the setters and values for the substitution can be specified.
+`template` specifies a ConfigMap reference. This is where a user can specify the multiline strings together with the substitutions.
+
+```yaml
+apiVersion: fn.kumorilabs.io/v1alpha1
+kind: ConfigMapInjector
+metadata:
+  name: my-config-injector
+spec:
+  target:
+    name: my-app-cm
+    namespace: my-app
+  values:
+    name: fn-config-my-app-values
+  template:
+    name: fn-config-my-app-template
+---
+# target
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: my-app-cm
+  namespace: my-app
+  annotations:
+    config.kubernetes.io/local-config: "true"
+data:
+  admin.enabled: "false"
+  statusbadge.enabled: "false"  # kpt-set: ${statusBadgeEnabled}
+  users.anonymous.enabled: "false"
+  users.session.duration: "240h"
+  url: https://my-app.dev.example.com # kpt-set: my-app.${stage}.${domain}
+---
+# values
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fn-config-my-app-values
+  annotations:
+    config.kubernetes.io/local-config: "true"
+data:
+  stage: dev # kpt-set: ${stage}
+  domain: example.com # kpt-set: ${domain}
+  realm: my-realm # kpt-set: ${realm}
+  s3BaseUrl: https://my-s3.com # ${s3BaseUrl}
+  s3Bucket: my-bucket # ${s3Bucket}
+---
+# template
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fn-config-my-app-template
+  annotations:
+    config.kubernetes.io/local-config: "true"
+data:
+  oidc.config: |
+    name: ${realm}
+    clientID: $oidc.client-id
+    clientSecret: $oidc.client-secret
+    issuer: https://auth.${stage}.${domain}/auth/realms/${realm}
+    requestedScopes:
+    - openid
+    - profile
+    - email
+    - groups
+  config.json: |
+    {
+      "deployment": {
+        "files": {
+          "example-resource-file1": {
+            "sourceUrl": "${s3BaseUrl}/${s3Bucket}/example-application/example-resource-file1"
+          },
+          "images/example-resource-file2": {
+            "sourceUrl": "${s3BaseUrl}/${s3Bucket}/example-application/images/example-resource-file2"
+          },
+        }
+      },
+      "id": "v1",
+      "runtime": "python27",
+      "threadsafe": true,
+    }
+```
+
+This config will result in the `target` ConfigMap to be updated like so:
+
+```yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: my-app-cm
+  namespace: my-app
+  annotations:
+    config.kubernetes.io/local-config: "true"
+data:
+  admin.enabled: "false"
+  statusbadge.enabled: "false"
+  users.anonymous.enabled: "false"
+  users.session.duration: "240h"
+  url: https://my-app.dev.example.com # kpt-set: my-app.${stage}.${domain}
+  oidc.config: |
+    name: my-realm
+    clientID: $oidc.client-id
+    clientSecret: $oidc.client-secret
+    issuer: https://auth.dev.example.com/auth/realms/my-realm
+    requestedScopes:
+    - openid
+    - profile
+    - email
+    - groups
+  config.json: |
+    {
+      "deployment": {
+        "files": {
+          "example-resource-file1": {
+            "sourceUrl": "https://my-s3.com/my-bucket/example-application/example-resource-file1"
+          },
+          "images/example-resource-file2": {
+            "sourceUrl": "https://my-s3.com/my-bucket/example-application/images/example-resource-file2"
+          },
+        }
+      },
+      "id": "v1",
+      "runtime": "python27",
+      "threadsafe": true,
+    }
+
+```
+
+<!--mdtogo-->
+
+### Examples
+
+<!-- TODO: update the following link to web page -->
+
+<!--mdtogo:Examples-->
+
+https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/configmap-injector/
+
+<!--mdtogo-->
