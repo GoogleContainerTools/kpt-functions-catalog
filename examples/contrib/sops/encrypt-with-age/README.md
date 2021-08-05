@@ -23,12 +23,6 @@ SOPS_IMPORT_AGE="$(cat age_keys.txt)" kpt fn run age
 
 ## Expected result
 
-Verify the updated configuration:
-
-```shell
-kpt cfg cat age
-```
-
-The resource called `toDecrypt` must be decrypted and the resource called `toEncrypt` must be encrypted.
+The resource named `toEncrypt` must be encrypted.
 
 [sops website]: https://github.com/mozilla/sops#encrypting-using-age

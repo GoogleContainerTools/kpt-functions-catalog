@@ -1,0 +1,34 @@
+diff --git a/to-encrypt.yaml b/to-encrypt.yaml
+index 8cb0bad..f93d16b 100644
+--- a/to-encrypt.yaml
++++ b/to-encrypt.yaml
+@@ -2,6 +2,26 @@ apiVersion: v1
+ kind: somekind
+ metadata:
+   name: toEncrypt
+-nnn-password: password1
+-user-password: password2
+-k8s-password: password3
++nnn-password: 'ENC[AES256_GCM,data:rgZIYdYXdzHe,iv:YI9eQJAkfobwLCdn5o4r5c9AnWEvJ5iiVUEVvGr9rz0=,tag:SnTdFSGZa2tzvZ8xPWh4/w==,type:str]'
++user-password: 'ENC[AES256_GCM,data:U2xuDNqIqHdg,iv:MYvgwpXm1A9NXVeC2xjHiufOZyhqMvLvv6Vv64ewXMc=,tag:0mgZxwMbyGnLAR9Kg4bs+w==,type:str]'
++k8s-password: 'ENC[AES256_GCM,data:knUeDm/Jpe9X,iv:JDcEwdOsS07lx10hdZPAWA2DkAa83jQVV/WzB6qh0Oo=,tag:zcgTEmKoOWYhmlNg051UxA==,type:str]'
++sops:
++  kms: []
++  gcp_kms: []
++  azure_kv: []
++  hc_vault: []
++  age:
++  - recipient: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
++    enc: |
++      -----BEGIN AGE ENCRYPTED FILE-----
++      YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBpRjJqOEJtWVJVMXRxUWdQ
++      UnhzbC9nTXByV3lDZ2JsQVdVSDhHVmN5TVZRCk9LblRlVHd1bitNUnBhMCtOcE1T
++      R0NmdStiVGZydjI0T0E4UW9XUHBtM0EKLS0tIFh4MWJZa2NSay8wSHFVaW5YK2d2
++      c0l1dzJlbmlYNDhYdCtBYXJrWU94YncKr699m2mWXtvhbUbb49bTANqnjRv84pyX
++      V2Z8NBtVL1vsOhoFOwbB6qvw0MsWFj7c4qwZackuXkfOqZ6dh67osQ==
++      -----END AGE ENCRYPTED FILE-----
++  lastmodified: '2021-08-05T21:27:00Z'
++  mac: 'ENC[AES256_GCM,data:/SCWcsSn8J8zo6tCfzcTJAx6UvOuW2EBAz/ZBGubkPmaJd2BS5TabE7+KSS0SJUixC2mhyqMI+vvpfkHTWH+MXoeGSvXtg5wcShZIKZCpXJZQJGXYjt1wuy87NMazmuyNs/EYQuVLFBIyAJPu4b7l/pnAmYwOI+/7ngxkyZUJsg=,iv:UktE3UR48H6vFgdShWpsH7Mawes3T+2xcJwkxk3H3PE=,tag:hTiLjYgbubG3X/VnFednxQ==,type:str]'
++  pgp: []
++  unencrypted_regex: ^(kind|apiVersion|group|metadata)$
++  version: 3.7.1
