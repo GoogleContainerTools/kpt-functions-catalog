@@ -11,7 +11,7 @@ configured to be warnings instead of errors.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-warning-only
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-warning-only@gatekeeper/v0.2
 ```
 
 Here's an example `Kptfile` to run the function:
@@ -23,7 +23,7 @@ metadata:
   name: example
 pipeline:
   validators:
-    - image: gcr.io/kpt-fn/gatekeeper:unstable
+    - image: gcr.io/kpt-fn/gatekeeper:v0.2
 ```
 
 In the constraint, we use `enforcementAction: warn` instead of
@@ -58,7 +58,7 @@ metadata:
   name: fnresults
 exitCode: 0
 items:
-  - image: gcr.io/kpt-fn/gatekeeper:unstable
+  - image: gcr.io/kpt-fn/gatekeeper:v0.2
     exitCode: 0
     results:
       - message: |-
@@ -86,4 +86,4 @@ To pass validation, let's replace the key `private_key` in the `ConfigMap` in
 `resources.yaml` with something else e.g. `public_key`.
 Rerun the command. It will no longer have the warning.
 
-[gatekeeper]: https://catalog.kpt.dev/gatekeeper/v0.1/
+[gatekeeper]: https://catalog.kpt.dev/gatekeeper/v0.2/
