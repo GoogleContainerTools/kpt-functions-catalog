@@ -10,7 +10,7 @@ enforce the policy `Containers must not run as root` on resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-disallow-root-user
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-disallow-root-user@gatekeeper/v0.2
 ```
 
 There are 3 resources: a `ConstraintTemplate`, a `DisallowRoot` and
@@ -81,7 +81,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/gatekeeper:unstable
+  - image: gcr.io/kpt-fn/gatekeeper:v0.2
     stderr: |-
       [error] apps/v1/Deployment/nginx-deploy : Containers must not run as root
       violatedConstraint: disallowroot
@@ -110,4 +110,4 @@ To pass validation, let's set
 field `spec.template.spec.securityContext.runAsNonRoot` to `true` in
 the `Deployment` in `resources.yaml`. Rerun the command. It will succeed.
 
-[gatekeeper]: https://catalog.kpt.dev/gatekeeper/v0.1/
+[gatekeeper]: https://catalog.kpt.dev/gatekeeper/v0.2/

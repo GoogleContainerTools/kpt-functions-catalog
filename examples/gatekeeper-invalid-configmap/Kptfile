@@ -4,4 +4,4 @@ metadata:
   name: example
 pipeline:
   validators:
-    - image: gcr.io/kpt-fn/gatekeeper:unstable
+    - image: gcr.io/kpt-fn/gatekeeper:v0.2
