@@ -14,10 +14,10 @@ if they are not already set.
 
 ## Usage
 
-list-setters function is expected to be executed imperatively like:
+set-project-id function is expected to be executed imperatively like:
 
 ```shell
-kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/set-project-id:v0.1 -- 'project-id=foo'
+kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/set-project-id:unstable -- 'project-id=foo'
 ```
 
 The `set-project-id` function does the following:
@@ -28,6 +28,9 @@ The `set-project-id` function does the following:
         config to set the “project-id” setter to the provided project ID value.
     *   If no 'apply-setters' function is present in the Kptfile, add one with
         just the 'project-id' setter set to the provided project ID value.
+    *   If no pipeline is declared in the Kptfile, declare it and add
+        'apply-setters' function as mutator with the 'project-id' setter set to
+        the provided project ID value.
 2.  For all
     [Config Connector resources](https://cloud.google.com/config-connector/docs/reference/overview),
     check if they have the `cnrm.cloud.google.com/project-id` annotation set. If
@@ -59,7 +62,7 @@ metadata:
 Invoke the function:
 
 ```shell
-kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/set-project-id:v0.1 -- 'project-id=foo'
+kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/set-project-id:unstable -- 'project-id=foo'
 ```
 
 Kptfile will be updated to the following:

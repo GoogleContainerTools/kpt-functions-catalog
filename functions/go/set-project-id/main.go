@@ -38,7 +38,7 @@ func findKptfile(nodes []*yaml.RNode) (*kptv1.KptFile, error) {
 		if node.GetAnnotations()[kioutil.PathAnnotation] == kptv1.KptFileName {
 			kf, err := kptv1.ReadFile(node)
 			if err != nil {
-				return nil, fmt.Errorf("failed to read Kptfile: %v", err)
+				return nil, fmt.Errorf("failed to read Kptfile: %w", err)
 			}
 			return kf, nil
 		}
@@ -49,11 +49,11 @@ func findKptfile(nodes []*yaml.RNode) (*kptv1.KptFile, error) {
 func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
 	b, err := yaml.Marshal(kf)
 	if err != nil {
-		return fmt.Errorf("failed to marshal updated Kptfile: %v", err)
+		return fmt.Errorf("failed to marshal updated Kptfile: %w", err)
 	}
 	kNode, err := yaml.Parse(string(b))
 	if err != nil {
-		return fmt.Errorf("failed to parse updated Kptfile: %v", err)
+		return fmt.Errorf("failed to parse updated Kptfile: %w", err)
 	}
 
 	for i, _ := range nodes {
@@ -69,7 +69,7 @@ func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
 func setSetters(nodes []*yaml.RNode, projectID string) error {
 	kf, err := findKptfile(nodes)
 	if err != nil {
-		return fmt.Errorf("faild to find Kptfile: %v", err)
+		return fmt.Errorf("faild to find Kptfile: %w", err)
 	}
 
 	if kf.Pipeline != nil {
@@ -82,13 +82,13 @@ func setSetters(nodes []*yaml.RNode, projectID string) error {
 					fn.ConfigMap[projectIDSetterName] = projectID
 				}
 				if err := setKptfile(nodes, kf); err != nil {
-					return fmt.Errorf("failed to update Kptfile file: %v", err)
+					return fmt.Errorf("failed to update Kptfile file: %w", err)
 				}
 				return nil
 			} else if fn.ConfigPath != "" {
 				settersConfig, err := findSetterNode(nodes, fn.ConfigPath)
 				if err != nil {
-					return fmt.Errorf("failed to find setter file: %v", err)
+					return fmt.Errorf("failed to find setter file: %w", err)
 				}
 				dataMap := settersConfig.GetDataMap()
 				if dataMap[projectIDSetterName] == "" {
@@ -97,7 +97,7 @@ func setSetters(nodes []*yaml.RNode, projectID string) error {
 				}
 				return nil
 			} else {
-				return fmt.Errorf("unable to find ConfigMap or ConfigPath fnConfig for apply-setters")
+				return fmt.Errorf("unable to find `ConfigMap` or `configPath` as the `functionConfig` for apply-setters")
 			}
 		}
 	} else {
@@ -112,7 +112,7 @@ func setSetters(nodes []*yaml.RNode, projectID string) error {
 	}
 	kf.Pipeline.Mutators = append(kf.Pipeline.Mutators, fn)
 	if err := setKptfile(nodes, kf); err != nil {
-		return fmt.Errorf("failed to update Kptfile file: %v", err)
+		return fmt.Errorf("failed to update Kptfile file: %w", err)
 	}
 
 	return nil
@@ -121,12 +121,14 @@ func setSetters(nodes []*yaml.RNode, projectID string) error {
 func setProjectIDAnnotation(nodes []*yaml.RNode, projectID string) error {
 	for _, node := range nodes {
 		matches := kccAPIVersionRegex.FindStringSubmatch(node.GetApiVersion())
+		// Check if it's a Config Connector resource (apiVersion: *.cnrm.cloud.google.com/*).
+		// Ignore Config Connector system resources (apiVersion: core.cnrm.cloud.google.com/*).
 		if len(matches) == 2 && matches[1] != "core" {
 			annotations := node.GetAnnotations()
 			if _, ok := annotations[projectIDAnnotation]; !ok {
 				annotations[projectIDAnnotation] = projectID
 				if err := node.SetAnnotations(annotations); err != nil {
-					return fmt.Errorf("failed to set project-id annotation: %v", err)
+					return fmt.Errorf("failed to set project-id annotation: %w", err)
 				}
 				continue
 			}
@@ -142,10 +144,10 @@ func (p *projectIDProcessor) Process(resourceList *framework.ResourceList) error
 	projectID := dm[projectIDSetterName]
 
 	if err := setSetters(resourceList.Items, projectID); err != nil {
-		return fmt.Errorf("failed to set project-id setter: %v", err)
+		return fmt.Errorf("failed to set project-id setter: %w", err)
 	}
 	if err := setProjectIDAnnotation(resourceList.Items, projectID); err != nil {
-		return fmt.Errorf("failed to set project-id annotation: %v", err)
+		return fmt.Errorf("failed to set project-id annotation: %w", err)
 	}
 
 	return nil
