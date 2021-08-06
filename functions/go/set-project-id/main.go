@@ -33,17 +33,21 @@ func findSetterNode(nodes []*yaml.RNode, path string) (*yaml.RNode, error) {
 	return nil, fmt.Errorf(`file %s doesn't exist, please ensure the file specified in "configPath" exists and retry`, path)
 }
 
-func findKptfile(nodes []*yaml.RNode) (*kptv1.KptFile, error) {
+func findKptfiles(nodes []*yaml.RNode) ([]*kptv1.KptFile, error) {
+	kptfiles := []*kptv1.KptFile{}
 	for _, node := range nodes {
 		if node.GetAnnotations()[kioutil.PathAnnotation] == kptv1.KptFileName {
 			kf, err := kptv1.ReadFile(node)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read Kptfile: %w", err)
 			}
-			return kf, nil
+			kptfiles = append(kptfiles, kf)
 		}
 	}
-	return nil, fmt.Errorf("unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present")
+	if len(kptfiles) == 0 {
+		return nil, fmt.Errorf("unable to find Kptfile, please include --include-meta-resources flag if a Kptfile is present")
+	}
+	return kptfiles, nil
 }
 
 func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
@@ -66,12 +70,7 @@ func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
 
 }
 
-func setSetters(nodes []*yaml.RNode, projectID string) error {
-	kf, err := findKptfile(nodes)
-	if err != nil {
-		return fmt.Errorf("faild to find Kptfile: %w", err)
-	}
-
+func setSettersOnKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile, projectID string) error {
 	if kf.Pipeline != nil {
 		for _, fn := range kf.Pipeline.Mutators {
 			if !strings.Contains(fn.Image, "apply-setters") {
@@ -113,6 +112,21 @@ func setSetters(nodes []*yaml.RNode, projectID string) error {
 	kf.Pipeline.Mutators = append(kf.Pipeline.Mutators, fn)
 	if err := setKptfile(nodes, kf); err != nil {
 		return fmt.Errorf("failed to update Kptfile file: %w", err)
+	}
+
+	return nil
+}
+
+func setSetters(nodes []*yaml.RNode, projectID string) error {
+	kptfiles, err := findKptfiles(nodes)
+	if err != nil {
+		return fmt.Errorf("faild to find Kptfile: %v", err)
+	}
+
+	for _, kf := range kptfiles {
+		if err := setSettersOnKptfile(nodes, kf, projectID); err != nil {
+			return fmt.Errorf("error updating Kptfile: %w", err)
+		}
 	}
 
 	return nil
