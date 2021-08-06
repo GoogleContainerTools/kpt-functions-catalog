@@ -4,8 +4,5 @@ metadata:
   name: test-blueprint
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-project-id:unstable
-inventory:
-  namespace: config-control
-  name: test-deployment
-  inventoryID: test-deployment
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configPath: setters.yaml
