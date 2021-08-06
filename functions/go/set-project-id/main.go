@@ -60,7 +60,7 @@ func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
 		return fmt.Errorf("failed to parse updated Kptfile: %w", err)
 	}
 
-	for i, _ := range nodes {
+	for i := range nodes {
 		if nodes[i].GetAnnotations()[kioutil.PathAnnotation] == kptv1.KptFileName {
 			nodes[i] = kNode
 			return nil
