@@ -99,22 +99,24 @@ $ make unit-test
 
 The e2e tests are the recommended way to test functions in the catalog. They are
 very easy to write and set up with our e2e test harness. You can find all the
-supported options [here][e2e test harness doc].
+supported options and expected test directory
+structure [here][e2e test harness doc].
 
 You can choose to put the e2e test in either the `examples/` directory or in the
 `tests/` directory depending on if it is worthwhile to be shown as an example.
-
-To test all examples and e2e tests, run
-
-```shell
-$ make e2e-test
-```
 
 To test a specific example or the e2e test, run
 
 ```shell
 $ cd tests/e2etest
 $ go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
+```
+
+Most contributors don't need this, but if you happen to need to test all
+examples and e2e tests, run the following command
+
+```shell
+$ make e2e-test
 ```
 
 #### Doc Verifier
@@ -126,8 +128,15 @@ Please ensure it's passing by running:
 $ ./scripts/verify-docs.py
 ```
 
-This script requires Python 3 and `mdrip` which is a CLI tool. To
-install `mdrip`, run the following commands:
+This script requires Python 3, `pyyaml` and `mdrip` which is a CLI tool.
+
+To install `pyyaml`, run the following command:
+
+```shell
+pip install pyyaml
+```
+
+To install `mdrip`, run the following commands:
 
 ```shell
 $ go get github.com/russross/blackfriday/v2@v2.0.1
@@ -154,8 +163,6 @@ You need to add new function name to the respective language Makefiles.
 
 - `functions/go/Makefile` for golang.
 - `functions/ts/Makefile` for typescript.
-
-###  
 
 ## Contact Us
 
