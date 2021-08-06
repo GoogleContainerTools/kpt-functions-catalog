@@ -36,7 +36,7 @@ func findSetterNode(nodes []*yaml.RNode, path string) (*yaml.RNode, error) {
 func findKptfiles(nodes []*yaml.RNode) ([]*kptv1.KptFile, error) {
 	kptfiles := []*kptv1.KptFile{}
 	for _, node := range nodes {
-		if node.GetAnnotations()[kioutil.PathAnnotation] == kptv1.KptFileName {
+		if node.GetKind() == kptv1.KptFileName {
 			kf, err := kptv1.ReadFile(node)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read Kptfile: %w", err)
