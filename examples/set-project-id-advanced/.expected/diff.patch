@@ -11,17 +11,16 @@ index 9e4fea2..ff21ea3 100644
    storageClass: standard # kpt-set: ${storage-class}
    uniformBucketLevelAccess: true
 diff --git a/setters.yaml b/setters.yaml
-index 1702bac..b0ef261 100644
+index 1702bac..06515a7 100644
 --- a/setters.yaml
 +++ b/setters.yaml
-@@ -4,4 +4,5 @@ metadata:
-   name: setters
+@@ -5,3 +5,4 @@ metadata:
  data:
    namespace: config-control
-+  project-id: foo
    storage-class: standard
++  project-id: foo
 diff --git a/subpkg/Kptfile b/subpkg/Kptfile
-index c96b2cd..9adb21b 100644
+index c96b2cd..2643351 100644
 --- a/subpkg/Kptfile
 +++ b/subpkg/Kptfile
 @@ -2,3 +2,8 @@ apiVersion: kpt.dev/v1
@@ -30,9 +29,9 @@ index c96b2cd..9adb21b 100644
    name: subpkg
 +pipeline:
 +  mutators:
-+    - image: gcr.io/kpt-fn/apply-setters:v0.1
-+      configMap:
-+        project-id: foo
++  - image: gcr.io/kpt-fn/apply-setters:v0.1
++    configMap:
++      project-id: foo
 diff --git a/subpkg/resources.yaml b/subpkg/resources.yaml
 index 84a6d6a..d568a8f 100644
 --- a/subpkg/resources.yaml
