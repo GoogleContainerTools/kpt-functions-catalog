@@ -61,7 +61,7 @@ func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
 	}
 
 	for i := range nodes {
-		if nodes[i].GetAnnotations()[kioutil.PathAnnotation] == kptv1.KptFileName {
+		if nodes[i].GetAnnotations()[kioutil.PathAnnotation] == kf.Annotations[kioutil.PathAnnotation] {
 			nodes[i] = kNode
 			return nil
 		}
@@ -71,36 +71,35 @@ func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
 }
 
 func setSettersOnKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile, projectID string) error {
-	if kf.Pipeline != nil {
-		for _, fn := range kf.Pipeline.Mutators {
-			if !strings.Contains(fn.Image, "apply-setters") {
-				continue
-			}
-			if fn.ConfigMap != nil {
-				if fn.ConfigMap[projectIDSetterName] == "" {
-					fn.ConfigMap[projectIDSetterName] = projectID
-				}
-				if err := setKptfile(nodes, kf); err != nil {
-					return fmt.Errorf("failed to update Kptfile file: %w", err)
-				}
-				return nil
-			} else if fn.ConfigPath != "" {
-				settersConfig, err := findSetterNode(nodes, fn.ConfigPath)
-				if err != nil {
-					return fmt.Errorf("failed to find setter file: %w", err)
-				}
-				dataMap := settersConfig.GetDataMap()
-				if dataMap[projectIDSetterName] == "" {
-					dataMap[projectIDSetterName] = projectID
-					settersConfig.SetDataMap(dataMap)
-				}
-				return nil
-			} else {
-				return fmt.Errorf("unable to find `ConfigMap` or `configPath` as the `functionConfig` for apply-setters")
-			}
-		}
-	} else {
+	if kf.Pipeline == nil {
 		kf.Pipeline = &kptv1.Pipeline{}
+	}
+	for _, fn := range kf.Pipeline.Mutators {
+		if !strings.Contains(fn.Image, "apply-setters") {
+			continue
+		}
+		if fn.ConfigMap != nil {
+			if fn.ConfigMap[projectIDSetterName] == "" {
+				fn.ConfigMap[projectIDSetterName] = projectID
+			}
+			if err := setKptfile(nodes, kf); err != nil {
+				return fmt.Errorf("failed to update Kptfile file: %w", err)
+			}
+			return nil
+		} else if fn.ConfigPath != "" {
+			settersConfig, err := findSetterNode(nodes, fn.ConfigPath)
+			if err != nil {
+				return fmt.Errorf("failed to find setter file: %w", err)
+			}
+			dataMap := settersConfig.GetDataMap()
+			if dataMap[projectIDSetterName] == "" {
+				dataMap[projectIDSetterName] = projectID
+				settersConfig.SetDataMap(dataMap)
+			}
+			return nil
+		} else {
+			return fmt.Errorf("unable to find `ConfigMap` or `configPath` as the `functionConfig` for apply-setters")
+		}
 	}
 
 	fn := kptv1.Function{

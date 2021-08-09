@@ -4,7 +4,8 @@
 
 <!--mdtogo:Short-->
 
-The `set-project-id` function sets 'project-id' setter and
+The `set-project-id` function sets 'project-id'
+[setter](https://catalog.kpt.dev/apply-setters/v0.1/?id=definitions) and
 `cnrm.cloud.google.com/project-id` annotation to the provided project ID, only
 if they are not already set.
 
