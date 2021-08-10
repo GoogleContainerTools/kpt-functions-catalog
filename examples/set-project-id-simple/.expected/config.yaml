@@ -1,5 +1,5 @@
 testType: eval
 includeMetaResources: true
-image: gcr.io/kpt-fn/set-project-id:unstable
+image: gcr.io/kpt-fn/set-project-id:v0.1
 args:
   project-id: foo
