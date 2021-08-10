@@ -30,6 +30,7 @@ FUNCTIONS := \
 	set-annotations \
 	set-labels \
 	set-namespace \
+	set-project-id \
 	starlark \
 	upsert-resource
 
