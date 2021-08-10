@@ -112,6 +112,16 @@ $ cd tests/e2etest
 $ go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
 ```
 
+To update the expected `diff.patch` or `results.yaml`, run
+```shell
+# Update one example
+$ KPT_E2E_UPDATE_EXPECTED=true go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
+
+# Update all examples
+$ KPT_E2E_UPDATE_EXPECTED=true go test -v ./...
+```
+
+
 Most contributors don't need this, but if you happen to need to test all
 examples and e2e tests, run the following command
 
