@@ -11,7 +11,8 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 
-	kptv1 "github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1"
+	kptfilev1 "github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/api/kptfile/v1"
+	kptutil "github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/api/util"
 )
 
 var (
@@ -33,11 +34,15 @@ func findSetterNode(nodes []*yaml.RNode, path string) (*yaml.RNode, error) {
 	return nil, fmt.Errorf(`file %s doesn't exist, please ensure the file specified in "configPath" exists and retry`, path)
 }
 
-func findKptfiles(nodes []*yaml.RNode) ([]*kptv1.KptFile, error) {
-	kptfiles := []*kptv1.KptFile{}
+func findKptfiles(nodes []*yaml.RNode) ([]*kptfilev1.KptFile, error) {
+	kptfiles := []*kptfilev1.KptFile{}
 	for _, node := range nodes {
-		if node.GetKind() == kptv1.KptFileName {
-			kf, err := kptv1.ReadFile(node)
+		if node.GetKind() == kptfilev1.KptFileKind {
+			s, err := node.String()
+			if err != nil {
+				return nil, fmt.Errorf("unable to read Kptfile: %w", err)
+			}
+			kf, err := kptutil.DecodeKptfile(s)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read Kptfile: %w", err)
 			}
@@ -50,7 +55,7 @@ func findKptfiles(nodes []*yaml.RNode) ([]*kptv1.KptFile, error) {
 	return kptfiles, nil
 }
 
-func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
+func setKptfile(nodes []*yaml.RNode, kf *kptfilev1.KptFile) error {
 	b, err := yaml.Marshal(kf)
 	if err != nil {
 		return fmt.Errorf("failed to marshal updated Kptfile: %w", err)
@@ -70,9 +75,9 @@ func setKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile) error {
 
 }
 
-func setSettersOnKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile, projectID string) error {
+func setSettersOnKptfile(nodes []*yaml.RNode, kf *kptfilev1.KptFile, projectID string) error {
 	if kf.Pipeline == nil {
-		kf.Pipeline = &kptv1.Pipeline{}
+		kf.Pipeline = &kptfilev1.Pipeline{}
 	}
 	for _, fn := range kf.Pipeline.Mutators {
 		if !strings.Contains(fn.Image, "apply-setters") {
@@ -102,7 +107,7 @@ func setSettersOnKptfile(nodes []*yaml.RNode, kf *kptv1.KptFile, projectID strin
 		}
 	}
 
-	fn := kptv1.Function{
+	fn := kptfilev1.Function{
 		Image: "gcr.io/kpt-fn/apply-setters:v0.1",
 		ConfigMap: map[string]string{
 			projectIDSetterName: projectID,
