@@ -9,7 +9,7 @@ In this example, we will see how to list setters in a package.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/list-setters-simple
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/list-setters-simple@list-setters/v0.1
 ```
 
 ### Function invocation
@@ -17,14 +17,14 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following command:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/list-setters:unstable
+$ kpt fn eval --image gcr.io/kpt-fn/list-setters:v0.1
 ```
 
 ### Expected result
 
 ```shell
-[RUNNING] "gcr.io/kpt-fn/list-setters:unstable"
-[PASS] "gcr.io/kpt-fn/list-setters:unstable"
+[RUNNING] "gcr.io/kpt-fn/list-setters:v0.1"
+[PASS] "gcr.io/kpt-fn/list-setters:v0.1"
   Results:
     [INFO] Name: env, Value: [stage, dev], Type: array, Count: 1
     [INFO] Name: nginx-replicas, Value: 3, Type: int, Count: 1
