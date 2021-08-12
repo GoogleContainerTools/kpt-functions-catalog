@@ -26,7 +26,7 @@ import (
 //  - 'diff.patch' is the expected diff output between original package files and
 //    files after function running. The diff will be compared only when the exit code
 //    matches expected and is zero.
-//  - 'results.yaml' is the expected results output from the command 'kpt fn run'.
+//  - 'results.yaml' is the expected results output from the command 'kpt fn eval'.
 //    The results will be compared only when the exit code matches expected and is not
 //    zero.
 //
