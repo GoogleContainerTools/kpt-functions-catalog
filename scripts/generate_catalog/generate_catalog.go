@@ -316,7 +316,14 @@ func getRelativeFunctionPath(source string, funcName string) (string, error) {
 		return "", err
 	}
 	if m == nil {
-		return "", fmt.Errorf("Could not find a function with the following pattern: %v", sourcePattern)
+		contribPattern := filepath.Join(source, "functions", "contrib", "*", funcName)
+		m, err = filepath.Glob(contribPattern)
+		if err != nil {
+			return "", err
+		}
+		if m == nil {
+			return "", fmt.Errorf("Could not find a function with the following name: %v", funcName)
+		}
 	}
 
 	return functionDirPrefix.ReplaceAllString(m[0], "functions/"), nil
