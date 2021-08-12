@@ -36,7 +36,7 @@ import yaml
 import subprocess
 
 metadata_filename = 'metadata.yaml'
-directories_to_skip = ['_template', 'dist', 'node_modules']
+directories_to_skip = ['_template', 'dist', 'node_modules', 'inflate-helm-chart']
 examples_directory = 'examples'
 functions_directory = 'functions'
 directories_to_scan = [os.path.join(functions_directory, 'go'), os.path.join(functions_directory, 'ts')]
