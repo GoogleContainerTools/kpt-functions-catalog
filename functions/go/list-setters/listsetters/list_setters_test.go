@@ -78,7 +78,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot
 `},
-			errMsg: "unable to read Kptfile: please make sure the package has a valid 'v1' Kptfile: yaml: unmarshal errors:\n  line 8: field foo not found in type v1.KptFile",
+			errMsg: "unable to read Kptfile: invalid 'v1' Kptfile: yaml: unmarshal errors:\n  line 8: field foo not found in type v1.KptFile",
 		},
 		{
 			name: "Scalar Simple missing apply-setters",
