@@ -79,6 +79,7 @@ type function struct {
 	Path              string
 	Description       string
 	Tags              string
+	Gcp               bool
 }
 
 type example struct {
@@ -291,8 +292,17 @@ func parseMetadata(f function, md metadata, version string, versionDest string) 
 	f.LatestVersion = version
 	f.Path = versionDest
 	f.Description = md.Description
-	sort.Strings(md.Tags)
-	f.Tags = strings.Join(md.Tags, ", ")
+	functionTags := make([]string, 0)
+	for _, tag := range md.Tags {
+		normalizedTag := strings.ToLower(tag)
+		if normalizedTag == "gcp" {
+			f.Gcp = true
+		} else {
+			functionTags = append(functionTags, normalizedTag)
+		}
+	}
+	sort.Strings(functionTags)
+	f.Tags = strings.Join(functionTags, ", ")
 	f.ImagePath = md.Image
 
 	return f
@@ -306,22 +316,50 @@ func getRelativeFunctionPath(source string, funcName string) (string, error) {
 		return "", err
 	}
 	if m == nil {
-		return "", fmt.Errorf("Could not find a function with the following pattern: %v", sourcePattern)
+		contribPattern := filepath.Join(source, "functions", "contrib", "*", funcName)
+		m, err = filepath.Glob(contribPattern)
+		if err != nil {
+			return "", err
+		}
+		if m == nil {
+			return "", fmt.Errorf("Could not find a function with the following name: %v", funcName)
+		}
 	}
 
 	return functionDirPrefix.ReplaceAllString(m[0], "functions/"), nil
 }
 
 func writeFunctionIndex(functions []function, source string, dest string) error {
-	out := []string{"# Functions Catalog", "", "| Name | Description | Tags |", "| ---- | ----------- | ---- |"}
+	out := []string{"# Functions Catalog", ""}
+	genericFunctions := make([]function, 0)
+	gcp := make([]function, 0)
 	for _, f := range functions {
-		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.FunctionName, strings.Replace(f.Path, filepath.Join(source, "site"), "", 1), f.Description, f.Tags)
-		out = append(out, functionEntry)
+		if f.Gcp {
+			gcp = append(gcp, f)
+		} else {
+			genericFunctions = append(genericFunctions, f)
+		}
+	}
+
+	out = append(out, getFunctionTable(genericFunctions, source)...)
+
+	if len(gcp) > 0 {
+		out = append(out, "", "## GCP Functions", "")
+		out = append(out, getFunctionTable(gcp, source)...)
 	}
 
 	o := strings.Join(out, "\n")
 	err := ioutil.WriteFile(filepath.Join(dest, "README.md"), []byte(o), 0744)
 	return err
+}
+
+func getFunctionTable(functions []function, source string) []string {
+	out := []string{"| Name | Description | Tags |", "| ---- | ----------- | ---- |"}
+	for _, f := range functions {
+		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.FunctionName, strings.Replace(f.Path, filepath.Join(source, "site"), "", 1), f.Description, f.Tags)
+		out = append(out, functionEntry)
+	}
+	return out
 }
 
 func writeExampleIndex(functions []function, source string, dest string) error {

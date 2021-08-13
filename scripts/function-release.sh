@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# GIT_TAG should be set in format as {language_name}/{function_name}/{semver}.
-# e.g. "go/set-namespace/v1.2.3" and "ts/kubeval/v2.3.4"
+# GIT_TAG should be set in format as
+# functions/{language_name}/{function_name}/{semver}.
+# e.g. "functions/go/set-namespace/v1.2.3" and "functions/ts/kubeval/v2.3.4"
 # You can optionally set environment variable GCR_REGISTRY
 # (e.g. "gcr.io/my-project"), then your image will be built as
 # {GCR_REGISTRY}/{function_name}:{tag}.
