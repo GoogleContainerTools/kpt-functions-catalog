@@ -1,9 +1,24 @@
+// Copyright 2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/inflate-helm-chart/generated"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/inflate-helm-chart/third_party/sigs.k8s.io/kustomize/api/builtins"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
@@ -17,8 +32,8 @@ func main() {
 	asp := HelmChartProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 
-	cmd.Short = "inflate helm chart"
-	cmd.Long = "inflate helm chart"
+	cmd.Short = generated.InflateHelmChartShort
+	cmd.Long = generated.InflateHelmChartLong
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -45,7 +60,7 @@ func (slp *HelmChartProcessor) Process(resourceList *framework.ResourceList) err
 
 type helmChartInflatorFunction struct {
 	kyaml.ResourceMeta `json:",inline" yaml:",inline"`
-	plugins []builtins.Plugin
+	plugins []builtins.HelmChartInflationGeneratorPlugin
 }
 
 func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {
@@ -74,7 +89,7 @@ func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("`functionConfig` must be 'ConfigMap' or 'InflateHelmChart'")
+		return fmt.Errorf("`functionConfig` must be `ConfigMap` or `InflateHelmChart`")
 	}
 	return nil
 }
@@ -143,7 +158,7 @@ func (f *helmChartInflatorFunction) ConfigHelmArgs(
 		return
 	}
 	for _, helmChart := range args.HelmCharts {
-		p := builtins.Plugin{
+		p := builtins.HelmChartInflationGeneratorPlugin{
 			HelmGlobals: args.HelmGlobals,
 			HelmChart:   helmChart,
 		}
@@ -158,7 +173,7 @@ func (f *helmChartInflatorFunction) ConfigHelmArgs(
 
 func (f *helmChartInflatorFunction) ConfigMapArgs(
 	bytes []byte) (err error) {
-	var p builtins.Plugin
+	var p builtins.HelmChartInflationGeneratorPlugin
 	err = kyaml.Unmarshal(bytes, &p)
 	if err != nil {
 		return err

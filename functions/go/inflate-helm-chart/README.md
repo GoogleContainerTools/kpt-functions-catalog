@@ -4,7 +4,7 @@
 [charts]: https://helm.sh/docs/topics/charts/
 [local]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/inflate-helm-chart-local
 [remote]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/inflate-helm-chart-remote
-
+[helm template command]: https://helm.sh/docs/helm/helm_template/
 
 ## Overview
 
@@ -19,7 +19,7 @@ called charts. A chart is a collection of files within a directory, which
 contain templates, CRDs, values, and metadata. 
 
 This function renders charts locally by using the 
-[helm template command][https://helm.sh/docs/helm/helm_template/],
+[helm template command],
 so that helm charts can be inflated without needing to install the
 helm binary directly.
 
@@ -69,19 +69,19 @@ data:
   includeCRDs: string
 ```
 
-| Field        |  Description | 
-| -----------: |  ----------- | 
-`helmGlobals`  | Parameters applied to all Helm charts
-`helmCharts`   | An array of helm chart parameters
-`chartHome`    | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/".
-`configHome`   | (exec only) Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm.
-`name`         | The name of the chart
-`version`      | The version of the chart
-`repo`         | A URL locating the chart on the internet
-`releaseName`  | Replaces RELEASE_NAME in the chart template output
-`namespace`    | Sets the target namespace for a release (.Release.Namespace in the template)
-`valuesFile`   | valuesFile is a remote or local file path to a values file to use _instead of_ the default values that accompanied the chart. The default values are in '{ChartHome}/{Name}/values.yaml'.
-`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions. Can be 'true' or 'false', defaults to 'false'
+
+| Field        |  Description | Example
+| -----------: |  ----------- | -----------
+`chartHome`    | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/". | tmp/charts
+`configHome`   | (exec only) Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm. | /tmp/helm/config
+`name`         | The name of the chart | minecraft
+`version`      | The version of the chart | 3.1.3
+`repo`         | A URL locating the chart on the internet | https://itzg.github.io/minecraft-server-charts
+`releaseName`  | Replaces RELEASE_NAME in the chart template output | test
+`namespace`    | Sets the target namespace for a release (`.Release.Namespace` in the template) | my-namespace
+`valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | tmp/values.yaml <br> <br> https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
+`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to 'false' | true
+
 
 The only required field is `name`.
 
@@ -104,21 +104,21 @@ helmCharts:
   includeCRDs: bool
 ```
 
-| Field        |  Description | 
-| -----------: |  ----------- | 
+| Field        |  Description | Example
+| -----------: |  ----------- | -----------
 `helmGlobals`  | Parameters applied to all Helm charts
 `helmCharts`   | An array of helm chart parameters
-`chartHome`    | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/".
-`configHome`   | (exec only) Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm.
-`name`         | The name of the chart
-`version`      | The version of the chart
-`repo`         | A URL locating the chart on the internet
-`releaseName`  | Replaces RELEASE_NAME in the chart template output
-`namespace`    | Sets the target namespace for a release (.Release.Namespace in the template)
-`valuesInline` | Values to use instead of default values that accompany the chart
-`valuesFile`   | valuesFile is a remote or local file path to a values file to use _instead of_ the default values that accompanied the chart. The default values are in '{ChartHome}/{Name}/values.yaml'.
-`valuesMerge`  | ValuesMerge specifies how to treat ValuesInline with respect to Values. Legal values: 'merge', 'override' (default), 'replace'.
-`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to 'false'
+`chartHome`    | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/". | tmp/charts
+`configHome`   | (exec only) Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm. | /tmp/helm/config
+`name`         | The name of the chart | minecraft
+`version`      | The version of the chart | 3.1.3
+`repo`         | A URL locating the chart on the internet | https://itzg.github.io/minecraft-server-charts
+`releaseName`  | Replaces RELEASE_NAME in the chart template output | test
+`namespace`    | Sets the target namespace for a release (`.Release.Namespace` in the template) | my-namespace
+`valuesInline` | Values to use instead of default values that accompany the chart |  global: <br> &emsp; enabled: false <br> tests: <br> &emsp; enabled: false  
+`valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | tmp/values.yaml <br> <br> https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
+`valuesMerge`  | ValuesMerge specifies how to treat ValuesInline with respect to Values. Legal values: 'merge', 'override' (default), 'replace'. | replace
+`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to 'false' | true
 
 The only required field is `name`.
 
@@ -139,7 +139,8 @@ repo=https://itzg.github.io/minecraft-server-charts \
 releaseName=test
 ```
 
-This will add two files to your directory, which you can view:
+The key-value pairs after the `--` will be converted to a 'functionConfig' of kind
+`ConfigMap`. The above command will add two files to your directory, which you can view:
 
 ```shell
 $ kpt pkg tree
@@ -163,7 +164,7 @@ generators:
       config.kubernetes.io/function: |
         container:
           network: true
-          image: gcr.io/kpt-fn/inflate-helm-chart:latest
+          image: gcr.io/kpt-fn/inflate-helm-chart:unstable
   helmCharts:
   - name: minecraft
     repo: https://itzg.github.io/minecraft-server-charts
@@ -192,8 +193,8 @@ generators:
     releaseName: test
 ```
 
-For both of the above kustomizations, the helm chart can be
-inflated with the following command:
+For both of the above kustomizations, you can use kustomize v4 to inflate
+the helm charts with the following command:
 
 ```shell
 kustomize build --enable-alpha-plugins --network .

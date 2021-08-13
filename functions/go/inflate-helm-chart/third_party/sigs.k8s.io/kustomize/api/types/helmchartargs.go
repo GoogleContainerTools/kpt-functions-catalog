@@ -71,3 +71,50 @@ type HelmChart struct {
 	// Defaults to 'false'.
 	IncludeCRDs bool `json:"includeCRDs,omitempty" yaml:"includeCRDs,omitempty"`
 }
+
+// HelmChartArgs contains arguments to helm.
+// Deprecated.  Use HelmGlobals and HelmChart instead.
+type HelmChartArgs struct {
+	ChartName        string                 `json:"chartName,omitempty" yaml:"chartName,omitempty"`
+	ChartVersion     string                 `json:"chartVersion,omitempty" yaml:"chartVersion,omitempty"`
+	ChartRepoURL     string                 `json:"chartRepoUrl,omitempty" yaml:"chartRepoUrl,omitempty"`
+	ChartHome        string                 `json:"chartHome,omitempty" yaml:"chartHome,omitempty"`
+	ChartRepoName    string                 `json:"chartRepoName,omitempty" yaml:"chartRepoName,omitempty"`
+	HelmBin          string                 `json:"helmBin,omitempty" yaml:"helmBin,omitempty"`
+	HelmHome         string                 `json:"helmHome,omitempty" yaml:"helmHome,omitempty"`
+	Values           string                 `json:"values,omitempty" yaml:"values,omitempty"`
+	ValuesLocal      map[string]interface{} `json:"valuesLocal,omitempty" yaml:"valuesLocal,omitempty"`
+	ValuesMerge      string                 `json:"valuesMerge,omitempty" yaml:"valuesMerge,omitempty"`
+	ReleaseName      string                 `json:"releaseName,omitempty" yaml:"releaseName,omitempty"`
+	ReleaseNamespace string                 `json:"releaseNamespace,omitempty" yaml:"releaseNamespace,omitempty"`
+	ExtraArgs        []string               `json:"extraArgs,omitempty" yaml:"extraArgs,omitempty"`
+}
+
+// SplitHelmParameters splits helm parameters into
+// per-chart params and global chart-independent parameters.
+func SplitHelmParameters(
+	oldArgs []HelmChartArgs) (charts []HelmChart, globals HelmGlobals) {
+	for _, old := range oldArgs {
+		charts = append(charts, makeHelmChartFromHca(&old))
+		if old.HelmHome != "" {
+			// last non-empty wins
+			globals.ConfigHome = old.HelmHome
+		}
+		if old.ChartHome != "" {
+			// last non-empty wins
+			globals.ChartHome = old.ChartHome
+		}
+	}
+	return charts, globals
+}
+
+func makeHelmChartFromHca(old *HelmChartArgs) (c HelmChart) {
+	c.Name = old.ChartName
+	c.Version = old.ChartVersion
+	c.Repo = old.ChartRepoURL
+	c.ValuesFile = old.Values
+	c.ValuesInline = old.ValuesLocal
+	c.ValuesMerge = old.ValuesMerge
+	c.ReleaseName = old.ReleaseName
+	return
+}
