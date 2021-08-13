@@ -112,7 +112,10 @@ $ cd tests/e2etest
 $ go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
 ```
 
-To update the expected `diff.patch` or `results.yaml`, run
+If you encounter some test failure saying something like "actual diff doesn't
+match expected" or "actual results doesn't match expected", you can update the
+expected `diff.patch` or `results.yaml` by running the following commands:
+
 ```shell
 # Update one example
 $ KPT_E2E_UPDATE_EXPECTED=true go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
