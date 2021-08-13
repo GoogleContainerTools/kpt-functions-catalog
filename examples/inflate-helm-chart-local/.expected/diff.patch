@@ -1,0 +1,119 @@
+diff --git a/deployment_test-helloworld-chart.yaml b/deployment_test-helloworld-chart.yaml
+new file mode 100644
+index 0000000..8ba7f5c
+--- /dev/null
++++ b/deployment_test-helloworld-chart.yaml
+@@ -0,0 +1,43 @@
++# Source: helloworld-chart/templates/deployment.yaml
++apiVersion: apps/v1
++kind: Deployment
++metadata:
++  name: test-helloworld-chart
++  labels:
++    helm.sh/chart: helloworld-chart-0.1.0
++    app.kubernetes.io/name: helloworld-chart
++    app.kubernetes.io/instance: test
++    app.kubernetes.io/version: "1.16.0"
++    app.kubernetes.io/managed-by: Helm
++spec:
++  replicas: 5
++  selector:
++    matchLabels:
++      app.kubernetes.io/name: helloworld-chart
++      app.kubernetes.io/instance: test
++  template:
++    metadata:
++      labels:
++        app.kubernetes.io/name: helloworld-chart
++        app.kubernetes.io/instance: test
++    spec:
++      serviceAccountName: test-helloworld-chart
++      securityContext: {}
++      containers:
++      - name: helloworld-chart
++        securityContext: {}
++        image: "nginx:1.16.0"
++        imagePullPolicy: Always
++        ports:
++        - name: http
++          containerPort: 80
++          protocol: TCP
++        livenessProbe:
++          httpGet:
++            path: /
++            port: http
++        readinessProbe:
++          httpGet:
++            path: /
++            port: http
++        resources: {}
+diff --git a/pod_test-helloworld-chart-test-connection.yaml b/pod_test-helloworld-chart-test-connection.yaml
+new file mode 100644
+index 0000000..8793304
+--- /dev/null
++++ b/pod_test-helloworld-chart-test-connection.yaml
+@@ -0,0 +1,20 @@
++# Source: helloworld-chart/templates/tests/test-connection.yaml
++apiVersion: v1
++kind: Pod
++metadata:
++  name: "test-helloworld-chart-test-connection"
++  labels:
++    helm.sh/chart: helloworld-chart-0.1.0
++    app.kubernetes.io/name: helloworld-chart
++    app.kubernetes.io/instance: test
++    app.kubernetes.io/version: "1.16.0"
++    app.kubernetes.io/managed-by: Helm
++  annotations:
++    "helm.sh/hook": test-success
++spec:
++  containers:
++  - name: wget
++    image: busybox
++    command: ['wget']
++    args: ['test-helloworld-chart:80']
++  restartPolicy: Never
+diff --git a/service_test-helloworld-chart.yaml b/service_test-helloworld-chart.yaml
+new file mode 100644
+index 0000000..7d734d3
+--- /dev/null
++++ b/service_test-helloworld-chart.yaml
+@@ -0,0 +1,21 @@
++# Source: helloworld-chart/templates/service.yaml
++apiVersion: v1
++kind: Service
++metadata:
++  name: test-helloworld-chart
++  labels:
++    helm.sh/chart: helloworld-chart-0.1.0
++    app.kubernetes.io/name: helloworld-chart
++    app.kubernetes.io/instance: test
++    app.kubernetes.io/version: "1.16.0"
++    app.kubernetes.io/managed-by: Helm
++spec:
++  type: ClusterIP
++  ports:
++  - port: 80
++    targetPort: http
++    protocol: TCP
++    name: http
++  selector:
++    app.kubernetes.io/name: helloworld-chart
++    app.kubernetes.io/instance: test
+diff --git a/serviceaccount_test-helloworld-chart.yaml b/serviceaccount_test-helloworld-chart.yaml
+new file mode 100644
+index 0000000..5800f2a
+--- /dev/null
++++ b/serviceaccount_test-helloworld-chart.yaml
+@@ -0,0 +1,11 @@
++# Source: helloworld-chart/templates/serviceaccount.yaml
++apiVersion: v1
++kind: ServiceAccount
++metadata:
++  name: test-helloworld-chart
++  labels:
++    helm.sh/chart: helloworld-chart-0.1.0
++    app.kubernetes.io/name: helloworld-chart
++    app.kubernetes.io/instance: test
++    app.kubernetes.io/version: "1.16.0"
++    app.kubernetes.io/managed-by: Helm

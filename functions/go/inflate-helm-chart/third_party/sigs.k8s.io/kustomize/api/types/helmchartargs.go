@@ -4,26 +4,24 @@
 package types
 
 type HelmGlobals struct {
-	// ChartHome is a file path, relative to the kustomization root,
-	// to a directory containing a subdirectory for each chart to be
-	// included in the kustomization.
-	// The default value of this field is "charts".
-	// So, for example, kustomize looks for the minecraft chart
-	// at {kustomizationRoot}/{ChartHome}/minecraft.
-	// If the chart is there at build time, kustomize will use it as found,
-	// and not check version numbers or dates.
-	// If the chart is not there, kustomize will attempt to pull it
-	// using the version number specified in the kustomization file,
-	// and put it there.  To suppress the pull attempt, simply assure
-	// that the chart is already there.
+	// ChartHome is a file path to a directory containing a subdirectory for
+	// each chart to be included in the output. The default value of this field 
+	// is "tmp/charts".
+	// At runtime, the function will look for the chart under {ChartHome}. If it
+	// is there, the function will use it as found. If it is not there, the
+	// function will attempt to pull it and put it in {ChartHome}.
+	// When run as a container function, local directories must be mounted into
+	// the container in order for the function to use them.
+	// If the function needs to pull the helm chart while running in a container,
+	// ChartHome MUST start with "tmp/".
 	ChartHome string `json:"chartHome,omitempty" yaml:"chartHome,omitempty"`
 
-	// ConfigHome defines a value that kustomize should pass to helm via
-	// the HELM_CONFIG_HOME environment variable.  kustomize doesn't attempt
+	// ConfigHome defines a value that the function should pass to helm via
+	// the HELM_CONFIG_HOME environment variable. The function doesn't attempt
 	// to read or write this directory.
 	// If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary
-	// directory created by kustomize for the benefit of helm.
-	// Likewise, kustomize sets
+	// directory created by the function for the benefit of helm.
+	// Likewise, the function sets
 	//   HELM_CACHE_HOME={ConfigHome}/.cache
 	//   HELM_DATA_HOME={ConfigHome}/.data
 	// for the helm subprocess.
