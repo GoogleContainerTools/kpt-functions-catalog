@@ -18,8 +18,7 @@ Helm is a package manager for kubernetes that uses a packaging format
 called charts. A chart is a collection of files within a directory, which 
 contain templates, CRDs, values, and metadata. 
 
-This function renders charts locally by using the 
-[helm template command],
+This function renders charts by using the [helm template command],
 so that helm charts can be inflated without needing to install the
 helm binary directly.
 
@@ -73,14 +72,14 @@ data:
 | Field        |  Description | Example
 | -----------: |  ----------- | -----------
 `chartHome`    | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/". | tmp/charts
-`configHome`   | (exec only) Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm. | /tmp/helm/config
+`configHome`   | Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm. This option is not supported when running in a container. It is supported only in exec mode (e.g. with kustomize) | /tmp/helm/config
 `name`         | The name of the chart | minecraft
 `version`      | The version of the chart | 3.1.3
 `repo`         | A URL locating the chart on the internet | https://itzg.github.io/minecraft-server-charts
 `releaseName`  | Replaces RELEASE_NAME in the chart template output | test
 `namespace`    | Sets the target namespace for a release (`.Release.Namespace` in the template) | my-namespace
-`valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | tmp/values.yaml <br> <br> https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
-`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to 'false' | true
+`valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
+`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to "false" | "true"
 
 
 The only required field is `name`.
@@ -109,16 +108,16 @@ helmCharts:
 `helmGlobals`  | Parameters applied to all Helm charts
 `helmCharts`   | An array of helm chart parameters
 `chartHome`    | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/". | tmp/charts
-`configHome`   | (exec only) Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm. | /tmp/helm/config
+`configHome`   | Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm. This option is not supported when running in a container. It is supported only in exec mode (e.g. with kustomize) | /tmp/helm/config
 `name`         | The name of the chart | minecraft
 `version`      | The version of the chart | 3.1.3
 `repo`         | A URL locating the chart on the internet | https://itzg.github.io/minecraft-server-charts
 `releaseName`  | Replaces RELEASE_NAME in the chart template output | test
 `namespace`    | Sets the target namespace for a release (`.Release.Namespace` in the template) | my-namespace
 `valuesInline` | Values to use instead of default values that accompany the chart |  global: <br> &emsp; enabled: false <br> tests: <br> &emsp; enabled: false  
-`valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | tmp/values.yaml <br> <br> https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
+`valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
 `valuesMerge`  | ValuesMerge specifies how to treat ValuesInline with respect to Values. Legal values: 'merge', 'override' (default), 'replace'. | replace
-`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to 'false' | true
+`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to false | true
 
 The only required field is `name`.
 
@@ -139,7 +138,7 @@ repo=https://itzg.github.io/minecraft-server-charts \
 releaseName=test
 ```
 
-The key-value pairs after the `--` will be converted to a 'functionConfig' of kind
+The key-value pairs after the `--` will be converted to a `functionConfig` of kind
 `ConfigMap`. The above command will add two files to your directory, which you can view:
 
 ```shell
@@ -149,7 +148,7 @@ $ kpt pkg tree
 ```
 
 ### Example with kustomize
-You can specify your `functionConfig` via the `generators` field in your `kustomization.yaml` file:
+You can specify your `functionConfig` via the `generators` field in your `kustomization.yaml` file.
 
 The `functionConfig` can be of type `InflateHelmChart`:
 
