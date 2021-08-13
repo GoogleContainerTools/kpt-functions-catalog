@@ -62,8 +62,8 @@ Contributions are required to follow these style guides:
 For each function, its files spread in the follow places:
 
 - `functions/` directory: Each function must have its own directory in one
-  of `functions/` sub-directory. In each function's directory, it must have
-  the following:
+  of `functions/` sub-directory. In each function's directory, it must have the
+  following:
     - Source code (and unit tests).
     - A README.md file serving as the usage doc and will be shown in
       the [catalog website].
@@ -77,13 +77,73 @@ For each function, its files spread in the follow places:
   should follow the [template][example-template].
 - The `tests/` directory contains additional e2e tests.
 
-### E2E Tests
+For golang-based functions, you need to generate some doc related variables from
+the `README.md` by running
+
+```shell
+$ cd functions/go
+$ make generate
+```
+
+### Tests
+
+#### Unit Tests
+
+To run all unit tests
+
+```shell
+$ make unit-test
+```
+
+#### E2E Tests
 
 The e2e tests are the recommended way to test functions in the catalog. They are
-very easy to write and set up with our [e2e test harness].
+very easy to write and set up with our e2e test harness. You can find all the
+supported options and expected test directory
+structure [here][e2e test harness doc].
 
 You can choose to put the e2e test in either the `examples/` directory or in the
 `tests/` directory depending on if it is worthwhile to be shown as an example.
+
+To test a specific example or the e2e test, run
+
+```shell
+$ cd tests/e2etest
+$ go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
+```
+
+Most contributors don't need this, but if you happen to need to test all
+examples and e2e tests, run the following command
+
+```shell
+$ make e2e-test
+```
+
+#### Doc Verifier
+
+We have a script to ensure the usage docs and the examples are consistent.
+Please ensure it's passing by running:
+
+```shell
+$ ./scripts/verify-docs.py
+```
+
+This script requires Python 3, `pyyaml` and `mdrip` which is a CLI tool.
+
+To install `pyyaml`, run the following command:
+
+```shell
+pip install pyyaml
+```
+
+To install `mdrip`, run the following commands:
+
+```shell
+$ go get github.com/russross/blackfriday/v2@v2.0.1
+$ go get github.com/monopole/mdrip@v1.0.2
+```
+
+And you need to ensure `$GOPATH/bin` is in your `PATH`.
 
 ### Change Existing Functions
 
@@ -99,6 +159,11 @@ If you fix a bug, you must add (unit or e2e) tests to cover that.
 
 You must follow the layout convention when you contribute new functions.
 
+You need to add new function name to the respective language Makefiles.
+
+- `functions/go/Makefile` for golang.
+- `functions/ts/Makefile` for typescript.
+
 ## Contact Us
 
 Do you need a review or release of functions? We’d love to hear from you!
@@ -112,7 +177,7 @@ Do you need a review or release of functions? We’d love to hear from you!
 
 [catalog website]: https://catalog.kpt.dev/
 
-[e2e test harness]: https://pkg.go.dev/github.com/GoogleContainerTools/kpt@v1.0.0-beta.2/pkg/test/runner
+[e2e test harness doc]: https://github.com/GoogleContainerTools/kpt/blob/main/pkg/test/runner/README.md
 
 [golang-template]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/functions/go/_template/README.md
 

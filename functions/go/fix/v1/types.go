@@ -7,6 +7,10 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
+// NOTE: Please do NOT import this package in other functions. You can import
+// the one in
+// https://github.com/GoogleContainerTools/kpt-functions-sdk/tree/master/go/pkg/api
+
 const (
 	KptFileName       = "Kptfile"
 	KptFileGroup      = "kpt.dev"

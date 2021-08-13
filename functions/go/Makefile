@@ -25,10 +25,13 @@ FUNCTIONS := \
 	fix \
 	format \
 	gatekeeper \
+	inflate-helm-chart \
+	list-setters \
 	search-replace \
 	set-annotations \
 	set-labels \
 	set-namespace \
+	set-project-id \
 	starlark \
 	upsert-resource
 
