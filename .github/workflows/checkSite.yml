@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Merge gob branch
+        run: git worktree add ./gob gob && cp -r gob/* .
       - uses: actions/checkout@v2
         with:
           repository: etefera/href-checker
