@@ -2,7 +2,7 @@
 
 ### Overview
 
-The `sops` KRM config function encrypts and decrypts resources. Learn more on the [sops website].
+The `sops` KRM config function encrypts and decrypts resources. Learn more info on the [sops website].
 
 This example demonstrates invocation of `sops` for encryption the resouce called `toEncrypt` and decryption of the resource called `toDecrypt` using the already existing PGP keys.
 
