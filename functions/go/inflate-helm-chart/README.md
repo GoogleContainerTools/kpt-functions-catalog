@@ -79,7 +79,7 @@ data:
 `releaseName`  | Replaces RELEASE_NAME in the chart template output | test
 `namespace`    | Sets the target namespace for a release (`.Release.Namespace` in the template) | my-namespace
 `valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
-`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to "false" | "true"
+`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default). | "true"
 
 
 The only required field is `name`.
@@ -100,7 +100,7 @@ helmCharts:
   valuesInline: map[string]interface{}
   valuesFile: string
   valuesMerge: string
-  includeCRDs: bool
+  includeCRDs: string
 ```
 
 | Field        |  Description | Example
@@ -117,7 +117,7 @@ helmCharts:
 `valuesInline` | Values to use instead of default values that accompany the chart |  global: <br> &emsp; enabled: false <br> tests: <br> &emsp; enabled: false  
 `valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
 `valuesMerge`  | ValuesMerge specifies how to treat ValuesInline with respect to Values. Legal values: 'merge', 'override' (default), 'replace'. | replace
-`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions, defaults to false | true
+`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default). | "true"
 
 The only required field is `name`.
 

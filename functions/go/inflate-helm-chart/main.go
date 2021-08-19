@@ -178,7 +178,6 @@ func (f *helmChartInflatorFunction) ConfigMapArgs(
 	if err != nil {
 		return err
 	}
-
 	if err := p.ValidateArgs(); err != nil {
 		return err
 	}
