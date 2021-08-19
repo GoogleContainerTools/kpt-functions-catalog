@@ -1,4 +1,4 @@
-# inflate-helm-chart: Remote Chart
+# inflate-helm-chart: Remote Chart with CRDs
 
 ### Overview
 
