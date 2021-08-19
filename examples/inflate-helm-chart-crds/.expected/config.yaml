@@ -1,0 +1,19 @@
+# This test should be skipped because a bug in the kpt orchestrator
+# results in non-idempotent behavior.
+
+# Upon the first run, the contents of customresourcedefinition_workspaces.app.terraform.io.yaml
+# contains the following:
+
+#  creationTimestamp: null
+#  name: workspaces.app.terraform.io
+
+# On the second run, however, these fields are reversed:
+
+#  name: workspaces.app.terraform.io
+#  creationTimestamp: null
+
+# kpt should preserve the ordering of fields. Ordering is preserved if creationTimestamp
+# is anything except null (correct behavior), but is not preserved when creationTimestamp
+# is null.
+
+skip: true
