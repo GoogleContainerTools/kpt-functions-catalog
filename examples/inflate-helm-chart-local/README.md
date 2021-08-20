@@ -2,7 +2,7 @@
 
 ### Overview
 
-This example demonstrated how to imperatively invoke the `inflate-helm-chart`
+This example demonstrates how to imperatively invoke the `inflate-helm-chart`
 function to inflate a helm chart that lives in your local filesystem.
 
 ### Function invocation

@@ -2,8 +2,8 @@
 
 ### Overview
 
-This example demonstrated how to imperatively invoke the `inflate-helm-chart`
-function with a remote values file chart.
+This example demonstrates how to imperatively invoke the `inflate-helm-chart`
+function with a remote values file.
 
 ### Function invocation
 

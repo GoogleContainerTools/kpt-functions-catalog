@@ -2,8 +2,8 @@
 
 ### Overview
 
-This example demonstrated how to imperatively invoke the `inflate-helm-chart`
-function to inflate a helm chart while including CRDs in the templated output.
+This example demonstrates how to imperatively invoke the `inflate-helm-chart`
+function to inflate a helm chart that contains CRDs in the templated output.
 
 ### Function invocation
 
