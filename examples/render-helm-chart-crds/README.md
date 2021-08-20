@@ -17,7 +17,7 @@ version=1.0.0 \
 releaseName=terraforming-mars 
 ```
 
-You should have several files in your local filesystem. You can run the
+You should see rendered chart resources in your local filesystem. You can run the
 following command to see what you have:
 
 ```shell
