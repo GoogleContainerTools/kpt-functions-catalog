@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/inflate-helm-chart
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/render-helm-chart
 
 go 1.16
 

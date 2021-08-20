@@ -1,8 +1,8 @@
-# inflate-helm-chart: Remote Values File
+# render-helm-chart: Remote Values File
 
 ### Overview
 
-This example demonstrates how to imperatively invoke the `inflate-helm-chart`
+This example demonstrates how to imperatively invoke the `render-helm-chart`
 function with a remote values file.
 
 ### Function invocation
@@ -10,23 +10,23 @@ function with a remote values file.
 Run the following command to fetch the example package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/inflate-helm-chart-remote-values-file
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/render-helm-chart-remote-values-file
 ```
 
 ```shell
-$ cd inflate-helm-chart-remote-values-file
+$ cd render-helm-chart-remote-values-file
 ```
 
-Run the following commands to inflate the helm chart in your local
+Run the following commands to render the helm chart in your local
 filesystem with the remote values file.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/inflate-helm-chart:unstable \
+$ kpt fn eval --image-pull-policy ifNotPresent --image gcr.io/kpt-fn/render-helm-chart:unstable \
 --network \
---mount type=bind,src=$(pwd),dst=/tmp/charts -- \
+--mount type=bind,src="$(pwd)",dst=/tmp/charts -- \
 name=helloworld-chart \
 releaseName=test \
-valuesFile=https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/examples/inflate-helm-chart-local/helloworld-values/values.yaml
+valuesFile=https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/42021718ecffe068c44e774746d75ee4870c96c6/examples/inflate-helm-chart-local/helloworld-values/values.yaml
 ```
 
 ### Expected result

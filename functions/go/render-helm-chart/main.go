@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/inflate-helm-chart/generated"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/inflate-helm-chart/third_party/sigs.k8s.io/kustomize/api/builtins"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/render-helm-chart/generated"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/render-helm-chart/third_party/sigs.k8s.io/kustomize/api/builtins"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
@@ -32,8 +32,8 @@ func main() {
 	asp := HelmChartProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)
 
-	cmd.Short = generated.InflateHelmChartShort
-	cmd.Long = generated.InflateHelmChartLong
+	cmd.Short = generated.RenderHelmChartShort
+	cmd.Long = generated.RenderHelmChartLong
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -45,7 +45,7 @@ func (slp *HelmChartProcessor) Process(resourceList *framework.ResourceList) err
 	err := run(resourceList)
 	if err != nil {
 		resourceList.Result = &framework.Result{
-			Name: "inflate-helm-chart",
+			Name: "render-helm-chart",
 			Items: []framework.ResultItem{
 				{
 					Message:  err.Error(),
@@ -73,7 +73,7 @@ func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {
 		return err
 	}
 	switch kind {
-	case "InflateHelmChart":
+	case "RenderHelmChart":
 		err = f.ConfigHelmArgs(nil, []byte(y))
 		if err != nil {
 			return err
@@ -89,7 +89,7 @@ func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("`functionConfig` must be `ConfigMap` or `InflateHelmChart`")
+		return fmt.Errorf("`functionConfig` must be `ConfigMap` or `RenderHelmChart`")
 	}
 	return nil
 }

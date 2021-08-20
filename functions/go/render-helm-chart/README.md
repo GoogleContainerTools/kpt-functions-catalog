@@ -1,16 +1,16 @@
-# inflate-helm-chart
+# render-helm-chart
 
 [helm]: https://helm.sh/
 [charts]: https://helm.sh/docs/topics/charts/
-[local]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/inflate-helm-chart-local
-[remote]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/inflate-helm-chart-remote
+[local]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-local
+[remote]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-remote
 [helm template command]: https://helm.sh/docs/helm/helm_template/
 
 ## Overview
 
 <!--mdtogo:Short-->
 
-The `inflate-helm-chart` function inflates a local or remote Helm chart. 
+The `render-helm-chart` function renders a local or remote Helm chart. 
 
 <!--mdtogo-->
 
@@ -19,7 +19,7 @@ called charts. A chart is a collection of files within a directory, which
 contain templates, CRDs, values, and metadata. 
 
 This function renders charts by using the [helm template command],
-so that helm charts can be inflated without needing to install the
+so that helm charts can be rendered without needing to install the
 helm binary directly.
 
 You can learn more about helm [here][helm] and more about helm
@@ -30,11 +30,11 @@ charts [here][charts].
 ## Usage
 
 This function can be used with any KRM function orchestrators such as kpt
-or kustomize to inflate a specified helm chart.
+or kustomize to render a specified helm chart.
 
 In kpt, the function can only be run imperatively. The function either
-needs network access to inflate a remote chart or needs a local file to be mounted
-into the container to inflate a local chart. As a result, to run the
+needs network access to render a remote chart or needs a local file to be mounted
+into the container to render a local chart. As a result, to run the
 function with `kpt fn eval`, the flag `--network` must be used for remote charts,
 and the flag `--mount` must be used for local charts. See the examples for inflating
 [local] and [remote] charts.
@@ -49,7 +49,7 @@ the `network` field is needed for remote charts and the `mounts` field is needed
 There are 2 kinds of `functionConfig` supported by this function:
 
 - `ConfigMap`
-- A custom resource of kind `InflateHelmChart`
+- A custom resource of kind `RenderHelmChart`
 
 #### `ConfigMap`
 To use a `ConfigMap` as the `functionConfig`, the desired parameters must be
@@ -84,8 +84,8 @@ data:
 
 The only required field is `name`.
 
-#### `InflateHelmChart`
-A `functionConfig` of kind `InflateHelmChart` has the following supported parameters: 
+#### `RenderHelmChart`
+A `functionConfig` of kind `RenderHelmChart` has the following supported parameters: 
 
 ```yaml
 helmGlobals:
@@ -129,10 +129,10 @@ The only required field is `name`.
 
 ### Example with kpt
 
-To inflate a remote minecraft chart, you can run the following command: 
+To render a remote minecraft chart, you can run the following command: 
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/inflate-helm-chart:unstable --network -- \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable --network -- \
 name=minecraft \
 repo=https://itzg.github.io/minecraft-server-charts \
 releaseName=test
@@ -150,20 +150,20 @@ $ kpt pkg tree
 ### Example kustomization with remote chart
 You can specify your `functionConfig` via the `generators` field in your `kustomization.yaml` file.
 
-The `functionConfig` can be of type `InflateHelmChart`:
+The `functionConfig` can be of type `RenderHelmChart`:
 
 ```yaml
 generators:
 - |-
   apiVersion: fn.kpt.dev/v1alpha1
-  kind: InflateHelmChart
+  kind: RenderHelmChart
   metadata:
     name: demo
     annotations:
       config.kubernetes.io/function: |
         container:
           network: true
-          image: gcr.io/kpt-fn/inflate-helm-chart:unstable
+          image: gcr.io/kpt-fn/render-helm-chart:unstable
   helmCharts:
   - name: minecraft
     repo: https://itzg.github.io/minecraft-server-charts
@@ -184,7 +184,7 @@ generators:
       config.kubernetes.io/function: |
         container:
           network: true
-          image: gcr.io/kpt-fn/inflate-helm-chart:unstable
+          image: gcr.io/kpt-fn/render-helm-chart:unstable
   data:
     name: minecraft
     repo: https://itzg.github.io/minecraft-server-charts
@@ -192,7 +192,7 @@ generators:
     releaseName: test
 ```
 
-For both of the above kustomizations, you can use kustomize v4 to inflate
+For both of the above kustomizations, you can use kustomize v4 to render
 the helm charts with the following command:
 
 ```shell
@@ -243,14 +243,14 @@ specify the function config in your generators field:
 generators:
 - |-
   apiVersion: fn.kpt.dev/v1alpha1
-  kind: InflateHelmChart
+  kind: RenderHelmChart
   metadata:
     name: demo
     annotations:
       config.kubernetes.io/function: |
         container:
           network: true
-          image: gcr.io/kpt-fn/inflate-helm-chart:unstable
+          image: gcr.io/kpt-fn/render-helm-chart:unstable
   helmCharts:
   - name: ocp-pipeline
     namespace: mynamespace

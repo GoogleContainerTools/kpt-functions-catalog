@@ -1,16 +1,16 @@
-# inflate-helm-chart: Remote Chart
+# render-helm-chart: Remote Chart
 
 ### Overview
 
-This example demonstrates how to imperatively invoke the `inflate-helm-chart`
-function to inflate a helm chart that lives in a remote repo.
+This example demonstrates how to imperatively invoke the `render-helm-chart`
+function to render a helm chart that lives in a remote repo.
 
 ### Function invocation
 
-Run the following command to inflate a minecraft chart.
+Run the following command to render a minecraft chart.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/inflate-helm-chart:unstable --network -- \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable --network -- \
 name=minecraft \
 repo=https://itzg.github.io/minecraft-server-charts \
 version=3.1.3 \

@@ -1,27 +1,27 @@
-# inflate-helm-chart: Local Chart
+# render-helm-chart: Local Chart
 
 ### Overview
 
-This example demonstrates how to imperatively invoke the `inflate-helm-chart`
-function to inflate a helm chart that lives in your local filesystem.
+This example demonstrates how to imperatively invoke the `render-helm-chart`
+function to render a helm chart that lives in your local filesystem.
 
 ### Function invocation
 
 Run the following command to fetch the example package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/inflate-helm-chart-local
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/render-helm-chart-local
 ```
 
 ```shell
-$ cd inflate-helm-chart-local
+$ cd render-helm-chart-local
 ```
 
-Run the following commands to inflate the helm chart in your local
+Run the following commands to render the helm chart in your local
 filesystem.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/inflate-helm-chart:unstable \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable \
 --mount type=bind,src=$(pwd),dst=/tmp/charts \
 -- name=helloworld-chart \
 releaseName=test
@@ -30,7 +30,7 @@ releaseName=test
 You can optionally provide your own values files using `--valuesFile`.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/inflate-helm-chart:unstable \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable \
 --mount type=bind,src=$(pwd),dst=/tmp/charts -- \
 name=helloworld-chart \
 releaseName=test \

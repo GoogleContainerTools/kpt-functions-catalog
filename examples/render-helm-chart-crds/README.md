@@ -1,16 +1,16 @@
-# inflate-helm-chart: Remote Chart with CRDs
+# render-helm-chart: Remote Chart with CRDs
 
 ### Overview
 
-This example demonstrates how to imperatively invoke the `inflate-helm-chart`
-function to inflate a helm chart that contains CRDs in the templated output.
+This example demonstrates how to imperatively invoke the `render-helm-chart`
+function to render a helm chart that contains CRDs in the templated output.
 
 ### Function invocation
 
-First, let's inflate a terraform chart without CRDs:
+First, let's render a terraform chart without CRDs:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/inflate-helm-chart:unstable --network -- \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable --network -- \
 name=terraform \
 repo=https://helm.releases.hashicorp.com \
 version=1.0.0 \
@@ -35,7 +35,7 @@ $ kpt pkg tree
 Now, let's run the command again, this time including CRDs:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/inflate-helm-chart:unstable --network -- \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable --network -- \
 name=terraform \
 repo=https://helm.releases.hashicorp.com \
 version=1.0.0 \

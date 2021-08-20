@@ -16,7 +16,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/inflate-helm-chart/third_party/sigs.k8s.io/kustomize/api/types"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/render-helm-chart/third_party/sigs.k8s.io/kustomize/api/types"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"sigs.k8s.io/kustomize/api/hasher"

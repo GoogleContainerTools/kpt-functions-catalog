@@ -1,5 +1,5 @@
 testType: eval
-image: gcr.io/kpt-fn/inflate-helm-chart:unstable
+image: gcr.io/kpt-fn/render-helm-chart:unstable
 network: true
 args:
   name: minecraft
