@@ -147,7 +147,7 @@ $ kpt pkg tree
 └── [service_test-minecraft.yaml]  Service test-minecraft
 ```
 
-### Example with kustomize
+### Example kustomization with remote chart
 You can specify your `functionConfig` via the `generators` field in your `kustomization.yaml` file.
 
 The `functionConfig` can be of type `InflateHelmChart`:
@@ -232,6 +232,62 @@ spec:
   selector:
     app: test-minecraft
   type: ClusterIP
+```
+
+### Example kustomization with inline values
+
+To use the function with kustomize and your own inline values, you can 
+specify the function config in your generators field:
+
+```yaml
+generators:
+- |-
+  apiVersion: fn.kpt.dev/v1alpha1
+  kind: InflateHelmChart
+  metadata:
+    name: demo
+    annotations:
+      config.kubernetes.io/function: |
+        container:
+          network: true
+          image: gcr.io/kpt-fn/inflate-helm-chart:unstable
+  helmCharts:
+  - name: ocp-pipeline
+    namespace: mynamespace
+    version: 0.1.16
+    repo: https://bcgov.github.io/helm-charts
+    releaseName: moria
+    valuesInline:
+      releaseNamespace: ""
+      rbac:
+        create: true
+        rules:
+          - apiGroups: [""]
+            verbs: ["*"]
+            resources: ["*"]
+```
+
+Then, to build the kustomization:
+
+```shell
+kustomize build --enable-alpha-plugins --network .
+```
+
+Which will contain the following as part of your output:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: moria-ocp-pipeline
+  namespace: mynamespace
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - '*'
+  verbs:
+  - '*'
 ```
 
 <!--mdtogo-->
