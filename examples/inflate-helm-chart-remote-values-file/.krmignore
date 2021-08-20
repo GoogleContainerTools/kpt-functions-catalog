@@ -1,2 +1,3 @@
 .expected
-cert-manager
+helloworld-chart
+helloworld-values

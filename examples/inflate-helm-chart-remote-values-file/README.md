@@ -17,53 +17,30 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 $ cd inflate-helm-chart-remote-values-file
 ```
 
-You can inflate the helm chart using a remote values file with the following command:
+Run the following commands to inflate the helm chart in your local
+filesystem with the remote values file.
 
 ```shell
 $ kpt fn eval --image gcr.io/kpt-fn/inflate-helm-chart:unstable \
-  --network \
-  --mount type=bind,src="$(pwd)",dst=/tmp/charts -- \
-  name=cert-manager \
-  namespace=cert-manager \
-  releaseName=cert-manager \
-  valuesFile=https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
+--network \
+--mount type=bind,src=$(pwd),dst=/tmp/charts -- \
+name=helloworld-chart \
+releaseName=test \
+valuesFile=https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/examples/inflate-helm-chart-local/helloworld-values/values.yaml
 ```
 
 ### Expected result
 
-You should have a number of new files in your local file system. You can view the contents of your current package:
+You can run the following command to see the new files you have:
 
 ```shell
 $ kpt pkg tree
-├── [clusterrole_cert-manager-cainjector.yaml]  ClusterRole cert-manager-cainjector
-├── [clusterrole_cert-manager-controller-approve:cert-manager-io.yaml]  ClusterRole cert-manager-controller-approve:cert-manager-io
-├── [clusterrole_cert-manager-controller-certificates.yaml]  ClusterRole cert-manager-controller-certificates
-├── [clusterrole_cert-manager-controller-challenges.yaml]  ClusterRole cert-manager-controller-challenges
-├── [clusterrole_cert-manager-controller-clusterissuers.yaml]  ClusterRole cert-manager-controller-clusterissuers
-├── [clusterrole_cert-manager-controller-ingress-shim.yaml]  ClusterRole cert-manager-controller-ingress-shim
-├── [clusterrole_cert-manager-controller-issuers.yaml]  ClusterRole cert-manager-controller-issuers
-├── [clusterrole_cert-manager-controller-orders.yaml]  ClusterRole cert-manager-controller-orders
-├── [clusterrole_cert-manager-edit.yaml]  ClusterRole cert-manager-edit
-├── [clusterrole_cert-manager-view.yaml]  ClusterRole cert-manager-view
-├── [clusterrole_cert-manager-webhook:subjectaccessreviews.yaml]  ClusterRole cert-manager-webhook:subjectaccessreviews
-├── [clusterrolebinding_cert-manager-cainjector.yaml]  ClusterRoleBinding cert-manager-cainjector
-├── [clusterrolebinding_cert-manager-controller-approve:cert-manager-io.yaml]  ClusterRoleBinding cert-manager-controller-approve:cert-manager-io
-├── [clusterrolebinding_cert-manager-controller-certificates.yaml]  ClusterRoleBinding cert-manager-controller-certificates
-├── [clusterrolebinding_cert-manager-controller-challenges.yaml]  ClusterRoleBinding cert-manager-controller-challenges
-├── [clusterrolebinding_cert-manager-controller-clusterissuers.yaml]  ClusterRoleBinding cert-manager-controller-clusterissuers
-├── [clusterrolebinding_cert-manager-controller-ingress-shim.yaml]  ClusterRoleBinding cert-manager-controller-ingress-shim
-├── [clusterrolebinding_cert-manager-controller-issuers.yaml]  ClusterRoleBinding cert-manager-controller-issuers
-├── [clusterrolebinding_cert-manager-controller-orders.yaml]  ClusterRoleBinding cert-manager-controller-orders
-├── [clusterrolebinding_cert-manager-webhook:subjectaccessreviews.yaml]  ClusterRoleBinding cert-manager-webhook:subjectaccessreviews
-├── [mutatingwebhookconfiguration_cert-manager-webhook.yaml]  MutatingWebhookConfiguration cert-manager-webhook
-├── [validatingwebhookconfiguration_cert-manager-webhook.yaml]  ValidatingWebhookConfiguration cert-manager-webhook
-└── kube-system
-    ├── [role_cert-manager-cainjector:leaderelection.yaml]  Role kube-system/cert-manager-cainjector:leaderelection
-    ├── [role_cert-manager:leaderelection.yaml]  Role kube-system/cert-manager:leaderelection
-    ├── [rolebinding_cert-manager-cainjector:leaderelection.yaml]  RoleBinding kube-system/cert-manager-cainjector:leaderelection
-    └── [rolebinding_cert-manager:leaderelection.yaml]  RoleBinding kube-system/cert-manager:leaderelection
+├── [deployment_test-helloworld-chart.yaml]  Deployment test-helloworld-chart
+├── [pod_test-helloworld-chart-test-connection.yaml]  Pod test-helloworld-chart-test-connection
+├── [service_test-helloworld-chart.yaml]  Service test-helloworld-chart
+└── [serviceaccount_test-helloworld-chart.yaml]  ServiceAccount test-helloworld-chart
 ```
 
-In `cert-manager/deployment_cert-manager-cainjector.yaml` and `cert-manager/deployment_cert-manager-cainjector.yaml`
-you should be able to find `imagePullPolicy: Always`, which indicates that the remote values file was used.
-If you run the command without the remote values file, you will find `imagePullPolicy: IfNotPresent` instead.
+You should be able to find `replicas: 5` in
+file `deployment_test-helloworld-chart.yaml`, which demonstrates that
+the correct values file provided by --valuesFile was used.

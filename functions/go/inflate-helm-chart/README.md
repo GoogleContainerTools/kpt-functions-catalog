@@ -155,7 +155,7 @@ The `functionConfig` can be of type `InflateHelmChart`:
 ```yaml
 generators:
 - |-
-  apiVersion: v1
+  apiVersion: fn.kpt.dev/v1alpha1
   kind: InflateHelmChart
   metadata:
     name: demo
