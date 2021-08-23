@@ -1,11 +1,5 @@
 # render-helm-chart
 
-[helm]: https://helm.sh/
-[charts]: https://helm.sh/docs/topics/charts/
-[local]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-local
-[remote]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-remote
-[helm template command]: https://helm.sh/docs/helm/helm_template/
-
 ## Overview
 
 <!--mdtogo:Short-->
@@ -100,7 +94,7 @@ helmCharts:
   valuesInline: map[string]interface{}
   valuesFile: string
   valuesMerge: string
-  includeCRDs: string
+  includeCRDs: bool
 ```
 
 | Field        |  Description | Example
@@ -117,7 +111,7 @@ helmCharts:
 `valuesInline` | Values to use instead of default values that accompany the chart |  global: <br> &emsp; enabled: false <br> tests: <br> &emsp; enabled: false  
 `valuesFile`   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
 `valuesMerge`  | ValuesMerge specifies how to treat ValuesInline with respect to Values. Legal values: 'merge', 'override' (default), 'replace'. | replace
-`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default). | "true"
+`includeCRDs`  | Specifies if Helm should also generate CustomResourceDefinitions. Defaults to false. | true
 
 The only required field is `name`.
 
@@ -146,3 +140,9 @@ $ kpt pkg tree
 ```
 
 <!--mdtogo-->
+
+[helm]: https://helm.sh/
+[charts]: https://helm.sh/docs/topics/charts/
+[local]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-local
+[remote]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-remote
+[helm template command]: https://helm.sh/docs/helm/helm_template/

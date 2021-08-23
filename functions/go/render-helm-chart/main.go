@@ -173,10 +173,41 @@ func (f *helmChartInflatorFunction) ConfigHelmArgs(
 
 func (f *helmChartInflatorFunction) ConfigMapArgs(
 	bytes []byte) (err error) {
-	var p builtins.HelmChartInflationGeneratorPlugin
-	err = kyaml.Unmarshal(bytes, &p)
+	var m map[string]string
+
+	err = kyaml.Unmarshal(bytes, &m)
 	if err != nil {
 		return err
+	}
+	var p builtins.HelmChartInflationGeneratorPlugin
+	if val, ok := m["chartHome"]; ok {
+		p.ChartHome = val
+	}
+	if val, ok := m["configHome"]; ok {
+		p.ConfigHome = val
+	}
+	if val, ok := m["name"]; ok {
+		p.Name = val
+	}
+	if val, ok := m["version"]; ok {
+		p.Version = val
+	}
+	if val, ok := m["repo"]; ok {
+		p.Repo = val
+	}
+	if val, ok := m["releaseName"]; ok {
+		p.ReleaseName = val
+	}
+	if val, ok := m["namespace"]; ok {
+		p.Namespace = val
+	}
+	if val, ok := m["valuesFile"]; ok {
+		p.ValuesFile = val
+	}
+	if val, ok := m["includeCRDs"]; ok {
+		if val == "true" {
+			p.IncludeCRDs = true
+		}
 	}
 	if err := p.ValidateArgs(); err != nil {
 		return err

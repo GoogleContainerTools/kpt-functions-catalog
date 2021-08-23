@@ -1,5 +1,5 @@
-# This test should be skipped because a bug in the kpt orchestrator
-# results in non-idempotent behavior.
+# This test has customresourcedefinition_workspaces.app.terraform.io.yaml in its
+# krm ignore because including it in the input results in field reodering.
 
 # Upon the first run, the contents of customresourcedefinition_workspaces.app.terraform.io.yaml
 # contains the following:
@@ -15,5 +15,3 @@
 # kpt should preserve the ordering of fields. Ordering is preserved if creationTimestamp
 # is anything except null (correct behavior), but is not preserved when creationTimestamp
 # is null.
-
-skip: true

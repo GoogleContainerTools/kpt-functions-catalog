@@ -90,6 +90,9 @@ jobs:
     - name: Install kpt
       run: |
         go get github.com/GoogleContainerTools/kpt@main
+    - name: Install kustomize
+      run: |
+        go get sigs.k8s.io/kustomize/kustomize/v4
     - name: Build node and Go docker images
       if: matrix.platform == 'ubuntu-latest'
       run: |

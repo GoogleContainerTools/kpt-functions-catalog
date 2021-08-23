@@ -43,7 +43,6 @@ releaseName=terraforming-mars \
 includeCRDs=true
 ```
 
-
 ### Expected result
 
 Run the following command to see what you have:

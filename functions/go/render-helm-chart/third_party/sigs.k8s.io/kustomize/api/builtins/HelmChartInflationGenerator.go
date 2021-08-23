@@ -81,14 +81,6 @@ func (p *HelmChartInflationGeneratorPlugin) ValidateArgs() (err error) {
 		return err
 	}
 
-	if p.IncludeCRDs == "" {
-		p.IncludeCRDs = "false"
-	}
-
-	if p.IncludeCRDs != "true" && p.IncludeCRDs != "false" {
-		return fmt.Errorf("includeCRDs must be 'true' or 'false'")
-	}
-
 	// ConfigHome is not loaded by the HelmChartInflationGeneratorPlugin, and can be located anywhere.
 	if p.ConfigHome == "" {
 		if err = p.establishTmpDir(); err != nil {
@@ -282,7 +274,7 @@ func (p *HelmChartInflationGeneratorPlugin) templateCommand() []string {
 		// I've tried placing the flag before and after the name argument.
 		args = append(args, "--generate-name")
 	}
-	if p.IncludeCRDs == "true" {
+	if p.IncludeCRDs {
 		args = append(args, "--include-crds")
 	}
 	return args

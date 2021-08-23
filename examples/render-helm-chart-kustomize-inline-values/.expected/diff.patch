@@ -1,8 +1,8 @@
-diff --git a/kustomization-dir/resources.yaml b/kustomization-dir/resources.yaml
+diff --git a/resources.yaml b/resources.yaml
 new file mode 100644
 index 0000000..b3a1630
 --- /dev/null
-+++ b/kustomization-dir/resources.yaml
++++ b/resources.yaml
 @@ -0,0 +1,137 @@
 +apiVersion: rbac.authorization.k8s.io/v1
 +kind: Role

@@ -48,7 +48,8 @@ kustomize build --enable-alpha-plugins --network .
 
 ### Expected result
 
-The following will appear as part of your output:
+You should also be able to find `def releaseNamespace = ""` in your output, as
+well as the following: 
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -63,4 +64,20 @@ rules:
   - '*'
   verbs:
   - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: moria-ocp-pipeline
+  namespace: mynamespace
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: moria-ocp-pipeline
+subjects:
+- kind: ServiceAccount
+  name: jenkins
+  namespace: mynamespace
 ```
+
+which demonstrates that the correct values provided via `valuesInline` were used.
