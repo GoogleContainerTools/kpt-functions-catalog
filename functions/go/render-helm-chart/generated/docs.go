@@ -74,7 +74,7 @@ A ` + "`" + `functionConfig` + "`" + ` of kind ` + "`" + `RenderHelmChart` + "`"
     valuesInline: map[string]interface{}
     valuesFile: string
     valuesMerge: string
-    includeCRDs: string
+    includeCRDs: bool
 
 | Field        |  Description | Example
 | -----------: |  ----------- | -----------
@@ -90,13 +90,11 @@ A ` + "`" + `functionConfig` + "`" + ` of kind ` + "`" + `RenderHelmChart` + "`"
 ` + "`" + `valuesInline` + "`" + ` | Values to use instead of default values that accompany the chart |  global: <br> &emsp; enabled: false <br> tests: <br> &emsp; enabled: false  
 ` + "`" + `valuesFile` + "`" + `   | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where ` + "`" + `chartHome` + "`" + ` and ` + "`" + `name` + "`" + ` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
 ` + "`" + `valuesMerge` + "`" + `  | ValuesMerge specifies how to treat ValuesInline with respect to Values. Legal values: 'merge', 'override' (default), 'replace'. | replace
-` + "`" + `includeCRDs` + "`" + `  | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default). | "true"
+` + "`" + `includeCRDs` + "`" + `  | Specifies if Helm should also generate CustomResourceDefinitions. Defaults to false. | true
 
 The only required field is ` + "`" + `name` + "`" + `.
 `
 var RenderHelmChartExamples = `
-### Example with kpt
-
 To render a remote minecraft chart, you can run the following command: 
 
   $ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable --network -- \
@@ -110,133 +108,4 @@ The key-value pairs after the ` + "`" + `--` + "`" + ` will be converted to a ` 
   $ kpt pkg tree
   ├── [secret_test-minecraft.yaml]  Secret test-minecraft
   └── [service_test-minecraft.yaml]  Service test-minecraft
-
-### Example kustomization with remote chart
-You can specify your ` + "`" + `functionConfig` + "`" + ` via the ` + "`" + `generators` + "`" + ` field in your ` + "`" + `kustomization.yaml` + "`" + ` file.
-
-The ` + "`" + `functionConfig` + "`" + ` can be of type ` + "`" + `RenderHelmChart` + "`" + `:
-
-  generators:
-  - |-
-    apiVersion: fn.kpt.dev/v1alpha1
-    kind: RenderHelmChart
-    metadata:
-      name: demo
-      annotations:
-        config.kubernetes.io/function: |
-          container:
-            network: true
-            image: gcr.io/kpt-fn/render-helm-chart:unstable
-    helmCharts:
-    - name: minecraft
-      repo: https://itzg.github.io/minecraft-server-charts
-      version: 3.1.3
-      releaseName: test
-
-You can equivalently use a ` + "`" + `functionConfig` + "`" + ` of type ` + "`" + `ConfigMap` + "`" + `:
-
-  generators:
-  - |-
-    apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: demo
-      annotations:
-        config.kubernetes.io/function: |
-          container:
-            network: true
-            image: gcr.io/kpt-fn/render-helm-chart:unstable
-    data:
-      name: minecraft
-      repo: https://itzg.github.io/minecraft-server-charts
-      version: 3.1.3
-      releaseName: test
-
-For both of the above kustomizations, you can use kustomize v4 to render
-the helm charts with the following command:
-
-  kustomize build --enable-alpha-plugins --network .
-
-This gives the output:
-  apiVersion: v1
-  data:
-    rcon-password: Q0hBTkdFTUUh
-  kind: Secret
-  metadata:
-    labels:
-      app: test-minecraft
-      chart: minecraft-3.1.3
-      heritage: Helm
-      release: test
-    name: test-minecraft
-  type: Opaque
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    labels:
-      app: test-minecraft
-      chart: minecraft-3.1.3
-      heritage: Helm
-      release: test
-    name: test-minecraft
-  spec:
-    ports:
-    - name: minecraft
-      port: 25565
-      protocol: TCP
-      targetPort: minecraft
-    selector:
-      app: test-minecraft
-    type: ClusterIP
-
-### Example kustomization with inline values
-
-To use the function with kustomize and your own inline values, you can 
-specify the function config in your generators field:
-
-  generators:
-  - |-
-    apiVersion: fn.kpt.dev/v1alpha1
-    kind: RenderHelmChart
-    metadata:
-      name: demo
-      annotations:
-        config.kubernetes.io/function: |
-          container:
-            network: true
-            image: gcr.io/kpt-fn/render-helm-chart:unstable
-    helmCharts:
-    - name: ocp-pipeline
-      namespace: mynamespace
-      version: 0.1.16
-      repo: https://bcgov.github.io/helm-charts
-      releaseName: moria
-      valuesInline:
-        releaseNamespace: ""
-        rbac:
-          create: true
-          rules:
-            - apiGroups: [""]
-              verbs: ["*"]
-              resources: ["*"]
-
-Then, to build the kustomization:
-
-  kustomize build --enable-alpha-plugins --network .
-
-Which will contain the following as part of your output:
-
-  apiVersion: rbac.authorization.k8s.io/v1
-  kind: Role
-  metadata:
-    name: moria-ocp-pipeline
-    namespace: mynamespace
-  rules:
-  - apiGroups:
-    - ""
-    resources:
-    - '*'
-    verbs:
-    - '*'
 `
