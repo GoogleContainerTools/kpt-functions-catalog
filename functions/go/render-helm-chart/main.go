@@ -27,6 +27,11 @@ import (
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
+const (
+	fnConfigKind = "RenderHelmChart"
+	configMap    = "ConfigMap"
+)
+
 //nolint
 func main() {
 	asp := HelmChartProcessor{}
@@ -73,12 +78,12 @@ func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {
 		return err
 	}
 	switch kind {
-	case "RenderHelmChart":
+	case fnConfigKind:
 		err = f.ConfigHelmArgs(nil, []byte(y))
 		if err != nil {
 			return err
 		}
-	case "ConfigMap":
+	case configMap:
 		dataMap := rn.GetDataMap()
 		bytes, err := kyaml.Marshal(dataMap)
 		if err != nil {
@@ -89,7 +94,7 @@ func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("`functionConfig` must be `ConfigMap` or `RenderHelmChart`")
+		return fmt.Errorf("`functionConfig` must be `%s` or `%s`", configMap, fnConfigKind)
 	}
 	return nil
 }

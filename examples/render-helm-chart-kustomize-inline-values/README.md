@@ -48,8 +48,8 @@ kustomize build --enable-alpha-plugins --network .
 
 ### Expected result
 
-You should also be able to find `def releaseNamespace = ""` in your output, as
-well as the following: 
+You should also be able to find the line `def releaseNamespace = ""` somewhere
+in your output, as well as the following: 
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
