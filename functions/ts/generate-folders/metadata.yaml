@@ -3,6 +3,7 @@ description: Transform the ResourceHierarchy custom resource into Folder custom 
 tags:
   - mutator
   - GCP
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/generate-folders/v0.1/functions/ts/generate-folders
 examplePackageURLs:
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/generate-folders/v0.1/examples/generate-folders-resourcehierarchy-v3
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/generate-folders/v0.1/examples/generate-folders-resourcehierarchy-v2
