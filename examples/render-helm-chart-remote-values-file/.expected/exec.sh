@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-kpt fn eval --image-pull-policy never --image gcr.io/kpt-fn/render-helm-chart:unstable \
+kpt fn eval --image-pull-policy never --image gcr.io/kpt-fn/render-helm-chart:v0.1 \
 --network \
 --mount type=bind,src="$(pwd)",dst=/tmp/charts -- \
 name=helloworld-chart \
