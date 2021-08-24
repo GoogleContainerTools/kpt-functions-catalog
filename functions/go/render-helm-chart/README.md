@@ -124,7 +124,7 @@ The only required field is `name`.
 To render a remote minecraft chart, you can run the following command: 
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable --network -- \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.1 --network -- \
 name=minecraft \
 repo=https://itzg.github.io/minecraft-server-charts \
 releaseName=test

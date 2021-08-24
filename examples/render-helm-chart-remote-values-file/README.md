@@ -10,14 +10,14 @@ function with a remote values file.
 Run the following command to fetch the example package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/render-helm-chart-remote-values-file
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/render-helm-chart-remote-values-file@render-helm-chart/v0.1
 ```
 
 Run the following commands to render the helm chart in your local
 filesystem with the remote values file.
 
 ```shell
-$ kpt fn eval render-helm-chart-remote-values-file --image gcr.io/kpt-fn/render-helm-chart:unstable \
+$ kpt fn eval render-helm-chart-remote-values-file --image gcr.io/kpt-fn/render-helm-chart:v0.1 \
 --network \
 --mount type=bind,src="$(pwd)"/render-helm-chart-remote-values-file,dst=/tmp/charts -- \
 name=helloworld-chart \
