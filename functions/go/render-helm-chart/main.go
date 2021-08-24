@@ -39,6 +39,7 @@ func main() {
 
 	cmd.Short = generated.RenderHelmChartShort
 	cmd.Long = generated.RenderHelmChartLong
+	cmd.Example = generated.RenderHelmChartExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
