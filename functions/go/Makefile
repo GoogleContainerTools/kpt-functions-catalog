@@ -25,7 +25,7 @@ FUNCTIONS := \
 	fix \
 	format \
 	gatekeeper \
-	inflate-helm-chart \
+	render-helm-chart \
 	list-setters \
 	search-replace \
 	set-annotations \
