@@ -338,7 +338,7 @@ spec:
 `,
 		},
 		{
-			name: "error: no input",
+			name: "do not error if no input",
 			config: `
 data: {}
 `,
@@ -366,7 +366,6 @@ spec:
         - name: nginx
           image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
-			errMsg: `input setters list cannot be empty`,
 		},
 		{
 			name: "set empty values",

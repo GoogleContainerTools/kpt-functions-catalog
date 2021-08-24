@@ -69,7 +69,10 @@ func getSetters(fc *kyaml.RNode) (applysetters.ApplySetters, error) {
 func resultsToItems(sr applysetters.ApplySetters) ([]framework.ResultItem, error) {
 	var items []framework.ResultItem
 	if len(sr.Results) == 0 {
-		return nil, fmt.Errorf("no matches for the input list of setters")
+		items = append(items, framework.ResultItem{
+			Message: "no matches for input setter(s)",
+		})
+		return items, nil
 	}
 	for _, res := range sr.Results {
 		items = append(items, framework.ResultItem{
