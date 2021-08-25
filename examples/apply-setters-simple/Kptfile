@@ -4,5 +4,5 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:unstable
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configPath: setters.yaml
