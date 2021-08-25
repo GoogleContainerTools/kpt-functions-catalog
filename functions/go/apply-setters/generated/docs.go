@@ -79,11 +79,11 @@ Declare the new desired values for setters in the functionConfig file.
 
 Invoke the function:
 
-  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.2 --fn-config ./apply-setters-fn-config
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
-  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- image=ubuntu replicas=3
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.2 -- image=ubuntu replicas=3
 
 Modified resource looks like the following:
 
@@ -138,7 +138,7 @@ Declare the desired array values, wrapped into string.
 
 Invoke the function using the input config:
 
-  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-setters-fn-config
+  $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.2 --fn-config ./apply-setters-fn-config
 
 Modified resource looks like the following:
 
