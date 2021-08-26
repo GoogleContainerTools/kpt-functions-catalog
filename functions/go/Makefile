@@ -25,6 +25,7 @@ FUNCTIONS := \
 	fix \
 	format \
 	gatekeeper \
+	remove-annotated-resources \
 	render-helm-chart \
 	list-setters \
 	search-replace \
