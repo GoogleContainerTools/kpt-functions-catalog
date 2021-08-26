@@ -1,0 +1,41 @@
+diff --git a/resources.yaml b/resources.yaml
+index bf0eaf1..30ca04c 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -4,6 +4,29 @@ metadata:
+   name: my-test-resource
+   namespace: example-namespace
+   annotations:
++    config.kubernetes.io/apply-time-mutation: |
++      - sourceRef:
++          group: foo.cloud.google.com
++          kind: RefKind
++          name: example-name1
++          namespace: example-namespace
++        sourcePath: $.status.number
++        targetPath: $.spec.fieldList[0]
++      - sourceRef:
++          apiVersion: bar.cloud.google.com/v1beta1
++          kind: OtherKind
++          name: example-name2
++          namespace: example-namespace
++        sourcePath: $.status.number2
++        targetPath: $.spec.numberMap.a
++      - sourceRef:
++          group: resourcemanager.cnrm.cloud.google.com
++          kind: Project
++          name: example-name
++          namespace: example-namespace
++        sourcePath: $.status.number
++        targetPath: $.spec.stringField
++        token: $ref2
+     unmodified-key: foobarbaz
+ spec:
+   fieldList:
+@@ -11,5 +34,5 @@ spec:
+     - 6
+   numberMap:
+     a: 0 # apply-time-mutation: ${bar.cloud.google.com/v1beta1/namespaces/example-namespace/OtherKind/example-name2:$.status.number2}
+-  stringField: placeholder # apply-time-mutation: serviceAccount:service-${resourcemanager.cnrm.cloud.google.com/namespaces/example-namespace/Project/example-name:$.status.number}@service.gserviceaccount.com
++  stringField: serviceAccount:service-$ref2@service.gserviceaccount.com # apply-time-mutation: serviceAccount:service-${resourcemanager.cnrm.cloud.google.com/namespaces/example-namespace/Project/example-name:$.status.number}@service.gserviceaccount.com
+   unmodifiedField: "no-diff"
