@@ -17,7 +17,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval generate-services-imperative --image gcr.io/kpt-fn/generate-services-imperative:v0.1
+$ kpt fn eval generate-services-imperative --image gcr.io/kpt-fn/generate-services:unstable
 ```
 
 ### Expected result

@@ -51,7 +51,7 @@ ${NAMESPACE}/service_${NAME}.yaml
     annotations:
       config.kubernetes.io/function: |
         container:
-          image: gcr.io/yakima-eap/generate-services:latest
+          image: gcr.io/kpt-fn/generate-services:unstable
     ```
 3. (Optional) Set the `data.namespace` field to specify which namespace Services will be created in.
 4. (Optional) Set the `data.disable-on-destroy` field to specify the value of the `cnrm.cloud.google.com/disable-on-destroy` annotation.
@@ -79,7 +79,7 @@ metadata:
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/function: |
       container:
-        image: gcr.io/yakima-eap/generate-services:latest
+        image: gcr.io/kpt-fn/generate-services:unstable
 data:
   namespace: gcp-services
   disable-on-destroy: "false"
