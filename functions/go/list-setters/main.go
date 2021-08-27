@@ -33,7 +33,7 @@ func (lsp *ListSettersProcessor) Process(resourceList *framework.ResourceList) e
 	}
 	items, err := run(resourceList)
 	if err != nil {
-		resourceList.Result.Items = getErrorItem(err.Error(), framework.Error)
+		resourceList.Result.Items = getErrorItem(fmt.Sprintf("failed to list setters: %s", err.Error()), framework.Error)
 		return err
 	}
 	resourceList.Result.Items = items
@@ -73,7 +73,7 @@ func resultsToItems(sr listsetters.ListSetters) ([]framework.ResultItem, error) 
 func getErrorItem(errMsg string, severity framework.Severity) []framework.ResultItem {
 	return []framework.ResultItem{
 		{
-			Message:  fmt.Sprintf("failed to list setters: %s", errMsg),
+			Message:  errMsg,
 			Severity: severity,
 		},
 	}

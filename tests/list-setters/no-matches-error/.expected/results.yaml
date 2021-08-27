@@ -7,5 +7,5 @@ items:
   - image: gcr.io/kpt-fn/list-setters:unstable
     exitCode: 0
     results:
-      - message: 'failed to list setters: no setters found'
+      - message: no setters found
         severity: warning
