@@ -18,7 +18,7 @@ and don't intend for Config Sync to pick up for validation and hydration
 `remove-annotated-resources` function can be executed imperatively as follows:
 
 ```shell
-$ kpt fn eval -i remove-annotated-resources:unstable
+$ kpt fn eval -i gcr.io/kpt-fn/remove-annotated-resources:unstable
 ```
 
 1. Searched for defined resources in a package
@@ -68,7 +68,7 @@ spec:
 Invoke the function in the package directory:
 
 ```shell
-$ kpt fn eval -i remove-annotated-resources:unstable
+$ kpt fn eval -i gcr.io/kpt-fn/remove-annotated-resources:unstable
 ```
 
 The resulting package structure would look like this:
