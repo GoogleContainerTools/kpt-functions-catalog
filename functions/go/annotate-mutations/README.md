@@ -32,7 +32,7 @@ The `annotate-mutations` function does the following:
 
 Appending an `config.k8s.io/apply-time-mutation` annotation based on a comment.
 
-Let's start with the Kptfile of an example package.
+Let's start with a sample resource.
 
 ```yaml
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
@@ -67,9 +67,9 @@ metadata:
           namespace: example-namespace
         sourcePath: $.status.number
         targetPath: $.spec.member
-        token: ${.status.number}
+        token: $ref0
 spec:
-  member: serviceAccount:service-${.status.number}@container-engine-robot.iam.gserviceaccount.com
+  member: serviceAccount:service-$ref0@container-engine-robot.iam.gserviceaccount.com # apply-time-mutation: ...
 ```
 
 <!--mdtogo-->
