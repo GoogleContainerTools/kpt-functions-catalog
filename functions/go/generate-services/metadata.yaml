@@ -1,0 +1,10 @@
+image: gcr.io/kpt-fn/generate-services
+description: Generates Config Controller Service resources required for supplied Config Controller resources to function.
+tags:
+  - mutator
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/generate-services
+examplePackageURLs:
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/generate-services-imperative
+emails:
+  - kpt-team@google.com
+license: Apache-2.0

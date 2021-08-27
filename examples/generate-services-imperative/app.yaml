@@ -1,0 +1,74 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: example
+  namespace: service-project-id # kpt-set: ${service-project-id}
+spec: {}
+---
+apiVersion: compute.cnrm.cloud.google.com/v1beta1
+kind: ComputeNetwork
+metadata:
+  name: example
+  namespace: networking # kpt-set: ${networking-namespace}
+  annotations:
+    cnrm.cloud.google.com/project-id: host-project-id # kpt-set: ${host-project-id}
+spec: {}
+---
+apiVersion: compute.cnrm.cloud.google.com/v1beta1
+kind: ComputeSubnetwork
+metadata:
+  name: example
+  namespace: networking # kpt-set: ${networking-namespace}
+  annotations:
+    cnrm.cloud.google.com/project-id: host-project-id # kpt-set: ${host-project-id}
+spec: {}
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Project
+metadata:
+  name: host-project-id # kpt-set: ${host-project-id}
+  namespace: projects # kpt-set: ${projects-namespace}
+  annotations:
+    cnrm.cloud.google.com/auto-create-network: "false"
+    cnrm.cloud.google.com/organization-id: "123456789012" # kpt-set: ${org-id}
+spec: {}
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Project
+metadata:
+  name: service-project-id # kpt-set: ${service-project-id}
+  namespace: projects # kpt-set: ${projects-namespace}
+  annotations:
+    cnrm.cloud.google.com/auto-create-network: "false"
+    cnrm.cloud.google.com/organization-id: "123456789012" # kpt-set: ${org-id}
+spec: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters
+data:
+  billing-account-id: AAAAAA-BBBBBB-CCCCCC
+  host-project-id: host-project-id
+  org-id: "123456789012"
+  projects-namespace: projects
+  service-project-id: service-project-id
+  networking-namespace: networking
+---
+apiVersion: spanner.cnrm.cloud.google.com/v1beta1
+kind: SpannerInstance
+metadata:
+  name: example
+  namespace: service-project-id # kpt-set: ${service-project-id}
+  annotations:
+    cnrm.cloud.google.com/deletion-policy: "abandon"
+spec: {}
+---
+apiVersion: spanner.cnrm.cloud.google.com/v1beta1
+kind: SpannerDatabase
+metadata:
+  name: example
+  namespace: service-project-id # kpt-set: ${service-project-id}
+  annotations:
+    cnrm.cloud.google.com/deletion-policy: "abandon"
+spec: {}

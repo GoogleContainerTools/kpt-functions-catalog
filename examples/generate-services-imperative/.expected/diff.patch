@@ -1,0 +1,60 @@
+diff --git a/gcp-services/service_host-project-id-compute.yaml b/gcp-services/service_host-project-id-compute.yaml
+new file mode 100644
+index 0000000..2f4f3b7
+--- /dev/null
++++ b/gcp-services/service_host-project-id-compute.yaml
+@@ -0,0 +1,9 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: host-project-id-compute
++  namespace: gcp-services
++  annotations:
++    cnrm.cloud.google.com/project-id: host-project-id
++spec:
++  resourceID: compute.googleapis.com
+diff --git a/gcp-services/service_projects-cloudresourcemanager.yaml b/gcp-services/service_projects-cloudresourcemanager.yaml
+new file mode 100644
+index 0000000..c9c74a3
+--- /dev/null
++++ b/gcp-services/service_projects-cloudresourcemanager.yaml
+@@ -0,0 +1,9 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: projects-cloudresourcemanager
++  namespace: gcp-services
++  annotations:
++    cnrm.cloud.google.com/project-id: projects
++spec:
++  resourceID: cloudresourcemanager.googleapis.com
+diff --git a/gcp-services/service_service-project-id-container.yaml b/gcp-services/service_service-project-id-container.yaml
+new file mode 100644
+index 0000000..3d15aee
+--- /dev/null
++++ b/gcp-services/service_service-project-id-container.yaml
+@@ -0,0 +1,9 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: service-project-id-container
++  namespace: gcp-services
++  annotations:
++    cnrm.cloud.google.com/project-id: service-project-id
++spec:
++  resourceID: container.googleapis.com
+diff --git a/gcp-services/service_service-project-id-spanner.yaml b/gcp-services/service_service-project-id-spanner.yaml
+new file mode 100644
+index 0000000..3c326c8
+--- /dev/null
++++ b/gcp-services/service_service-project-id-spanner.yaml
+@@ -0,0 +1,9 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: service-project-id-spanner
++  namespace: gcp-services
++  annotations:
++    cnrm.cloud.google.com/project-id: service-project-id
++spec:
++  resourceID: spanner.googleapis.com
