@@ -33,7 +33,7 @@ func (lsp *ListSettersProcessor) Process(resourceList *framework.ResourceList) e
 	}
 	items, err := run(resourceList)
 	if err != nil {
-		resourceList.Result.Items = getErrorItem(err.Error())
+		resourceList.Result.Items = getErrorItem(err.Error(), framework.Error)
 		return err
 	}
 	resourceList.Result.Items = items
@@ -59,7 +59,7 @@ func resultsToItems(sr listsetters.ListSetters) ([]framework.ResultItem, error) 
 	var items []framework.ResultItem
 	rs := sr.GetResults()
 	if len(rs) == 0 {
-		return nil, fmt.Errorf("no setters found")
+		return getErrorItem("no setters found", framework.Warning), nil
 	}
 	for _, r := range rs {
 		items = append(items, framework.ResultItem{
@@ -70,11 +70,11 @@ func resultsToItems(sr listsetters.ListSetters) ([]framework.ResultItem, error) 
 }
 
 // getErrorItem returns the item for an error message
-func getErrorItem(errMsg string) []framework.ResultItem {
+func getErrorItem(errMsg string, severity framework.Severity) []framework.ResultItem {
 	return []framework.ResultItem{
 		{
 			Message:  fmt.Sprintf("failed to list setters: %s", errMsg),
-			Severity: framework.Error,
+			Severity: severity,
 		},
 	}
 }
