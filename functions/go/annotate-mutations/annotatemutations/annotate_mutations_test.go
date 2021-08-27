@@ -32,20 +32,19 @@ func TestApplySettersReferenceParse(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.s, func(t *testing.T) {
-
 			doesHaveRef := HasRef(test.s)
 			if !doesHaveRef {
-				t.Fatalf("String doesn't have ref")
+				t.Fatalf("String %q doesn't have a valid ref", test.s)
 			}
 
 			gotRef, gotPath := CommentToReference(test.s)
 
 			if gotRef != test.wantStruct {
-				t.Errorf("Unexpected result %v", gotRef)
+				t.Errorf("CommentToReference returned struct %v wanted %v", gotRef, test.wantStruct)
 			}
 
 			if gotPath != test.wantPath {
-				t.Errorf("Unexpected path %q", gotPath)
+				t.Errorf("CommentToReference returned path %q wanted %q", gotPath, test.wantPath)
 			}
 		})
 	}
