@@ -20,7 +20,7 @@ index 1702bac..06515a7 100644
    storage-class: standard
 +  project-id: foo
 diff --git a/subpkg/Kptfile b/subpkg/Kptfile
-index c96b2cd..2643351 100644
+index c96b2cd..52b8640 100644
 --- a/subpkg/Kptfile
 +++ b/subpkg/Kptfile
 @@ -2,3 +2,8 @@ apiVersion: kpt.dev/v1
