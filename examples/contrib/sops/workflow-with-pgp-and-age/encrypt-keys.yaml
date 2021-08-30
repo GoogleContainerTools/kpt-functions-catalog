@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: encrypt-keys
+  annotations:
+    config.kubernetes.io/local-config: 'true'
+data:
+  # this field can contain the list of values, separated with comma
+  age: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
+  # this field can contain the list of values, separated with comma
+  pgp: FBC7B9E2A4F9289AC0C1D4843D16CEE4A27381B4
+  cmd-import-pgp: |
+    -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+    mQENBF1oQV0BCAC1iFfE7H3uu0hbWbRYVMoz5zZ91ACHETCOMVxN8GOG4SV0l8aQ
+    wmK9QWkYxhi52LnicVD3D7Uy75+J3zkvEDQ15C0AZ8UHXp4JlSQuXpFhrOhfYUF/
+    6pr/QexT+hQjOacvY4qfnj4xKa/AGdv5vPIygtQumE6r3GhEVAxQ1GSwtCWSU3Zl
+    3Uqf7S8kDvJTemtR2UkVfpXcMd4AmMKgt7fVhPO8eFotqTLPvz/iClzER+q61fLA
+    d1rP9YlmY46MJp/PffPicWdJiKv2i6ynKcIwkrQyP6V2ZzYi/gAhNJst3ZlMfsiN
+    ekCtcow9Bn44uxW3U8W02FNQSNyn6V6QPDIXABEBAAG0U1NPUFMgRnVuY3Rpb25h
+    bCBUZXN0cyBLZXkgMSAoaHR0cHM6Ly9naXRodWIuY29tL21vemlsbGEvc29wcy8p
+    IDxzZWNvcHNAbW96aWxsYS5jb20+iQFOBBMBCAA4FiEE+8e54qT5KJrAwdSEPRbO
+    5KJzgbQFAl1oQV0CGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQPRbO5KJz
+    gbTDcQf7Bp7e2zY9pBBXTgDASQl31SSHp9WkRUV5iqPVC9iPCELggteBGMwIpbDl
+    obc6O8/06foxWctTUaaciPBo2+jeWFTO+DNvB7oXIArqr5673QHLh6jEABBjyt91
+    rvta2wYF1XJBgxpui9aLICsCptFNIRvHeKUrXBI4fG5z3CDs/EOoY8K/AAYJUF+E
+    RtmvmisiE/m20UpbYRmkBJy25c89Wcn12I1SUJA3H3hGwvZCYp8hY1HPxxQUtU+D
+    ZBIpryi0xQqExGAlYqck7G03F+AD7/csaT1LEdCtWRLNwE8UkvfUF6liF0SgzxFo
+    1pp3gBU4swds9yO9wNe12JY/M5A/BLkBDQRdaEFdAQgAtun8JhSpNAKvOXwWX2nF
+    hnMXTJp4viMhlAZEdmMXEi27B2DM/nRzldjxGZoNUBSVbJNj2kx5ZUDl0o6eOpCh
+    vRaGuCOpYqOuSQvD8FnX0NgQULwuTZ+MawsaezktJEjDSBM1R6uASeJwDZj4hcUn
+    PgyAIESajPdowEkEjdYt261fGOLLcVoVdtqzOMBkLVdrK/FD1kGR9jnSlKEYDV9D
+    veBUBQGdqkgWXjS5BKcae07viC6xMa9AJS4pizyDALB2k0HQOelZNihOGXYUuvkc
+    s2Fivl0Tk3OCfH9XDvFehbYRHmkRDoMuKUDSzdy6tFBAkL0CPlXAWI6kQklaBEp1
+    9QARAQABiQE2BBgBCAAgFiEE+8e54qT5KJrAwdSEPRbO5KJzgbQFAl1oQV0CGwwA
+    CgkQPRbO5KJzgbS7zwgAndbf532OXo9HwPH+yQQmzQCLDFL6P4V7LcFrrydYItTE
+    hxqI3tbb96MKXRAt+G5Mw6JjRkWhwzbU3jE7D7XBMHw7GriTTU9QltNHg7VUpSSa
+    iTfVcSNErzsaqbjbA7jMs7VWzOq4LZo6Efy8UDKg5qcqLFaTQrzQZYNHNfM+kLAi
+    UPU8m7vwmz6oJWsjHkQKUhKhHptlpwMwdHkoacqDO0x2H6H91l/PnDm4ZG6FybJt
+    cjr98i+p52/XOo81nLgX7tcFS3nrN9HNdgKg1ZW3yrzg8NOaFCVA8qLDgLk//M3q
+    DixOxiurECkFrMvt/bDxEGpN5GVy550MmyUZQrkuqg==
+    =Zs2s
+    -----END PGP PUBLIC KEY BLOCK-----

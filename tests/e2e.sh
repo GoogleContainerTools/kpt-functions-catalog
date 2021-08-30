@@ -21,5 +21,3 @@ set -eo pipefail
 # Temporarily skip this test.
 # TODO(mengqiy): re-enable it after migrating all contrib functions.
 #DIR="$(dirname "$0")"
-
-#"$DIR"/sops.sh
