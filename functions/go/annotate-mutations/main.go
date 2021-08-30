@@ -31,7 +31,7 @@ type fieldWalker struct {
 	annotation    mutatorAnnotation
 }
 
-// extractMutationPattern extracts the setter pattern from the line comment.
+// extractMutationPattern extracts the mutation pattern from the line comment.
 // If the the line comment doesn't contain MutationCommentIdentifier
 // prefix, then it returns an empty string.
 func extractMutationPattern(lineComment string) string {
@@ -41,6 +41,7 @@ func extractMutationPattern(lineComment string) string {
 	return strings.TrimSpace(strings.TrimPrefix(lineComment, mutationCommentIdentifier))
 }
 
+// visitField searches for mutation markup comments and parses them to the equivalent annotations
 func (fw *fieldWalker) visitField(node *yaml.RNode, n string) error {
 	// Visit fields with comments.
 	if comment := node.YNode().LineComment; comment != "" {
@@ -71,7 +72,7 @@ func (fw *fieldWalker) visitField(node *yaml.RNode, n string) error {
 	return nil
 }
 
-// visitKeys recurses over a complex yaml hierarchy
+// visitKeys recurses over a yaml map of arbitrary complexity
 func (fw *fieldWalker) visitKeys(object *yaml.RNode, p string) error {
 	switch object.YNode().Kind {
 	case yaml.MappingNode:
@@ -99,6 +100,8 @@ func (fw *fieldWalker) visitKeys(object *yaml.RNode, p string) error {
 	return nil
 }
 
+// visitResource will recurse over all fields in a resource node to scan for comments to parse.
+// this expects a reference to a k8s object resource node, and a path to that resource config
 func (rp *commentProcessor) visitResource(object *yaml.RNode, resourcePath string) error {
 	if object.IsNil() {
 		return nil

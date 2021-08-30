@@ -4,7 +4,7 @@
 
 This example shows how the [`annotate-mutations`] function works.
 
-Running `annotate-mutations` function on the example packed will:
+Running `annotate-mutations` function on the example package will:
 
 1.  Set `config.k8s.io/apply-time-mutation` annotation on resources with `apply-time-mutation` inline comments.
 
