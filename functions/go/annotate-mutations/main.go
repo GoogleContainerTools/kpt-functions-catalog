@@ -31,10 +31,6 @@ type fieldWalker struct {
 	annotation    mutatorAnnotation
 }
 
-func hasComment(node *yaml.RNode) (bool, error) {
-	return false, nil
-}
-
 // extractMutationPattern extracts the setter pattern from the line comment.
 // If the the line comment doesn't contain MutationCommentIdentifier
 // prefix, then it returns an empty string.
@@ -124,7 +120,10 @@ func (rp *commentProcessor) visitResource(object *yaml.RNode, resourcePath strin
 		}
 		currentAnno := object.GetAnnotations()
 		currentAnno[annotationKey] = string(serialized)
-		object.SetAnnotations(currentAnno)
+		err = object.SetAnnotations(currentAnno)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
