@@ -1,0 +1,27 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 0
+items:
+  - image: gcr.io/kpt-fn/preview-hierarchy:unstable
+    stderr: |2
+
+      org-11111
+      ├─Commercial
+      ├─Financial
+      | ├─Apps
+      | | ├─Dev
+      | | ├─Prod
+      | | └─Test
+      | ├─Shared
+      | └─Web
+      ├─Retail
+      | ├─Apps
+      | | ├─Dev
+      | | ├─Prod
+      | | └─Test
+      | ├─Shared
+      | └─Web
+      └─Risk Mgmt
+    exitCode: 0
