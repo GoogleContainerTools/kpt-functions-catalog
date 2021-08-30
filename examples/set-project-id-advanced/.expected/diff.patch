@@ -29,7 +29,7 @@ index c96b2cd..2643351 100644
    name: subpkg
 +pipeline:
 +  mutators:
-+  - image: gcr.io/kpt-fn/apply-setters:v0.1
++  - image: gcr.io/kpt-fn/apply-setters:v0.2
 +    configMap:
 +      project-id: foo
 diff --git a/subpkg/resources.yaml b/subpkg/resources.yaml

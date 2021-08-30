@@ -28,7 +28,7 @@ info:
   man: nginx man text
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         image: nginx
         list: '[dev, stage]'

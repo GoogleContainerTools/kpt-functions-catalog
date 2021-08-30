@@ -277,11 +277,11 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 			return node, err
 		}
 
-		// apply-setters function input should be moved to configPath option as it the
-		// best practice
+		// apply-setters function input should be moved to configPath option as it
+		// is the best practice
 		if kf.Pipeline != nil {
 			for i, fn := range kf.Pipeline.Mutators {
-				if strings.Contains(fn.Image, "apply-setters:v0.1") && len(fn.ConfigMap) > 0 {
+				if strings.Contains(fn.Image, "gcr.io/kpt-fn/apply-setters:") && len(fn.ConfigMap) > 0 {
 					settersConfig, err := SettersNodeFromSetters(kf.Pipeline.Mutators[0].ConfigMap, settersConfigFilePath)
 					if err != nil {
 						return node, err
@@ -395,7 +395,7 @@ func (s *Fix) FixKptfile(node *yaml.RNode, functions []v1.Function) (*yaml.RNode
 
 	if len(setters) > 0 {
 		fn := v1.Function{
-			Image:      "gcr.io/kpt-fn/apply-setters:v0.1",
+			Image:      "gcr.io/kpt-fn/apply-setters:v0.2",
 			ConfigPath: SettersConfigFileName,
 		}
 		settersConfig, err := SettersNodeFromSetters(setters, settersConfigFilePath)
