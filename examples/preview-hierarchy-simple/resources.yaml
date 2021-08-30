@@ -1,0 +1,143 @@
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/organization-id: "11111"
+  name: commercial
+spec:
+  displayName: Commercial
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "financial-apps"
+  name: financial-apps-dev
+spec:
+  displayName: Dev
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "financial-apps"
+  name: financial-apps-prod
+spec:
+  displayName: Prod
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "financial-apps"
+  name: financial-apps-test
+spec:
+  displayName: Test
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "financial"
+  name: financial-apps
+spec:
+  displayName: Apps
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "financial"
+  name: financial-shared
+spec:
+  displayName: Shared
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "financial"
+  name: financial-web
+spec:
+  displayName: Web
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/organization-id: "11111"
+  name: financial
+spec:
+  displayName: Financial
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "retail-apps"
+  name: retail-apps-dev
+spec:
+  displayName: Dev
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "retail-apps"
+  name: retail-apps-prod
+spec:
+  displayName: Prod
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "retail-apps"
+  name: retail-apps-test
+spec:
+  displayName: Test
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "retail"
+  name: retail-apps
+spec:
+  displayName: Apps
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "retail"
+  name: retail-shared
+spec:
+  displayName: Shared
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/folder-ref: "retail"
+  name: retail-web
+spec:
+  displayName: Web
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/organization-id: "11111"
+  name: retail
+spec:
+  displayName: Retail
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    cnrm.cloud.google.com/organization-id: "11111"
+  name: risk-mgmt
+spec:
+  displayName: Risk Mgmt
