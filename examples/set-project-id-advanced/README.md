@@ -18,7 +18,7 @@ Running `set-project-id` function on the example packed will:
 Get the example package by running the following commands:
 
 ```shell
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-project-id-advanced
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-project-id-advanced@set-project-id/v0.2
 ```
 
 ### Function invocation
@@ -26,7 +26,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 Invoke the function with the following command:
 
 ```shell
-kpt fn eval set-project-id-advanced --include-meta-resources --image gcr.io/kpt-fn/set-project-id:unstable -- 'project-id=foo'
+kpt fn eval set-project-id-advanced --include-meta-resources --image gcr.io/kpt-fn/set-project-id:v0.2 -- 'project-id=foo'
 ```
 
 ### Expected result
@@ -40,4 +40,4 @@ kpt fn eval set-project-id-advanced --include-meta-resources --image gcr.io/kpt-
     IAMServiceAccount resource will include `cnrm.cloud.google.com/project-id:
     foo` annotation.
 
-[`set-project-id`]: https://catalog.kpt.dev/set-project-id/v0.1/
+[`set-project-id`]: https://catalog.kpt.dev/set-project-id/v0.2/
