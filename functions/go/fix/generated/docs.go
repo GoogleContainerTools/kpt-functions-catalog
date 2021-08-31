@@ -87,7 +87,7 @@ Here is the transformed ` + "`" + `v1` + "`" + ` Kptfile:
     name: nginx
   pipeline:
     mutators:
-      - image: gcr.io/kpt-fn/apply-setters:v0.1
+      - image: gcr.io/kpt-fn/apply-setters:v0.2
         configMap:
           replicas: "3"
 `

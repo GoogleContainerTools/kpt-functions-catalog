@@ -108,7 +108,7 @@ func setSettersOnKptfile(nodes []*yaml.RNode, kf *kptfilev1.KptFile, projectID s
 	}
 
 	fn := kptfilev1.Function{
-		Image: "gcr.io/kpt-fn/apply-setters:v0.1",
+		Image: "gcr.io/kpt-fn/apply-setters:v0.2",
 		ConfigMap: map[string]string{
 			projectIDSetterName: projectID,
 		},
