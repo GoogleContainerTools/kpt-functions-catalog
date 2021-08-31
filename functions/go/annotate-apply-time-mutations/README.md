@@ -1,10 +1,10 @@
-# annotate-mutations
+# annotate-apply-time-mutations
 
 ## Overview
 
 <!--mdtogo:Short-->
 
-The `annotate-mutations` function reads `apply-time-mutation` comments on resource YAML and adds
+The `annotate-apply-time-mutations` function reads `apply-time-mutation` comments on resource YAML and adds
 the equivalent `config.k8s.io/apply-time-mutation` to the resource.
 
 <!--mdtogo-->
@@ -13,13 +13,24 @@ the equivalent `config.k8s.io/apply-time-mutation` to the resource.
 
 ## Usage
 
-annotate-mutations function is expected to be executed imperatively like:
+The annotate-apply-time-mutations function can be executed declaratively as part of `kpt fn render`
 
-```shell
-kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/annotate-mutations:unstable
+```yaml
+apiVersion: kpt.dev/v1
+kind: Kptfile
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/annotate-apply-time-mutations:unstable
 ```
 
-The `annotate-mutations` function does the following:
+or imperatively like:
+
+```shell
+kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/annotate-apply-time-mutations:unstable
+```
+
+
+The `annotate-apply-time-mutations` function does the following:
 
 1.  Scans the package for `apply-time-mutation` comment markup.
 2.  Appends the equivalent `config.k8s.io/apply-time-mutation` annotation to the same.
@@ -47,7 +58,7 @@ spec:
 Invoke the function:
 
 ```shell
-kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/annotate-mutations:unstable
+kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/annotate-apply-time-mutations:unstable
 ```
 
 Resource will be updated to the following:
@@ -59,7 +70,7 @@ metadata:
   name: my-policy
   namespace: example-namespace
   annotations:
-    config.k8s.io/apply-time-mutation: |
+    config.kubernetes.io/apply-time-mutation: |
       - sourceRef:
           group: resourcemanager.cnrm.cloud.google.com
           kind: Project

@@ -1,10 +1,10 @@
-# annotate-mutations: Simple Example
+# annotate-apply-time-mutations: Simple Example
 
 ### Overview
 
-This example shows how the [`annotate-mutations`] function works.
+This example shows how the [`annotate-apply-time-mutations`] function works.
 
-Running `annotate-mutations` function on the example package will:
+Running `annotate-apply-time-mutations` function on the example package will:
 
 1.  Set `config.k8s.io/apply-time-mutation` annotation on resources with `apply-time-mutation` inline comments.
 
@@ -13,7 +13,7 @@ Running `annotate-mutations` function on the example package will:
 Get the example package by running the following commands:
 
 ```shell
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/annotate-mutations-simple
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/annotate-apply-time-mutations-simple
 ```
 
 ### Function invocation
@@ -21,7 +21,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 Invoke the function with the following command:
 
 ```shell
-kpt fn eval annotate-mutations-simple --image gcr.io/kpt-fn/annotate-mutations:unstable
+kpt fn eval annotate-apply-time-mutations-simple --image gcr.io/kpt-fn/annotate-apply-time-mutations:unstable
 ```
 
 ### Expected result
