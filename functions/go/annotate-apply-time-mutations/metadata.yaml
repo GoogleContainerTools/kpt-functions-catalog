@@ -1,10 +1,10 @@
-image: gcr.io/kpt-fn/annotate-mutations
+image: gcr.io/kpt-fn/annotate-apply-time-mutations
 description: Read mutation markup comments and add the equivalent annotation.
 tags:
   - mutator
-sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/annotate-mutations
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/annotate-apply-time-mutations
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/annotate-mutations-simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/annotate-apply-time-mutations-simple
 emails:
   - kpt-team@google.com
 license: Apache-2.0
