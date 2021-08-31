@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
+
 // Usage: generate_catalog SRC_REPO_DIR/ DEST_MD_DIR/
 //
 // The command will create a README.md file under DEST_MD_DIR/ containing a table
