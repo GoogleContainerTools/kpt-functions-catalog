@@ -15,6 +15,7 @@ const (
 	sourceRegex               = `\${(?P<group>[^/]+)/((?P<version>[^/]+)/)?namespaces/(?P<namespace>[^/]+)/(?P<kind>[^/]+)/(?P<name>[^:]+):(?P<path>[^}]+)}`
 	onlySourceRegex           = "^" + sourceRegex + "$"
 	mutationCommentIdentifier = "# apply-time-mutation: "
+	annotationKey             = "config.kubernetes.io/apply-time-mutation"
 )
 
 var (
@@ -39,23 +40,18 @@ type Mutation struct {
 
 type mutatorAnnotation []Mutation
 
-// FieldWalker scans all fields in a resource for mutation annotation comments.
-type FieldWalker struct {
-	// FileName is the name of the file or path where the object to "walk" is located.
-	FileName string
+// ResourceAnnotator scans all fields in a resource for mutation annotation comments and adds the matching annotation.
+type ResourceAnnotator struct {
+	// fileName is the name of the file or path where the object to annotate is located.
+	fileName string
 	results  []framework.ResultItem
 	// mutationCount increments as field mutations are found, to ensure unique replacement tokens in multi-comment resources.
 	mutationCount int
 	annotation    mutatorAnnotation
 }
 
-// Results returns framework results for info and error messaging.
-func (fw *FieldWalker) Results() []framework.ResultItem {
-	return fw.results
-}
-
-// Annotation generates the krm annotation string value, or errors.
-func (fw *FieldWalker) Annotation() (string, error) {
+// annotationAsString generates the krm annotation string value, or errors.
+func (fw *ResourceAnnotator) annotationAsString() (string, error) {
 	if len(fw.annotation) > 0 {
 		serialized, err := yaml.Marshal(fw.annotation)
 		if err != nil {
@@ -111,7 +107,7 @@ func extractMutationPattern(lineComment string) string {
 }
 
 // visitScalarNode searches for mutation markup comments and parses them to the equivalent annotations
-func (fw *FieldWalker) visitScalarNode(node *yaml.RNode, n string) error {
+func (fw *ResourceAnnotator) visitScalarNode(node *yaml.RNode, n string) error {
 	// Visit fields with comments.
 	if comment := node.YNode().LineComment; comment != "" {
 		fmt.Fprintln(os.Stderr, "Parsing field comment", comment)
@@ -136,19 +132,19 @@ func (fw *FieldWalker) visitScalarNode(node *yaml.RNode, n string) error {
 		}
 
 		fw.annotation = append(fw.annotation, Mutation{SourceRef: resourceRef, SourcePath: refPath, TargetPath: "$." + n, Token: replacementToken})
-		fw.results = append(fw.results, framework.ResultItem{Message: fmt.Sprintf("Parsed mutation in resource %q field %q", fw.FileName, n), Severity: framework.Info})
+		fw.results = append(fw.results, framework.ResultItem{Message: fmt.Sprintf("Parsed mutation in resource %q field %q", fw.fileName, n), Severity: framework.Info})
 	}
 	return nil
 }
 
-// VisitFields recurses over a yaml map of arbitrary complexity.
+// visitFields recurses over a yaml map of arbitrary complexity.
 // This is the entry point for processing any krm object.
-func (fw *FieldWalker) VisitFields(object *yaml.RNode, p string) error {
+func (fw *ResourceAnnotator) visitFields(object *yaml.RNode, p string) error {
 	switch object.YNode().Kind {
 	case yaml.MappingNode:
 		// iterate over map values
 		return object.VisitFields(func(node *yaml.MapNode) error {
-			return fw.VisitFields(node.Value, p+"."+node.Key.YNode().Value)
+			return fw.visitFields(node.Value, p+"."+node.Key.YNode().Value)
 		})
 	case yaml.SequenceNode:
 		els, err := object.Elements()
@@ -157,7 +153,7 @@ func (fw *FieldWalker) VisitFields(object *yaml.RNode, p string) error {
 		}
 		// iterate over list elements
 		for i, field := range els {
-			err := fw.VisitFields(field, p+fmt.Sprintf("[%d]", i))
+			err := fw.visitFields(field, p+fmt.Sprintf("[%d]", i))
 			if err != nil {
 				return err
 			}
@@ -168,4 +164,34 @@ func (fw *FieldWalker) VisitFields(object *yaml.RNode, p string) error {
 		return fw.visitScalarNode(object, p)
 	}
 	return nil
+}
+
+// AnnotateResource parses comments on fields in one resource and adds the corresponding annotations.
+func (fw *ResourceAnnotator) AnnotateResource(object *yaml.RNode, filePath string) ([]framework.ResultItem, error) {
+	var results []framework.ResultItem
+	fw.fileName = filePath
+	err := object.VisitFields(func(node *yaml.MapNode) error {
+		return fw.visitFields(node.Value, node.Key.YNode().Value)
+	})
+	if err != nil {
+		results = append(results, framework.ResultItem{Message: fmt.Sprintf("Resource %q encountered an error: %q", object.GetName(), err.Error()), Severity: framework.Error})
+		return results, err
+	}
+	results = fw.results
+
+	annoString, err := fw.annotationAsString()
+	if err != nil {
+		results = append(results, framework.ResultItem{Message: fmt.Sprintf("Resource %q encountered an error serializing the mutation annotation: %q", object.GetName(), err.Error()), Severity: framework.Error})
+		return results, err
+	}
+	if annoString != "" {
+		currentAnno := object.GetAnnotations()
+		currentAnno[annotationKey] = annoString
+		err = object.SetAnnotations(currentAnno)
+		if err != nil {
+			return results, err
+		}
+	}
+
+	return results, err
 }

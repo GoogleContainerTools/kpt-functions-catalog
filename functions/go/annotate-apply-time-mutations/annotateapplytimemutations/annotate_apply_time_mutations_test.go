@@ -32,12 +32,12 @@ func TestApplySettersReferenceParse(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.s, func(t *testing.T) {
-			doesHaveRef := HasRef(test.s)
+			doesHaveRef := hasRef(test.s)
 			if !doesHaveRef {
 				t.Fatalf("String %q doesn't have a valid ref", test.s)
 			}
 
-			gotRef, gotPath := CommentToReference(test.s)
+			gotRef, gotPath := commentToReference(test.s)
 
 			if gotRef != test.wantStruct {
 				t.Errorf("CommentToReference returned struct %v wanted %v", gotRef, test.wantStruct)
@@ -73,7 +73,7 @@ func TestCommentToTokenField(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.s, func(t *testing.T) {
-			gotReplace, gotToken := CommentToTokenField(test.s, test.givenIndex)
+			gotReplace, gotToken := commentToTokenField(test.s, test.givenIndex)
 			if gotReplace != test.wantValue {
 				t.Errorf("CommentToTokenField returned replacement %q want %q", gotReplace, test.wantValue)
 			}

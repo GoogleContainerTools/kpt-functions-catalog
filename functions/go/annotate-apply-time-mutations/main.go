@@ -8,7 +8,6 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
-	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 const (
@@ -16,40 +15,6 @@ const (
 )
 
 type AnnotateApplyTimeMutationsProcessor struct{}
-
-// processResource will recurse over all fields in a resource node to scan for comments to parse.
-// This expects a reference to a k8s object node, and a filepath to that resource config
-func processResource(object *yaml.RNode, resourcePath string) ([]framework.ResultItem, error) {
-	var results []framework.ResultItem
-	if object.IsNil() {
-		return results, nil
-	}
-
-	// one fw instance per resource
-	fw := annotateapplytimemutations.FieldWalker{FileName: resourcePath}
-	err := object.VisitFields(func(node *yaml.MapNode) error {
-		return fw.VisitFields(node.Value, node.Key.YNode().Value)
-	})
-	if err != nil {
-		results = append(results, framework.ResultItem{Message: fmt.Sprintf("Resource %q encountered error %q", object.GetName(), err.Error()), Severity: framework.Error})
-	}
-	results = append(results, fw.Results()...)
-
-	annoString, err := fw.Annotation()
-	if err != nil {
-		return results, err
-	}
-	if annoString != "" {
-		currentAnno := object.GetAnnotations()
-		currentAnno[annotationKey] = annoString
-		err = object.SetAnnotations(currentAnno)
-		if err != nil {
-			return results, err
-		}
-	}
-
-	return results, err
-}
 
 func (rp *AnnotateApplyTimeMutationsProcessor) Process(resourceList *framework.ResourceList) error {
 	resourceList.Result = &framework.Result{
@@ -61,11 +26,12 @@ func (rp *AnnotateApplyTimeMutationsProcessor) Process(resourceList *framework.R
 			return err
 		}
 		fmt.Fprintln(os.Stderr, "Processing resource in file", fileName)
-		results, err := processResource(node, fileName)
+		ra := annotateapplytimemutations.ResourceAnnotator{}
+		results, err := ra.AnnotateResource(node, fileName)
+		resourceList.Result.Items = append(resourceList.Result.Items, results...)
 		if err != nil {
 			return err
 		}
-		resourceList.Result.Items = append(resourceList.Result.Items, results...)
 	}
 
 	return nil
