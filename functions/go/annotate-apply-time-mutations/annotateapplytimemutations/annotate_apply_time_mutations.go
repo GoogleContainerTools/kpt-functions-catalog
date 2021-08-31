@@ -132,7 +132,7 @@ func (fw *ResourceAnnotator) visitScalarNode(node *yaml.RNode, n string) error {
 		}
 
 		fw.annotation = append(fw.annotation, Mutation{SourceRef: resourceRef, SourcePath: refPath, TargetPath: "$." + n, Token: replacementToken})
-		fw.results = append(fw.results, framework.ResultItem{Message: fmt.Sprintf("Parsed mutation in resource %q field %q", fw.fileName, n), Severity: framework.Info})
+		fw.results = append(fw.results, framework.ResultItem{Message: fmt.Sprintf("Parsed mutation in file %q field %q", fw.fileName, n), Severity: framework.Info})
 	}
 	return nil
 }

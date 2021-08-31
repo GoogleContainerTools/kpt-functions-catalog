@@ -1,6 +1,12 @@
 package annotateapplytimemutations
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"sigs.k8s.io/kustomize/kyaml/fn/framework"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
+)
 
 func TestApplySettersReferenceParse(t *testing.T) {
 	testCases := []struct {
@@ -79,6 +85,70 @@ func TestCommentToTokenField(t *testing.T) {
 			}
 			if gotToken != test.wantToken {
 				t.Errorf("CommentToTokenField returned token %q want %q", gotToken, test.wantToken)
+			}
+		})
+	}
+}
+
+func TestAnnotateResourceOutput(t *testing.T) {
+	testCases := []struct {
+		config            string
+		expectAnnotations map[string]string
+		expectResults     []framework.ResultItem
+	}{
+		{
+			config: `apiVersion: bar.foo/v1beta1
+kind: MyTestKind
+metadata:
+    name: my-test-resource
+    namespace: test-namespace
+    annotations:
+        unmodified-key: foobarbaz
+spec:
+    a: 0 # apply-time-mutation: ${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}
+`,
+			expectAnnotations: map[string]string{
+				"config.kubernetes.io/apply-time-mutation": `- sourceRef:
+    apiVersion: foo.bar/v0
+    kind: OtherKind
+    name: example-name2
+    namespace: example-namespace
+  sourcePath: $.status.count
+  targetPath: $.spec.a
+`,
+				"unmodified-key": "foobarbaz",
+			},
+			expectResults: []framework.ResultItem{
+				{Message: fmt.Sprintf("Parsed mutation in file %q field %q", "test.yaml", "spec.a"), Severity: framework.Info},
+			},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run("", func(t *testing.T) {
+			node, err := kyaml.Parse(test.config)
+			if err != nil {
+				t.Fatal(err)
+			}
+			ra := ResourceAnnotator{}
+			gotResults, err := ra.AnnotateResource(node, "test.yaml")
+			gotAnnotations := node.GetAnnotations()
+
+			if len(gotResults) != len(test.expectResults) {
+				t.Fatalf("Got %d results expected %d", len(gotResults), len(test.expectResults))
+			}
+			if len(gotAnnotations) != len(test.expectAnnotations) {
+				t.Fatalf("Got %d annotations expected %d", len(gotAnnotations), len(test.expectAnnotations))
+			}
+			for i, gotResult := range gotResults {
+				if gotResult != test.expectResults[i] {
+					t.Errorf("Got %dth result %v, expected %v", i, gotResult, test.expectResults[i])
+				}
+			}
+			for gotKey, gotVal := range gotAnnotations {
+				if gotVal != test.expectAnnotations[gotKey] {
+					t.Errorf("Got %q: %q, expected value: %q", gotKey, gotVal, test.expectAnnotations[gotKey])
+				}
 			}
 		})
 	}
