@@ -12,35 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: CheckSite
-on:
-  pull_request:
-    paths:
-      - "functions/**"
-      - "examples/**"
-      - "site/**"
-      - "scripts/generate_catalog/**"
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Merge gob branch
-        run: git worktree add ./gob gob && cp -r gob/* .
-      - uses: actions/checkout@v2
-        with:
-          repository: etefera/href-checker
-          ref: docsify
-          path: href-checker
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - name: Install Site Checker
-        run: yarn install
-        working-directory: href-checker
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Run Site Checker
-        run: make site-check
+# name: CheckSite
+# on:
+#   pull_request:
+#     paths:
+#       - "functions/**"
+#       - "examples/**"
+#       - "site/**"
+#       - "scripts/generate_catalog/**"
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#         with:
+#           fetch-depth: 0
+#       - name: Merge gob branch
+#         run: git worktree add ./gob gob && cp -r gob/* .
+#       - uses: actions/checkout@v2
+#         with:
+#           repository: etefera/href-checker
+#           ref: docsify
+#           path: href-checker
+#       - uses: actions/setup-node@v2
+#         with:
+#           node-version: '14'
+#       - name: Install Site Checker
+#         run: yarn install
+#         working-directory: href-checker
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v1
+#       - name: Run Site Checker
+#         run: make site-check
