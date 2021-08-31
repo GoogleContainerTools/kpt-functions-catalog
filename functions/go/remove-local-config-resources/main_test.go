@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
-	// "sigs.k8s.io/kustomize/kyaml/fn/framework"
-	"github.com/stretchr/testify/assert"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -15,24 +14,33 @@ const testDir = "testdata"
 type PrunerTest struct {
 	Name           string
 	ResFiles       []string
-	ExpectedResult string
+	ExpectedResult []string
 }
 
 var Tests = []PrunerTest{
 	{
-		Name:           "Multiple Pruned Resources",
-		ResFiles:       []string{"applied.yaml", "local-01.yaml", "local-02.yaml"},
-		ExpectedResult: "Resources Pruned: [Count: 2, Names: {sample-hierarchy-01, sample-hierarchy-02}]",
+		Name:     "Multiple Pruned Resources",
+		ResFiles: []string{"applied.yaml", "local-01.yaml", "local-02.yaml"},
+		ExpectedResult: []string{
+			"Number of resources pruned: 2",
+			"Resource name: [sample-hierarchy-01]",
+			"Resource name: [sample-hierarchy-02]",
+		},
 	},
 	{
-		Name:           "Single Pruned Resource",
-		ResFiles:       []string{"applied.yaml", "local-01.yaml"},
-		ExpectedResult: "Resources Pruned: [Count: 1, Names: {sample-hierarchy-01}]",
+		Name:     "Single Pruned Resource",
+		ResFiles: []string{"applied.yaml", "local-01.yaml"},
+		ExpectedResult: []string{
+			"Number of resources pruned: 1",
+			"Resource name: [sample-hierarchy-01]",
+		},
 	},
 	{
-		Name:           "No Pruned Resource",
-		ResFiles:       []string{"applied.yaml"},
-		ExpectedResult: "Resources Pruned: [Count: 0, Names: {local resources not found}]",
+		Name:     "No Pruned Resource",
+		ResFiles: []string{"applied.yaml"},
+		ExpectedResult: []string{
+			"Found no resources to prune with the local config annotation",
+		},
 	},
 }
 
@@ -56,12 +64,8 @@ func TestPrunedResources(t *testing.T) {
 				t.Errorf("Error when calling ProcessResources %s", err.Error())
 			}
 
-			println(items[0].Message)
-
-			resultMessage := items[0].Message
-
-			if !assert.Equal(t, resultMessage, test.ExpectedResult) {
-				t.FailNow()
+			for j := range items {
+				require.Equal(t, test.ExpectedResult[j], items[j].Message)
 			}
 		})
 	}

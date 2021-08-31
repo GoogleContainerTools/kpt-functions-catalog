@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
@@ -36,9 +35,7 @@ func (fp *RemoveLocalConfigResourcesConfigProcessor) Process(resourceList *frame
 
 func ProcessResources(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
 	var items []framework.ResultItem
-	var prunedCount = 0
-	var prunedNames []string
-	fileNames := "local resources not found"
+	results := []Result{}
 
 	var res []*yaml.RNode
 	for _, node := range resourceList.Items {
@@ -49,21 +46,31 @@ func ProcessResources(resourceList *framework.ResourceList) ([]framework.ResultI
 		if node.GetAnnotations()[filters.LocalConfigAnnotation] != "true" {
 			res = append(res, node)
 		} else {
-			prunedCount++
-			prunedNames = append(prunedNames, node.GetName())
+			result := Result{Name: node.GetName()}
+			results = append(results, result)
 		}
 	}
 
-	if prunedCount > 0 {
-		fileNames = strings.Join(prunedNames, ", ")
-	}
-
 	resourceList.Items = res
-	resultMessage := fmt.Sprintf("Resources Pruned: [Count: %d, Names: {%s}]", prunedCount, fileNames)
 
-	items = append(items, framework.ResultItem{
-		Message: resultMessage,
-	})
+	if len(results) > 0 {
+		items = append(items, framework.ResultItem{
+			Message: fmt.Sprintf("Number of resources pruned: %d", len(results)),
+		})
+
+		for _, result := range results {
+			items = append(items, framework.ResultItem{
+				Message: fmt.Sprintf("Resource name: [%s]", result.Name),
+			})
+		}
+	} else if len(results) == 0 {
+		item := framework.ResultItem{
+			Message: "Found no resources to prune with the local config annotation",
+		}
+
+		item.Severity = framework.Warning
+		items = append(items, item)
+	}
 
 	return items, nil
 }
@@ -72,10 +79,14 @@ func ProcessResources(resourceList *framework.ResourceList) ([]framework.ResultI
 func getErrorItem(errMsg string) []framework.ResultItem {
 	return []framework.ResultItem{
 		{
-			Message:  fmt.Sprintf("failed to list setters: %s", errMsg),
+			Message:  fmt.Sprintf("failed to remove local configs: %s", errMsg),
 			Severity: framework.Error,
 		},
 	}
+}
+
+type Result struct {
+	Name string
 }
 
 type RemoveLocalConfigResourcesConfigProcessor struct{}
