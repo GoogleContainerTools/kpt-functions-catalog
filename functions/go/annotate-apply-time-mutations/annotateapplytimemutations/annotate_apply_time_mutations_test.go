@@ -132,6 +132,9 @@ spec:
 			}
 			ra := ResourceAnnotator{}
 			gotResults, err := ra.AnnotateResource(node, "test.yaml")
+			if err != nil {
+				t.Fatal(err)
+			}
 			gotAnnotations := node.GetAnnotations()
 
 			if len(gotResults) != len(test.expectResults) {

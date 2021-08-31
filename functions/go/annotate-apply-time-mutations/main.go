@@ -10,10 +10,6 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 )
 
-const (
-	annotationKey = "config.kubernetes.io/apply-time-mutation"
-)
-
 type AnnotateApplyTimeMutationsProcessor struct{}
 
 func (rp *AnnotateApplyTimeMutationsProcessor) Process(resourceList *framework.ResourceList) error {
