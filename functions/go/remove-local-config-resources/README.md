@@ -1,24 +1,24 @@
-# remove-annotated-resources
+# remove-local-config-resources
 
 ## Overview
 
 <!--mdtogo:Short-->
 
-Removes resources with the annotation `config.kubernetes.io/local-config: true` from the resource list
+Removes resources with the annotation `config.kubernetes.io/local-config: true` from the resource list.
 
 <!--mdtogo-->
 
 This function provides a quick way for users to prune resources that they may have been working on locally
-and don't intend for Config Sync to pick up for validation and hydration
+and don't intend for Config Sync to pick up for validation and hydration.
 
 <!--mdtogo:Long-->
 
 ## Usage
 
-`remove-annotated-resources` function can be executed imperatively as follows:
+`remove-local-config-resources` function can be executed imperatively as follows:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn/remove-annotated-resources:unstable
+$ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:unstable
 ```
 
 1. Searched for defined resources in a package
@@ -34,10 +34,10 @@ $ kpt fn eval -i gcr.io/kpt-fn/remove-annotated-resources:unstable
 Consider the following package:
 
 ```
-├── ...
-├── sample
-│   ├── applied.yaml
-│   ├── local.yaml
+├─ ...
+└─ sample
+   ├─ applied.yaml
+   └─ local.yaml
 ```
 
 ```yaml
@@ -68,15 +68,15 @@ spec:
 Invoke the function in the package directory:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn/remove-annotated-resources:unstable
+$ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:unstable
 ```
 
 The resulting package structure would look like this:
 
 ```
-├── ...
-├── sample
-│   ├── applied.yaml
+├─ ...
+└─ sample
+   └─ applied.yaml
 ```
 
 <!--mdtogo-->

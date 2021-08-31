@@ -1,0 +1,10 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 0
+items:
+  - image: gcr.io/kpt-fn/remove-local-config-resources:unstable
+    exitCode: 0
+    results:
+      - message: 'Resources Pruned: [Count: 1, Names: {sample-hierarchy}]'
