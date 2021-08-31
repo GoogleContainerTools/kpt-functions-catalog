@@ -11,11 +11,11 @@ import (
 )
 
 const (
+	annotationKey             = "config.kubernetes.io/apply-time-mutation"
 	tokenPattern              = "$ref%d"
 	sourceRegex               = `\${(?P<group>[^/]+)/((?P<version>[^/]+)/)?namespaces/(?P<namespace>[^/]+)/(?P<kind>[^/]+)/(?P<name>[^:]+):(?P<path>[^}]+)}`
 	onlySourceRegex           = "^" + sourceRegex + "$"
 	mutationCommentIdentifier = "# apply-time-mutation: "
-	annotationKey             = "config.kubernetes.io/apply-time-mutation"
 )
 
 var (

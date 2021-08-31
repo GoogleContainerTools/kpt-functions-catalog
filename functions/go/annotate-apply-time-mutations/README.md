@@ -5,7 +5,7 @@
 <!--mdtogo:Short-->
 
 The `annotate-apply-time-mutations` function reads `apply-time-mutation` comments on resource YAML and adds
-the equivalent `config.k8s.io/apply-time-mutation` to the resource.
+the equivalent `config.kubernetes.io/apply-time-mutation` to the resource.
 
 <!--mdtogo-->
 
@@ -41,7 +41,7 @@ The `annotate-apply-time-mutations` function does the following:
 
 <!--mdtogo:Examples-->
 
-Appending an `config.k8s.io/apply-time-mutation` annotation based on a comment.
+Appending an `config.kubernetes.io/apply-time-mutation` annotation based on a comment.
 
 Let's start with a sample resource.
 
