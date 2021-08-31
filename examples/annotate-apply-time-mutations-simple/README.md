@@ -2,7 +2,7 @@
 
 ### Overview
 
-This example shows how the [`annotate-apply-time-mutations`] function works.
+This example shows how the [annotate-apply-time-mutations] function works.
 
 Running `annotate-apply-time-mutations` function on the example package will:
 
@@ -27,3 +27,6 @@ kpt fn eval annotate-apply-time-mutations-simple --image gcr.io/kpt-fn/annotate-
 ### Expected result
 
 1.  File resources.yaml will include `config.k8s.io/apply-time-mutation` annotation matching the comment markups.
+2.  Commented fields with templated values will be updated with the template and replacement tokens.
+
+[annotate-apply-time-mutations] https://catalog.kpt.dev/annotate-apply-time-mutations/v0.1/?id=definitions
