@@ -21,7 +21,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 Invoke the function with the following command:
 
 ```shell
-kpt fn eval annotate-apply-time-mutations-simple --image gcr.io/kpt-fn/annotate-apply-time-mutations:unstable
+kpt fn eval annotate-apply-time-mutations-simple --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 ### Expected result

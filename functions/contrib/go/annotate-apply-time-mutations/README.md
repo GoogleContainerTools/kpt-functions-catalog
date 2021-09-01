@@ -20,13 +20,13 @@ apiVersion: kpt.dev/v1
 kind: Kptfile
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/annotate-apply-time-mutations:unstable
+    - image: gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 or imperatively like:
 
 ```shell
-kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/annotate-apply-time-mutations:unstable
+kpt fn eval --include-meta-resources --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 
@@ -58,7 +58,7 @@ spec:
 Invoke the function:
 
 ```shell
-kpt fn eval --include-meta-resources --image gcr.io/kpt-fn/annotate-apply-time-mutations:unstable
+kpt fn eval --include-meta-resources --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 Resource will be updated to the following:
