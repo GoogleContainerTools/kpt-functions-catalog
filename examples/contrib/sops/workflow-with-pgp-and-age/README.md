@@ -13,7 +13,7 @@ The `sops` KRM config function encrypts and decrypts resources using the sops to
 
 Get the example package by running the following commands:
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/sops/workflow-with-pgp-and-age
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/sops/workflow-with-pgp-and-age@sops/v0.3
 ```
 
 The package resources, e.g. [deployment.yaml](deployment.yaml) as well as some meta-resources, e.g. [apply-setters.yaml](apply-setters.yaml)
@@ -29,7 +29,7 @@ Invoke the decryption by running one of the following command:
 $ kpt fn eval \
         --fn-config workflow-with-pgp-and-age/decrypt.yaml \
         --env SOPS_IMPORT_AGE="$(cat workflow-with-pgp-and-age/age_keys.txt)" \
-        --image gcr.io/kpt-fn-contrib/sops:unstable \
+        --image gcr.io/kpt-fn-contrib/sops:v0.3 \
         --include-meta-resources \
         workflow-with-pgp-and-age/
 ```
@@ -40,7 +40,7 @@ $ kpt fn eval \
 $ kpt fn eval \
         --fn-config workflow-with-pgp-and-age/decrypt.yaml \
         --env SOPS_IMPORT_PGP="$(cat workflow-with-pgp-and-age/pgp_keys.txt)" \
-        --image gcr.io/kpt-fn-contrib/sops:unstable \
+        --image gcr.io/kpt-fn-contrib/sops:v0.3 \
         --include-meta-resources \
         workflow-with-pgp-and-age/
 ```
@@ -65,7 +65,7 @@ Invoke the encryption by running the following command:
 $ kpt fn eval \
         --fn-config workflow-with-pgp-and-age/encrypt.yaml \
         --include-meta-resources \
-        --image gcr.io/kpt-fn-contrib/sops:unstable \
+        --image gcr.io/kpt-fn-contrib/sops:v0.3 \
         workflow-with-pgp-and-age/
 ```
 
