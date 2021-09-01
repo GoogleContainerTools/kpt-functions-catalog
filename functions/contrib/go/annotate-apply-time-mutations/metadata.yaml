@@ -1,4 +1,4 @@
-image: gcr.io/kpt-fn/annotate-apply-time-mutations
+image: gcr.io/kpt-fn-contrib/annotate-apply-time-mutations
 description: Read mutation markup comments and add the equivalent annotation.
 tags:
   - mutator
