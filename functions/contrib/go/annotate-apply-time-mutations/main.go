@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/annotate-apply-time-mutations/annotateapplytimemutations"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/contrib/go/annotate-apply-time-mutations/annotateapplytimemutations"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
