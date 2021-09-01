@@ -2,8 +2,7 @@ diff --git a/resources.yaml b/resources.yaml
 index 76ca35b..8325565 100644
 --- a/resources.yaml
 +++ b/resources.yaml
-@@ -4,6 +4,29 @@ metadata:
-   name: my-test-resource
+@@ -5,11 +5,34 @@ metadata:
    namespace: example-namespace
    annotations:
      unmodified-key: foobarbaz
