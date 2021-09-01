@@ -62,19 +62,31 @@ make possible to work with PGP and AGE encryption.
 For `pgp` if you have a file with keys it's possible to run:
 
 ```shell
-SOPS_IMPORT_PGP="$(cat <file with exported key>.asc)" kpt fn run <folder>
+$ kpt fn eval \
+        --fn-config <path to decrypt config>.yaml \
+        --env SOPS_IMPORT_PGP="$(cat <file with exported key>)" \
+        --image gcr.io/kpt-fn-contrib/sops:unstable \
+        <folder>
 ```
 
 or if your keys are already presented in `gpg`-storage, it's possible to run:
 
 ```shell
-SOPS_IMPORT_PGP="$(gpg --armor --export-secret-keys)" kpt fn run <folder>
+$ kpt fn eval \
+        --fn-config <path to decrypt config>.yaml \
+        --env SOPS_IMPORT_PGP="$(gpg --armor --export-secret-keys)" \
+        --image gcr.io/kpt-fn-contrib/sops:unstable \
+        <folder>
 ```
 
 To make `sops` decrypt `age` it's necessary to keep all keys in the single file `~/.config/sops/age/keys.txt`. If that file exists, it's possible to invoke sops function and provide it with that keys by the command:
 
 ```shell
-SOPS_IMPORT_AGE="$(cat ~/.config/sops/age/keys.txt)" kpt fn run <folder>
+$ kpt fn eval \
+        --fn-config <path to decrypt config>.yaml \
+        --env SOPS_IMPORT_AGE="$(cat ~/.config/sops/age/keys.txt)" \
+        --image gcr.io/kpt-fn-contrib/sops:unstable \
+        <folder>
 ```
 
 Please refer to [example 1] and [example 2] to get more details.
