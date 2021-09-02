@@ -1,3 +1,2 @@
 testType: eval
-includeMetaResources: false
 image: gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable

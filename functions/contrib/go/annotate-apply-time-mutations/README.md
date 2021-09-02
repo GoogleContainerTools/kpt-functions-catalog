@@ -4,8 +4,15 @@
 
 <!--mdtogo:Short-->
 
-The `annotate-apply-time-mutations` function reads `apply-time-mutation` comments on resource YAML and adds
-the equivalent `config.kubernetes.io/apply-time-mutation` to the resource.
+The `annotate-apply-time-mutations` function enables authors to use inline comments,
+rather than annotations, to specify field replacements using the apply time mutation feature.
+
+It works by reading `# apply-time-mutation:` comments on resource YAML and adds the equivalent
+`config.kubernetes.io/apply-time-mutation` annotation to the resource.
+
+The `config.kubernetes.io/apply-time-mutation` annotation is read by the [apply time mutation]
+functionality which patches the resource config at apply time, during `kpt live apply`, with
+the referenced resource's live value.
 
 <!--mdtogo-->
 
@@ -26,7 +33,7 @@ pipeline:
 or imperatively like:
 
 ```shell
-kpt fn eval --include-meta-resources --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 
@@ -34,6 +41,12 @@ The `annotate-apply-time-mutations` function does the following:
 
 1.  Scans the package for `apply-time-mutation` comment markup.
 2.  Appends the equivalent `config.k8s.io/apply-time-mutation` annotation to the same.
+
+The expected `apply-time-mutation` comment format is:
+
+`# apply-time-mutation: "[prefix]${[group]/[version]/namespaces/[source namespace]/[kind]/[source name]:[source field path]}[suffix]`
+
+Prefix, version, and suffix are optional fields.
 
 <!--mdtogo-->
 
@@ -84,3 +97,5 @@ spec:
 ```
 
 <!--mdtogo-->
+
+[apply time mutation] https://kpt.dev/reference/cli/live/apply/
