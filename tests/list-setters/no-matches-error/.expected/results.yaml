@@ -1,0 +1,11 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 0
+items:
+  - image: gcr.io/kpt-fn/list-setters:unstable
+    exitCode: 0
+    results:
+      - message: no setters found
+        severity: warning

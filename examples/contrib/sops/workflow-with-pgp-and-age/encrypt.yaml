@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: encrypt-config
+data:
+  cmd: encrypt
+  cmd-extra-params-json-path-filter: '$[?(@.metadata.name=="encrypt-keys")]'
+  cmd-json-path-filter: '$[?(@.kind!="Kptfile"&&@.metadata.name!="encrypt-config"&&@.metadata.name!="decrypt-config"&&@.metadata.name!="encrypt-keys")]'
+  unencrypted-regex: ^(kind|apiVersion|group|metadata)$

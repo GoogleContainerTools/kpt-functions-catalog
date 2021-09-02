@@ -5,7 +5,7 @@
 <!--mdtogo:Short-->
 
 The `set-project-id` function sets 'project-id'
-[setter](https://catalog.kpt.dev/apply-setters/v0.1/?id=definitions) and
+[setter](https://catalog.kpt.dev/apply-setters/v0.2/?id=definitions) and
 `cnrm.cloud.google.com/project-id` annotation to the provided project ID, only
 if they are not already set.
 
@@ -75,7 +75,7 @@ metadata:
   name: example-package
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         project-id: foo
 ```

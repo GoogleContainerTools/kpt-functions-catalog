@@ -46,7 +46,8 @@ kpt_team_email = 'kpt-team@google.com'
 disallowed_kpt_commands = ['kpt fn run', 'kpt cfg', 'kpt pkg cat']
 gcr_prefix = 'gcr.io/kpt-fn/'
 git_url_prefix = 'https://github.com/GoogleContainerTools/kpt-functions-catalog.git'
-verify_docs_config_filename = 'verify-docs-config.yaml'
+test_config_filename = 'config.yaml'
+
 
 def validate_master_branch():
     fn_name_to_examples = validate_functions_dir_for_master_branch()
@@ -61,7 +62,8 @@ def validate_examples_dir_for_master_branch(fn_name_to_examples):
             if not example_name.startswith(fn_name):
                 raise Exception(f'example name {example_name} must start with the function name {fn_name}')
             validate_example_md(fn_name, examples_directory, example_name, 'master')
-            validate_example_kptfile(fn_name, examples_directory, example_name, 'master')
+            if not is_eval(os.path.join(examples_directory, example_name)):
+                validate_example_kptfile(fn_name, examples_directory, example_name, 'master')
 
     for dir in os.listdir(examples_directory):
         dir_name = os.path.join(examples_directory, dir)
@@ -99,12 +101,14 @@ def validate_release_branch(branch_name):
     examples = validate_functions_dir_for_release_branch(branch_name, fn_name)
     validate_examples_dir_for_release_branch(branch_name, fn_name, examples)
 
+
 def validate_examples_dir_for_release_branch(branch_name, fn_name, examples):
     if fn_name in os.listdir(os.path.join(examples_directory, 'contrib')):
         return
     for example_name in examples:
         validate_example_md(fn_name, examples_directory, example_name, branch_name)
-        validate_example_kptfile(fn_name, examples_directory, example_name, branch_name)
+        if not is_eval(os.path.join(examples_directory, example_name)):
+            validate_example_kptfile(fn_name, examples_directory, example_name, branch_name)
 
 
 def validate_functions_dir_for_release_branch(branch_name, fn_name):
@@ -122,14 +126,18 @@ def validate_functions_dir_for_release_branch(branch_name, fn_name):
     return examples
 
 
+def is_eval(example_path):
+    test_config_filepath = os.path.join(example_path, '.expected', test_config_filename)
+    if os.path.exists(test_config_filepath):
+        test_config_file = yaml.load(open(test_config_filepath), Loader=yaml.Loader)
+        if 'testType' in test_config_file and test_config_file['testType'] == 'eval':
+            return True
+    return False
+
+
 def validate_example_kptfile(fn_name, dir_name, example_name, branch):
     example_path = os.path.join(dir_name, example_name)
     kptfile_path = os.path.join(example_path, 'Kptfile')
-    verify_docs_skip_path = os.path.join(example_path, '.expected', verify_docs_config_filename)
-    if os.path.exists(verify_docs_skip_path):
-        verify_docs_skip_file = yaml.load(open(verify_docs_skip_path), Loader=yaml.Loader)
-        if "Kptfile" in verify_docs_skip_file['skip']:
-            return
     if not os.path.exists(kptfile_path):
         return
 
@@ -145,6 +153,11 @@ def validate_example_kptfile(fn_name, dir_name, example_name, branch):
     kptfile = yaml.load(open(kptfile_path), Loader=yaml.Loader)
     if kptfile['apiVersion'] != 'kpt.dev/v1alpha2' and kptfile['apiVersion'] != 'kpt.dev/v1':
         return
+
+    # Stop processing when there are no pipeline declared.
+    if 'pipeline' not in kptfile:
+        return
+
     pipeline = kptfile['pipeline']
     if 'mutators' in pipeline:
         for mutator in pipeline['mutators']:

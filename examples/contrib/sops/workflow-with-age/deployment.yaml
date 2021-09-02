@@ -1,0 +1,53 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  replicas: 'ENC[AES256_GCM,data:wQ==,iv:AWY70MCwHwnIsq/PiydVNo69sgjuGCKBTrvn3kNjhhI=,tag:VJcF1vwGMMhVL9ox/Ih+Aw==,type:int]'
+  selector:
+    matchLabels:
+      app: 'ENC[AES256_GCM,data:HhPYDhM=,iv:0kpHhGjPUyCXw19A41RYK/NncDBZ/ZVUcj3j3o8LbgE=,tag:NVr+HAkcCaF4A/tiQny4XA==,type:str]'
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: 'ENC[AES256_GCM,data:z7ayHf4=,iv:Yc5o8cOKQsMWKXa2u4WTqVBBqqTbsa13Gc0R3yayiSI=,tag:Q02zovy+e6EV3ouEuLdnrg==,type:str]'
+          image: 'ENC[AES256_GCM,data:+8VoCrRnwwWE,iv:9OM35EtBuV/ck9Gx0mTgO7w9VSGln7q/mfFHY00OB00=,tag:vvawXM+kkT0FKfKi7lwSQQ==,type:str]' # kpt-set: ${image}:${tag}
+          ports:
+            - protocol: 'ENC[AES256_GCM,data:6tRZ,iv:sOYayTp8ZkGBkNF/dLC10SIG1k4Uc7IjYhyUQmh+zVM=,tag:qpPO18lj1AKw+i73qrbFdg==,type:str]'
+              containerPort: 'ENC[AES256_GCM,data:PJs=,iv:Ou8CIdoDJvbbAZNMmoHszXHI8RVC3KGF5JCRLl26pi4=,tag:v73qB9ExEblRjbvj9oIIoQ==,type:int]'
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiUXpyc216Z0o3U3FlSkdm
+        UER1aTJ1b2pKYUhWRnloQWYzd1kvcEhXV1I0Cmx0UFFtbVhrNFFzQ01JY2k0RE81
+        ZDhqZ2sxbUhId2NSTUVBcGIyQzR3bjAKLS0tIDZDYTVkNTc3Mk13VS9Ha2JZcmxL
+        T2ZsUnlBNDhiL1NvOUUwVmk5REcyTVEK1mBjO1LjR/1aVqc7YOZEenpMukRZ/oet
+        YCxQjDqCSvkB5hlsZVHUg5m1IYXktW73jA8wBIIrV/6Qdtj4MaER+A==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: '2021-08-16T22:01:26Z'
+  mac: 'ENC[AES256_GCM,data:744BEqgSBpvY/ObDBOgFdTKeIN4LSGYs2tTAEW7SBbgHAJs/z2svGhYHY0eyK7FmEgL28DgunZ9KL0GTsCA7p/1V9vOh6ntNwYEe8+eEn+jKnw45iG72uroQx5KWvRTyebiZ0M8qy0E3DbnXKcQnq8QS7htIrdnXsA3kLWMB7Qs=,iv:cFfZ4KhhqJsQTkj8ovI1kKlsrcMZEvJn2y4p8QuT+zg=,tag:sGzBN1POCK0iL5nJuVIBnA==,type:str]'
+  pgp: []
+  unencrypted_regex: ^(kind|apiVersion|group|metadata)$
+  version: 3.7.1

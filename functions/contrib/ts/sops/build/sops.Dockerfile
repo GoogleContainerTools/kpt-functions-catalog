@@ -51,5 +51,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 ENV PATH /usr/local/bin:$PATH
 ENV GNUPGHOME /tmp
 ENV XDG_CONFIG_HOME /tmp
+RUN mkdir -p -m 0777 $XDG_CONFIG_HOME/sops/age/
 
 ENTRYPOINT ["node", "/home/node/app/dist/sops_run.js"]
