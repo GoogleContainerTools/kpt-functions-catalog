@@ -46,7 +46,15 @@ func ProcessResources(resourceList *framework.ResourceList) ([]framework.ResultI
 		if node.GetAnnotations()[filters.LocalConfigAnnotation] != "true" {
 			res = append(res, node)
 		} else {
-			result := Result{Name: node.GetName()}
+			itemFilePath := node.GetAnnotations()["internal.config.kubernetes.io/path"]
+			if itemFilePath == "" {
+				itemFilePath = node.GetAnnotations()["config.kubernetes.io/path"]
+			}
+
+			result := Result{
+				Name: node.GetName(),
+				Path: itemFilePath,
+			}
 			results = append(results, result)
 		}
 	}
@@ -55,20 +63,25 @@ func ProcessResources(resourceList *framework.ResourceList) ([]framework.ResultI
 
 	if len(results) > 0 {
 		items = append(items, framework.ResultItem{
-			Message: fmt.Sprintf("Number of resources pruned: %d", len(results)),
+			Severity: framework.Info,
+			Message:  fmt.Sprintf("Number of resources pruned: %d", len(results)),
 		})
 
 		for _, result := range results {
 			items = append(items, framework.ResultItem{
 				Message: fmt.Sprintf("Resource name: [%s]", result.Name),
+				File: framework.File{
+					Path: result.Path,
+				},
+				Severity: framework.Info,
 			})
 		}
 	} else if len(results) == 0 {
 		item := framework.ResultItem{
-			Message: "Found no resources to prune with the local config annotation",
+			Message:  "Found no resources to prune with the local config annotation",
+			Severity: framework.Warning,
 		}
 
-		item.Severity = framework.Warning
 		items = append(items, item)
 	}
 
@@ -87,6 +100,7 @@ func getErrorItem(errMsg string) []framework.ResultItem {
 
 type Result struct {
 	Name string
+	Path string
 }
 
 type RemoveLocalConfigResourcesConfigProcessor struct{}

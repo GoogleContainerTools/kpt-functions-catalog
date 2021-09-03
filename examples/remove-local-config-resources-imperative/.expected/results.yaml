@@ -8,4 +8,8 @@ items:
     exitCode: 0
     results:
       - message: 'Number of resources pruned: 1'
+        severity: info
       - message: 'Resource name: [sample-hierarchy]'
+        severity: info
+        file:
+          path: resources.yaml

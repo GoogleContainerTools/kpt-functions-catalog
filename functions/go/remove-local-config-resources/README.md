@@ -21,9 +21,20 @@ and don't intend for Config Sync to pick up for validation and hydration.
 $ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:unstable
 ```
 
+The function will execute as follows:
+
 1. Searched for defined resources in a package
 2. Deletes the resources with the following annotation:
    `config.kubernetes.io/local-config: true`
+
+To execute `remove-local-config-resources` declaratively include the function in kpt package pipeline as follows:
+```yaml
+...
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/remove-local-config-resources:unstable
+...
+```
 
 <!--mdtogo-->
 
@@ -34,10 +45,9 @@ $ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:unstable
 Consider the following package:
 
 ```
-├─ ...
-└─ sample
-   ├─ applied.yaml
-   └─ local.yaml
+sample
+├─ applied.yaml
+└─ local.yaml
 ```
 
 ```yaml
@@ -74,9 +84,8 @@ $ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:unstable
 The resulting package structure would look like this:
 
 ```
-├─ ...
-└─ sample
-   └─ applied.yaml
+sample
+└─ applied.yaml
 ```
 
 <!--mdtogo-->
