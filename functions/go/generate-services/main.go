@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 
@@ -43,6 +44,130 @@ func getRequiredServices(serviceMap map[string][]string, meta yaml.ResourceMeta)
 	return requiredServices, exists, nil
 }
 
+// createExistingServicesMap takes in the resource list and create a map of Services that have already
+// been resourced to their list of project-ids
+func createExistingServicesMap(resourceList *framework.ResourceList) (map[string][]string, error) {
+	existingServices := make(map[string][]string)
+	for _, item := range resourceList.Items {
+		itemMeta, err := item.GetMeta()
+		if err != nil {
+			return nil, err
+		}
+
+		if itemMeta.Name == "" || itemMeta.APIVersion == "" || itemMeta.Kind == "" {
+			// Skip. Not a valid KRM resource.
+			continue
+		}
+
+		//if item is not a Service, continue
+		if itemMeta.Kind != serviceKind {
+			continue
+		}
+
+		projectId, err := getProjectID(item)
+		if err != nil {
+			return nil, err
+		}
+
+		resourceId, err := item.Pipe(yaml.Lookup("spec", "resourceID"))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		resourceIdStr, _ := resourceId.String()
+		resourceIdStr = strings.TrimSuffix(resourceIdStr, "\n")
+
+		projectIds := existingServices[resourceIdStr]
+		projectIds = append(projectIds, projectId)
+		existingServices[resourceIdStr] = projectIds
+	}
+
+	return existingServices, nil
+}
+
+func createProjectServicesMap(resourceList *framework.ResourceList,
+	serviceMap map[string][]string, existingServices map[string][]string) (map[string]map[string]bool, error) {
+	projectServices := make(map[string]map[string]bool)
+	for _, item := range resourceList.Items {
+		itemMeta, err := item.GetMeta()
+		if err != nil {
+			// Skip. Not a valid KRM resource.
+			continue
+		}
+
+		if itemMeta.Name == "" || itemMeta.APIVersion == "" || itemMeta.Kind == "" {
+			// Skip. Not a valid KRM resource.
+			continue
+		}
+
+		if itemMeta.Kind == serviceKind {
+			//Skip if resource is a Service . Nothing to do there.
+			continue
+		}
+
+		requiredServices, found, err := getRequiredServices(serviceMap, itemMeta)
+		if err != nil {
+			return nil, err
+		}
+		if !found {
+			// Skip. Not a KCC resource.
+			continue
+		}
+
+		projectId, err := getProjectID(item)
+		if err != nil {
+			return nil, err
+		}
+
+		// check if required services are already in the map for the item's project-id
+		// and build an index list
+		existingSvcInd := []int{}
+		for svcInd, requiredSvc := range requiredServices {
+			projectIds, exists := existingServices[requiredSvc]
+			if exists {
+				if containsProjectId(projectIds, projectId) {
+					existingSvcInd = append(existingSvcInd, svcInd)
+				}
+			}
+		}
+
+		// remove services from the slice that are already resourced
+		requiredServices = removeServicesFromSlice(requiredServices, existingSvcInd)
+		serviceMap, exists := projectServices[projectId]
+		if !exists {
+			serviceMap = map[string]bool{}
+			projectServices[projectId] = serviceMap
+		}
+		for _, resourceID := range requiredServices {
+			serviceMap[resourceID] = true
+		}
+	}
+
+	return projectServices, nil
+}
+
+// containsProjectId takes a project Ids slice and looks for a project Id. If found it will
+// return true, otherwise it will return false.
+func containsProjectId(projectIds []string, id string) bool {
+	for _, item := range projectIds {
+		if item == id {
+			return true
+		}
+	}
+	return false
+}
+
+// removeServicesFromSlice prunes the services slice based on the indices provided. Returns the
+// final list of services that required.
+func removeServicesFromSlice(services []string, indices []int) []string {
+	for i := 0; i < len(indices); i++ {
+		modifiedInd := indices[i] - i
+		services = append(services[:modifiedInd], services[modifiedInd+1:]...)
+	}
+
+	return services
+}
+
 func main() {
 	processor := framework.ResourceListProcessorFunc(func(resourceList *framework.ResourceList) error {
 
@@ -68,42 +193,18 @@ func main() {
 			return err
 		}
 
+		// Map of Services to list of Project IDs that are already resourced. This is required for
+		// making this function idempotent
+		existingServices, err := createExistingServicesMap(resourceList)
+		if err != nil {
+			log.Fatal("unable to create exisitng services map")
+			return err
+		}
+
 		// Map of Project IDs to Sets of Service APIs
-		projectServices := make(map[string]map[string]bool)
-		for _, item := range resourceList.Items {
-			itemMeta, err := item.GetMeta()
-			if err != nil {
-				// Skip. Not a valid KRM resource.
-				continue
-			}
-
-			if itemMeta.Name == "" || itemMeta.APIVersion == "" || itemMeta.Kind == "" {
-				// Skip. Not a valid KRM resource.
-				continue
-			}
-
-			requiredServices, found, err := getRequiredServices(serviceMap, itemMeta)
-			if err != nil {
-				return err
-			}
-			if !found {
-				// Skip. Not a KCC resource.
-				continue
-			}
-
-			projectID, err := getProjectID(item)
-			if err != nil {
-				return err
-			}
-
-			serviceMap, exists := projectServices[projectID]
-			if !exists {
-				serviceMap = map[string]bool{}
-				projectServices[projectID] = serviceMap
-			}
-			for _, resourceID := range requiredServices {
-				serviceMap[resourceID] = true
-			}
+		projectServices, err := createProjectServicesMap(resourceList, serviceMap, existingServices)
+		if err != nil {
+			return err
 		}
 
 		for projectID, serviceMap := range projectServices {
@@ -150,11 +251,13 @@ func loadServiceMap(filePath string) (map[string][]string, error) {
 	}
 	err = dataNode.Value.VisitFields(func(kgNode *yaml.MapNode) error {
 		kindGroup := yaml.GetValue(kgNode.Key)
+
 		return kgNode.Value.VisitElements(func(node *yaml.RNode) error {
 			serviceHostName := yaml.GetValue(node)
 			kindGroupServiceListMap[kindGroup] = append(kindGroupServiceListMap[kindGroup], serviceHostName)
 			return nil
 		})
+
 	})
 	if err != nil {
 		return nil, err

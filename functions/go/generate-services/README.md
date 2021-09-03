@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-The generate-services kpt function generates [Config Controller Service resources](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) required for usage of the other Config Controller resources supplied to the function.
+The generate-services kpt function generates [Config Controller Service resources](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) which are [GCP Services](https://cloud.google.com/service-usage/docs) required for actuating GCP resources.
 
 <!--mdtogo-->
 
@@ -20,7 +20,7 @@ The following config options are supported:
 - `namespace` - namespace set on the generated Services (default: `gcp-services`)
 - `disable-on-destroy` - value for the `cnrm.cloud.google.com/disable-on-destroy` annotation on the generated Services (default: `""` - no annotation)
 
-These options can be configured declaratively in the data field of a `ConfigMap` or imperatively following a `kpt fn run` command.
+These options can be configured declaratively in the data field of a `ConfigMap` or imperatively following a `kpt fn eval` command.
 
 ## Output
 
@@ -45,21 +45,24 @@ ${NAMESPACE}/service_${NAME}.yaml
 ## Usage
 
 1. Create any Config Controller resource(s), in one or more yaml files, anywhere in a directory.
-2. Create a ConfigMap with the `function` annotation to configure this resource as input to a containerized kpt function.
+2. Create a ConfigMap to pass optional data to the containerized kpt function as follows (example):
     Example:
     ```
-    annotations:
-      config.kubernetes.io/function: |
-        container:
-          image: gcr.io/kpt-fn/generate-services:unstable
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: generate-services
+    data:
+      namespace: gcp-services
+      disable-on-destroy: true
     ```
 3. (Optional) Set the `data.namespace` field to specify which namespace Services will be created in.
 4. (Optional) Set the `data.disable-on-destroy` field to specify the value of the `cnrm.cloud.google.com/disable-on-destroy` annotation.
 5. (Optional) Add the `config.kubernetes.io/local-config: "true"` annotation to tell ConfigSync to exclude the ConfigMap resource when applying.
-6. Run [kpt fn run](https://googlecontainertools.github.io/kpt/guides/consumer/function/#declarative-run) on the directory containing the resource yaml files.
+6. Run [kpt fn render](https://kpt.dev/book/04-using-functions/01-declarative-function-execution) on the directory containing the resource yaml files.
     Example:
     ```
-    kpt fn run .
+    kpt fn render .
     ```
 
 <!--mdtogo-->
@@ -77,9 +80,6 @@ metadata:
   name: generate-services
   annotations:
     config.kubernetes.io/local-config: "true"
-    config.kubernetes.io/function: |
-      container:
-        image: gcr.io/kpt-fn/generate-services:unstable
 data:
   namespace: gcp-services
   disable-on-destroy: "false"
