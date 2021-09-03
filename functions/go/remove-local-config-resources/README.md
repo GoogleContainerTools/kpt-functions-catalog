@@ -8,8 +8,8 @@ Removes resources with the annotation `config.kubernetes.io/local-config: true` 
 
 <!--mdtogo-->
 
-This function provides a quick way for users to prune resources that they may have been working on locally
-and don't intend for Config Sync to pick up for validation and hydration.
+This function provides a quick way for users to prune resources that are only intended to work client-side.
+For example, it can be useful for Config Sync to avoid picking up client-side resources for validation and hydration.
 
 <!--mdtogo:Long-->
 
@@ -87,7 +87,3 @@ The resulting package structure would look like this:
 sample
 └─ applied.yaml
 ```
-
-<!--mdtogo-->
-
-[kpt doc style guide]: https://github.com/GoogleContainerTools/kpt/blob/main/docs/style-guides/docs.md

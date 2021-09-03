@@ -59,9 +59,9 @@ func TestPrunedResources(t *testing.T) {
 
 			var items []framework.ResultItem
 
-			items, err = ProcessResources(rl)
+			items, err = processResources(rl)
 			if err != nil {
-				t.Errorf("Error when calling ProcessResources %s", err.Error())
+				t.Errorf("Error when calling processResources %s", err.Error())
 			}
 
 			for j := range items {

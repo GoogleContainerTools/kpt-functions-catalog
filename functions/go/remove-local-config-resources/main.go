@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
@@ -24,7 +25,7 @@ func (fp *RemoveLocalConfigResourcesConfigProcessor) Process(resourceList *frame
 		Name: "remove-local-config-resources",
 	}
 
-	items, err := ProcessResources(resourceList)
+	items, err := processResources(resourceList)
 	if err != nil {
 		resourceList.Result.Items = getErrorItem(err.Error())
 		return err
@@ -33,7 +34,7 @@ func (fp *RemoveLocalConfigResourcesConfigProcessor) Process(resourceList *frame
 	return nil
 }
 
-func ProcessResources(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
+func processResources(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
 	var items []framework.ResultItem
 	results := []Result{}
 
@@ -43,7 +44,7 @@ func ProcessResources(resourceList *framework.ResourceList) ([]framework.ResultI
 			continue
 		}
 		// only add the resources which are not local configs
-		if node.GetAnnotations()[filters.LocalConfigAnnotation] != "true" {
+		if strings.ToLower(node.GetAnnotations()[filters.LocalConfigAnnotation]) != "true" {
 			res = append(res, node)
 		} else {
 			itemFilePath := node.GetAnnotations()["internal.config.kubernetes.io/path"]
