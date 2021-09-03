@@ -44,9 +44,12 @@ The `annotate-apply-time-mutations` function does the following:
 
 The expected `apply-time-mutation` comment format is:
 
-`# apply-time-mutation: "[prefix]${[group]/[version]/namespaces/[source namespace]/[kind]/[source name]:[source field path]}[suffix]`
+`# apply-time-mutation: [prefix]${[group]/[version]/namespaces/[source namespace]/[kind]/[source name]:[source field path]}[suffix]`
 
 Prefix, version, and suffix are optional fields.
+
+For fields with a substitution as well as a constant prefix and/or suffix, this function will insert a replacement token in the field, matched in the annotation.
+`field: [prefix]replaceme[suffix] # apply-time-mutation: ...`
 
 <!--mdtogo-->
 
@@ -71,7 +74,7 @@ spec:
 Invoke the function:
 
 ```shell
-kpt fn eval --include-meta-resources --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 Resource will be updated to the following:
