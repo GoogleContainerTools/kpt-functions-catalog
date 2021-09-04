@@ -15,17 +15,17 @@ For example, it can be useful for Config Sync to avoid picking up client-side re
 
 ## Usage
 
-`remove-local-config-resources` function can be executed imperatively as follows:
-
-```shell
-$ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:unstable
-```
-
 The function will execute as follows:
 
 1. Searched for defined resources in a package
 2. Deletes the resources with the following annotation:
    `config.kubernetes.io/local-config: true`
+
+`remove-local-config-resources` function can be executed imperatively as follows:
+
+```shell
+$ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:unstable
+```
 
 To execute `remove-local-config-resources` declaratively include the function in kpt package pipeline as follows:
 ```yaml

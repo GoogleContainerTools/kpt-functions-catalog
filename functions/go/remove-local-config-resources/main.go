@@ -35,9 +35,7 @@ func (fp *RemoveLocalConfigResourcesConfigProcessor) Process(resourceList *frame
 }
 
 func processResources(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
-	var items []framework.ResultItem
-	results := []Result{}
-
+	var resultItems []framework.ResultItem
 	var res []*yaml.RNode
 	for _, node := range resourceList.Items {
 		if node.IsNilOrEmpty() {
@@ -52,41 +50,34 @@ func processResources(resourceList *framework.ResourceList) ([]framework.ResultI
 				itemFilePath = node.GetAnnotations()["config.kubernetes.io/path"]
 			}
 
-			result := Result{
-				Name: node.GetName(),
-				Path: itemFilePath,
-			}
-			results = append(results, result)
+			resultItems = append(resultItems, framework.ResultItem{
+				Message: fmt.Sprintf("Resource name: [%s]", node.GetName()),
+				File: framework.File{
+					Path: itemFilePath,
+				},
+				Severity: framework.Info,
+			})
 		}
 	}
 
 	resourceList.Items = res
 
-	if len(results) > 0 {
-		items = append(items, framework.ResultItem{
+	if len(resultItems) > 0 {
+		infoResultSlice := []framework.ResultItem{}
+		infoResultSlice = append(infoResultSlice, framework.ResultItem{
 			Severity: framework.Info,
-			Message:  fmt.Sprintf("Number of resources pruned: %d", len(results)),
+			Message:  fmt.Sprintf("Number of resources pruned: %d", len(resultItems)),
 		})
 
-		for _, result := range results {
-			items = append(items, framework.ResultItem{
-				Message: fmt.Sprintf("Resource name: [%s]", result.Name),
-				File: framework.File{
-					Path: result.Path,
-				},
-				Severity: framework.Info,
-			})
-		}
-	} else if len(results) == 0 {
-		item := framework.ResultItem{
+		resultItems = append(infoResultSlice, resultItems...)
+	} else if len(resultItems) == 0 {
+		resultItems = append(resultItems, framework.ResultItem{
 			Message:  "Found no resources to prune with the local config annotation",
 			Severity: framework.Warning,
-		}
-
-		items = append(items, item)
+		})
 	}
 
-	return items, nil
+	return resultItems, nil
 }
 
 // getErrorItem returns the item for an error message
@@ -97,11 +88,6 @@ func getErrorItem(errMsg string) []framework.ResultItem {
 			Severity: framework.Error,
 		},
 	}
-}
-
-type Result struct {
-	Name string
-	Path string
 }
 
 type RemoveLocalConfigResourcesConfigProcessor struct{}
