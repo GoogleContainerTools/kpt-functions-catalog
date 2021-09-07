@@ -1,0 +1,9 @@
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: proj1-service
+spec:
+  services:
+    - compute.googleapis.com
+    - redis.googleapis.com
+  projectID: proj1

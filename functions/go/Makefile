@@ -28,6 +28,7 @@ FUNCTIONS := \
 	remove-local-config-resources \
 	render-helm-chart \
 	list-setters \
+	project-service-list \
 	search-replace \
 	set-annotations \
 	set-labels \
