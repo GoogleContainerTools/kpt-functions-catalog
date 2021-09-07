@@ -1,0 +1,10 @@
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: proj1-service-compute
+  annotations:
+    blueprints.cloud.google.com/managed-by-project-services-list: 'proj1-service'
+spec:
+  resourceID: compute.googleapis.com
+  projectRef:
+    external: proj1
