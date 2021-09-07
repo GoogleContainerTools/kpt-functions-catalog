@@ -1,0 +1,1 @@
+This function has been removed and replaced with https://catalog.kpt.dev/render-helm-chart/v0.1/.
