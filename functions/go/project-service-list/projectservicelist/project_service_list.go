@@ -11,7 +11,6 @@ const (
 	projectServiceListKind       = "ProjectServiceList"
 	projectServiceListAPIVersion = "blueprints.cloud.google.com/v1alpha1"
 	serviceUsageAPIVersion       = "serviceusage.cnrm.cloud.google.com/v1beta1"
-	projectIDAnnotation          = "cnrm.cloud.google.com/project-id"
 	serviceUsageKind             = "Service"
 	managedByAnnotation          = "blueprints.cloud.google.com/managed-by-project-services-list"
 )
