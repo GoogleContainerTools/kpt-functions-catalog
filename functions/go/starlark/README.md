@@ -155,6 +155,27 @@ Here's what you currently cannot do in the Starlark script:
   kpt will attempt to retain comments by copying them from the function inputs
   to the function outputs.
 
+#### Libraries
+
+We support the following [Starlib libraries]:
+
+| Name               | How to load                            | Example |
+|--------------------|----------------------------------------|---------|
+| [bsoup]            | load('bsoup.star', 'bsoup')            | [example](https://github.com/qri-io/starlib/blob/master/bsoup/testdata/test.star)           |
+| [encoding/base64]  | load('encoding/base64.star', 'base64') | [example](https://github.com/qri-io/starlib/blob/master/encoding/base64/testdata/test.star) |
+| [encoding/csv]     | load('encoding/csv.star', 'csv')       | [example](https://github.com/qri-io/starlib/blob/master/encoding/csv/testdata/test.star)    |
+| [encoding/json]    | load('encoding/json.star', 'json')     | [example](https://github.com/google/starlark-go/blob/master/starlark/testdata/json.star)    |
+| [encoding/yaml]    | load('encoding/yaml.star', 'yaml')     | [example](https://github.com/qri-io/starlib/blob/master/encoding/yaml/testdata/test.star)   |
+| [geo]              | load('geo.star', 'geo')                | [example](https://github.com/qri-io/starlib/blob/master/geo/testdata/test.star)             |
+| [hash]             | load('hash.star', 'hash')              | [example](https://github.com/qri-io/starlib/blob/master/hash/testdata/test.star)            |
+| [html]             | load('html.star', 'html')              | [example](https://github.com/qri-io/starlib/blob/master/html/testdata/test.star)            |
+| [http]             | load('http.star', 'http')              | [example](https://github.com/qri-io/starlib/blob/master/http/testdata/test.star)            |
+| [math]             | load('math.star', 'math')              | [example](https://github.com/google/starlark-go/blob/master/starlark/testdata/math.star)    |
+| [re]               | load('re.star', 're')                  | [example](https://github.com/qri-io/starlib/blob/master/re/testdata/test.star)              |
+| [time]             | load('time.star', 'time')              | [example](https://github.com/google/starlark-go/blob/master/starlark/testdata/time.star)    |
+| [xlsx]             | load('xlsx.star', 'xlsx')              | [example](https://github.com/qri-io/starlib/blob/master/xlsx/testdata/test.star)            |
+| [zipfile]          | load('zipfile.star', 'ZipFile')        | [example](https://github.com/qri-io/starlib/blob/master/zipfile/testdata/test.star)         |
+
 ### Debugging
 
 It is possible to debug the `starlark` functions using [`print`][print].
@@ -190,3 +211,33 @@ You will find your debugging output in `functionResultList items.stderr`.
 [fail]: https://docs.bazel.build/versions/master/skylark/lib/globals.html#fail
 
 [print]: https://docs.bazel.build/versions/master/skylark/lib/globals.html#print
+
+[Starlib libraries]: https://github.com/qri-io/starlib#packages
+
+[bsoup]: https://github.com/qri-io/starlib/tree/v0.5.0/bsoup
+
+[encoding/base64]: https://github.com/qri-io/starlib/tree/v0.5.0/encoding/base64
+
+[encoding/csv]: https://github.com/qri-io/starlib/tree/v0.5.0/encoding/csv
+
+[encoding/json]: https://pkg.go.dev/go.starlark.net/lib/json
+
+[encoding/yaml]: https://github.com/qri-io/starlib/tree/v0.5.0/encoding/yaml
+
+[geo]: https://github.com/qri-io/starlib/tree/v0.5.0/geo
+
+[hash]: https://github.com/qri-io/starlib/tree/v0.5.0/hash
+
+[html]: https://github.com/qri-io/starlib/tree/v0.5.0/html
+
+[http]: https://github.com/qri-io/starlib/tree/v0.5.0/http
+
+[math]: https://pkg.go.dev/go.starlark.net/lib/math
+
+[re]: https://github.com/qri-io/starlib/tree/v0.5.0/re
+
+[time]: https://pkg.go.dev/go.starlark.net/lib/time
+
+[xlsx]: https://github.com/qri-io/starlib/tree/v0.5.0/xlsx
+
+[zipfile]: https://github.com/qri-io/starlib/tree/v0.5.0/zipfile
