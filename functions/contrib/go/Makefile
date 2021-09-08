@@ -85,7 +85,7 @@ $(FUNCTION_CHECKLICENSES):
 
 install-go-licenses:
 ifeq (, $(shell which go-licenses))
-	../../scripts/install-go-licenses.sh
+	../../../scripts/install-go-licenses.sh
 GO_LICENSES=$(GOPATH)/bin/go-licenses
 else
 GO_LICENSES=$(shell which go-licenses)
