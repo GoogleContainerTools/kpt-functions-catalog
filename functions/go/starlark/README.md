@@ -84,20 +84,18 @@ params:
     config.kubernetes.io/local-config: "true"
   toAdd:
     configmanagement.gke.io/managed: disabled
-source: |
-  def conditionallySetAnnotation(resources, toMatch, toAdd):
-    for resource in resources:
-      match = True
-      for key in toMatch:
-        if key not in resource["metadata"]["annotations"] or resource["metadata"]["annotations"][key] != toMatch[key]:
-          match = False
-          break
-      if match:
-        for key in toAdd:
-          resource["metadata"]["annotations"][key] = toAdd[key]
+source: |    
   toMatch = ctx.resource_list["functionConfig"]["params"]["toMatch"]
   toAdd = ctx.resource_list["functionConfig"]["params"]["toAdd"]
-  conditionallySetAnnotation(ctx.resource_list["items"], toMatch, toAdd)
+  for resource in ctx.resource_list["items"]:
+    match = True
+    for key in toMatch:
+      if key not in resource["metadata"]["annotations"] or resource["metadata"]["annotations"][key] != toMatch[key]:
+        match = False
+        break
+    if match:
+      for key in toAdd:
+        resource["metadata"]["annotations"][key] = toAdd[key]
 ```
 
 In the example above, the script accesses the `toMatch` parameters
@@ -133,10 +131,6 @@ $ kpt fn eval --image gcr.io/kpt-fn/starlark:unstable --fn-config fn-config.yaml
 
 ### Developing Starlark Script
 
-In Starlark, a [for loop] is permitted only within a function definition. It
-means if you want to iterate over `ctx.resource_list["items"]`, it has to be in
-a function. You can refer the example `functionConfig` above.
-
 Here's what you can do in the Starlark script:
 
 - Read resources from `ctx.resource_list`. The `ctx.resource_list` complies with
@@ -154,6 +148,17 @@ Here's what you currently cannot do in the Starlark script:
 - While Starlark programs don't support working with yaml comments on resources,
   kpt will attempt to retain comments by copying them from the function inputs
   to the function outputs.
+
+The starlark function has enabled the following non-standard starlark features:
+
+- set: allow the `set` built-in. e.g. `s=set(["foo", "bar"])`
+- recursion: allow while statements and recursive functions.
+- global reassign: allow reassignment to top-level names; also, allow
+  if/for/while at top-level.
+
+In the standard Starlark, a [for loop] is permitted only within a function
+definition. But in the starlark function, you can conveniently use `for`
+statement at the top-level.
 
 #### Libraries
 

@@ -4,8 +4,6 @@ metadata:
   name: set-namespace-to-prod
 source: |
   # set the namespace on all resources
-  def setnamespace(resources, namespace):
-    for resource in resources:
-      # mutate the resource
-      resource["metadata"]["namespace"] = namespace
-  setnamespace(ctx.resource_list["items"], "prod")
+  for resource in ctx.resource_list["items"]:
+    # mutate the resource
+    resource["metadata"]["namespace"] = "prod"
