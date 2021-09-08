@@ -13,7 +13,7 @@ Running `annotate-apply-time-mutations` function on the example package will:
 Get the example package by running the following commands:
 
 ```shell
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/annotate-apply-time-mutations-simple
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/annotate-apply-time-mutations-simple
 ```
 
 ### Function invocation
