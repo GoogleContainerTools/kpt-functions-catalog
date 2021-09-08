@@ -25,10 +25,10 @@ FUNCTIONS := \
 	fix \
 	format \
 	gatekeeper \
-	remove-local-config-resources \
-	generate-services \	
-	render-helm-chart \
+	generate-services \
 	list-setters \
+	remove-local-config-resources \
+	render-helm-chart \
 	search-replace \
 	set-annotations \
 	set-labels \
