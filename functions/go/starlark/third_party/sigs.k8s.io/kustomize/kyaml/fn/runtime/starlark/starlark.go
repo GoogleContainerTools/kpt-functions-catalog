@@ -108,7 +108,7 @@ func (sf *Filter) Run(reader io.Reader, writer io.Writer) error {
 // runStarlark runs the starlark script
 func runStarlark(name, starlarkProgram string, resourceList starlark.Value) error {
 	// run the starlark as program as transformation function
-	thread := &starlark.Thread{Name: name}
+	thread := &starlark.Thread{Name: name, Load: load}
 
 	ctx := &Context{resourceList: resourceList}
 	pd, err := ctx.predeclared()
