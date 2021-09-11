@@ -5,7 +5,8 @@
 <!--mdtogo:Short-->
 
 The `project-services-list` function generates [project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service)
-resources from a list of services to enable [GCP APIs](https://cloud.google.com/apis) within a specified project.
+resources from a list of services to enable [GCP APIs](https://cloud.google.com/apis) within a specified project. This allows users to succinctly define all
+the services necessary in a single resource and have tighter control over which services are enabled in a specific project.
 
 <!--mdtogo-->
 
@@ -49,13 +50,13 @@ metadata:
 spec:
   services: # list of services to generate
     - compute.googleapis.com
-  projectID: foo # explicit project ID to be set for the generated services
+  projectID: foo # kpt-set: ${project-id}
 ```
 
-| Field        |  Description | Example
-| -----------: |  ----------- | -----------
-`spec.services[]`    | A list of GCP services to enable | [compute.googleapis.com,bigquery.googleapis.com]
-`spec.projectID`   | Project ID where the services should be enabled. | my-project-id
+| Field        |  Description | Example | Required
+| -----------: |  ----------- | ----------- | -----------
+`spec.services[]`    | A list of GCP services to enable | [compute.googleapis.com,bigquery.googleapis.com] | yes
+`spec.projectID`   | Project ID where the services should be enabled. | my-project-id | no
 
 <!--mdtogo-->
 

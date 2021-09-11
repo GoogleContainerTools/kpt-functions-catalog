@@ -3,6 +3,7 @@ description: Generate and manage project service enablements for a GCP project.
 tags:
   - generator
   - GCP
+  - mutator
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/project-service-list
 examplePackageURLs:
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/project-service-list-simple

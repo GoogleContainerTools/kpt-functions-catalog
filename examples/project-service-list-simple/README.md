@@ -17,7 +17,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Render the configuration, `project-service-list` has been defined declaratively in the Kptfile and configured via `services.yaml`.
 
 ```shell
-$ kpt fn render project-service-list-simple --results-dir /tmp
+$ kpt fn render project-service-list-simple
 ```
 
 ### Expected result
