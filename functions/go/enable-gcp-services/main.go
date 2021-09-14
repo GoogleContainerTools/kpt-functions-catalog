@@ -15,9 +15,9 @@ func main() {
 	psf := ProjectServiceListFunction{}
 	cmd := command.Build(&psf, command.StandaloneEnabled, false)
 
-	cmd.Short = generated.ProjectServiceListShort
-	cmd.Long = generated.ProjectServiceListLong
-	cmd.Example = generated.ProjectServiceListExamples
+	cmd.Short = generated.EnableGcpServicesShort
+	cmd.Long = generated.EnableGcpServicesLong
+	cmd.Example = generated.EnableGcpServicesExamples
 
 	if err := cmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
