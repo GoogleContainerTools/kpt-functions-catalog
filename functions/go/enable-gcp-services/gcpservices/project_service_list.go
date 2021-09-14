@@ -1,4 +1,4 @@
-package projectservicelist
+package gcpservices
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ const (
 	projectServiceListAPIVersion = "blueprints.cloud.google.com/v1alpha1"
 	serviceUsageAPIVersion       = "serviceusage.cnrm.cloud.google.com/v1beta1"
 	serviceUsageKind             = "Service"
-	managedByAnnotation          = "blueprints.cloud.google.com/managed-by-project-services-list"
+	managedByAnnotation          = "blueprints.cloud.google.com/managed-by-enable-gcp-services"
 )
 
 // ProjectServiceList is the functionConfig for generating services

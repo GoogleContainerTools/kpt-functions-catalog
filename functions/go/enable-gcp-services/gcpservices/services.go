@@ -1,4 +1,4 @@
-package projectservicelist
+package gcpservices
 
 import (
 	"fmt"

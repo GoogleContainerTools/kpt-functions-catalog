@@ -1,4 +1,4 @@
-package projectservicelist
+package gcpservices
 
 import (
 	"bytes"
@@ -28,7 +28,7 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -44,7 +44,7 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: compute.googleapis.com
 ---
@@ -53,7 +53,7 @@ kind: Service
 metadata:
   name: project-services-redis
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: redis.googleapis.com
 `,
@@ -71,7 +71,7 @@ metadata:
   name: project-services-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -88,7 +88,7 @@ metadata:
   name: project-services-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
   namespace: foo
 spec:
   resourceID: compute.googleapis.com
@@ -106,7 +106,7 @@ metadata:
   name: project-services-compute
   annotations:
     new: 'anno'
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -116,7 +116,7 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -144,7 +144,7 @@ kind: Service
 metadata:
   name: project-services-redis
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: redis.googleapis.com
   projectRef:
@@ -155,7 +155,7 @@ kind: Service
 metadata:
   name: project-services-bigquery
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: bigquery.googleapis.com
   projectRef:
@@ -166,7 +166,7 @@ metadata:
   name: project-services-compute
   namespace: foo
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'project-services'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:

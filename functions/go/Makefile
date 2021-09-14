@@ -21,6 +21,7 @@ GOBIN := $(shell go env GOPATH)/bin
 FUNCTIONS := \
 	apply-setters \
 	create-setters \
+	enable-gcp-services \
 	ensure-name-substring \
 	fix \
 	format \
@@ -28,7 +29,6 @@ FUNCTIONS := \
 	remove-local-config-resources \
 	render-helm-chart \
 	list-setters \
-	project-service-list \
 	search-replace \
 	set-annotations \
 	set-labels \

@@ -1,10 +1,10 @@
-# project-services-list
+# enable-gcp-services
 
 ## Overview
 
 <!--mdtogo:Short-->
 
-The `project-services-list` function generates [project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service)
+The `enable-gcp-services` function generates [project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service)
 resources from a list of services to enable [GCP APIs](https://cloud.google.com/apis) within a specified project. This allows users to succinctly define all
 the services necessary in a single resource and have tighter control over which services are enabled in a specific project.
 
@@ -14,13 +14,13 @@ the services necessary in a single resource and have tighter control over which 
 
 ## Usage
 
-`project-services-list` function can be used both declaratively and imperatively.
+`enable-gcp-services` function can be used both declaratively and imperatively.
 
 ```shell
-kpt fn eval --image gcr.io/kpt-fn/project-services-list:unstable --fn-config /tmp/services-config.yaml
+kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable --fn-config /tmp/services-config.yaml
 ```
 
-The `project-services-list` function does the following:
+The `enable-gcp-services` function does the following:
 
 1. Generates [project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
 for each service specified in the `spec.services` list.
@@ -29,7 +29,7 @@ for each service specified in the `spec.services` list.
     * Sets namespace if any defined for `ProjectServiceList` custom resource to each generated resource.
     * Sets projectID if any defined for `ProjectServiceList` custom resource to each generated resource.
 1. Each generated [project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
-has a `blueprints.cloud.google.com/managed-by-project-services-list` annotation. This annotation allows `project-services-list` function to
+has a `blueprints.cloud.google.com/managed-by-enable-gcp-services` annotation. This annotation allows `enable-gcp-services` function to
 track generated resources for the declarative management of the generated resources. Any changes made to the generate resources will be overwritten and should be made to the `ProjectServiceList` CRD instead.
 
 ### FunctionConfig
@@ -82,7 +82,7 @@ spec:
 Invoke the function:
 
 ```shell
-kpt fn eval --image gcr.io/kpt-fn/project-services-list:unstable --fn-config /tmp/services-config.yaml
+kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable --fn-config /tmp/services-config.yaml
 ```
 
 Generated resources looks like the following:
@@ -94,7 +94,7 @@ kind: Service
 metadata:
   name: proj1-service-compute
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'proj1-service'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'proj1-service'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -108,7 +108,7 @@ kind: Service
 metadata:
   name: proj1-service-redis
   annotations:
-    blueprints.cloud.google.com/managed-by-project-services-list: 'proj1-service'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'proj1-service'
 spec:
   resourceID: redis.googleapis.com
   projectRef:

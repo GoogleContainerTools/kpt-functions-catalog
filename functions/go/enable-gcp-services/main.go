@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/project-services/gcpservices"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/project-services/generated"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/project-services/projectservicelist"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 )
@@ -28,14 +28,14 @@ func main() {
 type ProjectServiceListFunction struct{}
 
 func (psf *ProjectServiceListFunction) Process(resourceList *framework.ResourceList) error {
-	var psl projectservicelist.ProjectServiceList
+	var psl gcpservices.ProjectServiceList
 	err := framework.LoadFunctionConfig(resourceList.FunctionConfig, &psl)
 	if err != nil {
 		return fmt.Errorf("failed to load the `functionConfig`: %w", err)
 	}
 
 	resourceList.Result = &framework.Result{
-		Name: "project-service-list",
+		Name: "enable-gcp-services",
 	}
 	resourceList.Items, err = psl.Filter(resourceList.Items)
 	if err != nil {
