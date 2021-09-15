@@ -3,7 +3,7 @@ kind: ProjectServiceList
 metadata:
   name: proj1-service
 spec:
-  services:
+  services: # We expect only generated service resources by proj1-service ProjectServiceList to be pruned and regenarated. All other service resources remain unmodified.
     - compute.googleapis.com
     - redis.googleapis.com
   projectID: proj1

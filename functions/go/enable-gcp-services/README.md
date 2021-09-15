@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-The `enable-gcp-services` function generates [project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service)
+The `enable-gcp-services` function generates [GCP project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service)
 resources from a list of services to enable [GCP APIs](https://cloud.google.com/apis) within a specified project. This allows users to succinctly define all
 the services necessary in a single resource and have tighter control over which services are enabled in a specific project.
 
@@ -22,13 +22,13 @@ kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable --fn-config /tmp/
 
 The `enable-gcp-services` function does the following:
 
-1. Generates [project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
+1. Generates [GCP project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
 for each service specified in the `spec.services` list.
     * Adds all annotations defined for `ProjectServiceList` custom resource to each generated resource. This can be used for enabling features like
 [disable-on-destroy](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service#custom_resource_definition_properties) for generated services.
     * Sets namespace if any defined for `ProjectServiceList` custom resource to each generated resource.
     * Sets projectID if any defined for `ProjectServiceList` custom resource to each generated resource.
-1. Each generated [project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
+1. Each generated [GCP project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
 has a `blueprints.cloud.google.com/managed-by-enable-gcp-services` annotation. This annotation allows `enable-gcp-services` function to
 track generated resources for the declarative management of the generated resources. Any changes made to the generate resources will be overwritten and should be made to the `ProjectServiceList` CRD instead.
 
