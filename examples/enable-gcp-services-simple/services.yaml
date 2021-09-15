@@ -7,4 +7,3 @@ spec:
     - compute.googleapis.com
     - redis.googleapis.com
   projectID: proj1
-  
