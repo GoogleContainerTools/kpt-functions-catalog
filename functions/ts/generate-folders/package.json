@@ -23,9 +23,9 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.7.6",
-    "@types/node": "^14.17.1",
+    "@types/node": "^14.17.11",
     "create-kpt-functions": "^0.18.0",
-    "jasmine": "^3.7.0",
+    "jasmine": "^3.9.0",
     "license-checker": "^25.0.1",
     "js-yaml": "^4.1.0",
     "tslint": "^6.1.3",
