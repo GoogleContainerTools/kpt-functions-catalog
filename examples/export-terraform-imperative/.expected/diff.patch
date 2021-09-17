@@ -1,0 +1,26 @@
+diff --git a/terraform.yaml b/terraform.yaml
+new file mode 100644
+index 0000000..71490e8
+--- /dev/null
++++ b/terraform.yaml
+@@ -0,0 +1,20 @@
++apiVersion: v1
++kind: ConfigMap
++metadata:
++  name: terraform
++  annotations:
++    blueprints.cloud.google.com/flavor: terraform
++    blueprints.cloud.google.com/syntax: hcl
++    config.kubernetes.io/local-config: "true"
++data:
++  folders.tf: |+
++    resource "google_folder" "child-folder" {
++      display_name = "child-folder"
++      parent       = google_folder.parent-folder.name
++    }
++
++    resource "google_folder" "parent-folder" {
++      display_name = "parent folder"
++      parent       = "organizations/123456789012"
++    }
++

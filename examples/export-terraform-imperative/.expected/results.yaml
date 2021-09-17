@@ -1,0 +1,11 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 0
+items:
+  - image: gcr.io/kpt-fn/export-terraform:unstable
+    stderr: |
+      found matching template for Folder/child-folder: true
+      found matching template for Folder/parent-folder: true
+    exitCode: 0
