@@ -25,11 +25,11 @@ unit-test: unit-test-go unit-test-ts ## Run unit tests for all functions
 
 unit-test-go: ## Run unit tests for Go functions
 	cd functions/go && $(MAKE) test
-	cd functions/contrib/go && $(MAKE) test
+	cd contrib/functions/go && $(MAKE) test
 
 unit-test-ts: ## Run unit tests for TS functions
 	cd functions/ts && $(MAKE) test
-	cd functions/contrib/ts && $(MAKE) test
+	cd contrib/functions/ts && $(MAKE) test
 
 e2e-test: ## Run all e2e tests
 	cd tests && $(MAKE) TAG=$(TAG) test
@@ -39,8 +39,8 @@ test: unit-test e2e-test ## Run all unit tests and e2e tests
 check-licenses:
 	cd functions/ts && $(MAKE) check-licenses
 	cd functions/go && $(MAKE) check-licenses
-	cd functions/contrib/go && $(MAKE) check-licenses
-	cd functions/contrib/ts && $(MAKE) check-licenses
+	cd contrib/functions/go && $(MAKE) check-licenses
+	cd contrib/functions/ts && $(MAKE) check-licenses
 
 verify-docs:
 	GO111MODULE=on go get github.com/monopole/mdrip
@@ -49,14 +49,14 @@ verify-docs:
 build: ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
 	cd functions/go && $(MAKE) TAG=$(TAG) build
 	cd functions/ts && $(MAKE) TAG=$(TAG) build
-	cd functions/contrib/go && $(MAKE) TAG=$(TAG) build
-	cd functions/contrib/ts && $(MAKE) TAG=$(TAG) build
+	cd contrib/functions/go && $(MAKE) TAG=$(TAG) build
+	cd contrib/functions/ts && $(MAKE) TAG=$(TAG) build
 
 push: ## Push images to registry. WARN: This operation should only be done in CI environment.
 	cd functions/go && $(MAKE) push
 	cd functions/ts && $(MAKE) push
-	cd functions/contrib/go && $(MAKE) push
-	cd functions/contrib/ts && $(MAKE) push
+	cd contrib/functions/go && $(MAKE) push
+	cd contrib/functions/ts && $(MAKE) push
 
 site-generate: ## Collect function branches and generate a catalog of their examples and documentation using kpt next.
 	rm -rf ./site/*/

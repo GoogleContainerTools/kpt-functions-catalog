@@ -1,17 +1,24 @@
-# analyze-istio
+# analyze-istio: Simple Example
 
 The `analyze-istio` KRM config function detects potential issues with your
 Istio configuration and outputs structured results detailing any errors found
 during analysis. This example invokes the `analyze-istio` function using
 declarative configuration.
 
-### Function Invocation
+### Fetch the example package
 
-Get this example and try it out by running the following commands:
+Get the example package by running the following commands:
 
 ```shell
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/contrib/analyze-istio .
-kpt fn run analyze-istio
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/analyze-istio-simple
+```
+
+### Function Invocation
+
+Invoke the function with the following command:
+
+```shell
+kpt fn render analyze-istio
 ```
 
 ### Expected Results

@@ -5,7 +5,7 @@ package types
 
 type HelmGlobals struct {
 	// ChartHome is a file path to a directory containing a subdirectory for
-	// each chart to be included in the output. The default value of this field 
+	// each chart to be included in the output. The default value of this field
 	// is "tmp/charts".
 	// At runtime, the function will look for the chart under {ChartHome}. If it
 	// is there, the function will use it as found. If it is not there, the
