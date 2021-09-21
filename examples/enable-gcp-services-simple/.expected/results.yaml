@@ -13,9 +13,13 @@ items:
           apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
           kind: Service
           name: proj1-service-compute
+        file:
+          path: service_proj1-service-compute.yaml
       - message: generated service
         severity: info
         resourceRef:
           apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
           kind: Service
           name: proj1-service-redis
+        file:
+          path: service_proj1-service-redis.yaml
