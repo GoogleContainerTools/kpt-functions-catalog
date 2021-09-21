@@ -17,28 +17,27 @@ the services necessary in a single resource and have tighter control over which 
 `enable-gcp-services` function can be used both declaratively and imperatively.
 
 ```shell
-kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable --fn-config /tmp/services-config.yaml
+kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable
 ```
 
 The `enable-gcp-services` function does the following:
 
-1. Generates [GCP project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
-for each service specified in the `spec.services` list.
-    * Adds all annotations defined for `ProjectServiceList` custom resource to each generated resource. This can be used for enabling features like
+1. Discovers all `ProjectServiceList` custom resources in a given package.
+
+1. For each `ProjectServiceList` CR, it generates [GCP project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resources as specified in the `spec.services` list.
+    * Adds all annotations defined for `ProjectServiceList` CR to each generated resource. This can be used for enabling features like
 [disable-on-destroy](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service#custom_resource_definition_properties) for generated services.
-    * Sets namespace if any defined for `ProjectServiceList` custom resource to each generated resource.
-    * Sets projectID if any defined for `ProjectServiceList` custom resource to each generated resource.
+    * Sets namespace if any defined for `ProjectServiceList` CR to each generated resource.
+    * Sets projectID if any defined for `ProjectServiceList` CR to each generated resource.
 1. Each generated [GCP project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
 has a `blueprints.cloud.google.com/managed-by-enable-gcp-services` annotation. This annotation allows `enable-gcp-services` function to
-track generated resources for the declarative management of the generated resources. Any changes made to the generate resources will be overwritten and should be made to the `ProjectServiceList` CRD instead.
+track generated resources for the declarative management of the generated resources. Any changes made to the generate resources will be overwritten and should be made to the `ProjectServiceList` CR instead.
 
-### FunctionConfig
+### `ProjectServiceList`
 
-This function only supports a custom resource `functionConfig` of kind `ProjectServiceList`.
+This function only supports local-config custom resources of kind `ProjectServiceList` and can be provided using input items along with other KRM resources. Multiple `ProjectServiceList` CRs can be declared in a package.
 
-#### `ProjectServiceList`
-
-A functionConfig of kind `ProjectServiceList` has the following supported parameters:
+`ProjectServiceList` has the following supported parameters:
 
 ```yaml
 apiVersion: blueprints.cloud.google.com/v1alpha1
@@ -47,6 +46,7 @@ metadata:
   name: my-project-services
   annotations:
     cnrm.cloud.google.com/deletion-policy: false
+    config.kubernetes.io/local-config: true
 spec:
   services: # list of services to generate
     - compute.googleapis.com
@@ -64,7 +64,7 @@ spec:
 
 <!--mdtogo:Examples-->
 
-Let's start with the `functionConfig` for enabling two services `compute.googleapis.com` and `redis.googleapis.com` in a GCP Project `proj1`.
+Let's start with a `ProjectServiceList` CR for enabling two services `compute.googleapis.com` and `redis.googleapis.com` in a GCP Project `proj1`.
 
 ```yaml
 # services-config.yaml
@@ -72,6 +72,8 @@ apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: ProjectServiceList
 metadata:
   name: proj1-service
+  annotations:
+    config.kubernetes.io/local-config: true
 spec:
   services:
     - compute.googleapis.com
@@ -82,7 +84,7 @@ spec:
 Invoke the function:
 
 ```shell
-kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable --fn-config /tmp/services-config.yaml
+kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable
 ```
 
 Generated resources looks like the following:

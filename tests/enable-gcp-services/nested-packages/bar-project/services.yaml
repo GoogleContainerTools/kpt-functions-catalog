@@ -2,6 +2,8 @@ apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: ProjectServiceList
 metadata:
   name: bar-service
+  annotations:
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
     - cloudbuild.googleapis.com
