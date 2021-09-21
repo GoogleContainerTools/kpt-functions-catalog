@@ -38,8 +38,6 @@ import (
 var (
 	branchesToSkip = []string{
 		"sops/v0.2",
-		// TODO: Remove this line after port this PR to release branch sops/v0.3
-		"sops/v0.3",
 	}
 )
 
@@ -354,10 +352,10 @@ func getRelativeFunctionPath(source string, funcName string) (string, error) {
 	contribPattern := filepath.Join(source, "contrib", "functions", "*", funcName)
 	m, err = filepath.Glob(contribPattern)
 	if err != nil {
-		return  "", err
+		return "", err
 	}
 	if m == nil {
-		return  "", fmt.Errorf("Could not find a function with the following name: %v", funcName)
+		return "", fmt.Errorf("Could not find a function with the following name: %v", funcName)
 	}
 	return functionDirPrefix.ReplaceAllString(m[0], "contrib/functions/"), nil
 }
