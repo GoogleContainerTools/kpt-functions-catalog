@@ -1,0 +1,20 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
+metadata:
+  name: set-namespace-to-prod
+source: |
+  # Load all supported libraries.
+  load('bsoup.star', 'bsoup')
+  load('encoding/base64.star', 'base64')
+  load('encoding/csv.star', 'csv')
+  load('encoding/json.star', 'json')
+  load('encoding/yaml.star', 'yaml')
+  load('geo.star', 'geo')
+  load('hash.star', 'hash')
+  load('html.star', 'html')
+  load('http.star', 'http')
+  load('math.star', 'math')
+  load('re.star', 're')
+  load('time.star', 'time')
+  load('xlsx.star', 'xlsx')
+  load('zipfile.star', 'ZipFile')

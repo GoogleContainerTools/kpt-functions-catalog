@@ -28,13 +28,13 @@ import (
 // Add the given labels to the given field specifications.
 type HelmArgs struct {
 	types.HelmGlobals `json:"helmGlobals,omitempty" yaml:"helmGlobals,omitempty"`
-	HelmCharts []types.HelmChart `json:"helmCharts,omitempty" yaml:"helmCharts,omitempty"`
+	HelmCharts        []types.HelmChart `json:"helmCharts,omitempty" yaml:"helmCharts,omitempty"`
 }
 
 type HelmChartInflationGeneratorPlugin struct {
 	types.HelmGlobals `json:",inline,omitempty" yaml:",inline,omitempty"`
-	types.HelmChart `json:",inline,omitempty" yaml:",inline,omitempty"`
-	tmpDir string
+	types.HelmChart   `json:",inline,omitempty" yaml:",inline,omitempty"`
+	tmpDir            string
 }
 
 const (
@@ -75,7 +75,6 @@ func (p *HelmChartInflationGeneratorPlugin) ValidateArgs() (err error) {
 	if p.ValuesFile == "" {
 		p.ValuesFile = filepath.Join(p.ChartHome, p.Name, "values.yaml")
 	}
-
 
 	if err = p.errIfIllegalValuesMerge(); err != nil {
 		return err

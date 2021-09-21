@@ -49,7 +49,7 @@ GCR_REGISTRY=${GCR_REGISTRY:-${DEFAULT_GCR}}
 
 case "$2" in
     contrib)
-        cd "${scripts_dir}/../functions/contrib/ts/${CURRENT_FUNCTION}"
+        cd "${scripts_dir}/../contrib/functions/ts/${CURRENT_FUNCTION}"
         ;;
     curated)
         cd "${scripts_dir}/../functions/ts/${CURRENT_FUNCTION}"
