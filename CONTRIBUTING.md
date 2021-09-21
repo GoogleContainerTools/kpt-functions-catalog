@@ -38,15 +38,10 @@ Contributions are required to follow these style guides:
 ### Repo Layout
 
 ```shell
-├── examples: Home for all function examples
-│     ├── contrib: Home for all contrib function examples
+├── examples: Home for all curated function examples
 │     ├── curated_function_bar_example
 │     └── curated_function_foo_example
 ├── functions
-│     ├── contrib: Home for all contrib function source code
-│     │     └── ts: Home for all typescript-based contrib function source code
-│     │         ├── Makefile
-│     │         └── contrib_ts_function_foo
 │     ├── go: Home for all golang-based curated function source code
 │     │     ├── Makefile
 │     │     ├── curated_go_function_bar
@@ -55,6 +50,11 @@ Contributions are required to follow these style guides:
 │         ├── Makefile
 │         ├── curated_ts_function_bar
 │         └── curated_ts_function_foo
+├── contrib
+│     ├── functions
+│     │     ├── go: Home for all golang-based contrib function source code
+│     │     └── ts: Home for all typescript-based contrib function source code
+│     └── examples: Home for all contrib function examples.
 ├── scripts
 └── tests: Home for e2e tests
 ```
