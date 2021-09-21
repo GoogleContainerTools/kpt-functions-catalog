@@ -1,0 +1,96 @@
+diff --git a/bar-project/service_bar-service-cloudbuild.yaml b/bar-project/service_bar-service-cloudbuild.yaml
+new file mode 100644
+index 0000000..59f55f4
+--- /dev/null
++++ b/bar-project/service_bar-service-cloudbuild.yaml
+@@ -0,0 +1,10 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: bar-service-cloudbuild
++  annotations:
++    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'bar-service'
++spec:
++  resourceID: cloudbuild.googleapis.com
++  projectRef:
++    external: bar
+diff --git a/foo-project/service_foo-service-compute.yaml b/foo-project/service_foo-service-compute.yaml
+new file mode 100644
+index 0000000..7b181b0
+--- /dev/null
++++ b/foo-project/service_foo-service-compute.yaml
+@@ -0,0 +1,10 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: foo-service-compute
++  annotations:
++    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'foo-service'
++spec:
++  resourceID: compute.googleapis.com
++  projectRef:
++    external: foo
+diff --git a/foo-project/service_foo-service-redis.yaml b/foo-project/service_foo-service-redis.yaml
+new file mode 100644
+index 0000000..4130319
+--- /dev/null
++++ b/foo-project/service_foo-service-redis.yaml
+@@ -0,0 +1,10 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: foo-service-redis
++  annotations:
++    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'foo-service'
++spec:
++  resourceID: redis.googleapis.com
++  projectRef:
++    external: foo
+diff --git a/foo-project/service_foo-service-storage.yaml b/foo-project/service_foo-service-storage.yaml
+new file mode 100644
+index 0000000..672040c
+--- /dev/null
++++ b/foo-project/service_foo-service-storage.yaml
+@@ -0,0 +1,10 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: foo-service-storage
++  annotations:
++    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'foo-service'
++spec:
++  resourceID: storage.googleapis.com
++  projectRef:
++    external: foo
+diff --git a/service_proj1-service-compute.yaml b/service_proj1-service-compute.yaml
+new file mode 100644
+index 0000000..6e3a1dd
+--- /dev/null
++++ b/service_proj1-service-compute.yaml
+@@ -0,0 +1,10 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: proj1-service-compute
++  annotations:
++    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'proj1-service'
++spec:
++  resourceID: compute.googleapis.com
++  projectRef:
++    external: proj1
+diff --git a/service_proj1-service-redis.yaml b/service_proj1-service-redis.yaml
+new file mode 100644
+index 0000000..83f0c80
+--- /dev/null
++++ b/service_proj1-service-redis.yaml
+@@ -0,0 +1,10 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: proj1-service-redis
++  annotations:
++    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'proj1-service'
++spec:
++  resourceID: redis.googleapis.com
++  projectRef:
++    external: proj1

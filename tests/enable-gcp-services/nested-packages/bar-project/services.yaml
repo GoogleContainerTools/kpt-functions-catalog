@@ -1,0 +1,8 @@
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: bar-service
+spec:
+  services:
+    - cloudbuild.googleapis.com
+  projectID: bar
