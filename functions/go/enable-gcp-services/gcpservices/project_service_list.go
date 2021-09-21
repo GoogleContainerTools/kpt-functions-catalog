@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 
+	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -17,7 +18,7 @@ const (
 )
 
 // ignoreAnnotations is used to ignore any annotation that should not be added to generated Service CRs
-var ignoreAnnotations = map[string]bool{kioutil.PathAnnotation: true}
+var ignoreAnnotations = map[string]bool{kioutil.PathAnnotation: true, filters.LocalConfigAnnotation: true}
 
 // ProjectServiceListRunner discovers ProjectServiceList CRs to generate Service CRs
 type ProjectServiceListRunner struct {

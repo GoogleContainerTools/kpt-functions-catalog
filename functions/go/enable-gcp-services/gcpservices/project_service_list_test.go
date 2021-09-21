@@ -25,6 +25,8 @@ func TestProjectServiceList_Filter(t *testing.T) {
 kind: ProjectServiceList
 metadata:
   name: project-services
+  annotations:
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - compute.googleapis.com
@@ -35,6 +37,7 @@ kind: ProjectServiceList
 metadata:
   name: project-services
   annotations:
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
@@ -323,6 +326,7 @@ metadata:
   namespace: foo
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - compute.googleapis.com
@@ -346,6 +350,7 @@ metadata:
   namespace: foo
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps1.yaml'
 spec:
   services:
