@@ -3,6 +3,7 @@ package gcpservices
 import (
 	"fmt"
 	"path"
+	"strconv"
 
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
@@ -78,6 +79,17 @@ func (r *ProjectServiceListRunner) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, e
 func (ps ProjectServiceList) validate() error {
 	if len(ps.Spec.Services) < 1 {
 		return fmt.Errorf("at least one service must be specified under spec.services[]")
+	}
+	val, found := ps.Annotations[filters.LocalConfigAnnotation]
+	if !found {
+		return fmt.Errorf("%s annotation must be set", filters.LocalConfigAnnotation)
+	}
+	v, err := strconv.ParseBool(val)
+	if err != nil {
+		return fmt.Errorf("error parsing %s annotation: %v", filters.LocalConfigAnnotation, err)
+	}
+	if !v {
+		return fmt.Errorf("%s annotation must be set to true", filters.LocalConfigAnnotation)
 	}
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/kustomize/kyaml/kio"
+	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 )
 
 func TestProjectServiceList_Filter(t *testing.T) {
@@ -64,6 +65,8 @@ spec:
 kind: ProjectServiceList
 metadata:
   name: project-services
+  annotations:
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - compute.googleapis.com
@@ -74,6 +77,7 @@ kind: ProjectServiceList
 metadata:
   name: project-services
   annotations:
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
@@ -106,13 +110,14 @@ spec:
 			},
 		},
 		{
-			name: "simple with annotations1",
+			name: "simple with annotations",
 			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: ProjectServiceList
 metadata:
   name: project-services
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - compute.googleapis.com
@@ -124,6 +129,7 @@ metadata:
   name: project-services
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
@@ -154,6 +160,7 @@ metadata:
   namespace: foo
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - compute.googleapis.com
@@ -166,6 +173,7 @@ metadata:
   namespace: foo
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
@@ -195,6 +203,7 @@ kind: ProjectServiceList
 metadata:
   name: project-services
   annotations:
+    config.kubernetes.io/local-config: "true"
     new: anno
 spec:
   services:
@@ -215,6 +224,7 @@ kind: ProjectServiceList
 metadata:
   name: project-services
   annotations:
+    config.kubernetes.io/local-config: "true"
     new: anno
     config.kubernetes.io/path: 'ps.yaml'
 spec:
@@ -248,6 +258,8 @@ spec:
 kind: ProjectServiceList
 metadata:
   name: project-services
+  annotations:
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - redis.googleapis.com
@@ -293,6 +305,7 @@ kind: ProjectServiceList
 metadata:
   name: project-services
   annotations:
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
@@ -338,6 +351,7 @@ metadata:
   namespace: bar
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - redis.googleapis.com
@@ -364,6 +378,7 @@ metadata:
   namespace: bar
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps2.yaml'
 spec:
   services:
@@ -411,6 +426,7 @@ metadata:
   name: project-services-one
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - compute.googleapis.com
@@ -421,6 +437,7 @@ metadata:
   name: project-services-two
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - redis.googleapis.com
@@ -432,6 +449,7 @@ metadata:
   name: project-services-one
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps1.yaml'
 spec:
   services:
@@ -444,6 +462,7 @@ metadata:
   name: project-services-two
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'subpkg/ps2.yaml'
 spec:
   services:
@@ -587,24 +606,50 @@ func getResult(action, name, ns, fp string) Result {
 
 func TestProjectServiceList_validate(t *testing.T) {
 	tests := []struct {
-		name       string
-		apiVersion string
-		kind       string
-		services   []string
-		errMsg     string
+		name        string
+		apiVersion  string
+		kind        string
+		services    []string
+		annotations map[string]string
+		errMsg      string
 	}{
 		{
-			name:       "valid",
+			name:        "valid",
+			apiVersion:  projectServiceListAPIVersion,
+			kind:        projectServiceListKind,
+			annotations: map[string]string{filters.LocalConfigAnnotation: "true"},
+			services:    []string{"compute.googleapis.com"},
+		},
+		{
+			name:        "empty services",
+			apiVersion:  projectServiceListAPIVersion,
+			kind:        projectServiceListKind,
+			services:    []string{},
+			annotations: map[string]string{filters.LocalConfigAnnotation: "true"},
+			errMsg:      "at least one service must be specified under spec.services[]",
+		},
+		{
+			name:       "no local config annotation",
 			apiVersion: projectServiceListAPIVersion,
 			kind:       projectServiceListKind,
 			services:   []string{"compute.googleapis.com"},
+			errMsg:     "config.kubernetes.io/local-config annotation must be set",
 		},
 		{
-			name:       "empty services",
-			apiVersion: projectServiceListAPIVersion,
-			kind:       projectServiceListKind,
-			services:   []string{},
-			errMsg:     "at least one service must be specified under spec.services[]",
+			name:        "local config annotation false",
+			apiVersion:  projectServiceListAPIVersion,
+			kind:        projectServiceListKind,
+			services:    []string{"compute.googleapis.com"},
+			annotations: map[string]string{filters.LocalConfigAnnotation: "false"},
+			errMsg:      "config.kubernetes.io/local-config annotation must be set to true",
+		},
+		{
+			name:        "local config annotation invalid",
+			apiVersion:  projectServiceListAPIVersion,
+			kind:        projectServiceListKind,
+			services:    []string{"compute.googleapis.com"},
+			annotations: map[string]string{filters.LocalConfigAnnotation: "foo"},
+			errMsg:      "error parsing config.kubernetes.io/local-config annotation: strconv.ParseBool: parsing \"foo\": invalid syntax",
 		},
 	}
 	for _, tt := range tests {
@@ -614,10 +659,11 @@ func TestProjectServiceList_validate(t *testing.T) {
 			psl.APIVersion = tt.apiVersion
 			psl.Kind = tt.kind
 			psl.Spec.Services = tt.services
+			psl.Annotations = tt.annotations
 			err := psl.validate()
 			if tt.errMsg != "" {
 				require.NotNil(err)
-				require.Contains(err.Error(), tt.errMsg)
+				require.Equal(tt.errMsg, err.Error())
 			} else {
 				require.NoError(err)
 			}
