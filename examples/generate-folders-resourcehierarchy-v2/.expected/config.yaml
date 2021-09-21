@@ -1,0 +1,2 @@
+stdErr: |-
+  [WARN] ResourceHierarchy test-simple references an older Resource Hierarchy GroupVersion.

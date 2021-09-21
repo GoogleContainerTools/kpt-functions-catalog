@@ -124,7 +124,7 @@ func setSettersOnKptfile(nodes []*yaml.RNode, kf *kptfilev1.KptFile, projectID s
 func setSetters(nodes []*yaml.RNode, projectID string) error {
 	kptfiles, err := findKptfiles(nodes)
 	if err != nil {
-		return fmt.Errorf("faild to find Kptfile: %v", err)
+		return fmt.Errorf("failed to find Kptfile: %v", err)
 	}
 
 	for _, kf := range kptfiles {

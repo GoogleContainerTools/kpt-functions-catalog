@@ -36,10 +36,26 @@ by default the function will also update the [fields][commonnamespace] that
 target the namespace. There are a few cases that worth pointing out:
 
 - If there is a `Namespace` resource, its `metadata.name` field will be updated.
-- If it's a `RoleBinding` or `ClusterRoleBinding` resource, `subject` can
-  reference either a namespaced resource or a cluster-scoped resource. When
-  there are references to namespace in the `subject` fields, they will be
-  updated by the function.
+- If there's a `RoleBinding` or `ClusterRoleBinding` resource, the function will
+  update the namespace in the `ServiceAccount` if and only if the subject
+  element `name` is `default`. In the following example, the `set-namespace`
+  function will update `subjects.namespace` since the
+  corresponding `subjects.name` is `default`.
+
+```yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  ...
+subjects:
+  - kind: ServiceAccount
+    name: default # <======== using name default here
+    namespace: original-namespace
+roleRef:
+  kind: Role
+  name: confluent-operator
+  apiGroup: rbac.authorization.k8s.io
+```
 
 This function can be used both declaratively and imperatively.
 

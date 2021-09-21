@@ -1,0 +1,13 @@
+diff --git a/app.yaml b/app.yaml
+index b6ca925..d697d2f 100644
+--- a/app.yaml
++++ b/app.yaml
+@@ -5,7 +5,7 @@ metadata:
+   annotations:
+     last-applied: '{"spec":{"replicas":3}}'
+ spec:
+-  replicas: 1
++  replicas: 4
+   template:
+     spec:
+       containers:

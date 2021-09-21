@@ -8,6 +8,7 @@ node_modules
 .nyc_output
 bin/
 __pycache__
+.docker
 
 # We use sed -i.bak when doing in-line replace, because it works better cross-platform
 *.bak

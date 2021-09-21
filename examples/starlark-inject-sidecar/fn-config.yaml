@@ -14,7 +14,6 @@ source: |
         "image": "k8s.gcr.io/fluentd-gcp:1.30",
       }
       containers.append(sidecar)
-  def ensure_inject_sidecar(resources):
-    for resource in resources:
-      ensure_inject_sidecar_to_depl(resource)
-  ensure_inject_sidecar(ctx.resource_list["items"])
+
+  for resource in ctx.resource_list["items"]:
+    ensure_inject_sidecar_to_depl(resource)
