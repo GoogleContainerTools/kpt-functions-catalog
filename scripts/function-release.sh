@@ -46,8 +46,11 @@ if [ -d "${scripts_dir}/../functions/${fn_lang}/${fn_name}" ]; then
   DEFAULT_GCR=gcr.io/kpt-fn
 fi
 
-if [ -d "${scripts_dir}/../functions/contrib/${fn_lang}/${fn_name}" ]; then
-  cd "${scripts_dir}/../functions/contrib/${fn_lang}"
+if [ -d "${scripts_dir}/../contrib/functions/${fn_lang}/${fn_name}" ]; then
+  cd "${scripts_dir}/../contrib/functions/${fn_lang}"
+  if [ "${fn_lang}" == "go" ]; then
+    make install-mdtogo
+  fi
   DEFAULT_GCR=gcr.io/kpt-fn-contrib
 fi
 

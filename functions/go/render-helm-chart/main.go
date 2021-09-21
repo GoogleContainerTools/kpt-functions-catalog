@@ -66,7 +66,7 @@ func (slp *HelmChartProcessor) Process(resourceList *framework.ResourceList) err
 
 type helmChartInflatorFunction struct {
 	kyaml.ResourceMeta `json:",inline" yaml:",inline"`
-	plugins []builtins.HelmChartInflationGeneratorPlugin
+	plugins            []builtins.HelmChartInflationGeneratorPlugin
 }
 
 func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {

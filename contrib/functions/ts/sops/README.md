@@ -92,5 +92,5 @@ $ kpt fn eval \
 Please refer to [example 1] and [example 2] to get more details.
 
 [sops]: https://github.com/mozilla/sops
-[example 1]: /examples/contrib/sops/workflow-with-age/
-[example 2]: /examples/contrib/sops/workflow-with-pgp-and-age/
+[example 1]: /contrib/examples/sops-age/
+[example 2]: /contrib/examples/sops-pgp-and-age/

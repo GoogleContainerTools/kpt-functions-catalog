@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/contrib/go/annotate-apply-time-mutations
+module github.com/GoogleContainerTools/kpt-functions-catalog/contrib/functions/go/annotate-apply-time-mutations
 
 go 1.16
 
