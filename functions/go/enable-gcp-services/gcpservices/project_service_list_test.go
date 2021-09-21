@@ -14,37 +14,76 @@ import (
 func TestProjectServiceList_Filter(t *testing.T) {
 	var tests = []struct {
 		name        string
-		fnConfig    ProjectServiceList
 		resourceMap map[string]string
 		expected    string
 		results     []Result
 		errMsg      string
 	}{
 		{
-			name:     "simple",
-			fnConfig: getProjectServiceList("project-services", []string{"compute.googleapis.com"}, "test", "", nil),
-			expected: `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+			name: "simple",
+			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+`},
+			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+  annotations:
+    config.kubernetes.io/path: 'ps.yaml'
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
 metadata:
   name: project-services-compute
   annotations:
     blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
     external: test
 `,
-			results: []Result{getResult("generated service", "project-services-compute", "", "")},
+			results: []Result{getResult("generated service", "project-services-compute", "", "service_project-services-compute.yaml")},
 		},
 		{
-			name:     "simple no project",
-			fnConfig: getProjectServiceList("project-services", []string{"compute.googleapis.com", "redis.googleapis.com"}, "", "", nil),
-			expected: `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+			name: "simple no project",
+			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+spec:
+  services:
+  - compute.googleapis.com
+  - redis.googleapis.com
+`},
+			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+  annotations:
+    config.kubernetes.io/path: 'ps.yaml'
+spec:
+  services:
+  - compute.googleapis.com
+  - redis.googleapis.com
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
 metadata:
   name: project-services-compute
   annotations:
     blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
 ---
@@ -54,64 +93,111 @@ metadata:
   name: project-services-redis
   annotations:
     blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    config.kubernetes.io/path: 'service_project-services-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
 `,
 			results: []Result{
-				getResult("generated service", "project-services-compute", "", ""),
-				getResult("generated service", "project-services-redis", "", ""),
+				getResult("generated service", "project-services-compute", "", "service_project-services-compute.yaml"),
+				getResult("generated service", "project-services-redis", "", "service_project-services-redis.yaml"),
 			},
 		},
 		{
-			name:     "simple with annotations",
-			fnConfig: getProjectServiceList("project-services", []string{"compute.googleapis.com"}, "test", "", map[string]string{"cnrm.cloud.google.com/disable-dependent-services": "false"}),
-			expected: `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+			name: "simple with annotations1",
+			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+`},
+			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/path: 'ps.yaml'
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
 metadata:
   name: project-services-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
     external: test
 `,
-			results: []Result{getResult("generated service", "project-services-compute", "", "")},
+			results: []Result{getResult("generated service", "project-services-compute", "", "service_project-services-compute.yaml")},
 		},
 		{
-			name:     "simple with annotations with ns",
-			fnConfig: getProjectServiceList("project-services", []string{"compute.googleapis.com"}, "test", "foo", map[string]string{"cnrm.cloud.google.com/disable-dependent-services": "false"}),
-			expected: `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+			name: "simple with annotations with ns",
+			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+  namespace: foo
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+`},
+			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+  namespace: foo
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/path: 'ps.yaml'
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
 metadata:
   name: project-services-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    config.kubernetes.io/path: 'foo/service_project-services-compute.yaml'
   namespace: foo
 spec:
   resourceID: compute.googleapis.com
   projectRef:
     external: test
 `,
-			results: []Result{getResult("generated service", "project-services-compute", "foo", "")},
+			results: []Result{getResult("generated service", "project-services-compute", "foo", "foo/service_project-services-compute.yaml")},
 		},
 		{
-			name:     "simple with existing service generated",
-			fnConfig: getProjectServiceList("project-services", []string{"compute.googleapis.com"}, "test", "", map[string]string{"new": "anno"}),
-			expected: `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-kind: Service
+			name: "simple with existing service generated",
+			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
 metadata:
-  name: project-services-compute
+  name: project-services
   annotations:
-    new: 'anno'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    new: anno
 spec:
-  resourceID: compute.googleapis.com
-  projectRef:
-    external: test
-`, resourceMap: map[string]string{"compute.yaml": `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+  services:
+  - compute.googleapis.com
+  projectID: test
+`, "compute.yaml": `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
 metadata:
   name: project-services-compute
@@ -121,35 +207,48 @@ spec:
   resourceID: compute.googleapis.com
   projectRef:
     external: test`},
+			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+  annotations:
+    new: anno
+    config.kubernetes.io/path: 'ps.yaml'
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-compute
+  annotations:
+    new: 'anno'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    config.kubernetes.io/path: 'service_project-services-compute.yaml'
+spec:
+  resourceID: compute.googleapis.com
+  projectRef:
+    external: test
+`,
 			results: []Result{
-				getResult("generated service", "project-services-compute", "", ""),
+				getResult("generated service", "project-services-compute", "", "service_project-services-compute.yaml"),
 				getResult("pruned service", "project-services-compute", "", "compute.yaml"),
 			},
 		},
 
 		{
-			name:     "simple with new service, other objects and pruning previously generated services",
-			fnConfig: getProjectServiceList("project-services", []string{"redis.googleapis.com"}, "test", "", nil),
-			expected: `apiVersion: apps/v1
-kind: Deployment
+			name: "simple with new service, other objects and pruning previously generated services",
+			resourceMap: map[string]string{
+				"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
 metadata:
-  labels:
-    app: my-app1
-  name: mungebot1
-  annotations:
-    config.kubernetes.io/path: 'deploy1.yaml'
----
-apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-kind: Service
-metadata:
-  name: project-services-redis
-  annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+  name: project-services
 spec:
-  resourceID: redis.googleapis.com
-  projectRef:
-    external: test
-`, resourceMap: map[string]string{
+  services:
+  - redis.googleapis.com
+  projectID: test`,
 				"bq.yaml": `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
 metadata:
@@ -177,16 +276,254 @@ metadata:
   labels:
     app: my-app1
   name: mungebot1`},
+			expected: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app1
+  name: mungebot1
+  annotations:
+    config.kubernetes.io/path: 'deploy1.yaml'
+---
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+  annotations:
+    config.kubernetes.io/path: 'ps.yaml'
+spec:
+  services:
+  - redis.googleapis.com
+  projectID: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-redis
+  annotations:
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    config.kubernetes.io/path: 'service_project-services-redis.yaml'
+spec:
+  resourceID: redis.googleapis.com
+  projectRef:
+    external: test
+`,
 			results: []Result{
-				getResult("generated service", "project-services-redis", "", ""),
+				getResult("generated service", "project-services-redis", "", "service_project-services-redis.yaml"),
 				getResult("pruned service", "project-services-compute", "foo", "compute.yaml"),
 				getResult("pruned service", "project-services-bigquery", "", "bq.yaml"),
 			},
 		},
 		{
-			name:     "invalid empty",
-			fnConfig: getProjectServiceList("project-services", []string{}, "test", "", nil),
-			errMsg:   "at least one service must be specified under spec.services[]",
+			name: "multiple with annotations with ns",
+			resourceMap: map[string]string{"ps1.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-one
+  namespace: foo
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+`, "ps2.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-two
+  namespace: bar
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+spec:
+  services:
+  - redis.googleapis.com
+  projectID: test
+`},
+			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-one
+  namespace: foo
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/path: 'ps1.yaml'
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+---
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-two
+  namespace: bar
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/path: 'ps2.yaml'
+spec:
+  services:
+  - redis.googleapis.com
+  projectID: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-one-compute
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: 'false'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-one'
+    config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
+  namespace: foo
+spec:
+  resourceID: compute.googleapis.com
+  projectRef:
+    external: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-two-redis
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: 'false'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-two'
+    config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
+  namespace: bar
+spec:
+  resourceID: redis.googleapis.com
+  projectRef:
+    external: test
+`,
+			results: []Result{
+				getResult("generated service", "project-services-one-compute", "foo", "foo/service_project-services-one-compute.yaml"),
+				getResult("generated service", "project-services-two-redis", "bar", "bar/service_project-services-two-redis.yaml"),
+			},
+		},
+		{
+			name: "multiple in different packages",
+			resourceMap: map[string]string{"ps1.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-one
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+`, "subpkg/ps2.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-two
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+spec:
+  services:
+  - redis.googleapis.com
+  projectID: test
+`},
+			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-one
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/path: 'ps1.yaml'
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+---
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-two
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/path: 'subpkg/ps2.yaml'
+spec:
+  services:
+  - redis.googleapis.com
+  projectID: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-one-compute
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: 'false'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-one'
+    config.kubernetes.io/path: 'service_project-services-one-compute.yaml'
+spec:
+  resourceID: compute.googleapis.com
+  projectRef:
+    external: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-two-redis
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: 'false'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-two'
+    config.kubernetes.io/path: 'subpkg/service_project-services-two-redis.yaml'
+spec:
+  resourceID: redis.googleapis.com
+  projectRef:
+    external: test
+`,
+			results: []Result{
+				getResult("generated service", "project-services-one-compute", "", "service_project-services-one-compute.yaml"),
+				getResult("generated service", "project-services-two-redis", "", "subpkg/service_project-services-two-redis.yaml"),
+			},
+		},
+		{
+			name: "invalid empty",
+			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services
+spec:
+  services: []
+  projectID: test
+`},
+			errMsg: "at least one service must be specified under spec.services[]",
+		},
+		{
+			name: "no project services CR noop",
+			resourceMap: map[string]string{"compute.yaml": `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: custom-compute
+spec:
+  resourceID: compute.googleapis.com
+  projectRef:
+    external: test`, "deploy1.yaml": `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app1
+  name: mungebot1`},
+			expected: `apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: custom-compute
+  annotations:
+    config.kubernetes.io/path: 'compute.yaml'
+spec:
+  resourceID: compute.googleapis.com
+  projectRef:
+    external: test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app1
+  name: mungebot1
+  annotations:
+    config.kubernetes.io/path: 'deploy1.yaml'
+`,
+			results: []Result{},
 		},
 	}
 	for _, tt := range tests {
@@ -194,14 +531,14 @@ metadata:
 			require := require.New(t)
 			pkgDir := setupInputs(t, tt.resourceMap)
 			defer os.RemoveAll(pkgDir)
-
+			pslr := ProjectServiceListRunner{}
 			in := &kio.LocalPackageReader{
 				PackagePath: pkgDir,
 			}
 			out := &bytes.Buffer{}
 			err := kio.Pipeline{
 				Inputs:  []kio.Reader{in},
-				Filters: []kio.Filter{&tt.fnConfig},
+				Filters: []kio.Filter{&pslr},
 				Outputs: []kio.Writer{kio.ByteWriter{Writer: out}},
 			}.Execute()
 
@@ -211,23 +548,11 @@ metadata:
 			} else {
 				require.NoError(err)
 				require.Equal(tt.expected, out.String())
-				require.ElementsMatch(tt.results, tt.fnConfig.GetResults())
+				require.ElementsMatch(tt.results, pslr.GetResults())
 			}
 
 		})
 	}
-}
-
-func getProjectServiceList(name string, services []string, projectID string, ns string, annotations map[string]string) ProjectServiceList {
-	p := ProjectServiceList{}
-	p.APIVersion = projectServiceListAPIVersion
-	p.Kind = projectServiceListKind
-	p.Name = name
-	p.Spec.Services = services
-	p.Spec.ProjectID = projectID
-	p.Namespace = ns
-	p.Annotations = annotations
-	return p
 }
 
 func setupInputs(t *testing.T, resourceMap map[string]string) string {
@@ -268,17 +593,6 @@ func TestProjectServiceList_validate(t *testing.T) {
 			apiVersion: projectServiceListAPIVersion,
 			kind:       projectServiceListKind,
 			services:   []string{"compute.googleapis.com"},
-		},
-		{
-			name:       "invalid api version",
-			apiVersion: "foo",
-			errMsg:     "invalid APIVersion: foo supported APIVersion: blueprints.cloud.google.com/v1alpha1",
-		},
-		{
-			name:       "invalid kind",
-			apiVersion: projectServiceListAPIVersion,
-			kind:       "foo",
-			errMsg:     "invalid Kind: foo supported Kind: ProjectServiceList",
 		},
 		{
 			name:       "empty services",

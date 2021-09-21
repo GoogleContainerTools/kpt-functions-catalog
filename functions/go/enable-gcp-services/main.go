@@ -28,22 +28,19 @@ func main() {
 type ProjectServiceListFunction struct{}
 
 func (psf *ProjectServiceListFunction) Process(resourceList *framework.ResourceList) error {
-	var psl gcpservices.ProjectServiceList
-	err := framework.LoadFunctionConfig(resourceList.FunctionConfig, &psl)
-	if err != nil {
-		return fmt.Errorf("failed to load the `functionConfig`: %w", err)
-	}
+	var pslr gcpservices.ProjectServiceListRunner
 
 	resourceList.Result = &framework.Result{
 		Name: "enable-gcp-services",
 	}
-	resourceList.Items, err = psl.Filter(resourceList.Items)
+	var err error
+	resourceList.Items, err = pslr.Filter(resourceList.Items)
 	if err != nil {
 		resourceList.Result.Items = getErrorItem(err.Error())
 		return err
 	}
 
-	results := psl.GetResults()
+	results := pslr.GetResults()
 	for _, r := range results {
 		resourceList.Result.Items = append(resourceList.Result.Items,
 			framework.ResultItem{
