@@ -59,7 +59,7 @@ push: ## Push images to registry. WARN: This operation should only be done in CI
 	cd contrib/functions/ts && $(MAKE) push
 
 site-generate: ## Collect function branches and generate a catalog of their examples and documentation using kpt next.
-	rm -rf ./site/*/
+	rm -rf ./site/*/ && mkdir site/contrib
 	(cd scripts/generate_catalog/ && go run . ../.. ../../site)
 
 site-run: ## Run the site locally.

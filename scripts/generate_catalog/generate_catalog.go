@@ -165,8 +165,6 @@ func getFunctions(branches []string, source string, dest string) []function {
 
 		// Functions with the hidden field enabled should not be processed.
 		metadataPath := strings.TrimSpace(fmt.Sprintf("%v:%v", b, filepath.Join(relativeFuncPath, "metadata.yaml")))
-		fmt.Fprintf(os.Stderr, "metadataPath: %v\n", metadataPath)
-
 		md, err := getMetadata(metadataPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error getting metadata for %q from %q: %v\n", funcName, b, err)
