@@ -44,7 +44,7 @@ func TestGetServicesList(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			require := require.New(t)
-			got, err := getServicesList(tt.resName, tt.services, tt.projectID)
+			got, err := createServicesList(tt.resName, tt.services, tt.projectID)
 			if tt.errMsg != "" {
 				require.NotNil(err)
 				require.Contains(err.Error(), tt.errMsg)
@@ -57,8 +57,10 @@ func TestGetServicesList(t *testing.T) {
 }
 
 func getService(name, res, projectID string) Service {
-	service := Service{APIVersion: serviceUsageAPIVersion, Kind: serviceUsageKind}
-	service.Metadata.Name = name
+	service := Service{}
+	service.APIVersion = serviceUsageAPIVersion
+	service.Kind = serviceUsageKind
+	service.Name = name
 	service.Spec.ResourceID = res
 	if projectID != "" {
 		service.Spec.ProjectRef.External = projectID

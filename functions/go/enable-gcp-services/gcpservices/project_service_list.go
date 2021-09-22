@@ -5,6 +5,7 @@ import (
 	"path"
 	"strconv"
 
+	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
@@ -23,25 +24,32 @@ var ignoreAnnotations = map[string]bool{kioutil.PathAnnotation: true, filters.Lo
 
 // ProjectServiceListRunner discovers ProjectServiceList CRs to generate Service CRs
 type ProjectServiceListRunner struct {
-	results []Result
+	results []framework.ResultItem
 }
 
 // ProjectServiceList is the functionConfig for generating services
 type ProjectServiceList struct {
 	yaml.ResourceMeta `json:",inline" yaml:",inline"`
-	Spec              struct {
-		Services  []string `json:"services" yaml:"services"`
-		ProjectID string   `json:"projectID,omitempty" yaml:"projectID,omitempty"`
-	} `json:"spec" yaml:"spec"`
-	results []Result
+	Spec              projectServiceListSpec `json:"spec" yaml:"spec"`
+	results           []framework.ResultItem
 }
 
-// Result represents an action performed by ProjectServiceList on a resource
-type Result struct {
-	ResourceRef yaml.ResourceIdentifier
-	FilePath    string
-	Action      string
+type projectServiceListSpec struct {
+	Services  []string `json:"services" yaml:"services"`
+	ProjectID string   `json:"projectID,omitempty" yaml:"projectID,omitempty"`
 }
+
+// actionType represents the action performed on a resource
+type actionType string
+
+func (a actionType) String() string {
+	return string(a)
+}
+
+const (
+	generateAction actionType = "generated service"
+	pruneAction    actionType = "pruned service"
+)
 
 // Filter implements ProjectServiceListRunner as a yaml.Filter
 func (r *ProjectServiceListRunner) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
@@ -128,7 +136,7 @@ func (ps *ProjectServiceList) getServiceRNodes() ([]*yaml.RNode, error) {
 	// get namespace
 	ns := ps.GetIdentifier().Namespace
 	name := ps.GetIdentifier().Name
-	serviceList, err := getServicesList(name, ps.Spec.Services, ps.Spec.ProjectID)
+	serviceList, err := createServicesList(name, ps.Spec.Services, ps.Spec.ProjectID)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +176,7 @@ func (ps *ProjectServiceList) getServiceRNodes() ([]*yaml.RNode, error) {
 		}
 
 		services = append(services, svc)
-		err = ps.addResult("generated service", svc)
+		err = ps.addResult(generateAction, svc)
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +191,7 @@ func ignoreAnnotation(k string) bool {
 }
 
 // addResult records the action performed on a resource
-func (ps *ProjectServiceList) addResult(action string, r *yaml.RNode) error {
+func (ps *ProjectServiceList) addResult(action actionType, r *yaml.RNode) error {
 	meta, err := r.GetMeta()
 	if err != nil {
 		return err
@@ -192,12 +200,17 @@ func (ps *ProjectServiceList) addResult(action string, r *yaml.RNode) error {
 	if err != nil {
 		return err
 	}
-	ps.results = append(ps.results, Result{meta.GetIdentifier(), fp, action})
+	ps.results = append(ps.results, framework.ResultItem{
+		ResourceRef: meta.GetIdentifier(),
+		File:        framework.File{Path: fp},
+		Message:     action.String(),
+		Severity:    framework.Info,
+	})
 	return nil
 }
 
 // GetResults returns operations performed by ProjectServiceListRunner
-func (r *ProjectServiceListRunner) GetResults() []Result {
+func (r *ProjectServiceListRunner) GetResults() []framework.ResultItem {
 	return r.results
 }
 
@@ -220,7 +233,7 @@ func (ps *ProjectServiceList) pruneGeneratedServices(nodes []*yaml.RNode) ([]*ya
 			nodes[n] = nodes[i]
 			n++
 		} else {
-			err := ps.addResult("pruned service", nodes[i])
+			err := ps.addResult(pruneAction, nodes[i])
 			if err != nil {
 				return nodes, err
 			}

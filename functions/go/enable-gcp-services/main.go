@@ -39,17 +39,7 @@ func (psf *ProjectServiceListFunction) Process(resourceList *framework.ResourceL
 		resourceList.Result.Items = getErrorItem(err.Error())
 		return err
 	}
-
-	results := pslr.GetResults()
-	for _, r := range results {
-		resourceList.Result.Items = append(resourceList.Result.Items,
-			framework.ResultItem{
-				Message:     r.Action,
-				Severity:    framework.Info,
-				ResourceRef: r.ResourceRef,
-				File:        framework.File{Path: r.FilePath},
-			})
-	}
+	resourceList.Result.Items = pslr.GetResults()
 	return nil
 }
 

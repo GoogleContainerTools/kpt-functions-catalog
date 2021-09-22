@@ -9,29 +9,30 @@ import (
 
 // Service represents a valid GCP Service
 type Service struct {
-	APIVersion string `yaml:"apiVersion"`
-	Kind       string `yaml:"kind"`
-	Metadata   struct {
-		Name string `yaml:"name"`
-	} `yaml:"metadata"`
-	Spec struct {
-		ResourceID string `yaml:"resourceID"`
-		ProjectRef struct {
-			External string `yaml:"external,omitempty"`
-		} `yaml:"projectRef,omitempty"`
-	} `yaml:"spec"`
+	yaml.ResourceMeta `json:",inline" yaml:",inline"`
+	Spec              serviceSpec `yaml:"spec"`
 }
 
-// getServicesList creates a slice of services from service strings
-func getServicesList(name string, inputServices []string, projectID string) ([]Service, error) {
+type serviceSpec struct {
+	ResourceID string     `yaml:"resourceID"`
+	ProjectRef projectRef `yaml:"projectRef,omitempty"`
+}
+type projectRef struct {
+	External string `yaml:"external,omitempty"`
+}
+
+// createServicesList creates a slice of services from service strings
+func createServicesList(name string, inputServices []string, projectID string) ([]Service, error) {
 	var services []Service
 	for _, serviceName := range inputServices {
 		if len(strings.Split(serviceName, ".")) < 3 {
 			return nil, fmt.Errorf("invalid service specified: %s", serviceName)
 		}
 		serviceShortName := strings.Split(serviceName, ".")[0]
-		service := Service{APIVersion: serviceUsageAPIVersion, Kind: serviceUsageKind}
-		service.Metadata.Name = fmt.Sprintf("%s-%s", name, serviceShortName)
+		service := Service{}
+		service.APIVersion = serviceUsageAPIVersion
+		service.Kind = serviceUsageKind
+		service.Name = fmt.Sprintf("%s-%s", name, serviceShortName)
 		service.Spec.ResourceID = serviceName
 		if projectID != "" {
 			service.Spec.ProjectRef.External = projectID
