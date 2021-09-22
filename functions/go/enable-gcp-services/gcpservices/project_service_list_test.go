@@ -420,6 +420,108 @@ spec:
 			},
 		},
 		{
+			name: "multiple with prune an existing service",
+			resourceMap: map[string]string{"ps1.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-one
+  namespace: foo
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+`, "ps2.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-two
+  namespace: bar
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
+spec:
+  services:
+  - redis.googleapis.com
+  projectID: test
+`, "bar/service_project-services-two-redis.yaml": `---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-two-redis
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: 'false'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-two'
+  namespace: bar
+spec:
+  resourceID: redis.googleapis.com
+  projectRef:
+    external: test
+`},
+			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-one
+  namespace: foo
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
+    config.kubernetes.io/path: 'ps1.yaml'
+spec:
+  services:
+  - compute.googleapis.com
+  projectID: test
+---
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: ProjectServiceList
+metadata:
+  name: project-services-two
+  namespace: bar
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: "false"
+    config.kubernetes.io/local-config: "true"
+    config.kubernetes.io/path: 'ps2.yaml'
+spec:
+  services:
+  - redis.googleapis.com
+  projectID: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-one-compute
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: 'false'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-one'
+    config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
+  namespace: foo
+spec:
+  resourceID: compute.googleapis.com
+  projectRef:
+    external: test
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: project-services-two-redis
+  annotations:
+    cnrm.cloud.google.com/disable-dependent-services: 'false'
+    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-two'
+    config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
+  namespace: bar
+spec:
+  resourceID: redis.googleapis.com
+  projectRef:
+    external: test
+`,
+			results: []framework.ResultItem{
+				getResult(generateAction, "project-services-one-compute", "foo", "foo/service_project-services-one-compute.yaml"),
+				getResult(pruneAction, "project-services-two-redis", "bar", "bar/service_project-services-two-redis.yaml"),
+				getResult(generateAction, "project-services-two-redis", "bar", "bar/service_project-services-two-redis.yaml"),
+			},
+		},
+		{
 			name: "multiple in different packages",
 			resourceMap: map[string]string{"ps1.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: ProjectServiceList
