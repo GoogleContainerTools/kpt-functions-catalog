@@ -50,7 +50,7 @@ metadata:
 spec:
   services: # list of services to generate
     - compute.googleapis.com
-  projectID: foo # kpt-set: ${project-id}
+  projectID: foo
 ```
 
 | Field        |  Description | Example | Required
