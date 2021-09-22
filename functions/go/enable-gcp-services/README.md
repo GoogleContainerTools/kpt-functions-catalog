@@ -22,7 +22,7 @@ kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable
 
 The `enable-gcp-services` function does the following:
 
-1. Discovers all `ProjectServiceList` custom resources in a given package.
+1. Discovers all `ProjectServiceList` custom resources in a given package and nested packages if any.
 
 1. For each `ProjectServiceList` CR, it generates [GCP project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resources as specified in the `spec.services` list.
     * Adds all annotations defined for `ProjectServiceList` CR to each generated resource. This can be used for enabling features like
