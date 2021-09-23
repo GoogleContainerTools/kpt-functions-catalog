@@ -246,10 +246,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{
-				getResult(generateAction, "project-services-compute", "", "service_project-services-compute.yaml"),
-				getResult(pruneAction, "project-services-compute", "", "compute.yaml"),
-			},
+			results: []framework.ResultItem{getResult(recreateAction, "project-services-compute", "", "service_project-services-compute.yaml")},
 		},
 
 		{
@@ -517,8 +514,7 @@ spec:
 `,
 			results: []framework.ResultItem{
 				getResult(generateAction, "project-services-one-compute", "foo", "foo/service_project-services-one-compute.yaml"),
-				getResult(pruneAction, "project-services-two-redis", "bar", "bar/service_project-services-two-redis.yaml"),
-				getResult(generateAction, "project-services-two-redis", "bar", "bar/service_project-services-two-redis.yaml"),
+				getResult(recreateAction, "project-services-two-redis", "bar", "bar/service_project-services-two-redis.yaml"),
 			},
 		},
 		{

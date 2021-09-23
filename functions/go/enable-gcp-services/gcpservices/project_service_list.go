@@ -8,6 +8,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
+	"sigs.k8s.io/kustomize/kyaml/resid"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -31,7 +32,8 @@ type ProjectServiceListRunner struct {
 type ProjectServiceList struct {
 	yaml.ResourceMeta `json:",inline" yaml:",inline"`
 	Spec              projectServiceListSpec `json:"spec" yaml:"spec"`
-	results           []framework.ResultItem
+	prunedServices    map[string]framework.ResultItem
+	generatedServices map[string]framework.ResultItem
 }
 
 type projectServiceListSpec struct {
@@ -49,6 +51,7 @@ func (a actionType) String() string {
 const (
 	generateAction actionType = "generated service"
 	pruneAction    actionType = "pruned service"
+	recreateAction actionType = "recreated service"
 )
 
 // Filter implements ProjectServiceListRunner as a yaml.Filter
@@ -79,7 +82,7 @@ func (r *ProjectServiceListRunner) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, e
 
 		// add any new generated serviceNodes
 		generatedNodes = append(generatedNodes, newServiceNodes...)
-		r.results = append(r.results, psl.results...)
+		r.results = append(r.results, psl.getResults()...)
 	}
 	return append(nodes, generatedNodes...), nil
 }
@@ -116,6 +119,8 @@ func getProjectServiceLists(nodes []*yaml.RNode) ([]ProjectServiceList, error) {
 			if err != nil {
 				return nil, err
 			}
+			psl.generatedServices = make(map[string]framework.ResultItem)
+			psl.prunedServices = make(map[string]framework.ResultItem)
 			psls = append(psls, psl)
 		}
 	}
@@ -200,13 +205,41 @@ func (ps *ProjectServiceList) addResult(action actionType, r *yaml.RNode) error 
 	if err != nil {
 		return err
 	}
-	ps.results = append(ps.results, framework.ResultItem{
+
+	resID := resid.NewResIdWithNamespace(resid.GvkFromNode(r), meta.Name, meta.Namespace).String()
+	result := framework.ResultItem{
 		ResourceRef: meta.GetIdentifier(),
 		File:        framework.File{Path: fp},
 		Message:     action.String(),
 		Severity:    framework.Info,
-	})
+	}
+	switch action {
+	case pruneAction:
+		ps.prunedServices[resID] = result
+	case generateAction:
+		ps.generatedServices[resID] = result
+	}
 	return nil
+}
+
+// getResults returns operations performed by ProjectServiceList
+func (ps *ProjectServiceList) getResults() []framework.ResultItem {
+	collapsedResults := make([]framework.ResultItem, 0)
+	for resid, result := range ps.prunedServices {
+		g, recreated := ps.generatedServices[resid]
+		// check if a resource was pruned and recreated
+		if recreated {
+			result.Message = recreateAction.String()
+			result.File = g.File
+			// delete resource from generated results map
+			delete(ps.generatedServices, resid)
+		}
+		collapsedResults = append(collapsedResults, result)
+	}
+	for _, result := range ps.generatedServices {
+		collapsedResults = append(collapsedResults, result)
+	}
+	return collapsedResults
 }
 
 // GetResults returns operations performed by ProjectServiceListRunner
