@@ -30,7 +30,7 @@ The `enable-gcp-services` function does the following:
     * Sets namespace if any defined for `ProjectServiceSet` CR to each generated resource.
     * Sets projectID if any defined for `ProjectServiceSet` CR to each generated resource.
 1. Each generated [GCP project service](https://cloud.google.com/config-connector/docs/reference/resource-docs/serviceusage/service) resource
-has a `blueprints.cloud.google.com/managed-by-enable-gcp-services` annotation. This annotation allows `enable-gcp-services` function to
+has a `blueprints.cloud.google.com/ownerReference` annotation. This annotation allows `enable-gcp-services` function to
 track generated resources for the declarative management of the generated resources. Any changes made to the generate resources will be overwritten and should be made to the `ProjectServiceSet` CR instead.
 
 ### `ProjectServiceSet`
@@ -96,7 +96,7 @@ kind: Service
 metadata:
   name: proj1-service-compute
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'proj1-service'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/proj1-service'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -110,7 +110,7 @@ kind: Service
 metadata:
   name: proj1-service-redis
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'proj1-service'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/proj1-service'
 spec:
   resourceID: redis.googleapis.com
   projectRef:
