@@ -58,6 +58,14 @@ items:
         resourceRef:
           apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
           kind: Service
+          name: foo-service-compute
+        file:
+          path: service_foo-service-compute.yaml
+      - message: recreated service
+        severity: info
+        resourceRef:
+          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+          kind: Service
           name: foo-service-redis
         file:
           path: service_foo-service-redis.yaml
@@ -69,22 +77,6 @@ items:
           name: foo-service-storage
         file:
           path: service_foo-service-storage.yaml
-      - message: recreated service
-        severity: info
-        resourceRef:
-          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-          kind: Service
-          name: foo-service-compute
-        file:
-          path: service_foo-service-compute.yaml
-      - message: generated service
-        severity: info
-        resourceRef:
-          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-          kind: Service
-          name: proj1-service-redis
-        file:
-          path: service_proj1-service-redis.yaml
       - message: generated service
         severity: info
         resourceRef:
@@ -93,3 +85,11 @@ items:
           name: proj1-service-compute
         file:
           path: service_proj1-service-compute.yaml
+      - message: generated service
+        severity: info
+        resourceRef:
+          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+          kind: Service
+          name: proj1-service-redis
+        file:
+          path: service_proj1-service-redis.yaml
