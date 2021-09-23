@@ -31,3 +31,19 @@ $ kpt fn render enable-gcp-services-simple
 
 Successfully executed 1 function(s) in 1 package(s).
 ```
+
+Run the following command to see generated service resources:
+
+```shell
+$ kpt pkg tree enable-gcp-services-simple
+```
+
+You will see two new generated resources `proj1-service-compute` and `proj1-service-redis`.
+
+```shell
+Package "enable-gcp-services-simple"
+├── [Kptfile]  Kptfile enable-gcp-services-simple
+├── [service_proj1-service-compute.yaml]  Service proj1-service-compute
+├── [service_proj1-service-redis.yaml]  Service proj1-service-redis
+└── [services.yaml]  ProjectServiceList proj1-service
+```
