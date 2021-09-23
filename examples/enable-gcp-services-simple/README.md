@@ -14,7 +14,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 
 ### Function invocation
 
-Render the configuration, `enable-gcp-services` has been defined declaratively in the Kptfile and configured via `services.yaml`.
+Render the configuration, `enable-gcp-services` has been defined declaratively in the Kptfile.
 
 ```shell
 $ kpt fn render enable-gcp-services-simple

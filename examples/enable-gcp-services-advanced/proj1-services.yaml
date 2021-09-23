@@ -5,7 +5,7 @@ metadata:
   annotations:
     config.kubernetes.io/local-config: "true"
 spec:
-  services: # We expect only generated service resources by proj1-service ProjectServiceSet to be pruned and regenarated. All other service resources remain unmodified.
+  services:
     - compute.googleapis.com
     - redis.googleapis.com
   projectID: proj1

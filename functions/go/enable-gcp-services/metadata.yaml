@@ -7,6 +7,7 @@ tags:
 sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/enable-gcp-services
 examplePackageURLs:
   - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/enable-gcp-services-simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/enable-gcp-services-advanced
 emails:
   - kpt-team@google.com
 license: Apache-2.0
