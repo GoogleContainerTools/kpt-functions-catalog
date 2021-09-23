@@ -1,5 +1,5 @@
 apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: proj1-service
   annotations:

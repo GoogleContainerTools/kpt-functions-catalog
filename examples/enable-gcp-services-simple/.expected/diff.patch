@@ -1,6 +1,6 @@
 diff --git a/service_proj1-service-compute.yaml b/service_proj1-service-compute.yaml
 new file mode 100644
-index 0000000..6e3a1dd
+index 0000000..a0e4c9b
 --- /dev/null
 +++ b/service_proj1-service-compute.yaml
 @@ -0,0 +1,10 @@
@@ -16,7 +16,7 @@ index 0000000..6e3a1dd
 +    external: proj1
 diff --git a/service_proj1-service-redis.yaml b/service_proj1-service-redis.yaml
 new file mode 100644
-index 0000000..83f0c80
+index 0000000..2da01b0
 --- /dev/null
 +++ b/service_proj1-service-redis.yaml
 @@ -0,0 +1,10 @@

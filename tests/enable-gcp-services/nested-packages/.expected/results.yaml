@@ -45,7 +45,7 @@ items:
   - image: gcr.io/kpt-fn/enable-gcp-services:unstable
     exitCode: 0
     results:
-      - message: pruned service
+      - message: recreated service
         severity: info
         resourceRef:
           apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
@@ -53,23 +53,7 @@ items:
           name: bar-service-cloudbuild
         file:
           path: service_bar-service-cloudbuild.yaml
-      - message: generated service
-        severity: info
-        resourceRef:
-          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-          kind: Service
-          name: bar-service-cloudbuild
-        file:
-          path: service_bar-service-cloudbuild.yaml
-      - message: pruned service
-        severity: info
-        resourceRef:
-          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-          kind: Service
-          name: foo-service-compute
-        file:
-          path: service_foo-service-compute.yaml
-      - message: pruned service
+      - message: recreated service
         severity: info
         resourceRef:
           apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
@@ -77,7 +61,7 @@ items:
           name: foo-service-redis
         file:
           path: service_foo-service-redis.yaml
-      - message: pruned service
+      - message: recreated service
         severity: info
         resourceRef:
           apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
@@ -85,7 +69,7 @@ items:
           name: foo-service-storage
         file:
           path: service_foo-service-storage.yaml
-      - message: generated service
+      - message: recreated service
         severity: info
         resourceRef:
           apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
@@ -93,30 +77,6 @@ items:
           name: foo-service-compute
         file:
           path: service_foo-service-compute.yaml
-      - message: generated service
-        severity: info
-        resourceRef:
-          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-          kind: Service
-          name: foo-service-redis
-        file:
-          path: service_foo-service-redis.yaml
-      - message: generated service
-        severity: info
-        resourceRef:
-          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-          kind: Service
-          name: foo-service-storage
-        file:
-          path: service_foo-service-storage.yaml
-      - message: generated service
-        severity: info
-        resourceRef:
-          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
-          kind: Service
-          name: proj1-service-compute
-        file:
-          path: service_proj1-service-compute.yaml
       - message: generated service
         severity: info
         resourceRef:
@@ -125,3 +85,11 @@ items:
           name: proj1-service-redis
         file:
           path: service_proj1-service-redis.yaml
+      - message: generated service
+        severity: info
+        resourceRef:
+          apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+          kind: Service
+          name: proj1-service-compute
+        file:
+          path: service_proj1-service-compute.yaml

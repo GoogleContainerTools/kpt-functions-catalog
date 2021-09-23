@@ -1,6 +1,6 @@
 diff --git a/bar-project/service_bar-service-cloudbuild.yaml b/bar-project/service_bar-service-cloudbuild.yaml
 new file mode 100644
-index 0000000..59f55f4
+index 0000000..c1c92c0
 --- /dev/null
 +++ b/bar-project/service_bar-service-cloudbuild.yaml
 @@ -0,0 +1,10 @@
@@ -16,7 +16,7 @@ index 0000000..59f55f4
 +    external: bar
 diff --git a/foo-project/service_foo-service-compute.yaml b/foo-project/service_foo-service-compute.yaml
 new file mode 100644
-index 0000000..7b181b0
+index 0000000..b362cdf
 --- /dev/null
 +++ b/foo-project/service_foo-service-compute.yaml
 @@ -0,0 +1,10 @@
@@ -32,7 +32,7 @@ index 0000000..7b181b0
 +    external: foo
 diff --git a/foo-project/service_foo-service-redis.yaml b/foo-project/service_foo-service-redis.yaml
 new file mode 100644
-index 0000000..4130319
+index 0000000..68c4d29
 --- /dev/null
 +++ b/foo-project/service_foo-service-redis.yaml
 @@ -0,0 +1,10 @@
@@ -48,7 +48,7 @@ index 0000000..4130319
 +    external: foo
 diff --git a/foo-project/service_foo-service-storage.yaml b/foo-project/service_foo-service-storage.yaml
 new file mode 100644
-index 0000000..672040c
+index 0000000..65747f3
 --- /dev/null
 +++ b/foo-project/service_foo-service-storage.yaml
 @@ -0,0 +1,10 @@
@@ -64,7 +64,7 @@ index 0000000..672040c
 +    external: foo
 diff --git a/service_proj1-service-compute.yaml b/service_proj1-service-compute.yaml
 new file mode 100644
-index 0000000..6e3a1dd
+index 0000000..a0e4c9b
 --- /dev/null
 +++ b/service_proj1-service-compute.yaml
 @@ -0,0 +1,10 @@
@@ -80,7 +80,7 @@ index 0000000..6e3a1dd
 +    external: proj1
 diff --git a/service_proj1-service-redis.yaml b/service_proj1-service-redis.yaml
 new file mode 100644
-index 0000000..83f0c80
+index 0000000..2da01b0
 --- /dev/null
 +++ b/service_proj1-service-redis.yaml
 @@ -0,0 +1,10 @@

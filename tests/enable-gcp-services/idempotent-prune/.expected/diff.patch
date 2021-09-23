@@ -1,6 +1,6 @@
 diff --git a/service_proj1-service-bigquery.yaml b/service_proj1-service-bigquery.yaml
 deleted file mode 100644
-index ede7893..0000000
+index 42300cc..0000000
 --- a/service_proj1-service-bigquery.yaml
 +++ /dev/null
 @@ -1,10 +0,0 @@
