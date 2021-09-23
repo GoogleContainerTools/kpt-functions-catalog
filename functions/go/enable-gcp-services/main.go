@@ -12,7 +12,7 @@ import (
 
 //nolint
 func main() {
-	psf := ProjectServiceListFunction{}
+	psf := ProjectServiceSetFunction{}
 	cmd := command.Build(&psf, command.StandaloneEnabled, false)
 
 	cmd.Short = generated.EnableGcpServicesShort
@@ -25,10 +25,10 @@ func main() {
 	}
 }
 
-type ProjectServiceListFunction struct{}
+type ProjectServiceSetFunction struct{}
 
-func (psf *ProjectServiceListFunction) Process(resourceList *framework.ResourceList) error {
-	var pslr gcpservices.ProjectServiceListRunner
+func (psf *ProjectServiceSetFunction) Process(resourceList *framework.ResourceList) error {
+	var pslr gcpservices.ProjectServiceSetRunner
 
 	resourceList.Result = &framework.Result{
 		Name: "enable-gcp-services",

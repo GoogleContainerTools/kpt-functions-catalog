@@ -13,7 +13,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 )
 
-func TestProjectServiceList_Filter(t *testing.T) {
+func TestProjectServiceSet_Filter(t *testing.T) {
 	var tests = []struct {
 		name        string
 		resourceMap map[string]string
@@ -24,7 +24,7 @@ func TestProjectServiceList_Filter(t *testing.T) {
 		{
 			name: "simple",
 			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -35,7 +35,7 @@ spec:
   projectID: test
 `},
 			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -51,7 +51,7 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -63,7 +63,7 @@ spec:
 		{
 			name: "simple no project",
 			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -74,7 +74,7 @@ spec:
   - redis.googleapis.com
 `},
 			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -90,7 +90,7 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -100,7 +100,7 @@ kind: Service
 metadata:
   name: project-services-redis
   annotations:
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
     config.kubernetes.io/path: 'service_project-services-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
@@ -113,7 +113,7 @@ spec:
 		{
 			name: "simple with annotations",
 			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -125,7 +125,7 @@ spec:
   projectID: test
 `},
 			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -143,7 +143,7 @@ metadata:
   name: project-services-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -155,7 +155,7 @@ spec:
 		{
 			name: "simple with annotations with ns",
 			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   namespace: foo
@@ -168,7 +168,7 @@ spec:
   projectID: test
 `},
 			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   namespace: foo
@@ -187,7 +187,7 @@ metadata:
   name: project-services-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
     config.kubernetes.io/path: 'foo/service_project-services-compute.yaml'
   namespace: foo
 spec:
@@ -200,7 +200,7 @@ spec:
 		{
 			name: "simple with existing service generated",
 			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -215,13 +215,13 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
     external: test`},
 			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -239,7 +239,7 @@ metadata:
   name: project-services-compute
   annotations:
     new: 'anno'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -253,7 +253,7 @@ spec:
 			name: "simple with new service, other objects and pruning previously generated services",
 			resourceMap: map[string]string{
 				"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -267,7 +267,7 @@ kind: Service
 metadata:
   name: project-services-bigquery
   annotations:
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
 spec:
   resourceID: bigquery.googleapis.com
   projectRef:
@@ -278,7 +278,7 @@ metadata:
   name: project-services-compute
   namespace: foo
   annotations:
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -299,7 +299,7 @@ metadata:
     config.kubernetes.io/path: 'deploy1.yaml'
 ---
 apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
@@ -315,7 +315,7 @@ kind: Service
 metadata:
   name: project-services-redis
   annotations:
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
     config.kubernetes.io/path: 'service_project-services-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
@@ -331,7 +331,7 @@ spec:
 		{
 			name: "multiple with annotations with ns",
 			resourceMap: map[string]string{"ps1.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-one
   namespace: foo
@@ -343,7 +343,7 @@ spec:
   - compute.googleapis.com
   projectID: test
 `, "ps2.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-two
   namespace: bar
@@ -356,7 +356,7 @@ spec:
   projectID: test
 `},
 			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-one
   namespace: foo
@@ -370,7 +370,7 @@ spec:
   projectID: test
 ---
 apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-two
   namespace: bar
@@ -389,7 +389,7 @@ metadata:
   name: project-services-one-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-one'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-one'
     config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
   namespace: foo
 spec:
@@ -403,7 +403,7 @@ metadata:
   name: project-services-two-redis
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-two'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-two'
     config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
   namespace: bar
 spec:
@@ -419,7 +419,7 @@ spec:
 		{
 			name: "multiple with prune an existing service",
 			resourceMap: map[string]string{"ps1.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-one
   namespace: foo
@@ -431,7 +431,7 @@ spec:
   - compute.googleapis.com
   projectID: test
 `, "ps2.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-two
   namespace: bar
@@ -449,7 +449,7 @@ metadata:
   name: project-services-two-redis
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-two'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-two'
   namespace: bar
 spec:
   resourceID: redis.googleapis.com
@@ -457,7 +457,7 @@ spec:
     external: test
 `},
 			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-one
   namespace: foo
@@ -471,7 +471,7 @@ spec:
   projectID: test
 ---
 apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-two
   namespace: bar
@@ -490,7 +490,7 @@ metadata:
   name: project-services-one-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-one'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-one'
     config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
   namespace: foo
 spec:
@@ -504,7 +504,7 @@ metadata:
   name: project-services-two-redis
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-two'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-two'
     config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
   namespace: bar
 spec:
@@ -520,7 +520,7 @@ spec:
 		{
 			name: "multiple in different packages",
 			resourceMap: map[string]string{"ps1.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-one
   annotations:
@@ -531,7 +531,7 @@ spec:
   - compute.googleapis.com
   projectID: test
 `, "subpkg/ps2.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-two
   annotations:
@@ -543,7 +543,7 @@ spec:
   projectID: test
 `},
 			expected: `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-one
   annotations:
@@ -556,7 +556,7 @@ spec:
   projectID: test
 ---
 apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services-two
   annotations:
@@ -574,7 +574,7 @@ metadata:
   name: project-services-one-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-one'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-one'
     config.kubernetes.io/path: 'service_project-services-one-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -587,7 +587,7 @@ metadata:
   name: project-services-two-redis
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-two'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-two'
     config.kubernetes.io/path: 'subpkg/service_project-services-two-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
@@ -602,7 +602,7 @@ spec:
 		{
 			name: "invalid empty",
 			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
-kind: ProjectServiceList
+kind: ProjectServiceSet
 metadata:
   name: project-services
 spec:
@@ -654,7 +654,7 @@ metadata:
 			require := require.New(t)
 			pkgDir := setupInputs(t, tt.resourceMap)
 			defer os.RemoveAll(pkgDir)
-			pslr := ProjectServiceListRunner{}
+			pslr := ProjectServiceSetRunner{}
 			in := &kio.LocalPackageReader{
 				PackagePath: pkgDir,
 			}
@@ -706,7 +706,7 @@ func getResult(action actionType, name, ns, fp string) framework.ResultItem {
 	return r
 }
 
-func TestProjectServiceList_validate(t *testing.T) {
+func TestProjectServiceSet_validate(t *testing.T) {
 	tests := []struct {
 		name        string
 		apiVersion  string
@@ -717,38 +717,38 @@ func TestProjectServiceList_validate(t *testing.T) {
 	}{
 		{
 			name:        "valid",
-			apiVersion:  projectServiceListAPIVersion,
-			kind:        projectServiceListKind,
+			apiVersion:  projectServiceSetAPIVersion,
+			kind:        projectServiceSetKind,
 			annotations: map[string]string{filters.LocalConfigAnnotation: "true"},
 			services:    []string{"compute.googleapis.com"},
 		},
 		{
 			name:        "empty services",
-			apiVersion:  projectServiceListAPIVersion,
-			kind:        projectServiceListKind,
+			apiVersion:  projectServiceSetAPIVersion,
+			kind:        projectServiceSetKind,
 			services:    []string{},
 			annotations: map[string]string{filters.LocalConfigAnnotation: "true"},
 			errMsg:      "at least one service must be specified under spec.services[]",
 		},
 		{
 			name:       "no local config annotation",
-			apiVersion: projectServiceListAPIVersion,
-			kind:       projectServiceListKind,
+			apiVersion: projectServiceSetAPIVersion,
+			kind:       projectServiceSetKind,
 			services:   []string{"compute.googleapis.com"},
 			errMsg:     "config.kubernetes.io/local-config annotation must be set",
 		},
 		{
 			name:        "local config annotation false",
-			apiVersion:  projectServiceListAPIVersion,
-			kind:        projectServiceListKind,
+			apiVersion:  projectServiceSetAPIVersion,
+			kind:        projectServiceSetKind,
 			services:    []string{"compute.googleapis.com"},
 			annotations: map[string]string{filters.LocalConfigAnnotation: "false"},
 			errMsg:      "config.kubernetes.io/local-config annotation must be set to true",
 		},
 		{
 			name:        "local config annotation invalid",
-			apiVersion:  projectServiceListAPIVersion,
-			kind:        projectServiceListKind,
+			apiVersion:  projectServiceSetAPIVersion,
+			kind:        projectServiceSetKind,
 			services:    []string{"compute.googleapis.com"},
 			annotations: map[string]string{filters.LocalConfigAnnotation: "foo"},
 			errMsg:      "error parsing config.kubernetes.io/local-config annotation: strconv.ParseBool: parsing \"foo\": invalid syntax",
@@ -757,7 +757,7 @@ func TestProjectServiceList_validate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			require := require.New(t)
-			psl := ProjectServiceList{}
+			psl := ProjectServiceSet{}
 			psl.APIVersion = tt.apiVersion
 			psl.Kind = tt.kind
 			psl.Spec.Services = tt.services
