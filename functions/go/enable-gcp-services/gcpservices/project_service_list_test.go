@@ -51,7 +51,7 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -90,7 +90,7 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -100,7 +100,7 @@ kind: Service
 metadata:
   name: project-services-redis
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
     config.kubernetes.io/path: 'service_project-services-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
@@ -143,7 +143,7 @@ metadata:
   name: project-services-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -187,7 +187,7 @@ metadata:
   name: project-services-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
     config.kubernetes.io/path: 'foo/service_project-services-compute.yaml'
   namespace: foo
 spec:
@@ -215,7 +215,7 @@ kind: Service
 metadata:
   name: project-services-compute
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -239,7 +239,7 @@ metadata:
   name: project-services-compute
   annotations:
     new: 'anno'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -267,7 +267,7 @@ kind: Service
 metadata:
   name: project-services-bigquery
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
 spec:
   resourceID: bigquery.googleapis.com
   projectRef:
@@ -278,7 +278,7 @@ metadata:
   name: project-services-compute
   namespace: foo
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -315,7 +315,7 @@ kind: Service
 metadata:
   name: project-services-redis
   annotations:
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services'
     config.kubernetes.io/path: 'service_project-services-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
@@ -389,7 +389,7 @@ metadata:
   name: project-services-one-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-one'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-one'
     config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
   namespace: foo
 spec:
@@ -403,7 +403,7 @@ metadata:
   name: project-services-two-redis
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-two'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-two'
     config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
   namespace: bar
 spec:
@@ -449,7 +449,7 @@ metadata:
   name: project-services-two-redis
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-two'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-two'
   namespace: bar
 spec:
   resourceID: redis.googleapis.com
@@ -490,7 +490,7 @@ metadata:
   name: project-services-one-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-one'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-one'
     config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
   namespace: foo
 spec:
@@ -504,7 +504,7 @@ metadata:
   name: project-services-two-redis
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-two'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-two'
     config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
   namespace: bar
 spec:
@@ -574,7 +574,7 @@ metadata:
   name: project-services-one-compute
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-one'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-one'
     config.kubernetes.io/path: 'service_project-services-one-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -587,7 +587,7 @@ metadata:
   name: project-services-two-redis
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
-    blueprints.cloud.google.com/managed-by-enable-gcp-services: 'project-services-two'
+    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceList/project-services-two'
     config.kubernetes.io/path: 'subpkg/service_project-services-two-redis.yaml'
 spec:
   resourceID: redis.googleapis.com

@@ -14,10 +14,12 @@ import (
 
 const (
 	projectServiceListKind       = "ProjectServiceList"
-	projectServiceListAPIVersion = "blueprints.cloud.google.com/v1alpha1"
+	projectServiceListGroup      = "blueprints.cloud.google.com"
+	projectServiceListVersion    = "v1alpha1"
+	projectServiceListAPIVersion = projectServiceListGroup + "/" + projectServiceListVersion
 	serviceUsageAPIVersion       = "serviceusage.cnrm.cloud.google.com/v1beta1"
 	serviceUsageKind             = "Service"
-	managedByAnnotation          = "blueprints.cloud.google.com/managed-by-enable-gcp-services"
+	managedByAnnotation          = "blueprints.cloud.google.com/ownerReference"
 )
 
 // ignoreAnnotations is used to ignore any annotation that should not be added to generated Service CRs
@@ -161,7 +163,7 @@ func (ps *ProjectServiceList) getServiceRNodes() ([]*yaml.RNode, error) {
 			}
 		}
 		// add management annotation for state tracking
-		if _, err := svc.Pipe(yaml.SetAnnotation(managedByAnnotation, name)); err != nil {
+		if _, err := svc.Pipe(yaml.SetAnnotation(managedByAnnotation, path.Join(projectServiceListGroup, projectServiceListKind, name))); err != nil {
 			return nil, err
 		}
 		// add namespace to service if present
@@ -247,7 +249,7 @@ func (r *ProjectServiceListRunner) GetResults() []framework.ResultItem {
 	return r.results
 }
 
-// isManaged checks is a resource is managed by a the ProjectServiceList
+// isManaged checks is a resource is managed by the ProjectServiceList
 func (ps ProjectServiceList) isManaged(r *yaml.RNode) bool {
 	anno := r.GetAnnotations()
 	k, found := anno[managedByAnnotation]
@@ -255,7 +257,8 @@ func (ps ProjectServiceList) isManaged(r *yaml.RNode) bool {
 	if !found {
 		return false
 	}
-	return k == ps.Name
+	// annotation will be of form Group/Kind/Name
+	return k == path.Join(projectServiceListGroup, projectServiceListKind, ps.Name)
 }
 
 // pruneGeneratedServices removes resources managed by ProjectServiceList
