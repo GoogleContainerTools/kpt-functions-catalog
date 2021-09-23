@@ -16,7 +16,7 @@ Explore the package by running:
 ```shell
 $ kpt pkg tree enable-gcp-services-advanced
 Package "enable-gcp-services-advanced"
-├── [Kptfile]  Kptfile enable-gcp-services-simple
+├── [Kptfile]  Kptfile enable-gcp-services-advanced
 ├── [proj1-services.yaml]  ProjectServiceSet proj1-service
 ├── [proj2-services.yaml]  ProjectServiceSet proj2-service
 ├── [resources.yaml]  ComputeNetwork computenetwork-sample
@@ -62,7 +62,7 @@ We can see `proj1-service-bigquery` no longer exists.
 
 ```diff
 Package "enable-gcp-services-advanced"
- ├── [Kptfile]  Kptfile enable-gcp-services-simple
+ ├── [Kptfile]  Kptfile enable-gcp-services-advanced
  ├── [proj1-services.yaml]  ProjectServiceSet proj1-service
  ├── [proj2-services.yaml]  ProjectServiceSet proj2-service
  ├── [resources.yaml]  ComputeNetwork computenetwork-sample
