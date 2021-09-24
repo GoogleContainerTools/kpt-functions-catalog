@@ -3,7 +3,6 @@ package gcpservices
 import (
 	"fmt"
 	"path"
-	"strconv"
 
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
@@ -91,18 +90,7 @@ func (r *ProjectServiceSetRunner) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, er
 
 func (ps ProjectServiceSet) validate() error {
 	if len(ps.Spec.Services) < 1 {
-		return fmt.Errorf("at least one service must be specified under spec.services[]")
-	}
-	val, found := ps.Annotations[filters.LocalConfigAnnotation]
-	if !found {
-		return fmt.Errorf("%s annotation must be set", filters.LocalConfigAnnotation)
-	}
-	v, err := strconv.ParseBool(val)
-	if err != nil {
-		return fmt.Errorf("error parsing %s annotation: %v", filters.LocalConfigAnnotation, err)
-	}
-	if !v {
-		return fmt.Errorf("%s annotation must be set to true", filters.LocalConfigAnnotation)
+		return fmt.Errorf("at least one service must be specified under `spec.services[]`")
 	}
 	return nil
 }
@@ -112,6 +100,10 @@ func getProjectServiceSets(nodes []*yaml.RNode) ([]ProjectServiceSet, error) {
 	psls := make([]ProjectServiceSet, 0)
 	for _, r := range nodes {
 		if isProjectServiceSetGVK(r) {
+			// set LocalConfigAnnotation, noop if already set by user
+			if _, err := r.Pipe(yaml.SetAnnotation(filters.LocalConfigAnnotation, "true")); err != nil {
+				return nil, err
+			}
 			var psl ProjectServiceSet
 			rs, err := r.String()
 			if err != nil {

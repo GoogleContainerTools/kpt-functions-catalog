@@ -61,13 +61,11 @@ spec:
 			results: []framework.ResultItem{getResult(generateAction, "project-services-compute", "", "service_project-services-compute.yaml")},
 		},
 		{
-			name: "simple no project",
+			name: "simple no project, without local config anno",
 			resourceMap: map[string]string{"ps.yaml": `apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: ProjectServiceSet
 metadata:
   name: project-services
-  annotations:
-    config.kubernetes.io/local-config: "true"
 spec:
   services:
   - compute.googleapis.com
@@ -78,8 +76,8 @@ kind: ProjectServiceSet
 metadata:
   name: project-services
   annotations:
-    config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
+    config.kubernetes.io/local-config: 'true'
 spec:
   services:
   - compute.googleapis.com
@@ -609,7 +607,7 @@ spec:
   services: []
   projectID: test
 `},
-			errMsg: "at least one service must be specified under spec.services[]",
+			errMsg: "at least one service must be specified under `spec.services[]`",
 		},
 		{
 			name: "no project services CR noop",
@@ -728,30 +726,7 @@ func TestProjectServiceSet_validate(t *testing.T) {
 			kind:        projectServiceSetKind,
 			services:    []string{},
 			annotations: map[string]string{filters.LocalConfigAnnotation: "true"},
-			errMsg:      "at least one service must be specified under spec.services[]",
-		},
-		{
-			name:       "no local config annotation",
-			apiVersion: projectServiceSetAPIVersion,
-			kind:       projectServiceSetKind,
-			services:   []string{"compute.googleapis.com"},
-			errMsg:     "config.kubernetes.io/local-config annotation must be set",
-		},
-		{
-			name:        "local config annotation false",
-			apiVersion:  projectServiceSetAPIVersion,
-			kind:        projectServiceSetKind,
-			services:    []string{"compute.googleapis.com"},
-			annotations: map[string]string{filters.LocalConfigAnnotation: "false"},
-			errMsg:      "config.kubernetes.io/local-config annotation must be set to true",
-		},
-		{
-			name:        "local config annotation invalid",
-			apiVersion:  projectServiceSetAPIVersion,
-			kind:        projectServiceSetKind,
-			services:    []string{"compute.googleapis.com"},
-			annotations: map[string]string{filters.LocalConfigAnnotation: "foo"},
-			errMsg:      "error parsing config.kubernetes.io/local-config annotation: strconv.ParseBool: parsing \"foo\": invalid syntax",
+			errMsg:      "at least one service must be specified under `spec.services[]`",
 		},
 	}
 	for _, tt := range tests {
