@@ -21,6 +21,7 @@ GOBIN := $(shell go env GOPATH)/bin
 FUNCTIONS := \
 	apply-setters \
 	create-setters \
+	enable-gcp-services \
 	ensure-name-substring \
 	fix \
 	format \

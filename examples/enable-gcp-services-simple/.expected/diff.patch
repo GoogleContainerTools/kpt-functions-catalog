@@ -1,0 +1,32 @@
+diff --git a/service_proj1-service-compute.yaml b/service_proj1-service-compute.yaml
+new file mode 100644
+index 0000000..a0e4c9b
+--- /dev/null
++++ b/service_proj1-service-compute.yaml
+@@ -0,0 +1,10 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: proj1-service-compute
++  annotations:
++    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/proj1-service'
++spec:
++  resourceID: compute.googleapis.com
++  projectRef:
++    external: proj1
+diff --git a/service_proj1-service-redis.yaml b/service_proj1-service-redis.yaml
+new file mode 100644
+index 0000000..2da01b0
+--- /dev/null
++++ b/service_proj1-service-redis.yaml
+@@ -0,0 +1,10 @@
++apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
++kind: Service
++metadata:
++  name: proj1-service-redis
++  annotations:
++    blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/proj1-service'
++spec:
++  resourceID: redis.googleapis.com
++  projectRef:
++    external: proj1
