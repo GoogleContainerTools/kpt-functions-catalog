@@ -27,7 +27,7 @@ Package "enable-gcp-services-advanced"
 └── [service_proj2-service-redis.yaml]  Service proj2-service-redis
 ```
 
-We can see two ProjectServiceSet resources `proj1-service` and `proj2-service` for managing service enablement in two projects `proj1` and `proj2`. We can also see the services `compute.googleapis.com`, `redis.googleapis.com` managed within ProjectServiceSet `proj1-service` resource and `redis.googleapis.com` within ProjectServiceSet `proj2-service` resource. Notice that `bigquery.googleapis.com` is no longer present in `proj1-service` ProjectServiceSet. We can re render this package to prune that service resource.
+We can see two `ProjectServiceSet` resources `proj1-service` and `proj2-service` for managing service enablement in two projects `proj1` and `proj2`. We can also see the services `compute.googleapis.com`, `redis.googleapis.com` managed within `ProjectServiceSet` `proj1-service` resource and `redis.googleapis.com` within `ProjectServiceSet` `proj2-service` resource. Notice that `bigquery.googleapis.com` is no longer present in `proj1-service` `ProjectServiceSet`. We can re render this package to prune that service resource.
 
 ### Function invocation
 
