@@ -1,40 +1,58 @@
 # some-function-name
 
-### Overview
+Note: Please ensure you follow the [kpt doc style guide].
+
+## Overview
 
 <!--mdtogo:Short-->
 
 Explain what this function does in one or two sentences.
 
+<!--mdtogo-->
+
+Describe why the user should care about this function.
+
+What problem does it solve?
+
+Provide some context (e.g. In the `gatekeeper` function, explain what's
+is `Gatekeeper` project)
+
 [//]: <> (Note: The content between `<!--mdtogo:Short-->` and the following
 `<!--mdtogo-->` will be used as the short description for the command.)
 
-<!--mdtogo-->
+<!--mdtogo:Long-->
 
+## Usage
+
+How do I use this function?
+
+Explain what does it do in details.
+
+Is this function meant to be used declaratively, imperatively or both?
 
 ### FunctionConfig
 
-<!--mdtogo:Long-->
-
-Explain the function config and behavior for this function in detail.
+Omit this section, if the function doesn't support any `functionConfigs`.
+Otherwise, explain the function config and behavior for this function in detail.
 For each field in the function config, specify:
- - An example value
- - Whether it is optional, and if so, the default value
 
-To decouple the function orchestrator (i.e. kpt) from the function, it's
-recommended to not show the kpt CLI or custom resources like the Kptfile.
+- An example value
+- Whether it is optional, and if so, the default value
+
+If showing the function orchestrator (e.g. kpt) can make it clear about how to
+use the function, it's recommended to use it.
 
 [//]: <> (Note: The content between `<!--mdtogo:Long-->` and the following
 `<!--mdtogo-->` will be used as the long description for the command.)
 
 <!--mdtogo-->
 
-### Examples
+## Examples
 
 <!--mdtogo:Examples-->
 
-Omit this ection if you are poviding complete example kpt packages which
-are linked from the catalog site.
+Omit this section if you are providing complete example kpt packages which are
+linked from the catalog site.
 
 Otherwise, provide inline examples in this section.
 
@@ -42,3 +60,5 @@ Otherwise, provide inline examples in this section.
 `<!--mdtogo-->` will be used as the examples for the command.)
 
 <!--mdtogo-->
+
+[kpt doc style guide]: https://github.com/GoogleContainerTools/kpt/blob/main/docs/style-guides/docs.md

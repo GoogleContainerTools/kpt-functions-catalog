@@ -21,14 +21,19 @@ GOBIN := $(shell go env GOPATH)/bin
 FUNCTIONS := \
 	apply-setters \
 	create-setters \
+	enable-gcp-services \
 	ensure-name-substring \
 	fix \
 	format \
 	gatekeeper \
+	remove-local-config-resources \
+	render-helm-chart \
+	list-setters \
 	search-replace \
 	set-annotations \
 	set-labels \
 	set-namespace \
+	set-project-id \
 	starlark \
 	upsert-resource
 
@@ -118,8 +123,8 @@ func-fmt:
 
 func-lint:
 	(which $(GOPATH)/bin/golangci-lint || \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.32.2)
-	cd $(CURRENT_FUNCTION) && $(GOPATH)/bin/golangci-lint run ./...
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.41.1)
+	cd $(CURRENT_FUNCTION) && time $(GOPATH)/bin/golangci-lint run --timeout=10m ./...
 
 func-test:
 	cd $(CURRENT_FUNCTION) && go test -cover ./...

@@ -1,7 +1,7 @@
 # fix: Simple Example
 
 In this example, we will fix a simple package which is compatible with v0.X version of kpt,
-and make it compatible with kpt 1.0 
+and make it compatible with kpt 1.0
 
 ### Fetch the example package
 
@@ -82,8 +82,8 @@ info:
   description: describe this package
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
-      configPath: setters-config.yaml
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
+      configPath: setters.yaml
 ```
 
 The transformed package is compatible with kpt 1.0 binary.

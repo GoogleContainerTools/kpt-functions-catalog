@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters
+data:
+  replicas: "5"
+  http-port: "80"
+  image-tag: v0.3.0

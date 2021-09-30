@@ -1,0 +1,19 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
+metadata:
+  name: set-namespace-to-prod
+source: |
+  # Test set
+  x = set(["foo", "bar"])
+  print(x)
+
+  # Test recursion
+  def fib(n):
+    if n == 0 or n == 1:
+      return n
+    else:
+      return fib(n-1) + fib(n-2)
+  print(fib(3))
+
+  for resource in ctx.resource_list["items"]:
+    resource["metadata"]["namespace"] = "test"

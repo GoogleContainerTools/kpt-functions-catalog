@@ -1,0 +1,32 @@
+diff --git a/app.yaml b/app.yaml
+index f821124..4cf1245 100644
+--- a/app.yaml
++++ b/app.yaml
+@@ -2,6 +2,7 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: my-cm
++  namespace: prod
+   annotations:
+     config.k8s.io/id: "1"
+ data:
+@@ -11,6 +12,7 @@ apiVersion: foo.com/v1
+ kind: Bar
+ metadata:
+   name: my-bar
++  namespace: prod
+   annotations:
+     config.k8s.io/id: "2"
+ spec:
+diff --git a/fn-config.yaml b/fn-config.yaml
+index 5b8d869..eddef45 100644
+--- a/fn-config.yaml
++++ b/fn-config.yaml
+@@ -2,6 +2,7 @@ apiVersion: fn.kpt.dev/v1alpha1
+ kind: StarlarkRun
+ metadata:
+   name: set-namespace-to-prod
++  namespace: prod
+   annotations:
+     config.k8s.io/id: "3"
+ source: |

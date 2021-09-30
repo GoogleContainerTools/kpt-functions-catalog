@@ -23,5 +23,5 @@ echo "Starting check."
 # Check each link for Docsify 404s
 find . -name README.md -printf "%P\n" | grep -v node_modules | sed "s/README.md//"  \
     | sed "s/^/http:\/\/localhost:3001\//" \
-    | xargs -I {} -n1 sh -c "! (npx href-checker {} --bad-content=\"404 - Not found\" --silent --no-off-site -c=15 | grep .) || exit 255" 
+    | xargs -I {} -n1 sh -c "! (echo Checking $0 && npx href-checker {} --bad-content=\"404 - Not found\" --silent --no-off-site -c=15 | grep .) || exit 255"
 echo "Success."

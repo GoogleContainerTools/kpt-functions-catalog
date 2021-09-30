@@ -35,6 +35,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var (
+	branchesToSkip = []string{
+		"sops/v0.2",
+	}
+)
+
 func main() {
 	if len(os.Args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: generate-catalog SRC_REPO_DIR/ DEST_MD_DIR/\n")
@@ -58,13 +64,19 @@ func main() {
 	}
 
 	functions := getFunctions(branches, source, dest)
-	err = writeFunctionIndex(functions, source, dest)
+	curatedFns, contribFns, err := writeFunctionIndex(functions, source, dest)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
-	err = writeExampleIndex(functions, source, dest)
+	err = writeExampleIndex(curatedFns, source, dest)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+
+	err = writeExampleIndex(contribFns, source, filepath.Join(dest, "contrib"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
@@ -79,6 +91,7 @@ type function struct {
 	Path              string
 	Description       string
 	Tags              string
+	Gcp               bool
 }
 
 type example struct {
@@ -114,6 +127,17 @@ func getBranches() ([]string, error) {
 	}
 
 	for _, branch := range strings.Split(buf.String(), "\n") {
+		skipCurrentBranch := false
+		for _, branchToSkip := range branchesToSkip {
+			if strings.Contains(branch, branchToSkip) {
+				skipCurrentBranch = true
+				break
+			}
+		}
+		if skipCurrentBranch {
+			continue
+		}
+
 		if branchSemverPrefix.MatchString(branch) {
 			verBranches = append(verBranches, strings.TrimSpace(branch))
 		}
@@ -127,17 +151,14 @@ func getFunctions(branches []string, source string, dest string) []function {
 		segments := strings.Split(b, "/")
 		funcName := segments[len(segments)-2]
 		minorVersion := segments[len(segments)-1]
-		funcDest := filepath.Join(dest, funcName)
-		versionDest := filepath.Join(funcDest, minorVersion)
 		relativeFuncPath, err := getRelativeFunctionPath(source, funcName)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			continue
 		}
-
-		// Skip contributed functions.
-		if strings.Contains(relativeFuncPath, "contrib/") {
-			continue
+		versionDest := filepath.Join(dest, funcName, minorVersion)
+		if strings.Contains(relativeFuncPath, "contrib") {
+			versionDest = filepath.Join(dest, "contrib", funcName, minorVersion)
 		}
 
 		// Functions with the hidden field enabled should not be processed.
@@ -195,7 +216,11 @@ func copyExamples(b string, exampleSources []string, versionDest, minorVersion s
 	}
 
 	for _, exampleSource := range exampleSources {
-		relativePath := strings.SplitN(exampleSource, minorVersion+string(filepath.Separator), 2)[1]
+		splitedPaths := strings.SplitN(exampleSource, minorVersion+string(filepath.Separator), 2)
+		if len(splitedPaths) != 2 {
+			return fmt.Errorf("expect 2 substring after spliting %q by %q", exampleSource, minorVersion+string(filepath.Separator))
+		}
+		relativePath := splitedPaths[1]
 		// Fetch example into temporary directory.
 		cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", relativePath)
 		err = cmd.Run()
@@ -208,6 +233,9 @@ func copyExamples(b string, exampleSources []string, versionDest, minorVersion s
 		dest := filepath.Join(versionDest, exampleName)
 
 		// Move example content to the site's example directory.
+		if err = os.RemoveAll(dest); err != nil {
+			return err
+		}
 		err = os.Rename(src, dest)
 		if err != nil {
 			return err
@@ -219,7 +247,7 @@ func copyExamples(b string, exampleSources []string, versionDest, minorVersion s
 }
 
 func copyReadme(b string, funcName string, relativeFuncPath string, versionDest string) error {
-	// Copy README for the function's version to the example directory.
+	// Copy README for the function's version to the function's directory.
 	tempDir, err := ioutil.TempDir("", "functions")
 	if err != nil {
 		return err
@@ -230,10 +258,17 @@ func copyReadme(b string, funcName string, relativeFuncPath string, versionDest 
 		return fmt.Errorf("Error running %v: %v", cmd, err)
 	}
 
-	// Find the README in the example directory.
+	// Find the README in the function's directory.
 	m, err := filepath.Glob(filepath.Join(tempDir, "functions", "*", funcName, "README.md"))
 	if err != nil {
 		return err
+	}
+
+	if m == nil {
+		m, err = filepath.Glob(filepath.Join(tempDir, "contrib", "functions", "*", funcName, "README.md"))
+		if err != nil {
+			return err
+		}
 	}
 
 	// Move the README to the destination directory.
@@ -287,8 +322,17 @@ func parseMetadata(f function, md metadata, version string, versionDest string) 
 	f.LatestVersion = version
 	f.Path = versionDest
 	f.Description = md.Description
-	sort.Strings(md.Tags)
-	f.Tags = strings.Join(md.Tags, ", ")
+	functionTags := make([]string, 0)
+	for _, tag := range md.Tags {
+		normalizedTag := strings.ToLower(tag)
+		if normalizedTag == "gcp" {
+			f.Gcp = true
+		} else {
+			functionTags = append(functionTags, normalizedTag)
+		}
+	}
+	sort.Strings(functionTags)
+	f.Tags = strings.Join(functionTags, ", ")
 	f.ImagePath = md.Image
 
 	return f
@@ -301,23 +345,70 @@ func getRelativeFunctionPath(source string, funcName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if m == nil {
-		return "", fmt.Errorf("Could not find a function with the following pattern: %v", sourcePattern)
+	if m != nil {
+		return functionDirPrefix.ReplaceAllString(m[0], "functions/"), nil
 	}
 
-	return functionDirPrefix.ReplaceAllString(m[0], "functions/"), nil
+	contribPattern := filepath.Join(source, "contrib", "functions", "*", funcName)
+	m, err = filepath.Glob(contribPattern)
+	if err != nil {
+		return "", err
+	}
+	if m == nil {
+		return "", fmt.Errorf("Could not find a function with the following name: %v", funcName)
+	}
+	return functionDirPrefix.ReplaceAllString(m[0], "contrib/functions/"), nil
 }
 
-func writeFunctionIndex(functions []function, source string, dest string) error {
-	out := []string{"# Functions Catalog", "", "| Name | Description | Tags |", "| ---- | ----------- | ---- |"}
+func writeFunctionIndex(functions []function, source string, dest string) ([]function, []function, error) {
+	out := []string{"# Curated Functions Catalog", ""}
+	var contribOut []string
+
+	genericFunctions := make([]function, 0)
+	gcp := make([]function, 0)
+	contribFunctions := make([]function, 0)
+	for _, f := range functions {
+		if strings.Contains(f.ImagePath, "contrib") {
+			contribFunctions = append(contribFunctions, f)
+		} else {
+			if f.Gcp {
+				gcp = append(gcp, f)
+			} else {
+				genericFunctions = append(genericFunctions, f)
+			}
+		}
+	}
+
+	out = append(out, getFunctionTable(genericFunctions, source)...)
+
+	if len(gcp) > 0 {
+		out = append(out, "", "## GCP Functions", "")
+		out = append(out, getFunctionTable(gcp, source)...)
+	}
+
+	if len(contribFunctions) > 0 {
+		contribOut = append(contribOut, "# Contrib Functions Catalog", "")
+		contribOut = append(contribOut, getFunctionTable(contribFunctions, source)...)
+	}
+
+	o := strings.Join(out, "\n")
+	if err := ioutil.WriteFile(filepath.Join(dest, "README.md"), []byte(o), 0744); err != nil {
+		return nil, nil, err
+	}
+	co := strings.Join(contribOut, "\n")
+	if err := ioutil.WriteFile(filepath.Join(dest, "contrib", "README.md"), []byte(co), 0744); err != nil {
+		return nil, nil, err
+	}
+	return append(genericFunctions, gcp...), contribFunctions, nil
+}
+
+func getFunctionTable(functions []function, source string) []string {
+	out := []string{"| Name | Description | Tags |", "| ---- | ----------- | ---- |"}
 	for _, f := range functions {
 		functionEntry := fmt.Sprintf("| [%v](%v/) | %v | %v |", f.FunctionName, strings.Replace(f.Path, filepath.Join(source, "site"), "", 1), f.Description, f.Tags)
 		out = append(out, functionEntry)
 	}
-
-	o := strings.Join(out, "\n")
-	err := ioutil.WriteFile(filepath.Join(dest, "README.md"), []byte(o), 0744)
-	return err
+	return out
 }
 
 func writeExampleIndex(functions []function, source string, dest string) error {

@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Fix resources and make them compatible with kpt 1.0.
+Migrate resources to make them compatible with 1.0+ versions of kpt.
 
 <!--mdtogo-->
 
@@ -108,7 +108,7 @@ metadata:
   name: nginx
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         replicas: "3"
 ```
