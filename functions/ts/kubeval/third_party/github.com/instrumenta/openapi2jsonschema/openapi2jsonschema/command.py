@@ -57,11 +57,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict, a
     """
     Converts a valid OpenAPI specification into a set of JSON Schema files
     """
-    apiVersionKindSet = set()
-    avkList = apiversionkind.strip("'\"").split(";")
-    for avk in avkList:
-        elements = avk.split(",")
-        apiVersionKindSet.add((elements[0], elements[1].lower()))
+    apiVersionKindSet = set(apiversionkind.strip("'\"").split(";"))
 
     info("Downloading schema")
     if sys.version_info < (3, 0):
@@ -102,6 +98,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict, a
                 }
 
                 # For Kubernetes, populate `apiVersion` and `kind` properties from `x-kubernetes-group-version-kind`
+                type_name_to_apiversion_kind = {}
                 for type_name in definitions:
                     type_def = definitions[type_name]
                     if "x-kubernetes-group-version-kind" in type_def:
@@ -113,6 +110,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict, a
                                     if kube_ext["group"]
                                     else kube_ext["version"]
                                 )
+                                type_name_to_apiversion_kind[type_name] = api_version + "," + kube_ext["kind"]
                                 append_no_duplicates(
                                     type_def["properties"]["apiVersion"],
                                     "enum",
@@ -137,13 +135,16 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict, a
         components = data["components"]["schemas"]
 
     for title in components:
+        if title not in type_name_to_apiversion_kind:
+            continue
+        apiversion_kind = type_name_to_apiversion_kind[title]
+        if apiversion_kind not in apiVersionKindSet:
+            continue
+
         kind = title.split(".")[-1].lower()
         if kubernetes:
             group = title.split(".")[-3].lower()
             api_version = title.split(".")[-2].lower()
-        tup = (group + "/" + api_version if group and group != "core" else api_version, kind)
-        if tup not in apiVersionKindSet:
-            continue
         specification = components[title]
         specification["$schema"] = "http://json-schema.org/schema#"
         specification.setdefault("type", "object")
