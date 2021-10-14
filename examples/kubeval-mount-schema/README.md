@@ -2,6 +2,9 @@
 
 ### Overview
 
+If you want to use your own schema instead of the built-in schema, you can
+follow this example.
+
 This example demonstrates how to mount a local schema directory and then use it
 with [`kubeval`] function to validate KRM resources.
 
