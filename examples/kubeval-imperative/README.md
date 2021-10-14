@@ -10,7 +10,7 @@ validate KRM resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval-imperative
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval-imperative@kubeval/v0.2
 ```
 
 We have a `ReplicationController` in `app.yaml` that has 2 schema violations:
@@ -23,7 +23,7 @@ Try it out by running the following command:
 
 ```shell
 # We set `strict=true` to disallow unknown field and `skip_kinds=MyCustom,MyOtherCustom` to skip 2 kinds that we don't have schemas.
-$ kpt fn eval kubeval-imperative --image gcr.io/kpt-fn/kubeval:unstable --results-dir /tmp -- strict=true skip_kinds=MyCustom,MyOtherCustom
+$ kpt fn eval kubeval-imperative --image gcr.io/kpt-fn/kubeval:v0.2 --results-dir /tmp -- strict=true skip_kinds=MyCustom,MyOtherCustom
 ```
 
 The key-value pair(s) provided after `--` will be converted to `ConfigMap` by
@@ -40,7 +40,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/kubeval:unstable
+  - image: gcr.io/kpt-fn/kubeval:v0.2
     exitCode: 1
     results:
       - message: Additional property templates is not allowed
