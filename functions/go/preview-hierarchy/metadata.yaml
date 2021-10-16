@@ -3,7 +3,7 @@ description: Preview hierarchy of Folder resources visually before actuation
 tags:
   - viewer
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/preview-hierarchy-simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/preview-hierarchy/v0.1/examples/preview-hierarchy-simple
 emails:
   - kpt-team@google.com
 license: Apache-2.0

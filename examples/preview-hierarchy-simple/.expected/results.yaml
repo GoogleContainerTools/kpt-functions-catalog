@@ -4,7 +4,7 @@ metadata:
   name: fnresults
 exitCode: 0
 items:
-  - image: gcr.io/kpt-fn/preview-hierarchy:unstable
+  - image: gcr.io/kpt-fn/preview-hierarchy:v0.1
     stderr: |2
 
       org-11111
