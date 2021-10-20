@@ -1,0 +1,19 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 0
+items:
+  - image: gcr.io/kpt-fn/set-enforcement-action:unstable
+    exitCode: 0
+    results:
+      - message: 'Number of policies set to [dryrun]: 2'
+        severity: info
+      - message: 'Policy name: [restrict-clusteradmin-rolebindings]'
+        severity: info
+        file:
+          path: resources.yaml
+      - message: 'Policy name: [prohibit-role-wildcard-access]'
+        severity: info
+        file:
+          path: resources.yaml
