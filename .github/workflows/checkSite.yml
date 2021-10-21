@@ -16,10 +16,11 @@
  on:
    pull_request:
      paths:
-       - "functions/**"
-       - "examples/**"
-       - "site/**"
-       - "scripts/generate_catalog/**"
+       - "**"
+#       - "functions/**"
+#       - "examples/**"
+#       - "site/**"
+#       - "scripts/generate_catalog/**"
  jobs:
    build:
      runs-on: ubuntu-latest
