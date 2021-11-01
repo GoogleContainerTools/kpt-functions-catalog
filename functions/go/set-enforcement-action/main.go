@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
@@ -23,7 +22,6 @@ func main() {
 	fp := SetEnforcementActionProcessor{}
 	cmd := command.Build(&fp, command.StandaloneEnabled, false)
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -67,12 +65,13 @@ func processPolicies(resourceList []*yaml.RNode, acn string) ([]framework.Result
 			continue
 		}
 
-		acnElem, err := node.Pipe(yaml.Lookup("spec", "enforcementAction"))
+		err = node.PipeE(
+			yaml.LookupCreate(yaml.ScalarNode, "spec"),
+			yaml.SetField("enforcementAction", yaml.NewScalarRNode(acn)))
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
-		acnElem.YNode().Value = acn
 		itemFilePath := node.GetAnnotations()["internal.config.kubernetes.io/path"]
 		if itemFilePath == "" {
 			itemFilePath = node.GetAnnotations()["config.kubernetes.io/path"]

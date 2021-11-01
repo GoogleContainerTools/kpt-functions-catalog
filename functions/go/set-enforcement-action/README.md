@@ -10,7 +10,7 @@ Applies the supplied enforcement action on [policy constraints](https://cloud.go
 
 Policy Controller [constraint objects](https://cloud.google.com/anthos-config-management/docs/how-to/creating-constraints) enable you to enforce policies for your Kubernetes clusters.
 This function provides a quick way for users to set the [enforcementAction](https://cloud.google.com/anthos-config-management/docs/how-to/auditing-constraints#types_of_enforcement_actions)
-attribute to either `dryrun` for auditing or `deny` for enforcing the constraints.
+attribute to either `dryrun` for auditing, `warn` for letting the non-compliant resource be applied to the cluster with a warning or `deny` for enforcing the constraints and denying the resource application altogether.
 
 <!--mdtogo:Long-->
 
