@@ -23,10 +23,9 @@ $ kpt fn render set-enforcement-action-simple
 
 ### Expected result
 
-The two policy constraints should have been muted with their `spec.enforcementAction` 
+The two policy constraints should have been mutated with their `spec.enforcementAction` 
 elements set to `dryrun` which were initially set to `deny`
 
-`restrict-clusteradmin-rolebindings.yaml`
 ```yaml
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRestrictRoleBindings
@@ -37,7 +36,7 @@ metadata: # kpt-merge: /restrict-clusteradmin-rolebindings
     description: "Restricts use of the cluster-admin role."
     bundles.validator.forsetisecurity.org/cis-k8s-v1.5.1: 5.1.1
 spec:
-  enforcementAction: dryrun # kpt-set: ${enforcementAction}
+  enforcementAction: dryrun
   parameters:
     restrictedRole:
       apiGroup: "rbac.authorization.k8s.io"
@@ -47,10 +46,7 @@ spec:
     - apiGroup: "rbac.authorization.k8s.io"
       kind: "Group"
       name: "system:masters"
-```
-
-`prohibit-role-wildcard-access`
-```yaml
+---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sProhibitRoleWildcardAccess
 metadata: # kpt-merge: /prohibit-role-wildcard-access
@@ -60,5 +56,5 @@ metadata: # kpt-merge: /prohibit-role-wildcard-access
     description: "Restricts use of wildcards in Roles and ClusterRoles."
     bundles.validator.forsetisecurity.org/cis-k8s-v1.5.1: 5.1.3
 spec:
-  enforcementAction: dryrun # kpt-set: ${enforcementAction}
+  enforcementAction: dryrun
 ```

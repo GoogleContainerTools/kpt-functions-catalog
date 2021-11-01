@@ -8,9 +8,12 @@ Applies the supplied enforcement action on [policy constraints](https://cloud.go
 
 <!--mdtogo-->
 
-Policy Controller [constraint objects](https://cloud.google.com/anthos-config-management/docs/how-to/creating-constraints) enable you to enforce policies for your Kubernetes clusters.
-This function provides a quick way for users to set the [enforcementAction](https://cloud.google.com/anthos-config-management/docs/how-to/auditing-constraints#types_of_enforcement_actions)
-attribute to either `dryrun` for auditing, `warn` for letting the non-compliant resource be applied to the cluster with a warning or `deny` for enforcing the constraints and denying the resource application altogether.
+Policy Controller allows users to define [constraints](https://cloud.google.com/anthos-config-management/docs/how-to/creating-constraints) to enforce policies for your Kubernetes clusters.
+This function provides a quick way for users to set the [`spec.enforcementAction`](https://cloud.google.com/anthos-config-management/docs/how-to/auditing-constraints#types_of_enforcement_actions)
+attribute to:
+1. `dryrun` for auditing the cluster for policy violations or
+2. `warn` for letting non-compliant resources be applied to the cluster with warnings or 
+3. `deny` for enforcing the constraints and denying the resource application altogether
 
 <!--mdtogo:Long-->
 
@@ -35,7 +38,7 @@ pipeline:
   mutators:
     - image: gcr.io/kpt-fn/set-enforcement-action:unstable
       configMap:
-          enforcementAction: deny
+        enforcementAction: deny
 ...
 ```
 

@@ -104,7 +104,7 @@ data:
   enforcementAction: dry-run
 `,
 		expectedResult: []string{
-			"expected values for enforcementAction are [deny] or [dryrun]",
+			"expected values for enforcementAction are [deny] or [warn] or [dryrun]",
 		},
 	},
 	{

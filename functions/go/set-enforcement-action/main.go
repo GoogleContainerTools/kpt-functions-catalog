@@ -14,6 +14,7 @@ const (
 	policyAPIVersion     = "constraints.gatekeeper.sh/v1beta1"
 	enforcementActionKey = "enforcementAction"
 	denyActionValue      = "deny"
+	warnActionValue      = "warn"
 	dryRunActionValue    = "dryrun"
 )
 
@@ -111,8 +112,8 @@ func getEnforcementAction(fc *yaml.RNode, acn *string) error {
 	}
 
 	*acn = fc.GetDataMap()[enforcementActionKey]
-	if *acn != denyActionValue && *acn != dryRunActionValue {
-		return fmt.Errorf("expected values for enforcementAction are [%s] or [%s]", denyActionValue, dryRunActionValue)
+	if *acn != denyActionValue && *acn != warnActionValue && *acn != dryRunActionValue {
+		return fmt.Errorf("expected values for enforcementAction are [%s] or [%s] or [%s]", denyActionValue, warnActionValue, dryRunActionValue)
 	}
 
 	return nil
