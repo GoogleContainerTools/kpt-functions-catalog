@@ -31,6 +31,7 @@ FUNCTIONS := \
 	list-setters \
 	search-replace \
 	set-annotations \
+	set-enforcement-action \
 	set-labels \
 	set-namespace \
 	set-project-id \
