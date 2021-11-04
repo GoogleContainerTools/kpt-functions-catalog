@@ -17,7 +17,7 @@ For example, it can be useful for Config Sync to avoid picking up client-side re
 
 The function will execute as follows:
 
-1. Searched for defined resources in a package
+1. Searches for defined resources in a package
 2. Deletes the resources with the following annotation:
    `config.kubernetes.io/local-config: true`
 
