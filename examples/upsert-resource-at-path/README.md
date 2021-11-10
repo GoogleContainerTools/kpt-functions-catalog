@@ -1,4 +1,4 @@
-# upsert-resource: Upsert At Specific Path Example
+# upsert-resource: Upsert Resource At Path Example
 
 In this example, we will see how to add a resource at specified path using `upsert-resource` function.
 

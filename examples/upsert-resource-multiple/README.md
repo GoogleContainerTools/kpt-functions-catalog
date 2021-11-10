@@ -1,4 +1,4 @@
-# upsert-resource: Multiple Resources Example
+# upsert-resource: Upsert Resource Multiple Example
 
 In this example, we will see how to upsert multiple resources using `upsert-resource`
 function.
