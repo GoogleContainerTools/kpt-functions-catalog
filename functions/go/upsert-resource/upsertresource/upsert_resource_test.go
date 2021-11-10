@@ -181,6 +181,359 @@ spec:
       targetPort: 1234
 `,
 		},
+		{
+			name: "replace multiple resources",
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  annotations:
+    foo: bar
+spec:
+  selector:
+    app: MyApp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+`,
+			fnconfig: `
+apiVersion: config.kubernetes.io/v1alpha1
+kind: UpsertResourceList
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: myService
+    annotations:
+      foo: bar
+      config.kubernetes.io/index: '0'
+      config.kubernetes.io/path: 'foo.yaml'
+      internal.config.kubernetes.io/seqindent: 'wide'
+  spec:
+    selector:
+      app: MyAppNew
+    ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 9376
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: myDeployment
+    annotations:
+      config.kubernetes.io/index: '1'
+      config.kubernetes.io/path: 'foo.yaml'
+      internal.config.kubernetes.io/seqindent: 'compact'
+  spec:
+    replicas: 4
+    template:
+      spec:
+        containers:
+        - name: nginx-new
+          image: nginx:1.14.2
+          ports:
+          - containerPort: 80
+`,
+			expectedResources: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  annotations:
+    config.kubernetes.io/path: f1.yaml
+    foo: bar
+    internal.config.kubernetes.io/seqindent: wide
+spec:
+  selector:
+    app: MyAppNew
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 9376
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+  annotations:
+    config.kubernetes.io/path: f1.yaml
+    internal.config.kubernetes.io/seqindent: compact
+spec:
+  replicas: 4
+  template:
+    spec:
+      containers:
+        - name: nginx-new
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+`,
+		},
+		{
+			name: "add multiple resources",
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  annotations:
+    foo: bar
+spec:
+  selector:
+    app: MyApp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+`,
+			fnconfig: `
+apiVersion: config.kubernetes.io/v1alpha1
+kind: UpsertResourceList
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: myService2
+    annotations:
+      foo: bar
+      config.kubernetes.io/index: '0'
+      config.kubernetes.io/path: 'foo.yaml'
+      internal.config.kubernetes.io/seqindent: 'wide'
+  spec:
+    selector:
+      app: MyAppNew
+    ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 9376
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: myDeployment2
+    annotations:
+      config.kubernetes.io/index: '1'
+      config.kubernetes.io/path: 'foo.yaml'
+      internal.config.kubernetes.io/seqindent: 'compact'
+  spec:
+    replicas: 4
+    template:
+      spec:
+        containers:
+        - name: nginx-new
+          image: nginx:1.14.2
+          ports:
+          - containerPort: 80
+`,
+			expectedResources: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  annotations:
+    foo: bar
+    config.kubernetes.io/path: 'f1.yaml'
+spec:
+  selector:
+    app: MyApp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+  annotations:
+    config.kubernetes.io/path: 'f1.yaml'
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myService2
+  annotations:
+    foo: bar
+    internal.config.kubernetes.io/seqindent: wide
+spec:
+  selector:
+    app: MyAppNew
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 9376
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment2
+  annotations:
+    internal.config.kubernetes.io/seqindent: compact
+spec:
+  replicas: 4
+  template:
+    spec:
+      containers:
+        - name: nginx-new
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+`,
+		},
+		{
+			name: "add resource at specific path",
+			input: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  annotations:
+    foo: bar
+spec:
+  selector:
+    app: MyApp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+`,
+			fnconfig: `
+apiVersion: config.kubernetes.io/v1alpha1
+kind: UpsertResourceList
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: myService
+    annotations:
+      foo: bar
+      config.kubernetes.io/index: '0'
+      config.kubernetes.io/path: 'foo.yaml'
+      internal.config.kubernetes.io/seqindent: 'wide'
+  spec:
+    selector:
+      app: MyAppNew
+    ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 9376
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: myDeployment
+    annotations:
+      config.kubernetes.io/upsert-path: 'f2.yaml'
+      config.kubernetes.io/index: '1'
+      config.kubernetes.io/path: 'foo.yaml'
+      internal.config.kubernetes.io/seqindent: 'compact'
+  spec:
+    replicas: 4
+    template:
+      spec:
+        containers:
+        - name: nginx-new
+          image: nginx:1.14.2
+          ports:
+          - containerPort: 80
+`,
+			expectedResources: `apiVersion: v1
+kind: Service
+metadata:
+  name: myService
+  annotations:
+    config.kubernetes.io/path: f1.yaml
+    foo: bar
+    internal.config.kubernetes.io/seqindent: wide
+spec:
+  selector:
+    app: MyAppNew
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 9376
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+  annotations:
+    config.kubernetes.io/path: 'f1.yaml'
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+  annotations:
+    config.kubernetes.io/path: f2.yaml
+    config.kubernetes.io/upsert-path: f2.yaml
+    internal.config.kubernetes.io/seqindent: compact
+spec:
+  replicas: 4
+  template:
+    spec:
+      containers:
+        - name: nginx-new
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+`,
+		},
 	}
 	for i := range tests {
 		test := tests[i]
@@ -200,7 +553,7 @@ spec:
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
-			s := &UpsertResource{Resource: node}
+			s := &UpsertResource{UpsertResourceList: node}
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
@@ -225,6 +578,8 @@ spec:
 			if test.errMsg == "" && !assert.NoError(t, err) {
 				t.FailNow()
 			}
+
+			println(out.String())
 
 			if !assert.Equal(t,
 				test.expectedResources,
@@ -267,6 +622,24 @@ metadata:
 kind: Deployment
 metadata:
   name: myDeployment
+`,
+			expected: true,
+		},
+		{
+			name: "same resource with upsert path",
+			resource1: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+  annotations:
+    config.kubernetes.io/upsert-path: 'f1.yaml'
+`,
+			resource2: `apiVersion: apps/v1alpha1
+kind: Deployment
+metadata:
+  name: myDeployment
+  annotations:
+    config.kubernetes.io/path: 'f1.yaml'
 `,
 			expected: true,
 		},
@@ -328,6 +701,24 @@ kind: Deployment
 metadata:
   name: myDeployment2
   namespace: foo
+`,
+			expected: false,
+		},
+		{
+			name: "not same resource with upsert path",
+			resource1: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myDeployment
+  annotations:
+    config.kubernetes.io/upsert-path: 'f1.yaml'
+`,
+			resource2: `apiVersion: apps/v1alpha1
+kind: Deployment
+metadata:
+  name: myDeployment
+  annotations:
+    config.kubernetes.io/path: 'f2.yaml'
 `,
 			expected: false,
 		},
