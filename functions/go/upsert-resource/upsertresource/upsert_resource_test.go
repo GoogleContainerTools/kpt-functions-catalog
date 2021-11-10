@@ -521,7 +521,6 @@ metadata:
   name: myDeployment
   annotations:
     config.kubernetes.io/path: f2.yaml
-    config.kubernetes.io/upsert-path: f2.yaml
     internal.config.kubernetes.io/seqindent: compact
 spec:
   replicas: 4
