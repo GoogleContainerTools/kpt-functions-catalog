@@ -579,8 +579,6 @@ spec:
 				t.FailNow()
 			}
 
-			println(out.String())
-
 			if !assert.Equal(t,
 				test.expectedResources,
 				out.String()) {

@@ -120,6 +120,7 @@ func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode,
 	if path != "" {
 		meta.Annotations[kioutil.PathAnnotation] = path
 	}
+	delete(meta.Annotations, DestPathAnnotation)
 	err = newNode.SetAnnotations(meta.Annotations)
 	if err != nil {
 		return nodes, err
