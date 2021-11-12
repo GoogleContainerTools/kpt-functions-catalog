@@ -12,21 +12,21 @@ var GenerateBlueprintDocsLong = `
 The ` + "`" + `generate-blueprint-docs` + "`" + ` function is expected to be executed imperatively like:
 
   kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
-  --mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- readme-path=/tmp/README.md
+  --mount type=bind,src="$(pwd)",dst="/tmp",rw=true
 
 ## FunctionConfig
 
 This function supports ` + "`" + `ConfigMap` + "`" + ` ` + "`" + `functionConfig` + "`" + `.
 
-- A ` + "`" + `readme-path` + "`" + ` value can be provided to write to a specific file. If a ` + "`" + `readme-path` + "`" + ` is not provided, it defaults to ` + "`" + `tmp/README.md` + "`" + `.
+- A ` + "`" + `readme-path` + "`" + ` can be provided to write to a specific file. If a ` + "`" + `readme-path` + "`" + ` is not provided, it defaults to ` + "`" + `tmp/README.md` + "`" + `.
 
-- A ` + "`" + `repo-path` + "`" + ` value can be provided to include in usage section. This will generate a usage section with sample commands like ` + "`" + `kpt pkg get ${repo-path}/{pkgname}@version` + "`" + `. If a ` + "`" + `repo-path` + "`" + ` is not provided, it defaults to ` + "`" + `https://github.com/GoogleCloudPlatform/blueprints.git/catalog` + "`" + `.
+- A ` + "`" + `repo-path` + "`" + ` can be provided to include in usage section. This will generate a usage section with sample commands like ` + "`" + `kpt pkg get ${repo-path}/{pkgname}@version` + "`" + `. If a ` + "`" + `repo-path` + "`" + ` is not provided, it defaults to ` + "`" + `https://github.com/GoogleCloudPlatform/blueprints.git/catalog` + "`" + `.
 
 The ` + "`" + `generate-blueprint-docs` + "`" + ` function does the following:
 
 1. Scans the package contents including meta resources like Kptfile(s) and function configs.
 1. Generates readme contents in markdown format.
-1. Writes the generated readme to ` + "`" + `path` + "`" + `.
+1. Writes the generated readme to ` + "`" + `readme-path` + "`" + `.
 `
 var GenerateBlueprintDocsExamples = `
 Let's start with a sample blueprint.
@@ -75,7 +75,7 @@ Let's start with a sample blueprint.
 Invoke the function:
 
   kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
-  --mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- path=/tmp/README.md
+  --mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- readme-path=/tmp/README.md
 
 The following readme will be created:
 
