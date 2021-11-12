@@ -90,7 +90,7 @@ Invoke the function:
 
 ```shell
 kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
---mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- path=/tmp/README.md
+--mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- readme-path=/tmp/README.md
 ```
 
 The following readme will be created:

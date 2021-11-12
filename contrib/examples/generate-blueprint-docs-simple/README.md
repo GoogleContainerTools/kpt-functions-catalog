@@ -22,7 +22,7 @@ Invoke the function with the following command:
 
 ```shell
 kpt fn eval -i gcr.io/kpt-fn-contrib/blueprint-docs:unstable --include-meta-resources \
---mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- path=/tmp/GENERATED.md
+--mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- readme-path=/tmp/GENERATED.md
 ```
 
 ### Expected result

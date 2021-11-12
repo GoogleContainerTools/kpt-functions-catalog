@@ -32,7 +32,10 @@ func GenerateBlueprintReadme(nodes []*yaml.RNode, repoPath string) (string, erro
 		r.addSection(section)
 	}
 	// render readme
-	r.render()
+	err = r.render()
+	if err != nil {
+		return "", err
+	}
 	return r.string(), nil
 
 }
