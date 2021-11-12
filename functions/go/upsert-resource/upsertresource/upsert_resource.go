@@ -11,7 +11,7 @@ import (
 // UpsertResource upserts resources to input list of resources
 // resources are uniquely identifies by Group, Kind, Name, Namespace and input file path
 type UpsertResource struct {
-	// UpsertResourceList input resources to upsert
+	// List input resources to upsert
 	List *yaml.RNode
 }
 
@@ -35,7 +35,7 @@ func (ur UpsertResource) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	return nodes, nil
 }
 
-// unwrap unwraps UpsertResourceList and returns the list to input resources to upsert
+// unwrap unwraps List and returns the list to input resources to upsert
 func unwrap(node *yaml.RNode) ([]*yaml.RNode, error) {
 	rm, err := node.GetMeta()
 	if err != nil {
