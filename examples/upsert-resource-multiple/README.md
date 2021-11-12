@@ -13,14 +13,14 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 
 kpt CLI accepts only one resource as fn-config. Hence, `upsert-resource` function 
 accepts Resource `List` which is used to wrap multiple resources to upsert. 
-You can find an example ofqq `List` at `.fn-config/fn-config.yaml`
+You can find an example ofqq `List` at `.expected/fn-config.yaml`
 
 ### Function invocation
 
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval -i upsert-resource:unstable --fn-config .fn-config/fn-config.yaml
+$ kpt fn eval -i upsert-resource:unstable --fn-config .expected/fn-config.yaml
 ```
 
 ### Expected result

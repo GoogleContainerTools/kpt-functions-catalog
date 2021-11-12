@@ -10,7 +10,7 @@ Get the example package by running the following commands:
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource-at-path
 ```
 
-The input resource is present at path `.fnconfig/fn-config.yaml`. It has an annotation
+The input resource is present at path `.expected/fn-config.yaml`. It has an annotation
 `config.kubernetes.io/target-path` which is used to specify the target path where the resource
 should be upserted.
 
@@ -19,7 +19,7 @@ should be upserted.
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval -i upsert-resource:unstable --fn-config .fn-config/fn-config.yaml
+$ kpt fn eval -i upsert-resource:unstable --fn-config .expected/fn-config.yaml
 ```
 
 ### Expected result
