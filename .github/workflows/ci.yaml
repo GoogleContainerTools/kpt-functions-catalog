@@ -89,7 +89,7 @@ jobs:
         go-version: 1.16
     - name: Install kpt
       run: |
-        go get github.com/GoogleContainerTools/kpt@main
+        go get github.com/GoogleContainerTools/kpt@v1.0.0-beta.7
     - name: Build node and Go docker images
       if: matrix.platform == 'ubuntu-latest'
       run: |
