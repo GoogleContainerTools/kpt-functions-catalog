@@ -11,7 +11,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 ```
 
 The input resource is present at path `.fnconfig/fn-config.yaml`. It has an annotation
-`config.kubernetes.io/upsert-path` which is used to specify the target path where the resource
+`config.kubernetes.io/target-path` which is used to specify the target path where the resource
 should be upserted.
 
 ### Function invocation

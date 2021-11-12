@@ -212,8 +212,8 @@ spec:
         - containerPort: 80
 `,
 			fnconfig: `
-apiVersion: config.kubernetes.io/v1alpha1
-kind: UpsertResourceList
+apiVersion: v1
+kind: List
 items:
 - apiVersion: v1
   kind: Service
@@ -314,8 +314,8 @@ spec:
         - containerPort: 80
 `,
 			fnconfig: `
-apiVersion: config.kubernetes.io/v1alpha1
-kind: UpsertResourceList
+apiVersion: v1
+kind: List
 items:
 - apiVersion: v1
   kind: Service
@@ -445,8 +445,8 @@ spec:
         - containerPort: 80
 `,
 			fnconfig: `
-apiVersion: config.kubernetes.io/v1alpha1
-kind: UpsertResourceList
+apiVersion: v1
+kind: List
 items:
 - apiVersion: v1
   kind: Service
@@ -469,7 +469,7 @@ items:
   metadata:
     name: myDeployment
     annotations:
-      config.kubernetes.io/upsert-path: 'f2.yaml'
+      config.kubernetes.io/target-path: 'f2.yaml'
       config.kubernetes.io/index: '1'
       config.kubernetes.io/path: 'foo.yaml'
       internal.config.kubernetes.io/seqindent: 'compact'
@@ -552,7 +552,7 @@ spec:
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
-			s := &UpsertResource{UpsertResourceList: node}
+			s := &UpsertResource{List: node}
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
@@ -629,7 +629,7 @@ kind: Deployment
 metadata:
   name: myDeployment
   annotations:
-    config.kubernetes.io/upsert-path: 'f1.yaml'
+    config.kubernetes.io/target-path: 'f1.yaml'
 `,
 			resource2: `apiVersion: apps/v1alpha1
 kind: Deployment
@@ -708,7 +708,7 @@ kind: Deployment
 metadata:
   name: myDeployment
   annotations:
-    config.kubernetes.io/upsert-path: 'f1.yaml'
+    config.kubernetes.io/target-path: 'f1.yaml'
 `,
 			resource2: `apiVersion: apps/v1alpha1
 kind: Deployment

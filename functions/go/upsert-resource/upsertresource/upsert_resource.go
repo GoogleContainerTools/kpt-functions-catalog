@@ -12,17 +12,17 @@ import (
 // resources are uniquely identifies by Group, Kind, Name, Namespace and input file path
 type UpsertResource struct {
 	// UpsertResourceList input resources to upsert
-	UpsertResourceList *yaml.RNode
+	List *yaml.RNode
 }
 
 const (
-	DestPathAnnotation     = "config.kubernetes.io/upsert-path"
-	UpsertResourceListKind = "UpsertResourceList"
+	DestPathAnnotation = "config.kubernetes.io/target-path"
+	ListKind           = "List"
 )
 
 // Filter implements UpsertResource as a yaml.Filter
 func (ur UpsertResource) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	resources, err := unwrap(ur.UpsertResourceList)
+	resources, err := unwrap(ur.List)
 	if err != nil {
 		return nodes, err
 	}
@@ -42,7 +42,7 @@ func unwrap(node *yaml.RNode) ([]*yaml.RNode, error) {
 		return nil, err
 	}
 	var resources []*yaml.RNode
-	if rm.Kind == UpsertResourceListKind {
+	if rm.Kind == ListKind {
 		items := node.Field("items")
 		if items != nil {
 			for i := range items.Value.Content() {
@@ -51,6 +51,8 @@ func unwrap(node *yaml.RNode) ([]*yaml.RNode, error) {
 			}
 			return resources, nil
 		}
+		// the list has no items
+		return []*yaml.RNode{}, nil
 	}
 	// the resource is a plain single node to upsert
 	return []*yaml.RNode{node}, nil
@@ -141,7 +143,7 @@ func IsSameResource(inputResourceMeta, targetResourceMeta yaml.ResourceMeta) boo
 		upsertPathMatch(inputResourceMeta, targetResourceMeta)
 }
 
-// upsertPathMatch checks if the upsert-path specified by user in input resource matches
+// upsertPathMatch checks if the target-path specified by user in input resource matches
 // the path of target resource
 func upsertPathMatch(inputResourceMeta, targetResourceMeta yaml.ResourceMeta) bool {
 	return inputResourceMeta.Annotations[DestPathAnnotation] == "" ||

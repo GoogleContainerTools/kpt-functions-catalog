@@ -1,4 +1,4 @@
-apiVersion: config.kubernetes.io/v1alpha1
+apiVersion: v1
 kind: UpsertResourceList
 metadata:
   name: upsert-multiple-resources-config

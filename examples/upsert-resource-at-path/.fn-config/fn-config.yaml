@@ -4,7 +4,7 @@ metadata:
   name: myService
   namespace: mySpace
   annotations:
-    config.kubernetes.io/upsert-path: 'subpkg/service.yaml'
+    config.kubernetes.io/target-path: 'subpkg/service.yaml'
 spec:
   selector:
     app: bar
