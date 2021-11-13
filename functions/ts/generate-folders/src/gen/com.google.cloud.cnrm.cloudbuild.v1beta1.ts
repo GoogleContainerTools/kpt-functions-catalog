@@ -23,14 +23,18 @@ export class CloudBuildTriggerList {
 }
 
 export function isCloudBuildTriggerList(o: any): o is CloudBuildTriggerList {
-  return o && o.apiVersion === CloudBuildTriggerList.apiVersion && o.kind === CloudBuildTriggerList.kind;
+  return (
+    o &&
+    o.apiVersion === CloudBuildTriggerList.apiVersion &&
+    o.kind === CloudBuildTriggerList.kind
+  );
 }
 
 export namespace CloudBuildTriggerList {
-  export const apiVersion = "cloudbuild.cnrm.cloud.google.com/v1beta1";
-  export const group = "cloudbuild.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "CloudBuildTriggerList";
+  export const apiVersion = 'cloudbuild.cnrm.cloud.google.com/v1beta1';
+  export const group = 'cloudbuild.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'CloudBuildTriggerList';
 
   // CloudBuildTriggerList is a list of CloudBuildTrigger
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace CloudBuildTriggerList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

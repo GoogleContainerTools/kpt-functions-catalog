@@ -23,14 +23,18 @@ export class ScalingPolicyList {
 }
 
 export function isScalingPolicyList(o: any): o is ScalingPolicyList {
-  return o && o.apiVersion === ScalingPolicyList.apiVersion && o.kind === ScalingPolicyList.kind;
+  return (
+    o &&
+    o.apiVersion === ScalingPolicyList.apiVersion &&
+    o.kind === ScalingPolicyList.kind
+  );
 }
 
 export namespace ScalingPolicyList {
-  export const apiVersion = "scalingpolicy.kope.io/v1alpha1";
-  export const group = "scalingpolicy.kope.io";
-  export const version = "v1alpha1";
-  export const kind = "ScalingPolicyList";
+  export const apiVersion = 'scalingpolicy.kope.io/v1alpha1';
+  export const group = 'scalingpolicy.kope.io';
+  export const version = 'v1alpha1';
+  export const kind = 'ScalingPolicyList';
 
   // ScalingPolicyList is a list of ScalingPolicy
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace ScalingPolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

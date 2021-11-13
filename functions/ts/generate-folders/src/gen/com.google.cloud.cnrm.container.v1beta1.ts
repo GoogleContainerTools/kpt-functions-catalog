@@ -23,14 +23,18 @@ export class ContainerClusterList {
 }
 
 export function isContainerClusterList(o: any): o is ContainerClusterList {
-  return o && o.apiVersion === ContainerClusterList.apiVersion && o.kind === ContainerClusterList.kind;
+  return (
+    o &&
+    o.apiVersion === ContainerClusterList.apiVersion &&
+    o.kind === ContainerClusterList.kind
+  );
 }
 
 export namespace ContainerClusterList {
-  export const apiVersion = "container.cnrm.cloud.google.com/v1beta1";
-  export const group = "container.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ContainerClusterList";
+  export const apiVersion = 'container.cnrm.cloud.google.com/v1beta1';
+  export const group = 'container.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ContainerClusterList';
 
   // ContainerClusterList is a list of ContainerCluster
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace ContainerClusterList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,18 @@ export class ContainerNodePoolList {
 }
 
 export function isContainerNodePoolList(o: any): o is ContainerNodePoolList {
-  return o && o.apiVersion === ContainerNodePoolList.apiVersion && o.kind === ContainerNodePoolList.kind;
+  return (
+    o &&
+    o.apiVersion === ContainerNodePoolList.apiVersion &&
+    o.kind === ContainerNodePoolList.kind
+  );
 }
 
 export namespace ContainerNodePoolList {
-  export const apiVersion = "container.cnrm.cloud.google.com/v1beta1";
-  export const group = "container.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ContainerNodePoolList";
+  export const apiVersion = 'container.cnrm.cloud.google.com/v1beta1';
+  export const group = 'container.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ContainerNodePoolList';
 
   // ContainerNodePoolList is a list of ContainerNodePool
   export interface Interface {
@@ -112,7 +120,7 @@ export namespace ContainerNodePoolList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

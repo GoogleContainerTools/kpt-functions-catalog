@@ -6,7 +6,7 @@ import * as apisMetaV1 from './io.k8s.apimachinery.pkg.apis.meta.v1';
 // Overhead structure represents the resource overhead associated with running a pod.
 export class Overhead {
   // PodFixed represents the fixed resource overhead associated with running a pod.
-  public podFixed?: {[key: string]: pkgApiResource.Quantity};
+  public podFixed?: { [key: string]: pkgApiResource.Quantity };
 }
 
 // RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
@@ -40,14 +40,18 @@ export class RuntimeClass implements KubernetesObject {
 }
 
 export function isRuntimeClass(o: any): o is RuntimeClass {
-  return o && o.apiVersion === RuntimeClass.apiVersion && o.kind === RuntimeClass.kind;
+  return (
+    o &&
+    o.apiVersion === RuntimeClass.apiVersion &&
+    o.kind === RuntimeClass.kind
+  );
 }
 
 export namespace RuntimeClass {
-  export const apiVersion = "node.k8s.io/v1beta1";
-  export const group = "node.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "RuntimeClass";
+  export const apiVersion = 'node.k8s.io/v1beta1';
+  export const group = 'node.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'RuntimeClass';
 
   // RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
   export interface Interface {
@@ -88,14 +92,18 @@ export class RuntimeClassList {
 }
 
 export function isRuntimeClassList(o: any): o is RuntimeClassList {
-  return o && o.apiVersion === RuntimeClassList.apiVersion && o.kind === RuntimeClassList.kind;
+  return (
+    o &&
+    o.apiVersion === RuntimeClassList.apiVersion &&
+    o.kind === RuntimeClassList.kind
+  );
 }
 
 export namespace RuntimeClassList {
-  export const apiVersion = "node.k8s.io/v1beta1";
-  export const group = "node.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "RuntimeClassList";
+  export const apiVersion = 'node.k8s.io/v1beta1';
+  export const group = 'node.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'RuntimeClassList';
 
   // RuntimeClassList is a list of RuntimeClass objects.
   export interface Interface {
@@ -110,7 +118,7 @@ export namespace RuntimeClassList {
 // Scheduling specifies the scheduling constraints for nodes supporting a RuntimeClass.
 export class Scheduling {
   // nodeSelector lists labels that must be present on nodes that support this RuntimeClass. Pods using this RuntimeClass can only be scheduled to a node matched by this selector. The RuntimeClass nodeSelector is merged with a pod's existing nodeSelector. Any conflicts will cause the pod to be rejected in admission.
-  public nodeSelector?: {[key: string]: string};
+  public nodeSelector?: { [key: string]: string };
 
   // tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
   public tolerations?: apiCoreV1.Toleration[];

@@ -23,14 +23,18 @@ export class StorageTransferJobList {
 }
 
 export function isStorageTransferJobList(o: any): o is StorageTransferJobList {
-  return o && o.apiVersion === StorageTransferJobList.apiVersion && o.kind === StorageTransferJobList.kind;
+  return (
+    o &&
+    o.apiVersion === StorageTransferJobList.apiVersion &&
+    o.kind === StorageTransferJobList.kind
+  );
 }
 
 export namespace StorageTransferJobList {
-  export const apiVersion = "storagetransfer.cnrm.cloud.google.com/v1beta1";
-  export const group = "storagetransfer.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "StorageTransferJobList";
+  export const apiVersion = 'storagetransfer.cnrm.cloud.google.com/v1beta1';
+  export const group = 'storagetransfer.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'StorageTransferJobList';
 
   // StorageTransferJobList is a list of StorageTransferJob
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace StorageTransferJobList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

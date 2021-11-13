@@ -22,7 +22,13 @@ const (
 )
 
 // ignoreAnnotations is used to ignore any annotation that should not be added to generated Service CRs
-var ignoreAnnotations = map[string]bool{kioutil.PathAnnotation: true, filters.LocalConfigAnnotation: true}
+var ignoreAnnotations = map[string]bool{
+	kioutil.PathAnnotation:        true,
+	kioutil.LegacyPathAnnotation:  true, // nolint:staticcheck
+	kioutil.IndexAnnotation:       true,
+	kioutil.LegacyIndexAnnotation: true, // nolint:staticcheck
+	filters.LocalConfigAnnotation: true,
+}
 
 // ProjectServiceSetRunner discovers ProjectServiceSet CRs to generate Service CRs
 type ProjectServiceSetRunner struct {

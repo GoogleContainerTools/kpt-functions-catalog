@@ -22,15 +22,22 @@ export class AccessContextManagerAccessLevelList {
   }
 }
 
-export function isAccessContextManagerAccessLevelList(o: any): o is AccessContextManagerAccessLevelList {
-  return o && o.apiVersion === AccessContextManagerAccessLevelList.apiVersion && o.kind === AccessContextManagerAccessLevelList.kind;
+export function isAccessContextManagerAccessLevelList(
+  o: any
+): o is AccessContextManagerAccessLevelList {
+  return (
+    o &&
+    o.apiVersion === AccessContextManagerAccessLevelList.apiVersion &&
+    o.kind === AccessContextManagerAccessLevelList.kind
+  );
 }
 
 export namespace AccessContextManagerAccessLevelList {
-  export const apiVersion = "accesscontextmanager.cnrm.cloud.google.com/v1beta1";
-  export const group = "accesscontextmanager.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "AccessContextManagerAccessLevelList";
+  export const apiVersion =
+    'accesscontextmanager.cnrm.cloud.google.com/v1beta1';
+  export const group = 'accesscontextmanager.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'AccessContextManagerAccessLevelList';
 
   // AccessContextManagerAccessLevelList is a list of AccessContextManagerAccessLevel
   export interface Interface {
@@ -52,7 +59,7 @@ export namespace AccessContextManagerAccessLevelList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -82,15 +89,22 @@ export class AccessContextManagerAccessPolicyList {
   }
 }
 
-export function isAccessContextManagerAccessPolicyList(o: any): o is AccessContextManagerAccessPolicyList {
-  return o && o.apiVersion === AccessContextManagerAccessPolicyList.apiVersion && o.kind === AccessContextManagerAccessPolicyList.kind;
+export function isAccessContextManagerAccessPolicyList(
+  o: any
+): o is AccessContextManagerAccessPolicyList {
+  return (
+    o &&
+    o.apiVersion === AccessContextManagerAccessPolicyList.apiVersion &&
+    o.kind === AccessContextManagerAccessPolicyList.kind
+  );
 }
 
 export namespace AccessContextManagerAccessPolicyList {
-  export const apiVersion = "accesscontextmanager.cnrm.cloud.google.com/v1beta1";
-  export const group = "accesscontextmanager.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "AccessContextManagerAccessPolicyList";
+  export const apiVersion =
+    'accesscontextmanager.cnrm.cloud.google.com/v1beta1';
+  export const group = 'accesscontextmanager.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'AccessContextManagerAccessPolicyList';
 
   // AccessContextManagerAccessPolicyList is a list of AccessContextManagerAccessPolicy
   export interface Interface {
@@ -112,7 +126,7 @@ export namespace AccessContextManagerAccessPolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

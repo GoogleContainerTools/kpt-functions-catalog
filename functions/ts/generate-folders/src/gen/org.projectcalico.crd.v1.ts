@@ -23,14 +23,18 @@ export class BGPConfigurationList {
 }
 
 export function isBGPConfigurationList(o: any): o is BGPConfigurationList {
-  return o && o.apiVersion === BGPConfigurationList.apiVersion && o.kind === BGPConfigurationList.kind;
+  return (
+    o &&
+    o.apiVersion === BGPConfigurationList.apiVersion &&
+    o.kind === BGPConfigurationList.kind
+  );
 }
 
 export namespace BGPConfigurationList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "BGPConfigurationList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'BGPConfigurationList';
 
   // BGPConfigurationList is a list of BGPConfiguration
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace BGPConfigurationList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,16 @@ export class BGPPeerList {
 }
 
 export function isBGPPeerList(o: any): o is BGPPeerList {
-  return o && o.apiVersion === BGPPeerList.apiVersion && o.kind === BGPPeerList.kind;
+  return (
+    o && o.apiVersion === BGPPeerList.apiVersion && o.kind === BGPPeerList.kind
+  );
 }
 
 export namespace BGPPeerList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "BGPPeerList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'BGPPeerList';
 
   // BGPPeerList is a list of BGPPeer
   export interface Interface {
@@ -112,7 +118,7 @@ export namespace BGPPeerList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -143,14 +149,18 @@ export class BlockAffinityList {
 }
 
 export function isBlockAffinityList(o: any): o is BlockAffinityList {
-  return o && o.apiVersion === BlockAffinityList.apiVersion && o.kind === BlockAffinityList.kind;
+  return (
+    o &&
+    o.apiVersion === BlockAffinityList.apiVersion &&
+    o.kind === BlockAffinityList.kind
+  );
 }
 
 export namespace BlockAffinityList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "BlockAffinityList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'BlockAffinityList';
 
   // BlockAffinityList is a list of BlockAffinity
   export interface Interface {
@@ -172,7 +182,7 @@ export namespace BlockAffinityList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -203,14 +213,18 @@ export class ClusterInformationList {
 }
 
 export function isClusterInformationList(o: any): o is ClusterInformationList {
-  return o && o.apiVersion === ClusterInformationList.apiVersion && o.kind === ClusterInformationList.kind;
+  return (
+    o &&
+    o.apiVersion === ClusterInformationList.apiVersion &&
+    o.kind === ClusterInformationList.kind
+  );
 }
 
 export namespace ClusterInformationList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "ClusterInformationList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'ClusterInformationList';
 
   // ClusterInformationList is a list of ClusterInformation
   export interface Interface {
@@ -232,7 +246,7 @@ export namespace ClusterInformationList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -263,14 +277,18 @@ export class FelixConfigurationList {
 }
 
 export function isFelixConfigurationList(o: any): o is FelixConfigurationList {
-  return o && o.apiVersion === FelixConfigurationList.apiVersion && o.kind === FelixConfigurationList.kind;
+  return (
+    o &&
+    o.apiVersion === FelixConfigurationList.apiVersion &&
+    o.kind === FelixConfigurationList.kind
+  );
 }
 
 export namespace FelixConfigurationList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "FelixConfigurationList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'FelixConfigurationList';
 
   // FelixConfigurationList is a list of FelixConfiguration
   export interface Interface {
@@ -292,7 +310,7 @@ export namespace FelixConfigurationList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -323,14 +341,18 @@ export class GlobalBGPConfigList {
 }
 
 export function isGlobalBGPConfigList(o: any): o is GlobalBGPConfigList {
-  return o && o.apiVersion === GlobalBGPConfigList.apiVersion && o.kind === GlobalBGPConfigList.kind;
+  return (
+    o &&
+    o.apiVersion === GlobalBGPConfigList.apiVersion &&
+    o.kind === GlobalBGPConfigList.kind
+  );
 }
 
 export namespace GlobalBGPConfigList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "GlobalBGPConfigList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'GlobalBGPConfigList';
 
   // GlobalBGPConfigList is a list of GlobalBGPConfig
   export interface Interface {
@@ -352,7 +374,7 @@ export namespace GlobalBGPConfigList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -383,14 +405,18 @@ export class GlobalFelixConfigList {
 }
 
 export function isGlobalFelixConfigList(o: any): o is GlobalFelixConfigList {
-  return o && o.apiVersion === GlobalFelixConfigList.apiVersion && o.kind === GlobalFelixConfigList.kind;
+  return (
+    o &&
+    o.apiVersion === GlobalFelixConfigList.apiVersion &&
+    o.kind === GlobalFelixConfigList.kind
+  );
 }
 
 export namespace GlobalFelixConfigList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "GlobalFelixConfigList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'GlobalFelixConfigList';
 
   // GlobalFelixConfigList is a list of GlobalFelixConfig
   export interface Interface {
@@ -412,7 +438,7 @@ export namespace GlobalFelixConfigList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -442,15 +468,21 @@ export class GlobalNetworkPolicyList {
   }
 }
 
-export function isGlobalNetworkPolicyList(o: any): o is GlobalNetworkPolicyList {
-  return o && o.apiVersion === GlobalNetworkPolicyList.apiVersion && o.kind === GlobalNetworkPolicyList.kind;
+export function isGlobalNetworkPolicyList(
+  o: any
+): o is GlobalNetworkPolicyList {
+  return (
+    o &&
+    o.apiVersion === GlobalNetworkPolicyList.apiVersion &&
+    o.kind === GlobalNetworkPolicyList.kind
+  );
 }
 
 export namespace GlobalNetworkPolicyList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "GlobalNetworkPolicyList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'GlobalNetworkPolicyList';
 
   // GlobalNetworkPolicyList is a list of GlobalNetworkPolicy
   export interface Interface {
@@ -472,7 +504,7 @@ export namespace GlobalNetworkPolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -503,14 +535,18 @@ export class GlobalNetworkSetList {
 }
 
 export function isGlobalNetworkSetList(o: any): o is GlobalNetworkSetList {
-  return o && o.apiVersion === GlobalNetworkSetList.apiVersion && o.kind === GlobalNetworkSetList.kind;
+  return (
+    o &&
+    o.apiVersion === GlobalNetworkSetList.apiVersion &&
+    o.kind === GlobalNetworkSetList.kind
+  );
 }
 
 export namespace GlobalNetworkSetList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "GlobalNetworkSetList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'GlobalNetworkSetList';
 
   // GlobalNetworkSetList is a list of GlobalNetworkSet
   export interface Interface {
@@ -532,7 +568,7 @@ export namespace GlobalNetworkSetList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -563,14 +599,18 @@ export class HostEndpointList {
 }
 
 export function isHostEndpointList(o: any): o is HostEndpointList {
-  return o && o.apiVersion === HostEndpointList.apiVersion && o.kind === HostEndpointList.kind;
+  return (
+    o &&
+    o.apiVersion === HostEndpointList.apiVersion &&
+    o.kind === HostEndpointList.kind
+  );
 }
 
 export namespace HostEndpointList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "HostEndpointList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'HostEndpointList';
 
   // HostEndpointList is a list of HostEndpoint
   export interface Interface {
@@ -592,7 +632,7 @@ export namespace HostEndpointList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -623,14 +663,18 @@ export class IPAMBlockList {
 }
 
 export function isIPAMBlockList(o: any): o is IPAMBlockList {
-  return o && o.apiVersion === IPAMBlockList.apiVersion && o.kind === IPAMBlockList.kind;
+  return (
+    o &&
+    o.apiVersion === IPAMBlockList.apiVersion &&
+    o.kind === IPAMBlockList.kind
+  );
 }
 
 export namespace IPAMBlockList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "IPAMBlockList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'IPAMBlockList';
 
   // IPAMBlockList is a list of IPAMBlock
   export interface Interface {
@@ -652,7 +696,7 @@ export namespace IPAMBlockList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -683,14 +727,18 @@ export class IPAMConfigList {
 }
 
 export function isIPAMConfigList(o: any): o is IPAMConfigList {
-  return o && o.apiVersion === IPAMConfigList.apiVersion && o.kind === IPAMConfigList.kind;
+  return (
+    o &&
+    o.apiVersion === IPAMConfigList.apiVersion &&
+    o.kind === IPAMConfigList.kind
+  );
 }
 
 export namespace IPAMConfigList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "IPAMConfigList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'IPAMConfigList';
 
   // IPAMConfigList is a list of IPAMConfig
   export interface Interface {
@@ -712,7 +760,7 @@ export namespace IPAMConfigList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -743,14 +791,18 @@ export class IPAMHandleList {
 }
 
 export function isIPAMHandleList(o: any): o is IPAMHandleList {
-  return o && o.apiVersion === IPAMHandleList.apiVersion && o.kind === IPAMHandleList.kind;
+  return (
+    o &&
+    o.apiVersion === IPAMHandleList.apiVersion &&
+    o.kind === IPAMHandleList.kind
+  );
 }
 
 export namespace IPAMHandleList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "IPAMHandleList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'IPAMHandleList';
 
   // IPAMHandleList is a list of IPAMHandle
   export interface Interface {
@@ -772,7 +824,7 @@ export namespace IPAMHandleList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -803,14 +855,16 @@ export class IPPoolList {
 }
 
 export function isIPPoolList(o: any): o is IPPoolList {
-  return o && o.apiVersion === IPPoolList.apiVersion && o.kind === IPPoolList.kind;
+  return (
+    o && o.apiVersion === IPPoolList.apiVersion && o.kind === IPPoolList.kind
+  );
 }
 
 export namespace IPPoolList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "IPPoolList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'IPPoolList';
 
   // IPPoolList is a list of IPPool
   export interface Interface {
@@ -832,7 +886,7 @@ export namespace IPPoolList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -863,14 +917,18 @@ export class NetworkPolicyList {
 }
 
 export function isNetworkPolicyList(o: any): o is NetworkPolicyList {
-  return o && o.apiVersion === NetworkPolicyList.apiVersion && o.kind === NetworkPolicyList.kind;
+  return (
+    o &&
+    o.apiVersion === NetworkPolicyList.apiVersion &&
+    o.kind === NetworkPolicyList.kind
+  );
 }
 
 export namespace NetworkPolicyList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "NetworkPolicyList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'NetworkPolicyList';
 
   // NetworkPolicyList is a list of NetworkPolicy
   export interface Interface {
@@ -892,7 +950,7 @@ export namespace NetworkPolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -923,14 +981,18 @@ export class NetworkSetList {
 }
 
 export function isNetworkSetList(o: any): o is NetworkSetList {
-  return o && o.apiVersion === NetworkSetList.apiVersion && o.kind === NetworkSetList.kind;
+  return (
+    o &&
+    o.apiVersion === NetworkSetList.apiVersion &&
+    o.kind === NetworkSetList.kind
+  );
 }
 
 export namespace NetworkSetList {
-  export const apiVersion = "crd.projectcalico.org/v1";
-  export const group = "crd.projectcalico.org";
-  export const version = "v1";
-  export const kind = "NetworkSetList";
+  export const apiVersion = 'crd.projectcalico.org/v1';
+  export const group = 'crd.projectcalico.org';
+  export const version = 'v1';
+  export const kind = 'NetworkSetList';
 
   // NetworkSetList is a list of NetworkSet
   export interface Interface {
@@ -952,7 +1014,7 @@ export namespace NetworkSetList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

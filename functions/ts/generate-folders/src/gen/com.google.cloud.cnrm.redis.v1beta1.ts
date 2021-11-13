@@ -23,14 +23,18 @@ export class RedisInstanceList {
 }
 
 export function isRedisInstanceList(o: any): o is RedisInstanceList {
-  return o && o.apiVersion === RedisInstanceList.apiVersion && o.kind === RedisInstanceList.kind;
+  return (
+    o &&
+    o.apiVersion === RedisInstanceList.apiVersion &&
+    o.kind === RedisInstanceList.kind
+  );
 }
 
 export namespace RedisInstanceList {
-  export const apiVersion = "redis.cnrm.cloud.google.com/v1beta1";
-  export const group = "redis.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "RedisInstanceList";
+  export const apiVersion = 'redis.cnrm.cloud.google.com/v1beta1';
+  export const group = 'redis.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'RedisInstanceList';
 
   // RedisInstanceList is a list of RedisInstance
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace RedisInstanceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

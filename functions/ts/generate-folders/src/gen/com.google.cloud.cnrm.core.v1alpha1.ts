@@ -23,14 +23,18 @@ export class ServiceMappingList {
 }
 
 export function isServiceMappingList(o: any): o is ServiceMappingList {
-  return o && o.apiVersion === ServiceMappingList.apiVersion && o.kind === ServiceMappingList.kind;
+  return (
+    o &&
+    o.apiVersion === ServiceMappingList.apiVersion &&
+    o.kind === ServiceMappingList.kind
+  );
 }
 
 export namespace ServiceMappingList {
-  export const apiVersion = "core.cnrm.cloud.google.com/v1alpha1";
-  export const group = "core.cnrm.cloud.google.com";
-  export const version = "v1alpha1";
-  export const kind = "ServiceMappingList";
+  export const apiVersion = 'core.cnrm.cloud.google.com/v1alpha1';
+  export const group = 'core.cnrm.cloud.google.com';
+  export const version = 'v1alpha1';
+  export const kind = 'ServiceMappingList';
 
   // ServiceMappingList is a list of ServiceMapping
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace ServiceMappingList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

@@ -58,14 +58,14 @@ export function isIngress(o: any): o is Ingress {
 }
 
 export namespace Ingress {
-  export const apiVersion = "networking.k8s.io/v1beta1";
-  export const group = "networking.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "Ingress";
+  export const apiVersion = 'networking.k8s.io/v1beta1';
+  export const group = 'networking.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'Ingress';
 
   // named constructs a Ingress with metadata.name set to name.
   export function named(name: string): Ingress {
-    return new Ingress({metadata: {name}});
+    return new Ingress({ metadata: { name } });
   }
   // Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.
   export interface Interface {
@@ -117,14 +117,16 @@ export class IngressList {
 }
 
 export function isIngressList(o: any): o is IngressList {
-  return o && o.apiVersion === IngressList.apiVersion && o.kind === IngressList.kind;
+  return (
+    o && o.apiVersion === IngressList.apiVersion && o.kind === IngressList.kind
+  );
 }
 
 export namespace IngressList {
-  export const apiVersion = "networking.k8s.io/v1beta1";
-  export const group = "networking.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "IngressList";
+  export const apiVersion = 'networking.k8s.io/v1beta1';
+  export const group = 'networking.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'IngressList';
 
   // IngressList is a collection of Ingress.
   export interface Interface {

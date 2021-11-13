@@ -22,14 +22,18 @@ export class ResourceHierarchy implements KubernetesObject {
 }
 
 export function isResourceHierarchy(o: any): o is ResourceHierarchy {
-  return o && o.apiVersion === ResourceHierarchy.apiVersion && o.kind === ResourceHierarchy.kind;
+  return (
+    o &&
+    o.apiVersion === ResourceHierarchy.apiVersion &&
+    o.kind === ResourceHierarchy.kind
+  );
 }
 
 export namespace ResourceHierarchy {
-  export const apiVersion = "cft.dev/v1alpha1";
-  export const group = "cft.dev";
-  export const version = "v1alpha1";
-  export const kind = "ResourceHierarchy";
+  export const apiVersion = 'cft.dev/v1alpha1';
+  export const group = 'cft.dev';
+  export const version = 'v1alpha1';
+  export const kind = 'ResourceHierarchy';
 
   export interface Interface {
     // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -38,7 +42,7 @@ export namespace ResourceHierarchy {
     spec: ResourceHierarchy.Spec;
   }
   export class Spec {
-    public config: {[key: string]: string[]};
+    public config: { [key: string]: string[] };
 
     public layers: string[];
 
@@ -75,14 +79,18 @@ export class ResourceHierarchyList {
 }
 
 export function isResourceHierarchyList(o: any): o is ResourceHierarchyList {
-  return o && o.apiVersion === ResourceHierarchyList.apiVersion && o.kind === ResourceHierarchyList.kind;
+  return (
+    o &&
+    o.apiVersion === ResourceHierarchyList.apiVersion &&
+    o.kind === ResourceHierarchyList.kind
+  );
 }
 
 export namespace ResourceHierarchyList {
-  export const apiVersion = "cft.dev/v1alpha1";
-  export const group = "cft.dev";
-  export const version = "v1alpha1";
-  export const kind = "ResourceHierarchyList";
+  export const apiVersion = 'cft.dev/v1alpha1';
+  export const group = 'cft.dev';
+  export const version = 'v1alpha1';
+  export const kind = 'ResourceHierarchyList';
 
   // ResourceHierarchyList is a list of ResourceHierarchy
   export interface Interface {

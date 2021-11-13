@@ -28,14 +28,14 @@ export function isLease(o: any): o is Lease {
 }
 
 export namespace Lease {
-  export const apiVersion = "coordination.k8s.io/v1beta1";
-  export const group = "coordination.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "Lease";
+  export const apiVersion = 'coordination.k8s.io/v1beta1';
+  export const group = 'coordination.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'Lease';
 
   // named constructs a Lease with metadata.name set to name.
   export function named(name: string): Lease {
-    return new Lease({metadata: {name}});
+    return new Lease({ metadata: { name } });
   }
   // Lease defines a lease concept.
   export interface Interface {
@@ -70,14 +70,16 @@ export class LeaseList {
 }
 
 export function isLeaseList(o: any): o is LeaseList {
-  return o && o.apiVersion === LeaseList.apiVersion && o.kind === LeaseList.kind;
+  return (
+    o && o.apiVersion === LeaseList.apiVersion && o.kind === LeaseList.kind
+  );
 }
 
 export namespace LeaseList {
-  export const apiVersion = "coordination.k8s.io/v1beta1";
-  export const group = "coordination.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "LeaseList";
+  export const apiVersion = 'coordination.k8s.io/v1beta1';
+  export const group = 'coordination.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'LeaseList';
 
   // LeaseList is a list of Lease objects.
   export interface Interface {

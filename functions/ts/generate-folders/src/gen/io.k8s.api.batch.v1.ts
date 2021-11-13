@@ -33,14 +33,14 @@ export function isJob(o: any): o is Job {
 }
 
 export namespace Job {
-  export const apiVersion = "batch/v1";
-  export const group = "batch";
-  export const version = "v1";
-  export const kind = "Job";
+  export const apiVersion = 'batch/v1';
+  export const group = 'batch';
+  export const version = 'v1';
+  export const kind = 'Job';
 
   // named constructs a Job with metadata.name set to name.
   export function named(name: string): Job {
-    return new Job({metadata: {name}});
+    return new Job({ metadata: { name } });
   }
   // Job represents the configuration of a single job.
   export interface Interface {
@@ -112,10 +112,10 @@ export function isJobList(o: any): o is JobList {
 }
 
 export namespace JobList {
-  export const apiVersion = "batch/v1";
-  export const group = "batch";
-  export const version = "v1";
-  export const kind = "JobList";
+  export const apiVersion = 'batch/v1';
+  export const group = 'batch';
+  export const version = 'v1';
+  export const kind = 'JobList';
 
   // JobList is a collection of jobs.
   export interface Interface {

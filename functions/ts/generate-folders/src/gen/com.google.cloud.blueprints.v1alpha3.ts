@@ -22,14 +22,18 @@ export class ResourceHierarchy implements KubernetesObject {
 }
 
 export function isResourceHierarchy(o: any): o is ResourceHierarchy {
-  return o && o.apiVersion === ResourceHierarchy.apiVersion && o.kind === ResourceHierarchy.kind;
+  return (
+    o &&
+    o.apiVersion === ResourceHierarchy.apiVersion &&
+    o.kind === ResourceHierarchy.kind
+  );
 }
 
 export namespace ResourceHierarchy {
-  export const apiVersion = "blueprints.cloud.google.com/v1alpha3";
-  export const group = "blueprints.cloud.google.com";
-  export const version = "v1alpha3";
-  export const kind = "ResourceHierarchy";
+  export const apiVersion = 'blueprints.cloud.google.com/v1alpha3';
+  export const group = 'blueprints.cloud.google.com';
+  export const version = 'v1alpha3';
+  export const kind = 'ResourceHierarchy';
 
   export interface Interface {
     // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -38,11 +42,11 @@ export namespace ResourceHierarchy {
     spec: ResourceHierarchy.Spec;
   }
   export class Spec {
-    public config: {[key: string]: object}[];
+    public config: { [key: string]: object }[];
 
     public parentRef: ResourceHierarchy.Spec.ParentRef;
 
-    public subtrees?: {[key: string]: object};
+    public subtrees?: { [key: string]: object };
 
     constructor(desc: ResourceHierarchy.Spec) {
       this.config = desc.config;
@@ -88,14 +92,18 @@ export class ResourceHierarchyList {
 }
 
 export function isResourceHierarchyList(o: any): o is ResourceHierarchyList {
-  return o && o.apiVersion === ResourceHierarchyList.apiVersion && o.kind === ResourceHierarchyList.kind;
+  return (
+    o &&
+    o.apiVersion === ResourceHierarchyList.apiVersion &&
+    o.kind === ResourceHierarchyList.kind
+  );
 }
 
 export namespace ResourceHierarchyList {
-  export const apiVersion = "blueprints.cloud.google.com/v1alpha3";
-  export const group = "blueprints.cloud.google.com";
-  export const version = "v1alpha3";
-  export const kind = "ResourceHierarchyList";
+  export const apiVersion = 'blueprints.cloud.google.com/v1alpha3';
+  export const group = 'blueprints.cloud.google.com';
+  export const version = 'v1alpha3';
+  export const kind = 'ResourceHierarchyList';
 
   // ResourceHierarchyList is a list of ResourceHierarchy
   export interface Interface {

@@ -1,32 +1,40 @@
 diff --git a/app.yaml b/app.yaml
-index f821124..4cf1245 100644
+index f821124..2c5853d 100644
 --- a/app.yaml
 +++ b/app.yaml
-@@ -2,6 +2,7 @@ apiVersion: v1
+@@ -2,8 +2,10 @@ apiVersion: v1
  kind: ConfigMap
  metadata:
    name: my-cm
 +  namespace: prod
    annotations:
      config.k8s.io/id: "1"
++    internal.config.kubernetes.io/id: "1"
  data:
-@@ -11,6 +12,7 @@ apiVersion: foo.com/v1
+   some-key: some-value
+ ---
+@@ -11,7 +13,9 @@ apiVersion: foo.com/v1
  kind: Bar
  metadata:
    name: my-bar
 +  namespace: prod
    annotations:
      config.k8s.io/id: "2"
++    internal.config.kubernetes.io/id: "2"
  spec:
+   featureA: true
 diff --git a/fn-config.yaml b/fn-config.yaml
-index 5b8d869..eddef45 100644
+index 5b8d869..d6354f2 100644
 --- a/fn-config.yaml
 +++ b/fn-config.yaml
-@@ -2,6 +2,7 @@ apiVersion: fn.kpt.dev/v1alpha1
+@@ -2,8 +2,10 @@ apiVersion: fn.kpt.dev/v1alpha1
  kind: StarlarkRun
  metadata:
    name: set-namespace-to-prod
 +  namespace: prod
    annotations:
      config.k8s.io/id: "3"
++    internal.config.kubernetes.io/id: "3"
  source: |
+   # set the namespace on all resources
+   def setnamespace(resources, namespace):

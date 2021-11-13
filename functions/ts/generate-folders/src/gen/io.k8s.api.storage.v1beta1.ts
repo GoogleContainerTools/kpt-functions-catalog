@@ -25,14 +25,16 @@ export class CSIDriver implements KubernetesObject {
 }
 
 export function isCSIDriver(o: any): o is CSIDriver {
-  return o && o.apiVersion === CSIDriver.apiVersion && o.kind === CSIDriver.kind;
+  return (
+    o && o.apiVersion === CSIDriver.apiVersion && o.kind === CSIDriver.kind
+  );
 }
 
 export namespace CSIDriver {
-  export const apiVersion = "storage.k8s.io/v1beta1";
-  export const group = "storage.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "CSIDriver";
+  export const apiVersion = 'storage.k8s.io/v1beta1';
+  export const group = 'storage.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'CSIDriver';
 
   // CSIDriver captures information about a Container Storage Interface (CSI) volume driver deployed on the cluster. CSI drivers do not need to create the CSIDriver object directly. Instead they may use the cluster-driver-registrar sidecar container. When deployed with a CSI driver it automatically creates a CSIDriver object representing the driver. Kubernetes attach detach controller uses this object to determine whether attach is required. Kubelet uses this object to determine whether pod information needs to be passed on mount. CSIDriver objects are non-namespaced.
   export interface Interface {
@@ -67,14 +69,18 @@ export class CSIDriverList {
 }
 
 export function isCSIDriverList(o: any): o is CSIDriverList {
-  return o && o.apiVersion === CSIDriverList.apiVersion && o.kind === CSIDriverList.kind;
+  return (
+    o &&
+    o.apiVersion === CSIDriverList.apiVersion &&
+    o.kind === CSIDriverList.kind
+  );
 }
 
 export namespace CSIDriverList {
-  export const apiVersion = "storage.k8s.io/v1beta1";
-  export const group = "storage.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "CSIDriverList";
+  export const apiVersion = 'storage.k8s.io/v1beta1';
+  export const group = 'storage.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'CSIDriverList';
 
   // CSIDriverList is a collection of CSIDriver objects.
   export interface Interface {
@@ -93,7 +99,7 @@ export class CSIDriverSpec {
 
   // If set to true, podInfoOnMount indicates this CSI volume driver requires additional pod information (like podName, podUID, etc.) during mount operations. If set to false, pod information will not be passed on mount. Default is false. The CSI driver specifies podInfoOnMount as part of driver deployment. If true, Kubelet will pass pod information as VolumeContext in the CSI NodePublishVolume() calls. The CSI driver is responsible for parsing and validating the information passed in as VolumeContext. The following VolumeConext will be passed if podInfoOnMount is set to true. This list might grow, but the prefix will be used. "csi.storage.k8s.io/pod.name": pod.Name "csi.storage.k8s.io/pod.namespace": pod.Namespace "csi.storage.k8s.io/pod.uid": string(pod.UID) "csi.storage.k8s.io/ephemeral": "true" iff the volume is an ephemeral inline volume
   //                                 defined by a CSIVolumeSource, otherwise "false"
-  // 
+  //
   // "csi.storage.k8s.io/ephemeral" is a new feature in Kubernetes 1.16. It is only required for drivers which support both the "Persistent" and "Ephemeral" VolumeLifecycleMode. Other drivers can leave pod info disabled and/or ignore this field. As Kubernetes 1.15 doesn't support this field, drivers can only support one mode when deployed on such a cluster and the deployment determines which mode that is, for example via a command line parameter of the driver.
   public podInfoOnMount?: boolean;
 
@@ -128,10 +134,10 @@ export function isCSINode(o: any): o is CSINode {
 }
 
 export namespace CSINode {
-  export const apiVersion = "storage.k8s.io/v1beta1";
-  export const group = "storage.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "CSINode";
+  export const apiVersion = 'storage.k8s.io/v1beta1';
+  export const group = 'storage.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'CSINode';
 
   // CSINode holds information about all CSI drivers installed on a node. CSI drivers do not need to create the CSINode object directly. As long as they use the node-driver-registrar sidecar container, the kubelet will automatically populate the CSINode object for the CSI driver as part of kubelet plugin registration. CSINode has the same name as a node. If the object is missing, it means either there are no CSI Drivers available on the node, or the Kubelet version is low enough that it doesn't create this object. CSINode has an OwnerReference that points to the corresponding node object.
   export interface Interface {
@@ -188,14 +194,16 @@ export class CSINodeList {
 }
 
 export function isCSINodeList(o: any): o is CSINodeList {
-  return o && o.apiVersion === CSINodeList.apiVersion && o.kind === CSINodeList.kind;
+  return (
+    o && o.apiVersion === CSINodeList.apiVersion && o.kind === CSINodeList.kind
+  );
 }
 
 export namespace CSINodeList {
-  export const apiVersion = "storage.k8s.io/v1beta1";
-  export const group = "storage.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "CSINodeList";
+  export const apiVersion = 'storage.k8s.io/v1beta1';
+  export const group = 'storage.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'CSINodeList';
 
   // CSINodeList is a collection of CSINode objects.
   export interface Interface {
@@ -218,7 +226,7 @@ export class CSINodeSpec {
 }
 
 // StorageClass describes the parameters for a class of storage for which PersistentVolumes can be dynamically provisioned.
-// 
+//
 // StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
 export class StorageClass implements KubernetesObject {
   // AllowVolumeExpansion shows whether the storage class allow volume expand
@@ -240,7 +248,7 @@ export class StorageClass implements KubernetesObject {
   public mountOptions?: string[];
 
   // Parameters holds the parameters for the provisioner that should create volumes of this storage class.
-  public parameters?: {[key: string]: string};
+  public parameters?: { [key: string]: string };
 
   // Provisioner indicates the type of the provisioner.
   public provisioner: string;
@@ -266,17 +274,21 @@ export class StorageClass implements KubernetesObject {
 }
 
 export function isStorageClass(o: any): o is StorageClass {
-  return o && o.apiVersion === StorageClass.apiVersion && o.kind === StorageClass.kind;
+  return (
+    o &&
+    o.apiVersion === StorageClass.apiVersion &&
+    o.kind === StorageClass.kind
+  );
 }
 
 export namespace StorageClass {
-  export const apiVersion = "storage.k8s.io/v1beta1";
-  export const group = "storage.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "StorageClass";
+  export const apiVersion = 'storage.k8s.io/v1beta1';
+  export const group = 'storage.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'StorageClass';
 
   // StorageClass describes the parameters for a class of storage for which PersistentVolumes can be dynamically provisioned.
-  // 
+  //
   // StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
   export interface Interface {
     // AllowVolumeExpansion shows whether the storage class allow volume expand
@@ -292,7 +304,7 @@ export namespace StorageClass {
     mountOptions?: string[];
 
     // Parameters holds the parameters for the provisioner that should create volumes of this storage class.
-    parameters?: {[key: string]: string};
+    parameters?: { [key: string]: string };
 
     // Provisioner indicates the type of the provisioner.
     provisioner: string;
@@ -328,14 +340,18 @@ export class StorageClassList {
 }
 
 export function isStorageClassList(o: any): o is StorageClassList {
-  return o && o.apiVersion === StorageClassList.apiVersion && o.kind === StorageClassList.kind;
+  return (
+    o &&
+    o.apiVersion === StorageClassList.apiVersion &&
+    o.kind === StorageClassList.kind
+  );
 }
 
 export namespace StorageClassList {
-  export const apiVersion = "storage.k8s.io/v1beta1";
-  export const group = "storage.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "StorageClassList";
+  export const apiVersion = 'storage.k8s.io/v1beta1';
+  export const group = 'storage.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'StorageClassList';
 
   // StorageClassList is a collection of storage classes.
   export interface Interface {
@@ -348,7 +364,7 @@ export namespace StorageClassList {
 }
 
 // VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.
-// 
+//
 // VolumeAttachment objects are non-namespaced.
 export class VolumeAttachment implements KubernetesObject {
   // APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
@@ -376,17 +392,21 @@ export class VolumeAttachment implements KubernetesObject {
 }
 
 export function isVolumeAttachment(o: any): o is VolumeAttachment {
-  return o && o.apiVersion === VolumeAttachment.apiVersion && o.kind === VolumeAttachment.kind;
+  return (
+    o &&
+    o.apiVersion === VolumeAttachment.apiVersion &&
+    o.kind === VolumeAttachment.kind
+  );
 }
 
 export namespace VolumeAttachment {
-  export const apiVersion = "storage.k8s.io/v1beta1";
-  export const group = "storage.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "VolumeAttachment";
+  export const apiVersion = 'storage.k8s.io/v1beta1';
+  export const group = 'storage.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'VolumeAttachment';
 
   // VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.
-  // 
+  //
   // VolumeAttachment objects are non-namespaced.
   export interface Interface {
     // Standard object metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -423,14 +443,18 @@ export class VolumeAttachmentList {
 }
 
 export function isVolumeAttachmentList(o: any): o is VolumeAttachmentList {
-  return o && o.apiVersion === VolumeAttachmentList.apiVersion && o.kind === VolumeAttachmentList.kind;
+  return (
+    o &&
+    o.apiVersion === VolumeAttachmentList.apiVersion &&
+    o.kind === VolumeAttachmentList.kind
+  );
 }
 
 export namespace VolumeAttachmentList {
-  export const apiVersion = "storage.k8s.io/v1beta1";
-  export const group = "storage.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "VolumeAttachmentList";
+  export const apiVersion = 'storage.k8s.io/v1beta1';
+  export const group = 'storage.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'VolumeAttachmentList';
 
   // VolumeAttachmentList is a collection of VolumeAttachment objects.
   export interface Interface {
@@ -478,7 +502,7 @@ export class VolumeAttachmentStatus {
   public attached: boolean;
 
   // Upon successful attach, this field is populated with any information returned by the attach operation that must be passed into subsequent WaitForAttach or Mount calls. This field must only be set by the entity completing the attach operation, i.e. the external-attacher.
-  public attachmentMetadata?: {[key: string]: string};
+  public attachmentMetadata?: { [key: string]: string };
 
   // The last error encountered during detach operation, if any. This field must only be set by the entity completing the detach operation, i.e. the external-attacher.
   public detachError?: VolumeError;

@@ -7,6 +7,12 @@ import {
   getAnnotation,
   addAnnotation,
   removeAnnotation,
+  SOURCE_INDEX_ANNOTATION,
+  LEGACY_SOURCE_PATH_ANNOTATION,
+  LEGACY_SOURCE_INDEX_ANNOTATION,
+  SOURCE_PATH_ANNOTATION,
+  ID_ANNOTATION,
+  LEGACY_ID_ANNOTATION,
 } from 'kpt-functions';
 import { DumpOptions, safeDump, safeLoad } from 'js-yaml';
 import rw from 'rw';
@@ -64,9 +70,12 @@ let importCmd = preExecCmd;
 // https://github.com/kubernetes-sigs/kustomize/issues/2996
 // Please update the list when it is finished.
 let detachedAnnotations: string[] = [
-  'config.kubernetes.io/index',
-  'config.kubernetes.io/path',
-  'config.k8s.io/id',
+  SOURCE_INDEX_ANNOTATION,
+  LEGACY_SOURCE_INDEX_ANNOTATION,
+  SOURCE_PATH_ANNOTATION,
+  LEGACY_SOURCE_PATH_ANNOTATION,
+  ID_ANNOTATION,
+  LEGACY_ID_ANNOTATION,
   'kustomize.config.k8s.io/id',
 ];
 

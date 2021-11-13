@@ -23,14 +23,18 @@ export class BigtableInstanceList {
 }
 
 export function isBigtableInstanceList(o: any): o is BigtableInstanceList {
-  return o && o.apiVersion === BigtableInstanceList.apiVersion && o.kind === BigtableInstanceList.kind;
+  return (
+    o &&
+    o.apiVersion === BigtableInstanceList.apiVersion &&
+    o.kind === BigtableInstanceList.kind
+  );
 }
 
 export namespace BigtableInstanceList {
-  export const apiVersion = "bigtable.cnrm.cloud.google.com/v1beta1";
-  export const group = "bigtable.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "BigtableInstanceList";
+  export const apiVersion = 'bigtable.cnrm.cloud.google.com/v1beta1';
+  export const group = 'bigtable.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'BigtableInstanceList';
 
   // BigtableInstanceList is a list of BigtableInstance
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace BigtableInstanceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
