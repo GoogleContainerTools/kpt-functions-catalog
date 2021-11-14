@@ -1,4 +1,3 @@
 testType: eval
 image: upsert-resource:unstable
 fnConfig: fn-config.yaml
-image-pull-policy: never
