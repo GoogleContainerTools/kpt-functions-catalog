@@ -23,14 +23,18 @@ export class ComputeAddressList {
 }
 
 export function isComputeAddressList(o: any): o is ComputeAddressList {
-  return o && o.apiVersion === ComputeAddressList.apiVersion && o.kind === ComputeAddressList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeAddressList.apiVersion &&
+    o.kind === ComputeAddressList.kind
+  );
 }
 
 export namespace ComputeAddressList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeAddressList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeAddressList';
 
   // ComputeAddressList is a list of ComputeAddress
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace ComputeAddressList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -82,15 +86,21 @@ export class ComputeBackendBucketList {
   }
 }
 
-export function isComputeBackendBucketList(o: any): o is ComputeBackendBucketList {
-  return o && o.apiVersion === ComputeBackendBucketList.apiVersion && o.kind === ComputeBackendBucketList.kind;
+export function isComputeBackendBucketList(
+  o: any
+): o is ComputeBackendBucketList {
+  return (
+    o &&
+    o.apiVersion === ComputeBackendBucketList.apiVersion &&
+    o.kind === ComputeBackendBucketList.kind
+  );
 }
 
 export namespace ComputeBackendBucketList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeBackendBucketList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeBackendBucketList';
 
   // ComputeBackendBucketList is a list of ComputeBackendBucket
   export interface Interface {
@@ -112,7 +122,7 @@ export namespace ComputeBackendBucketList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -142,15 +152,21 @@ export class ComputeBackendServiceList {
   }
 }
 
-export function isComputeBackendServiceList(o: any): o is ComputeBackendServiceList {
-  return o && o.apiVersion === ComputeBackendServiceList.apiVersion && o.kind === ComputeBackendServiceList.kind;
+export function isComputeBackendServiceList(
+  o: any
+): o is ComputeBackendServiceList {
+  return (
+    o &&
+    o.apiVersion === ComputeBackendServiceList.apiVersion &&
+    o.kind === ComputeBackendServiceList.kind
+  );
 }
 
 export namespace ComputeBackendServiceList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeBackendServiceList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeBackendServiceList';
 
   // ComputeBackendServiceList is a list of ComputeBackendService
   export interface Interface {
@@ -172,7 +188,7 @@ export namespace ComputeBackendServiceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -203,14 +219,18 @@ export class ComputeDiskList {
 }
 
 export function isComputeDiskList(o: any): o is ComputeDiskList {
-  return o && o.apiVersion === ComputeDiskList.apiVersion && o.kind === ComputeDiskList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeDiskList.apiVersion &&
+    o.kind === ComputeDiskList.kind
+  );
 }
 
 export namespace ComputeDiskList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeDiskList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeDiskList';
 
   // ComputeDiskList is a list of ComputeDisk
   export interface Interface {
@@ -232,7 +252,7 @@ export namespace ComputeDiskList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -262,15 +282,21 @@ export class ComputeExternalVPNGatewayList {
   }
 }
 
-export function isComputeExternalVPNGatewayList(o: any): o is ComputeExternalVPNGatewayList {
-  return o && o.apiVersion === ComputeExternalVPNGatewayList.apiVersion && o.kind === ComputeExternalVPNGatewayList.kind;
+export function isComputeExternalVPNGatewayList(
+  o: any
+): o is ComputeExternalVPNGatewayList {
+  return (
+    o &&
+    o.apiVersion === ComputeExternalVPNGatewayList.apiVersion &&
+    o.kind === ComputeExternalVPNGatewayList.kind
+  );
 }
 
 export namespace ComputeExternalVPNGatewayList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeExternalVPNGatewayList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeExternalVPNGatewayList';
 
   // ComputeExternalVPNGatewayList is a list of ComputeExternalVPNGateway
   export interface Interface {
@@ -292,7 +318,7 @@ export namespace ComputeExternalVPNGatewayList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -323,14 +349,18 @@ export class ComputeFirewallList {
 }
 
 export function isComputeFirewallList(o: any): o is ComputeFirewallList {
-  return o && o.apiVersion === ComputeFirewallList.apiVersion && o.kind === ComputeFirewallList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeFirewallList.apiVersion &&
+    o.kind === ComputeFirewallList.kind
+  );
 }
 
 export namespace ComputeFirewallList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeFirewallList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeFirewallList';
 
   // ComputeFirewallList is a list of ComputeFirewall
   export interface Interface {
@@ -352,7 +382,7 @@ export namespace ComputeFirewallList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -382,15 +412,21 @@ export class ComputeForwardingRuleList {
   }
 }
 
-export function isComputeForwardingRuleList(o: any): o is ComputeForwardingRuleList {
-  return o && o.apiVersion === ComputeForwardingRuleList.apiVersion && o.kind === ComputeForwardingRuleList.kind;
+export function isComputeForwardingRuleList(
+  o: any
+): o is ComputeForwardingRuleList {
+  return (
+    o &&
+    o.apiVersion === ComputeForwardingRuleList.apiVersion &&
+    o.kind === ComputeForwardingRuleList.kind
+  );
 }
 
 export namespace ComputeForwardingRuleList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeForwardingRuleList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeForwardingRuleList';
 
   // ComputeForwardingRuleList is a list of ComputeForwardingRule
   export interface Interface {
@@ -412,7 +448,7 @@ export namespace ComputeForwardingRuleList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -442,15 +478,21 @@ export class ComputeHTTPHealthCheckList {
   }
 }
 
-export function isComputeHTTPHealthCheckList(o: any): o is ComputeHTTPHealthCheckList {
-  return o && o.apiVersion === ComputeHTTPHealthCheckList.apiVersion && o.kind === ComputeHTTPHealthCheckList.kind;
+export function isComputeHTTPHealthCheckList(
+  o: any
+): o is ComputeHTTPHealthCheckList {
+  return (
+    o &&
+    o.apiVersion === ComputeHTTPHealthCheckList.apiVersion &&
+    o.kind === ComputeHTTPHealthCheckList.kind
+  );
 }
 
 export namespace ComputeHTTPHealthCheckList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeHTTPHealthCheckList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeHTTPHealthCheckList';
 
   // ComputeHTTPHealthCheckList is a list of ComputeHTTPHealthCheck
   export interface Interface {
@@ -472,7 +514,7 @@ export namespace ComputeHTTPHealthCheckList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -502,15 +544,21 @@ export class ComputeHTTPSHealthCheckList {
   }
 }
 
-export function isComputeHTTPSHealthCheckList(o: any): o is ComputeHTTPSHealthCheckList {
-  return o && o.apiVersion === ComputeHTTPSHealthCheckList.apiVersion && o.kind === ComputeHTTPSHealthCheckList.kind;
+export function isComputeHTTPSHealthCheckList(
+  o: any
+): o is ComputeHTTPSHealthCheckList {
+  return (
+    o &&
+    o.apiVersion === ComputeHTTPSHealthCheckList.apiVersion &&
+    o.kind === ComputeHTTPSHealthCheckList.kind
+  );
 }
 
 export namespace ComputeHTTPSHealthCheckList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeHTTPSHealthCheckList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeHTTPSHealthCheckList';
 
   // ComputeHTTPSHealthCheckList is a list of ComputeHTTPSHealthCheck
   export interface Interface {
@@ -532,7 +580,7 @@ export namespace ComputeHTTPSHealthCheckList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -563,14 +611,18 @@ export class ComputeHealthCheckList {
 }
 
 export function isComputeHealthCheckList(o: any): o is ComputeHealthCheckList {
-  return o && o.apiVersion === ComputeHealthCheckList.apiVersion && o.kind === ComputeHealthCheckList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeHealthCheckList.apiVersion &&
+    o.kind === ComputeHealthCheckList.kind
+  );
 }
 
 export namespace ComputeHealthCheckList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeHealthCheckList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeHealthCheckList';
 
   // ComputeHealthCheckList is a list of ComputeHealthCheck
   export interface Interface {
@@ -592,7 +644,7 @@ export namespace ComputeHealthCheckList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -623,14 +675,18 @@ export class ComputeImageList {
 }
 
 export function isComputeImageList(o: any): o is ComputeImageList {
-  return o && o.apiVersion === ComputeImageList.apiVersion && o.kind === ComputeImageList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeImageList.apiVersion &&
+    o.kind === ComputeImageList.kind
+  );
 }
 
 export namespace ComputeImageList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeImageList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeImageList';
 
   // ComputeImageList is a list of ComputeImage
   export interface Interface {
@@ -652,7 +708,7 @@ export namespace ComputeImageList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -684,15 +740,21 @@ export class ComputeInstanceGroupList {
   }
 }
 
-export function isComputeInstanceGroupList(o: any): o is ComputeInstanceGroupList {
-  return o && o.apiVersion === ComputeInstanceGroupList.apiVersion && o.kind === ComputeInstanceGroupList.kind;
+export function isComputeInstanceGroupList(
+  o: any
+): o is ComputeInstanceGroupList {
+  return (
+    o &&
+    o.apiVersion === ComputeInstanceGroupList.apiVersion &&
+    o.kind === ComputeInstanceGroupList.kind
+  );
 }
 
 export namespace ComputeInstanceGroupList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeInstanceGroupList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeInstanceGroupList';
 
   // ComputeInstanceGroupList is a list of ComputeInstanceGroup
   export interface Interface {
@@ -714,7 +776,7 @@ export namespace ComputeInstanceGroupList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -743,14 +805,18 @@ export class ComputeInstanceList {
 }
 
 export function isComputeInstanceList(o: any): o is ComputeInstanceList {
-  return o && o.apiVersion === ComputeInstanceList.apiVersion && o.kind === ComputeInstanceList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeInstanceList.apiVersion &&
+    o.kind === ComputeInstanceList.kind
+  );
 }
 
 export namespace ComputeInstanceList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeInstanceList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeInstanceList';
 
   // ComputeInstanceList is a list of ComputeInstance
   export interface Interface {
@@ -772,7 +838,7 @@ export namespace ComputeInstanceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -802,15 +868,21 @@ export class ComputeInstanceTemplateList {
   }
 }
 
-export function isComputeInstanceTemplateList(o: any): o is ComputeInstanceTemplateList {
-  return o && o.apiVersion === ComputeInstanceTemplateList.apiVersion && o.kind === ComputeInstanceTemplateList.kind;
+export function isComputeInstanceTemplateList(
+  o: any
+): o is ComputeInstanceTemplateList {
+  return (
+    o &&
+    o.apiVersion === ComputeInstanceTemplateList.apiVersion &&
+    o.kind === ComputeInstanceTemplateList.kind
+  );
 }
 
 export namespace ComputeInstanceTemplateList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeInstanceTemplateList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeInstanceTemplateList';
 
   // ComputeInstanceTemplateList is a list of ComputeInstanceTemplate
   export interface Interface {
@@ -832,7 +904,7 @@ export namespace ComputeInstanceTemplateList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -862,15 +934,21 @@ export class ComputeInterconnectAttachmentList {
   }
 }
 
-export function isComputeInterconnectAttachmentList(o: any): o is ComputeInterconnectAttachmentList {
-  return o && o.apiVersion === ComputeInterconnectAttachmentList.apiVersion && o.kind === ComputeInterconnectAttachmentList.kind;
+export function isComputeInterconnectAttachmentList(
+  o: any
+): o is ComputeInterconnectAttachmentList {
+  return (
+    o &&
+    o.apiVersion === ComputeInterconnectAttachmentList.apiVersion &&
+    o.kind === ComputeInterconnectAttachmentList.kind
+  );
 }
 
 export namespace ComputeInterconnectAttachmentList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeInterconnectAttachmentList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeInterconnectAttachmentList';
 
   // ComputeInterconnectAttachmentList is a list of ComputeInterconnectAttachment
   export interface Interface {
@@ -892,7 +970,7 @@ export namespace ComputeInterconnectAttachmentList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -924,15 +1002,21 @@ export class ComputeNetworkEndpointGroupList {
   }
 }
 
-export function isComputeNetworkEndpointGroupList(o: any): o is ComputeNetworkEndpointGroupList {
-  return o && o.apiVersion === ComputeNetworkEndpointGroupList.apiVersion && o.kind === ComputeNetworkEndpointGroupList.kind;
+export function isComputeNetworkEndpointGroupList(
+  o: any
+): o is ComputeNetworkEndpointGroupList {
+  return (
+    o &&
+    o.apiVersion === ComputeNetworkEndpointGroupList.apiVersion &&
+    o.kind === ComputeNetworkEndpointGroupList.kind
+  );
 }
 
 export namespace ComputeNetworkEndpointGroupList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeNetworkEndpointGroupList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeNetworkEndpointGroupList';
 
   // ComputeNetworkEndpointGroupList is a list of ComputeNetworkEndpointGroup
   export interface Interface {
@@ -954,7 +1038,7 @@ export namespace ComputeNetworkEndpointGroupList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -983,14 +1067,18 @@ export class ComputeNetworkList {
 }
 
 export function isComputeNetworkList(o: any): o is ComputeNetworkList {
-  return o && o.apiVersion === ComputeNetworkList.apiVersion && o.kind === ComputeNetworkList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeNetworkList.apiVersion &&
+    o.kind === ComputeNetworkList.kind
+  );
 }
 
 export namespace ComputeNetworkList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeNetworkList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeNetworkList';
 
   // ComputeNetworkList is a list of ComputeNetwork
   export interface Interface {
@@ -1012,7 +1100,7 @@ export namespace ComputeNetworkList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1042,15 +1130,21 @@ export class ComputeNetworkPeeringList {
   }
 }
 
-export function isComputeNetworkPeeringList(o: any): o is ComputeNetworkPeeringList {
-  return o && o.apiVersion === ComputeNetworkPeeringList.apiVersion && o.kind === ComputeNetworkPeeringList.kind;
+export function isComputeNetworkPeeringList(
+  o: any
+): o is ComputeNetworkPeeringList {
+  return (
+    o &&
+    o.apiVersion === ComputeNetworkPeeringList.apiVersion &&
+    o.kind === ComputeNetworkPeeringList.kind
+  );
 }
 
 export namespace ComputeNetworkPeeringList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeNetworkPeeringList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeNetworkPeeringList';
 
   // ComputeNetworkPeeringList is a list of ComputeNetworkPeering
   export interface Interface {
@@ -1072,7 +1166,7 @@ export namespace ComputeNetworkPeeringList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1103,14 +1197,18 @@ export class ComputeNodeGroupList {
 }
 
 export function isComputeNodeGroupList(o: any): o is ComputeNodeGroupList {
-  return o && o.apiVersion === ComputeNodeGroupList.apiVersion && o.kind === ComputeNodeGroupList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeNodeGroupList.apiVersion &&
+    o.kind === ComputeNodeGroupList.kind
+  );
 }
 
 export namespace ComputeNodeGroupList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeNodeGroupList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeNodeGroupList';
 
   // ComputeNodeGroupList is a list of ComputeNodeGroup
   export interface Interface {
@@ -1132,7 +1230,7 @@ export namespace ComputeNodeGroupList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1162,15 +1260,21 @@ export class ComputeNodeTemplateList {
   }
 }
 
-export function isComputeNodeTemplateList(o: any): o is ComputeNodeTemplateList {
-  return o && o.apiVersion === ComputeNodeTemplateList.apiVersion && o.kind === ComputeNodeTemplateList.kind;
+export function isComputeNodeTemplateList(
+  o: any
+): o is ComputeNodeTemplateList {
+  return (
+    o &&
+    o.apiVersion === ComputeNodeTemplateList.apiVersion &&
+    o.kind === ComputeNodeTemplateList.kind
+  );
 }
 
 export namespace ComputeNodeTemplateList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeNodeTemplateList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeNodeTemplateList';
 
   // ComputeNodeTemplateList is a list of ComputeNodeTemplate
   export interface Interface {
@@ -1192,7 +1296,7 @@ export namespace ComputeNodeTemplateList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1223,14 +1327,18 @@ export class ComputeReservationList {
 }
 
 export function isComputeReservationList(o: any): o is ComputeReservationList {
-  return o && o.apiVersion === ComputeReservationList.apiVersion && o.kind === ComputeReservationList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeReservationList.apiVersion &&
+    o.kind === ComputeReservationList.kind
+  );
 }
 
 export namespace ComputeReservationList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeReservationList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeReservationList';
 
   // ComputeReservationList is a list of ComputeReservation
   export interface Interface {
@@ -1252,7 +1360,7 @@ export namespace ComputeReservationList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1282,15 +1390,21 @@ export class ComputeResourcePolicyList {
   }
 }
 
-export function isComputeResourcePolicyList(o: any): o is ComputeResourcePolicyList {
-  return o && o.apiVersion === ComputeResourcePolicyList.apiVersion && o.kind === ComputeResourcePolicyList.kind;
+export function isComputeResourcePolicyList(
+  o: any
+): o is ComputeResourcePolicyList {
+  return (
+    o &&
+    o.apiVersion === ComputeResourcePolicyList.apiVersion &&
+    o.kind === ComputeResourcePolicyList.kind
+  );
 }
 
 export namespace ComputeResourcePolicyList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeResourcePolicyList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeResourcePolicyList';
 
   // ComputeResourcePolicyList is a list of ComputeResourcePolicy
   export interface Interface {
@@ -1312,7 +1426,7 @@ export namespace ComputeResourcePolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1343,14 +1457,18 @@ export class ComputeRouteList {
 }
 
 export function isComputeRouteList(o: any): o is ComputeRouteList {
-  return o && o.apiVersion === ComputeRouteList.apiVersion && o.kind === ComputeRouteList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeRouteList.apiVersion &&
+    o.kind === ComputeRouteList.kind
+  );
 }
 
 export namespace ComputeRouteList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeRouteList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeRouteList';
 
   // ComputeRouteList is a list of ComputeRoute
   export interface Interface {
@@ -1372,7 +1490,7 @@ export namespace ComputeRouteList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1404,15 +1522,21 @@ export class ComputeRouterInterfaceList {
   }
 }
 
-export function isComputeRouterInterfaceList(o: any): o is ComputeRouterInterfaceList {
-  return o && o.apiVersion === ComputeRouterInterfaceList.apiVersion && o.kind === ComputeRouterInterfaceList.kind;
+export function isComputeRouterInterfaceList(
+  o: any
+): o is ComputeRouterInterfaceList {
+  return (
+    o &&
+    o.apiVersion === ComputeRouterInterfaceList.apiVersion &&
+    o.kind === ComputeRouterInterfaceList.kind
+  );
 }
 
 export namespace ComputeRouterInterfaceList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeRouterInterfaceList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeRouterInterfaceList';
 
   // ComputeRouterInterfaceList is a list of ComputeRouterInterface
   export interface Interface {
@@ -1434,7 +1558,7 @@ export namespace ComputeRouterInterfaceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1463,14 +1587,18 @@ export class ComputeRouterList {
 }
 
 export function isComputeRouterList(o: any): o is ComputeRouterList {
-  return o && o.apiVersion === ComputeRouterList.apiVersion && o.kind === ComputeRouterList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeRouterList.apiVersion &&
+    o.kind === ComputeRouterList.kind
+  );
 }
 
 export namespace ComputeRouterList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeRouterList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeRouterList';
 
   // ComputeRouterList is a list of ComputeRouter
   export interface Interface {
@@ -1492,7 +1620,7 @@ export namespace ComputeRouterList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1523,14 +1651,18 @@ export class ComputeRouterNATList {
 }
 
 export function isComputeRouterNATList(o: any): o is ComputeRouterNATList {
-  return o && o.apiVersion === ComputeRouterNATList.apiVersion && o.kind === ComputeRouterNATList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeRouterNATList.apiVersion &&
+    o.kind === ComputeRouterNATList.kind
+  );
 }
 
 export namespace ComputeRouterNATList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeRouterNATList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeRouterNATList';
 
   // ComputeRouterNATList is a list of ComputeRouterNAT
   export interface Interface {
@@ -1552,7 +1684,7 @@ export namespace ComputeRouterNATList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1583,14 +1715,18 @@ export class ComputeRouterPeerList {
 }
 
 export function isComputeRouterPeerList(o: any): o is ComputeRouterPeerList {
-  return o && o.apiVersion === ComputeRouterPeerList.apiVersion && o.kind === ComputeRouterPeerList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeRouterPeerList.apiVersion &&
+    o.kind === ComputeRouterPeerList.kind
+  );
 }
 
 export namespace ComputeRouterPeerList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeRouterPeerList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeRouterPeerList';
 
   // ComputeRouterPeerList is a list of ComputeRouterPeer
   export interface Interface {
@@ -1612,7 +1748,7 @@ export namespace ComputeRouterPeerList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1642,15 +1778,21 @@ export class ComputeSSLCertificateList {
   }
 }
 
-export function isComputeSSLCertificateList(o: any): o is ComputeSSLCertificateList {
-  return o && o.apiVersion === ComputeSSLCertificateList.apiVersion && o.kind === ComputeSSLCertificateList.kind;
+export function isComputeSSLCertificateList(
+  o: any
+): o is ComputeSSLCertificateList {
+  return (
+    o &&
+    o.apiVersion === ComputeSSLCertificateList.apiVersion &&
+    o.kind === ComputeSSLCertificateList.kind
+  );
 }
 
 export namespace ComputeSSLCertificateList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeSSLCertificateList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeSSLCertificateList';
 
   // ComputeSSLCertificateList is a list of ComputeSSLCertificate
   export interface Interface {
@@ -1672,7 +1814,7 @@ export namespace ComputeSSLCertificateList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1703,14 +1845,18 @@ export class ComputeSSLPolicyList {
 }
 
 export function isComputeSSLPolicyList(o: any): o is ComputeSSLPolicyList {
-  return o && o.apiVersion === ComputeSSLPolicyList.apiVersion && o.kind === ComputeSSLPolicyList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeSSLPolicyList.apiVersion &&
+    o.kind === ComputeSSLPolicyList.kind
+  );
 }
 
 export namespace ComputeSSLPolicyList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeSSLPolicyList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeSSLPolicyList';
 
   // ComputeSSLPolicyList is a list of ComputeSSLPolicy
   export interface Interface {
@@ -1732,7 +1878,7 @@ export namespace ComputeSSLPolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1762,15 +1908,21 @@ export class ComputeSecurityPolicyList {
   }
 }
 
-export function isComputeSecurityPolicyList(o: any): o is ComputeSecurityPolicyList {
-  return o && o.apiVersion === ComputeSecurityPolicyList.apiVersion && o.kind === ComputeSecurityPolicyList.kind;
+export function isComputeSecurityPolicyList(
+  o: any
+): o is ComputeSecurityPolicyList {
+  return (
+    o &&
+    o.apiVersion === ComputeSecurityPolicyList.apiVersion &&
+    o.kind === ComputeSecurityPolicyList.kind
+  );
 }
 
 export namespace ComputeSecurityPolicyList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeSecurityPolicyList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeSecurityPolicyList';
 
   // ComputeSecurityPolicyList is a list of ComputeSecurityPolicy
   export interface Interface {
@@ -1792,7 +1944,7 @@ export namespace ComputeSecurityPolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1822,15 +1974,21 @@ export class ComputeSharedVPCHostProjectList {
   }
 }
 
-export function isComputeSharedVPCHostProjectList(o: any): o is ComputeSharedVPCHostProjectList {
-  return o && o.apiVersion === ComputeSharedVPCHostProjectList.apiVersion && o.kind === ComputeSharedVPCHostProjectList.kind;
+export function isComputeSharedVPCHostProjectList(
+  o: any
+): o is ComputeSharedVPCHostProjectList {
+  return (
+    o &&
+    o.apiVersion === ComputeSharedVPCHostProjectList.apiVersion &&
+    o.kind === ComputeSharedVPCHostProjectList.kind
+  );
 }
 
 export namespace ComputeSharedVPCHostProjectList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeSharedVPCHostProjectList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeSharedVPCHostProjectList';
 
   // ComputeSharedVPCHostProjectList is a list of ComputeSharedVPCHostProject
   export interface Interface {
@@ -1852,7 +2010,7 @@ export namespace ComputeSharedVPCHostProjectList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1882,15 +2040,21 @@ export class ComputeSharedVPCServiceProjectList {
   }
 }
 
-export function isComputeSharedVPCServiceProjectList(o: any): o is ComputeSharedVPCServiceProjectList {
-  return o && o.apiVersion === ComputeSharedVPCServiceProjectList.apiVersion && o.kind === ComputeSharedVPCServiceProjectList.kind;
+export function isComputeSharedVPCServiceProjectList(
+  o: any
+): o is ComputeSharedVPCServiceProjectList {
+  return (
+    o &&
+    o.apiVersion === ComputeSharedVPCServiceProjectList.apiVersion &&
+    o.kind === ComputeSharedVPCServiceProjectList.kind
+  );
 }
 
 export namespace ComputeSharedVPCServiceProjectList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeSharedVPCServiceProjectList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeSharedVPCServiceProjectList';
 
   // ComputeSharedVPCServiceProjectList is a list of ComputeSharedVPCServiceProject
   export interface Interface {
@@ -1912,7 +2076,7 @@ export namespace ComputeSharedVPCServiceProjectList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -1943,14 +2107,18 @@ export class ComputeSnapshotList {
 }
 
 export function isComputeSnapshotList(o: any): o is ComputeSnapshotList {
-  return o && o.apiVersion === ComputeSnapshotList.apiVersion && o.kind === ComputeSnapshotList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeSnapshotList.apiVersion &&
+    o.kind === ComputeSnapshotList.kind
+  );
 }
 
 export namespace ComputeSnapshotList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeSnapshotList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeSnapshotList';
 
   // ComputeSnapshotList is a list of ComputeSnapshot
   export interface Interface {
@@ -1972,7 +2140,7 @@ export namespace ComputeSnapshotList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2003,14 +2171,18 @@ export class ComputeSubnetworkList {
 }
 
 export function isComputeSubnetworkList(o: any): o is ComputeSubnetworkList {
-  return o && o.apiVersion === ComputeSubnetworkList.apiVersion && o.kind === ComputeSubnetworkList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeSubnetworkList.apiVersion &&
+    o.kind === ComputeSubnetworkList.kind
+  );
 }
 
 export namespace ComputeSubnetworkList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeSubnetworkList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeSubnetworkList';
 
   // ComputeSubnetworkList is a list of ComputeSubnetwork
   export interface Interface {
@@ -2032,7 +2204,7 @@ export namespace ComputeSubnetworkList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2062,15 +2234,21 @@ export class ComputeTargetHTTPProxyList {
   }
 }
 
-export function isComputeTargetHTTPProxyList(o: any): o is ComputeTargetHTTPProxyList {
-  return o && o.apiVersion === ComputeTargetHTTPProxyList.apiVersion && o.kind === ComputeTargetHTTPProxyList.kind;
+export function isComputeTargetHTTPProxyList(
+  o: any
+): o is ComputeTargetHTTPProxyList {
+  return (
+    o &&
+    o.apiVersion === ComputeTargetHTTPProxyList.apiVersion &&
+    o.kind === ComputeTargetHTTPProxyList.kind
+  );
 }
 
 export namespace ComputeTargetHTTPProxyList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeTargetHTTPProxyList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeTargetHTTPProxyList';
 
   // ComputeTargetHTTPProxyList is a list of ComputeTargetHTTPProxy
   export interface Interface {
@@ -2092,7 +2270,7 @@ export namespace ComputeTargetHTTPProxyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2122,15 +2300,21 @@ export class ComputeTargetHTTPSProxyList {
   }
 }
 
-export function isComputeTargetHTTPSProxyList(o: any): o is ComputeTargetHTTPSProxyList {
-  return o && o.apiVersion === ComputeTargetHTTPSProxyList.apiVersion && o.kind === ComputeTargetHTTPSProxyList.kind;
+export function isComputeTargetHTTPSProxyList(
+  o: any
+): o is ComputeTargetHTTPSProxyList {
+  return (
+    o &&
+    o.apiVersion === ComputeTargetHTTPSProxyList.apiVersion &&
+    o.kind === ComputeTargetHTTPSProxyList.kind
+  );
 }
 
 export namespace ComputeTargetHTTPSProxyList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeTargetHTTPSProxyList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeTargetHTTPSProxyList';
 
   // ComputeTargetHTTPSProxyList is a list of ComputeTargetHTTPSProxy
   export interface Interface {
@@ -2152,7 +2336,7 @@ export namespace ComputeTargetHTTPSProxyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2182,15 +2366,21 @@ export class ComputeTargetInstanceList {
   }
 }
 
-export function isComputeTargetInstanceList(o: any): o is ComputeTargetInstanceList {
-  return o && o.apiVersion === ComputeTargetInstanceList.apiVersion && o.kind === ComputeTargetInstanceList.kind;
+export function isComputeTargetInstanceList(
+  o: any
+): o is ComputeTargetInstanceList {
+  return (
+    o &&
+    o.apiVersion === ComputeTargetInstanceList.apiVersion &&
+    o.kind === ComputeTargetInstanceList.kind
+  );
 }
 
 export namespace ComputeTargetInstanceList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeTargetInstanceList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeTargetInstanceList';
 
   // ComputeTargetInstanceList is a list of ComputeTargetInstance
   export interface Interface {
@@ -2212,7 +2402,7 @@ export namespace ComputeTargetInstanceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2243,14 +2433,18 @@ export class ComputeTargetPoolList {
 }
 
 export function isComputeTargetPoolList(o: any): o is ComputeTargetPoolList {
-  return o && o.apiVersion === ComputeTargetPoolList.apiVersion && o.kind === ComputeTargetPoolList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeTargetPoolList.apiVersion &&
+    o.kind === ComputeTargetPoolList.kind
+  );
 }
 
 export namespace ComputeTargetPoolList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeTargetPoolList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeTargetPoolList';
 
   // ComputeTargetPoolList is a list of ComputeTargetPool
   export interface Interface {
@@ -2272,7 +2466,7 @@ export namespace ComputeTargetPoolList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2302,15 +2496,21 @@ export class ComputeTargetSSLProxyList {
   }
 }
 
-export function isComputeTargetSSLProxyList(o: any): o is ComputeTargetSSLProxyList {
-  return o && o.apiVersion === ComputeTargetSSLProxyList.apiVersion && o.kind === ComputeTargetSSLProxyList.kind;
+export function isComputeTargetSSLProxyList(
+  o: any
+): o is ComputeTargetSSLProxyList {
+  return (
+    o &&
+    o.apiVersion === ComputeTargetSSLProxyList.apiVersion &&
+    o.kind === ComputeTargetSSLProxyList.kind
+  );
 }
 
 export namespace ComputeTargetSSLProxyList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeTargetSSLProxyList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeTargetSSLProxyList';
 
   // ComputeTargetSSLProxyList is a list of ComputeTargetSSLProxy
   export interface Interface {
@@ -2332,7 +2532,7 @@ export namespace ComputeTargetSSLProxyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2362,15 +2562,21 @@ export class ComputeTargetTCPProxyList {
   }
 }
 
-export function isComputeTargetTCPProxyList(o: any): o is ComputeTargetTCPProxyList {
-  return o && o.apiVersion === ComputeTargetTCPProxyList.apiVersion && o.kind === ComputeTargetTCPProxyList.kind;
+export function isComputeTargetTCPProxyList(
+  o: any
+): o is ComputeTargetTCPProxyList {
+  return (
+    o &&
+    o.apiVersion === ComputeTargetTCPProxyList.apiVersion &&
+    o.kind === ComputeTargetTCPProxyList.kind
+  );
 }
 
 export namespace ComputeTargetTCPProxyList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeTargetTCPProxyList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeTargetTCPProxyList';
 
   // ComputeTargetTCPProxyList is a list of ComputeTargetTCPProxy
   export interface Interface {
@@ -2392,7 +2598,7 @@ export namespace ComputeTargetTCPProxyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2422,15 +2628,21 @@ export class ComputeTargetVPNGatewayList {
   }
 }
 
-export function isComputeTargetVPNGatewayList(o: any): o is ComputeTargetVPNGatewayList {
-  return o && o.apiVersion === ComputeTargetVPNGatewayList.apiVersion && o.kind === ComputeTargetVPNGatewayList.kind;
+export function isComputeTargetVPNGatewayList(
+  o: any
+): o is ComputeTargetVPNGatewayList {
+  return (
+    o &&
+    o.apiVersion === ComputeTargetVPNGatewayList.apiVersion &&
+    o.kind === ComputeTargetVPNGatewayList.kind
+  );
 }
 
 export namespace ComputeTargetVPNGatewayList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeTargetVPNGatewayList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeTargetVPNGatewayList';
 
   // ComputeTargetVPNGatewayList is a list of ComputeTargetVPNGateway
   export interface Interface {
@@ -2452,7 +2664,7 @@ export namespace ComputeTargetVPNGatewayList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2483,14 +2695,18 @@ export class ComputeURLMapList {
 }
 
 export function isComputeURLMapList(o: any): o is ComputeURLMapList {
-  return o && o.apiVersion === ComputeURLMapList.apiVersion && o.kind === ComputeURLMapList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeURLMapList.apiVersion &&
+    o.kind === ComputeURLMapList.kind
+  );
 }
 
 export namespace ComputeURLMapList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeURLMapList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeURLMapList';
 
   // ComputeURLMapList is a list of ComputeURLMap
   export interface Interface {
@@ -2512,7 +2728,7 @@ export namespace ComputeURLMapList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2543,14 +2759,18 @@ export class ComputeVPNGatewayList {
 }
 
 export function isComputeVPNGatewayList(o: any): o is ComputeVPNGatewayList {
-  return o && o.apiVersion === ComputeVPNGatewayList.apiVersion && o.kind === ComputeVPNGatewayList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeVPNGatewayList.apiVersion &&
+    o.kind === ComputeVPNGatewayList.kind
+  );
 }
 
 export namespace ComputeVPNGatewayList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeVPNGatewayList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeVPNGatewayList';
 
   // ComputeVPNGatewayList is a list of ComputeVPNGateway
   export interface Interface {
@@ -2572,7 +2792,7 @@ export namespace ComputeVPNGatewayList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -2603,14 +2823,18 @@ export class ComputeVPNTunnelList {
 }
 
 export function isComputeVPNTunnelList(o: any): o is ComputeVPNTunnelList {
-  return o && o.apiVersion === ComputeVPNTunnelList.apiVersion && o.kind === ComputeVPNTunnelList.kind;
+  return (
+    o &&
+    o.apiVersion === ComputeVPNTunnelList.apiVersion &&
+    o.kind === ComputeVPNTunnelList.kind
+  );
 }
 
 export namespace ComputeVPNTunnelList {
-  export const apiVersion = "compute.cnrm.cloud.google.com/v1beta1";
-  export const group = "compute.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ComputeVPNTunnelList";
+  export const apiVersion = 'compute.cnrm.cloud.google.com/v1beta1';
+  export const group = 'compute.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ComputeVPNTunnelList';
 
   // ComputeVPNTunnelList is a list of ComputeVPNTunnel
   export interface Interface {
@@ -2632,7 +2856,7 @@ export namespace ComputeVPNTunnelList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

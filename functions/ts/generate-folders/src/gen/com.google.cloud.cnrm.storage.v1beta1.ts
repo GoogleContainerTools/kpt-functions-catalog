@@ -24,15 +24,21 @@ export class StorageBucketAccessControlList {
   }
 }
 
-export function isStorageBucketAccessControlList(o: any): o is StorageBucketAccessControlList {
-  return o && o.apiVersion === StorageBucketAccessControlList.apiVersion && o.kind === StorageBucketAccessControlList.kind;
+export function isStorageBucketAccessControlList(
+  o: any
+): o is StorageBucketAccessControlList {
+  return (
+    o &&
+    o.apiVersion === StorageBucketAccessControlList.apiVersion &&
+    o.kind === StorageBucketAccessControlList.kind
+  );
 }
 
 export namespace StorageBucketAccessControlList {
-  export const apiVersion = "storage.cnrm.cloud.google.com/v1beta1";
-  export const group = "storage.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "StorageBucketAccessControlList";
+  export const apiVersion = 'storage.cnrm.cloud.google.com/v1beta1';
+  export const group = 'storage.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'StorageBucketAccessControlList';
 
   // StorageBucketAccessControlList is a list of StorageBucketAccessControl
   export interface Interface {
@@ -54,7 +60,7 @@ export namespace StorageBucketAccessControlList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +89,18 @@ export class StorageBucketList {
 }
 
 export function isStorageBucketList(o: any): o is StorageBucketList {
-  return o && o.apiVersion === StorageBucketList.apiVersion && o.kind === StorageBucketList.kind;
+  return (
+    o &&
+    o.apiVersion === StorageBucketList.apiVersion &&
+    o.kind === StorageBucketList.kind
+  );
 }
 
 export namespace StorageBucketList {
-  export const apiVersion = "storage.cnrm.cloud.google.com/v1beta1";
-  export const group = "storage.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "StorageBucketList";
+  export const apiVersion = 'storage.cnrm.cloud.google.com/v1beta1';
+  export const group = 'storage.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'StorageBucketList';
 
   // StorageBucketList is a list of StorageBucket
   export interface Interface {
@@ -112,7 +122,7 @@ export namespace StorageBucketList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -142,15 +152,21 @@ export class StorageDefaultObjectAccessControlList {
   }
 }
 
-export function isStorageDefaultObjectAccessControlList(o: any): o is StorageDefaultObjectAccessControlList {
-  return o && o.apiVersion === StorageDefaultObjectAccessControlList.apiVersion && o.kind === StorageDefaultObjectAccessControlList.kind;
+export function isStorageDefaultObjectAccessControlList(
+  o: any
+): o is StorageDefaultObjectAccessControlList {
+  return (
+    o &&
+    o.apiVersion === StorageDefaultObjectAccessControlList.apiVersion &&
+    o.kind === StorageDefaultObjectAccessControlList.kind
+  );
 }
 
 export namespace StorageDefaultObjectAccessControlList {
-  export const apiVersion = "storage.cnrm.cloud.google.com/v1beta1";
-  export const group = "storage.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "StorageDefaultObjectAccessControlList";
+  export const apiVersion = 'storage.cnrm.cloud.google.com/v1beta1';
+  export const group = 'storage.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'StorageDefaultObjectAccessControlList';
 
   // StorageDefaultObjectAccessControlList is a list of StorageDefaultObjectAccessControl
   export interface Interface {
@@ -172,7 +188,7 @@ export namespace StorageDefaultObjectAccessControlList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -202,15 +218,21 @@ export class StorageNotificationList {
   }
 }
 
-export function isStorageNotificationList(o: any): o is StorageNotificationList {
-  return o && o.apiVersion === StorageNotificationList.apiVersion && o.kind === StorageNotificationList.kind;
+export function isStorageNotificationList(
+  o: any
+): o is StorageNotificationList {
+  return (
+    o &&
+    o.apiVersion === StorageNotificationList.apiVersion &&
+    o.kind === StorageNotificationList.kind
+  );
 }
 
 export namespace StorageNotificationList {
-  export const apiVersion = "storage.cnrm.cloud.google.com/v1beta1";
-  export const group = "storage.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "StorageNotificationList";
+  export const apiVersion = 'storage.cnrm.cloud.google.com/v1beta1';
+  export const group = 'storage.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'StorageNotificationList';
 
   // StorageNotificationList is a list of StorageNotification
   export interface Interface {
@@ -232,7 +254,7 @@ export namespace StorageNotificationList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

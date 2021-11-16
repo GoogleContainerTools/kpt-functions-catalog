@@ -23,14 +23,18 @@ export class FirestoreIndexList {
 }
 
 export function isFirestoreIndexList(o: any): o is FirestoreIndexList {
-  return o && o.apiVersion === FirestoreIndexList.apiVersion && o.kind === FirestoreIndexList.kind;
+  return (
+    o &&
+    o.apiVersion === FirestoreIndexList.apiVersion &&
+    o.kind === FirestoreIndexList.kind
+  );
 }
 
 export namespace FirestoreIndexList {
-  export const apiVersion = "firestore.cnrm.cloud.google.com/v1beta1";
-  export const group = "firestore.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "FirestoreIndexList";
+  export const apiVersion = 'firestore.cnrm.cloud.google.com/v1beta1';
+  export const group = 'firestore.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'FirestoreIndexList';
 
   // FirestoreIndexList is a list of FirestoreIndex
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace FirestoreIndexList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

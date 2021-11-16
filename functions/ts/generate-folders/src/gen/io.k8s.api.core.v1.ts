@@ -4,7 +4,7 @@ import * as apisMetaV1 from './io.k8s.apimachinery.pkg.apis.meta.v1';
 import * as pkgUtilIntstr from './io.k8s.apimachinery.pkg.util.intstr';
 
 // Represents a Persistent Disk resource in AWS.
-// 
+//
 // An AWS EBS disk must exist before mounting to a container. The disk must also be in the same AWS zone as the kubelet. An AWS EBS disk can only be mounted as read/write once. AWS EBS volumes support ownership management and SELinux relabeling.
 export class AWSElasticBlockStoreVolumeSource {
   // Filesystem type of the volume that you want to mount. Tip: Ensure that the filesystem type is supported by the host operating system. Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore
@@ -150,10 +150,10 @@ export function isBinding(o: any): o is Binding {
 }
 
 export namespace Binding {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "Binding";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'Binding';
 
   // Binding ties one object to another; for example, a pod is bound to a node by a scheduler. Deprecated in 1.7, please use the bindings subresource of pods instead.
   export interface Interface {
@@ -189,7 +189,7 @@ export class CSIPersistentVolumeSource {
   public readOnly?: boolean;
 
   // Attributes of the volume to publish.
-  public volumeAttributes?: {[key: string]: string};
+  public volumeAttributes?: { [key: string]: string };
 
   // VolumeHandle is the unique volume name returned by the CSI volume plugin’s CreateVolume to refer to the volume on all subsequent calls. Required.
   public volumeHandle: string;
@@ -222,7 +222,7 @@ export class CSIVolumeSource {
   public readOnly?: boolean;
 
   // VolumeAttributes stores driver-specific properties that are passed to the CSI driver. Consult your driver's documentation for supported values.
-  public volumeAttributes?: {[key: string]: string};
+  public volumeAttributes?: { [key: string]: string };
 
   constructor(desc: CSIVolumeSource) {
     this.driver = desc.driver;
@@ -397,18 +397,22 @@ export class ComponentStatus implements KubernetesObject {
 }
 
 export function isComponentStatus(o: any): o is ComponentStatus {
-  return o && o.apiVersion === ComponentStatus.apiVersion && o.kind === ComponentStatus.kind;
+  return (
+    o &&
+    o.apiVersion === ComponentStatus.apiVersion &&
+    o.kind === ComponentStatus.kind
+  );
 }
 
 export namespace ComponentStatus {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ComponentStatus";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ComponentStatus';
 
   // named constructs a ComponentStatus with metadata.name set to name.
   export function named(name: string): ComponentStatus {
-    return new ComponentStatus({metadata: {name}});
+    return new ComponentStatus({ metadata: { name } });
   }
   // ComponentStatus (and ComponentStatusList) holds the cluster validation info.
   export interface Interface {
@@ -443,14 +447,18 @@ export class ComponentStatusList {
 }
 
 export function isComponentStatusList(o: any): o is ComponentStatusList {
-  return o && o.apiVersion === ComponentStatusList.apiVersion && o.kind === ComponentStatusList.kind;
+  return (
+    o &&
+    o.apiVersion === ComponentStatusList.apiVersion &&
+    o.kind === ComponentStatusList.kind
+  );
 }
 
 export namespace ComponentStatusList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ComponentStatusList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ComponentStatusList';
 
   // Status of all the conditions for the component as a list of ComponentStatus objects.
   export interface Interface {
@@ -468,10 +476,10 @@ export class ConfigMap implements KubernetesObject {
   public apiVersion: string;
 
   // BinaryData contains the binary data. Each key must consist of alphanumeric characters, '-', '_' or '.'. BinaryData can contain byte sequences that are not in the UTF-8 range. The keys stored in BinaryData must not overlap with the ones in the Data field, this is enforced during validation process. Using this field will require 1.10+ apiserver and kubelet.
-  public binaryData?: {[key: string]: string};
+  public binaryData?: { [key: string]: string };
 
   // Data contains the configuration data. Each key must consist of alphanumeric characters, '-', '_' or '.'. Values with non-UTF-8 byte sequences must use the BinaryData field. The keys stored in Data must not overlap with the keys in the BinaryData field, this is enforced during validation process.
-  public data?: {[key: string]: string};
+  public data?: { [key: string]: string };
 
   // Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   public kind: string;
@@ -489,26 +497,28 @@ export class ConfigMap implements KubernetesObject {
 }
 
 export function isConfigMap(o: any): o is ConfigMap {
-  return o && o.apiVersion === ConfigMap.apiVersion && o.kind === ConfigMap.kind;
+  return (
+    o && o.apiVersion === ConfigMap.apiVersion && o.kind === ConfigMap.kind
+  );
 }
 
 export namespace ConfigMap {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ConfigMap";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ConfigMap';
 
   // named constructs a ConfigMap with metadata.name set to name.
   export function named(name: string): ConfigMap {
-    return new ConfigMap({metadata: {name}});
+    return new ConfigMap({ metadata: { name } });
   }
   // ConfigMap holds configuration data for pods to consume.
   export interface Interface {
     // BinaryData contains the binary data. Each key must consist of alphanumeric characters, '-', '_' or '.'. BinaryData can contain byte sequences that are not in the UTF-8 range. The keys stored in BinaryData must not overlap with the ones in the Data field, this is enforced during validation process. Using this field will require 1.10+ apiserver and kubelet.
-    binaryData?: {[key: string]: string};
+    binaryData?: { [key: string]: string };
 
     // Data contains the configuration data. Each key must consist of alphanumeric characters, '-', '_' or '.'. Values with non-UTF-8 byte sequences must use the BinaryData field. The keys stored in Data must not overlap with the keys in the BinaryData field, this is enforced during validation process.
-    data?: {[key: string]: string};
+    data?: { [key: string]: string };
 
     // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
     metadata: apisMetaV1.ObjectMeta;
@@ -516,7 +526,7 @@ export namespace ConfigMap {
 }
 
 // ConfigMapEnvSource selects a ConfigMap to populate the environment variables with.
-// 
+//
 // The contents of the target ConfigMap's Data field will represent the key-value pairs as environment variables.
 export class ConfigMapEnvSource {
   // Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
@@ -567,14 +577,18 @@ export class ConfigMapList {
 }
 
 export function isConfigMapList(o: any): o is ConfigMapList {
-  return o && o.apiVersion === ConfigMapList.apiVersion && o.kind === ConfigMapList.kind;
+  return (
+    o &&
+    o.apiVersion === ConfigMapList.apiVersion &&
+    o.kind === ConfigMapList.kind
+  );
 }
 
 export namespace ConfigMapList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ConfigMapList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ConfigMapList';
 
   // ConfigMapList is a resource containing a list of ConfigMap objects.
   export interface Interface {
@@ -613,7 +627,7 @@ export class ConfigMapNodeConfigSource {
 }
 
 // Adapts a ConfigMap into a projected volume.
-// 
+//
 // The contents of the target ConfigMap's Data field will be presented in a projected volume as files using the keys in the Data field as the file names, unless the items element is populated with specific mappings of keys to paths. Note that this is identical to a configmap volume source without the default mode.
 export class ConfigMapProjection {
   // If unspecified, each key-value pair in the Data field of the referenced ConfigMap will be projected into the volume as a file whose name is the key and content is the value. If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present. If a key is specified which is not present in the ConfigMap, the volume setup will error unless it is marked optional. Paths must be relative and may not contain the '..' path or start with '..'.
@@ -627,7 +641,7 @@ export class ConfigMapProjection {
 }
 
 // Adapts a ConfigMap into a volume.
-// 
+//
 // The contents of the target ConfigMap's Data field will be presented in a volume as files using the keys in the Data field as the file names, unless the items element is populated with specific mappings of keys to paths. ConfigMap volumes support ownership management and SELinux relabeling.
 export class ConfigMapVolumeSource {
   // Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
@@ -1029,18 +1043,20 @@ export class Endpoints implements KubernetesObject {
 }
 
 export function isEndpoints(o: any): o is Endpoints {
-  return o && o.apiVersion === Endpoints.apiVersion && o.kind === Endpoints.kind;
+  return (
+    o && o.apiVersion === Endpoints.apiVersion && o.kind === Endpoints.kind
+  );
 }
 
 export namespace Endpoints {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "Endpoints";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'Endpoints';
 
   // named constructs a Endpoints with metadata.name set to name.
   export function named(name: string): Endpoints {
-    return new Endpoints({metadata: {name}});
+    return new Endpoints({ metadata: { name } });
   }
   // Endpoints is a collection of endpoints that implement the actual service. Example:
   //   Name: "mysvc",
@@ -1086,14 +1102,18 @@ export class EndpointsList {
 }
 
 export function isEndpointsList(o: any): o is EndpointsList {
-  return o && o.apiVersion === EndpointsList.apiVersion && o.kind === EndpointsList.kind;
+  return (
+    o &&
+    o.apiVersion === EndpointsList.apiVersion &&
+    o.kind === EndpointsList.kind
+  );
 }
 
 export namespace EndpointsList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "EndpointsList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'EndpointsList';
 
   // EndpointsList is a list of endpoints.
   export interface Interface {
@@ -1327,10 +1347,10 @@ export function isEvent(o: any): o is Event {
 }
 
 export namespace Event {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "Event";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'Event';
 
   // Event is a report of an event somewhere in the cluster.
   export interface Interface {
@@ -1404,14 +1424,16 @@ export class EventList {
 }
 
 export function isEventList(o: any): o is EventList {
-  return o && o.apiVersion === EventList.apiVersion && o.kind === EventList.kind;
+  return (
+    o && o.apiVersion === EventList.apiVersion && o.kind === EventList.kind
+  );
 }
 
 export namespace EventList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "EventList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'EventList';
 
   // EventList is a list of events.
   export interface Interface {
@@ -1477,7 +1499,7 @@ export class FlexPersistentVolumeSource {
   public fsType?: string;
 
   // Optional: Extra command options if any.
-  public options?: {[key: string]: string};
+  public options?: { [key: string]: string };
 
   // Optional: Defaults to false (read/write). ReadOnly here will force the ReadOnly setting in VolumeMounts.
   public readOnly?: boolean;
@@ -1503,7 +1525,7 @@ export class FlexVolumeSource {
   public fsType?: string;
 
   // Optional: Extra command options if any.
-  public options?: {[key: string]: string};
+  public options?: { [key: string]: string };
 
   // Optional: Defaults to false (read/write). ReadOnly here will force the ReadOnly setting in VolumeMounts.
   public readOnly?: boolean;
@@ -1530,7 +1552,7 @@ export class FlockerVolumeSource {
 }
 
 // Represents a Persistent Disk resource in Google Compute Engine.
-// 
+//
 // A GCE PD must exist before mounting to a container. The disk must also be in the same GCE project and zone as the kubelet. A GCE PD can only be mounted as read/write once or read-only many times. GCE PDs support ownership management and SELinux relabeling.
 export class GCEPersistentDiskVolumeSource {
   // Filesystem type of the volume that you want to mount. Tip: Ensure that the filesystem type is supported by the host operating system. Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk
@@ -1554,7 +1576,7 @@ export class GCEPersistentDiskVolumeSource {
 }
 
 // Represents a volume that is populated with the contents of a git repository. Git repo volumes do not support ownership management. Git repo volumes support SELinux relabeling.
-// 
+//
 // DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mount an EmptyDir into an InitContainer that clones the repo using git, then mount the EmptyDir into the Pod's container.
 export class GitRepoVolumeSource {
   // Target directory name. Must not contain or start with '..'.  If '.' is supplied, the volume directory will be the git repository.  Otherwise, if specified, the volume will contain the git repository in the subdirectory with the given name.
@@ -1838,18 +1860,20 @@ export class LimitRange implements KubernetesObject {
 }
 
 export function isLimitRange(o: any): o is LimitRange {
-  return o && o.apiVersion === LimitRange.apiVersion && o.kind === LimitRange.kind;
+  return (
+    o && o.apiVersion === LimitRange.apiVersion && o.kind === LimitRange.kind
+  );
 }
 
 export namespace LimitRange {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "LimitRange";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'LimitRange';
 
   // named constructs a LimitRange with metadata.name set to name.
   export function named(name: string): LimitRange {
-    return new LimitRange({metadata: {name}});
+    return new LimitRange({ metadata: { name } });
   }
   // LimitRange sets resource usage limits for each kind of resource in a Namespace.
   export interface Interface {
@@ -1864,19 +1888,19 @@ export namespace LimitRange {
 // LimitRangeItem defines a min/max usage limit for any resource that matches on kind.
 export class LimitRangeItem {
   // Default resource requirement limit value by resource name if resource limit is omitted.
-  public default?: {[key: string]: pkgApiResource.Quantity};
+  public default?: { [key: string]: pkgApiResource.Quantity };
 
   // DefaultRequest is the default resource requirement request value by resource name if resource request is omitted.
-  public defaultRequest?: {[key: string]: pkgApiResource.Quantity};
+  public defaultRequest?: { [key: string]: pkgApiResource.Quantity };
 
   // Max usage constraints on this kind by resource name.
-  public max?: {[key: string]: pkgApiResource.Quantity};
+  public max?: { [key: string]: pkgApiResource.Quantity };
 
   // MaxLimitRequestRatio if specified, the named resource must have a request and limit that are both non-zero where limit divided by request is less than or equal to the enumerated value; this represents the max burst for the named resource.
-  public maxLimitRequestRatio?: {[key: string]: pkgApiResource.Quantity};
+  public maxLimitRequestRatio?: { [key: string]: pkgApiResource.Quantity };
 
   // Min usage constraints on this kind by resource name.
-  public min?: {[key: string]: pkgApiResource.Quantity};
+  public min?: { [key: string]: pkgApiResource.Quantity };
 
   // Type of resource that this limit applies to.
   public type?: string;
@@ -1905,14 +1929,18 @@ export class LimitRangeList {
 }
 
 export function isLimitRangeList(o: any): o is LimitRangeList {
-  return o && o.apiVersion === LimitRangeList.apiVersion && o.kind === LimitRangeList.kind;
+  return (
+    o &&
+    o.apiVersion === LimitRangeList.apiVersion &&
+    o.kind === LimitRangeList.kind
+  );
 }
 
 export namespace LimitRangeList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "LimitRangeList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'LimitRangeList';
 
   // LimitRangeList is a list of LimitRange items.
   export interface Interface {
@@ -2014,18 +2042,20 @@ export class Namespace implements KubernetesObject {
 }
 
 export function isNamespace(o: any): o is Namespace {
-  return o && o.apiVersion === Namespace.apiVersion && o.kind === Namespace.kind;
+  return (
+    o && o.apiVersion === Namespace.apiVersion && o.kind === Namespace.kind
+  );
 }
 
 export namespace Namespace {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "Namespace";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'Namespace';
 
   // named constructs a Namespace with metadata.name set to name.
   export function named(name: string): Namespace {
-    return new Namespace({metadata: {name}});
+    return new Namespace({ metadata: { name } });
   }
   // Namespace provides a scope for Names. Use of multiple namespaces is optional.
   export interface Interface {
@@ -2086,14 +2116,18 @@ export class NamespaceList {
 }
 
 export function isNamespaceList(o: any): o is NamespaceList {
-  return o && o.apiVersion === NamespaceList.apiVersion && o.kind === NamespaceList.kind;
+  return (
+    o &&
+    o.apiVersion === NamespaceList.apiVersion &&
+    o.kind === NamespaceList.kind
+  );
 }
 
 export namespace NamespaceList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "NamespaceList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'NamespaceList';
 
   // NamespaceList is a list of Namespaces.
   export interface Interface {
@@ -2151,14 +2185,14 @@ export function isNode(o: any): o is Node {
 }
 
 export namespace Node {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "Node";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'Node';
 
   // named constructs a Node with metadata.name set to name.
   export function named(name: string): Node {
-    return new Node({metadata: {name}});
+    return new Node({ metadata: { name } });
   }
   // Node is a worker node in Kubernetes. Each node will have a unique identifier in the cache (i.e. in etcd).
   export interface Interface {
@@ -2280,10 +2314,10 @@ export function isNodeList(o: any): o is NodeList {
 }
 
 export namespace NodeList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "NodeList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'NodeList';
 
   // NodeList is the whole list of all Nodes which have been registered with master.
   export interface Interface {
@@ -2362,10 +2396,10 @@ export class NodeStatus {
   public addresses?: NodeAddress[];
 
   // Allocatable represents the resources of a node that are available for scheduling. Defaults to Capacity.
-  public allocatable?: {[key: string]: pkgApiResource.Quantity};
+  public allocatable?: { [key: string]: pkgApiResource.Quantity };
 
   // Capacity represents the total resources of a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
-  public capacity?: {[key: string]: pkgApiResource.Quantity};
+  public capacity?: { [key: string]: pkgApiResource.Quantity };
 
   // Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/concepts/nodes/node/#condition
   public conditions?: NodeCondition[];
@@ -2503,18 +2537,22 @@ export class PersistentVolume implements KubernetesObject {
 }
 
 export function isPersistentVolume(o: any): o is PersistentVolume {
-  return o && o.apiVersion === PersistentVolume.apiVersion && o.kind === PersistentVolume.kind;
+  return (
+    o &&
+    o.apiVersion === PersistentVolume.apiVersion &&
+    o.kind === PersistentVolume.kind
+  );
 }
 
 export namespace PersistentVolume {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "PersistentVolume";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'PersistentVolume';
 
   // named constructs a PersistentVolume with metadata.name set to name.
   export function named(name: string): PersistentVolume {
-    return new PersistentVolume({metadata: {name}});
+    return new PersistentVolume({ metadata: { name } });
   }
   // PersistentVolume (PV) is a storage resource provisioned by an administrator. It is analogous to a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
   export interface Interface {
@@ -2556,18 +2594,22 @@ export class PersistentVolumeClaim implements KubernetesObject {
 }
 
 export function isPersistentVolumeClaim(o: any): o is PersistentVolumeClaim {
-  return o && o.apiVersion === PersistentVolumeClaim.apiVersion && o.kind === PersistentVolumeClaim.kind;
+  return (
+    o &&
+    o.apiVersion === PersistentVolumeClaim.apiVersion &&
+    o.kind === PersistentVolumeClaim.kind
+  );
 }
 
 export namespace PersistentVolumeClaim {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "PersistentVolumeClaim";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'PersistentVolumeClaim';
 
   // named constructs a PersistentVolumeClaim with metadata.name set to name.
   export function named(name: string): PersistentVolumeClaim {
-    return new PersistentVolumeClaim({metadata: {name}});
+    return new PersistentVolumeClaim({ metadata: { name } });
   }
   // PersistentVolumeClaim is a user's request for and claim to a persistent volume
   export interface Interface {
@@ -2632,15 +2674,21 @@ export class PersistentVolumeClaimList {
   }
 }
 
-export function isPersistentVolumeClaimList(o: any): o is PersistentVolumeClaimList {
-  return o && o.apiVersion === PersistentVolumeClaimList.apiVersion && o.kind === PersistentVolumeClaimList.kind;
+export function isPersistentVolumeClaimList(
+  o: any
+): o is PersistentVolumeClaimList {
+  return (
+    o &&
+    o.apiVersion === PersistentVolumeClaimList.apiVersion &&
+    o.kind === PersistentVolumeClaimList.kind
+  );
 }
 
 export namespace PersistentVolumeClaimList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "PersistentVolumeClaimList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'PersistentVolumeClaimList';
 
   // PersistentVolumeClaimList is a list of PersistentVolumeClaim items.
   export interface Interface {
@@ -2682,7 +2730,7 @@ export class PersistentVolumeClaimStatus {
   public accessModes?: string[];
 
   // Represents the actual resources of the underlying volume.
-  public capacity?: {[key: string]: pkgApiResource.Quantity};
+  public capacity?: { [key: string]: pkgApiResource.Quantity };
 
   // Current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'ResizeStarted'.
   public conditions?: PersistentVolumeClaimCondition[];
@@ -2728,14 +2776,18 @@ export class PersistentVolumeList {
 }
 
 export function isPersistentVolumeList(o: any): o is PersistentVolumeList {
-  return o && o.apiVersion === PersistentVolumeList.apiVersion && o.kind === PersistentVolumeList.kind;
+  return (
+    o &&
+    o.apiVersion === PersistentVolumeList.apiVersion &&
+    o.kind === PersistentVolumeList.kind
+  );
 }
 
 export namespace PersistentVolumeList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "PersistentVolumeList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'PersistentVolumeList';
 
   // PersistentVolumeList is a list of PersistentVolume items.
   export interface Interface {
@@ -2762,7 +2814,7 @@ export class PersistentVolumeSpec {
   public azureFile?: AzureFilePersistentVolumeSource;
 
   // A description of the persistent volume's resources and capacity. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity
-  public capacity?: {[key: string]: pkgApiResource.Quantity};
+  public capacity?: { [key: string]: pkgApiResource.Quantity };
 
   // CephFS represents a Ceph FS mount on the host that shares a pod's lifetime
   public cephfs?: CephFSPersistentVolumeSource;
@@ -2897,14 +2949,14 @@ export function isPod(o: any): o is Pod {
 }
 
 export namespace Pod {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "Pod";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'Pod';
 
   // named constructs a Pod with metadata.name set to name.
   export function named(name: string): Pod {
-    return new Pod({metadata: {name}});
+    return new Pod({ metadata: { name } });
   }
   // Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
   export interface Interface {
@@ -3039,10 +3091,10 @@ export function isPodList(o: any): o is PodList {
 }
 
 export namespace PodList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "PodList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'PodList';
 
   // PodList is a list of Pods.
   export interface Interface {
@@ -3067,9 +3119,9 @@ export class PodReadinessGate {
 // PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext.
 export class PodSecurityContext {
   // A special supplemental group that applies to all containers in a pod. Some volume types allow the Kubelet to change the ownership of that volume to be owned by the pod:
-  // 
+  //
   // 1. The owning GID will be the FSGroup 2. The setgid bit is set (new files created in the volume will be owned by FSGroup) 3. The permission bits are OR'd with rw-rw----
-  // 
+  //
   // If unset, the Kubelet will not modify the ownership and permissions of any volume.
   public fsGroup?: number;
 
@@ -3146,10 +3198,10 @@ export class PodSpec {
   public nodeName?: string;
 
   // NodeSelector is a selector which must be true for the pod to fit on a node. Selector which must match a node's labels for the pod to be scheduled on that node. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  public nodeSelector?: {[key: string]: string};
+  public nodeSelector?: { [key: string]: string };
 
   // Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. This field will be autopopulated at admission time by the RuntimeClass admission controller. If the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests. The RuntimeClass admission controller will reject Pod create requests which have the overhead already set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero. More info: https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md This field is alpha-level as of Kubernetes v1.16, and is only honored by servers that enable the PodOverhead feature.
-  public overhead?: {[key: string]: pkgApiResource.Quantity};
+  public overhead?: { [key: string]: pkgApiResource.Quantity };
 
   // PreemptionPolicy is the Policy for preempting pods with lower priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority if unset. This field is alpha-level and is only honored by servers that enable the NonPreemptingPriority feature.
   public preemptionPolicy?: string;
@@ -3261,9 +3313,9 @@ export class PodStatus {
   public nominatedNodeName?: string;
 
   // The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle. The conditions array, the reason and message fields, and the individual container status arrays contain more detail about the pod's status. There are five possible phase values:
-  // 
+  //
   // Pending: The pod has been accepted by the Kubernetes system, but one or more of the container images has not been created. This includes time before being scheduled as well as time spent downloading images over the network, which could take a while. Running: The pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting. Succeeded: All containers in the pod have terminated in success, and will not be restarted. Failed: All containers in the pod have terminated, and at least one container has terminated in failure. The container either exited with non-zero status or was terminated by the system. Unknown: For some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod.
-  // 
+  //
   // More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase
   public phase?: string;
 
@@ -3306,18 +3358,20 @@ export class PodTemplate implements KubernetesObject {
 }
 
 export function isPodTemplate(o: any): o is PodTemplate {
-  return o && o.apiVersion === PodTemplate.apiVersion && o.kind === PodTemplate.kind;
+  return (
+    o && o.apiVersion === PodTemplate.apiVersion && o.kind === PodTemplate.kind
+  );
 }
 
 export namespace PodTemplate {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "PodTemplate";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'PodTemplate';
 
   // named constructs a PodTemplate with metadata.name set to name.
   export function named(name: string): PodTemplate {
-    return new PodTemplate({metadata: {name}});
+    return new PodTemplate({ metadata: { name } });
   }
   // PodTemplate describes a template for creating copies of a predefined pod.
   export interface Interface {
@@ -3352,14 +3406,18 @@ export class PodTemplateList {
 }
 
 export function isPodTemplateList(o: any): o is PodTemplateList {
-  return o && o.apiVersion === PodTemplateList.apiVersion && o.kind === PodTemplateList.kind;
+  return (
+    o &&
+    o.apiVersion === PodTemplateList.apiVersion &&
+    o.kind === PodTemplateList.kind
+  );
 }
 
 export namespace PodTemplateList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "PodTemplateList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'PodTemplateList';
 
   // PodTemplateList is a list of PodTemplates.
   export interface Interface {
@@ -3586,18 +3644,22 @@ export class ReplicationController implements KubernetesObject {
 }
 
 export function isReplicationController(o: any): o is ReplicationController {
-  return o && o.apiVersion === ReplicationController.apiVersion && o.kind === ReplicationController.kind;
+  return (
+    o &&
+    o.apiVersion === ReplicationController.apiVersion &&
+    o.kind === ReplicationController.kind
+  );
 }
 
 export namespace ReplicationController {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ReplicationController";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ReplicationController';
 
   // named constructs a ReplicationController with metadata.name set to name.
   export function named(name: string): ReplicationController {
-    return new ReplicationController({metadata: {name}});
+    return new ReplicationController({ metadata: { name } });
   }
   // ReplicationController represents the configuration of a replication controller.
   export interface Interface {
@@ -3660,15 +3722,21 @@ export class ReplicationControllerList {
   }
 }
 
-export function isReplicationControllerList(o: any): o is ReplicationControllerList {
-  return o && o.apiVersion === ReplicationControllerList.apiVersion && o.kind === ReplicationControllerList.kind;
+export function isReplicationControllerList(
+  o: any
+): o is ReplicationControllerList {
+  return (
+    o &&
+    o.apiVersion === ReplicationControllerList.apiVersion &&
+    o.kind === ReplicationControllerList.kind
+  );
 }
 
 export namespace ReplicationControllerList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ReplicationControllerList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ReplicationControllerList';
 
   // ReplicationControllerList is a collection of replication controllers.
   export interface Interface {
@@ -3689,7 +3757,7 @@ export class ReplicationControllerSpec {
   public replicas?: number;
 
   // Selector is a label query over pods that should match the Replicas count. If Selector is empty, it is defaulted to the labels present on the Pod template. Label keys and values that must match in order to be controlled by this replication controller, if empty defaulted to labels on Pod template. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
-  public selector?: {[key: string]: string};
+  public selector?: { [key: string]: string };
 
   // Template is the object that describes the pod that will be created if insufficient replicas are detected. This takes precedence over a TemplateRef. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
   public template?: PodTemplateSpec;
@@ -3770,18 +3838,22 @@ export class ResourceQuota implements KubernetesObject {
 }
 
 export function isResourceQuota(o: any): o is ResourceQuota {
-  return o && o.apiVersion === ResourceQuota.apiVersion && o.kind === ResourceQuota.kind;
+  return (
+    o &&
+    o.apiVersion === ResourceQuota.apiVersion &&
+    o.kind === ResourceQuota.kind
+  );
 }
 
 export namespace ResourceQuota {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ResourceQuota";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ResourceQuota';
 
   // named constructs a ResourceQuota with metadata.name set to name.
   export function named(name: string): ResourceQuota {
-    return new ResourceQuota({metadata: {name}});
+    return new ResourceQuota({ metadata: { name } });
   }
   // ResourceQuota sets aggregate quota restrictions enforced per namespace
   export interface Interface {
@@ -3819,14 +3891,18 @@ export class ResourceQuotaList {
 }
 
 export function isResourceQuotaList(o: any): o is ResourceQuotaList {
-  return o && o.apiVersion === ResourceQuotaList.apiVersion && o.kind === ResourceQuotaList.kind;
+  return (
+    o &&
+    o.apiVersion === ResourceQuotaList.apiVersion &&
+    o.kind === ResourceQuotaList.kind
+  );
 }
 
 export namespace ResourceQuotaList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ResourceQuotaList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ResourceQuotaList';
 
   // ResourceQuotaList is a list of ResourceQuota items.
   export interface Interface {
@@ -3841,7 +3917,7 @@ export namespace ResourceQuotaList {
 // ResourceQuotaSpec defines the desired hard limits to enforce for Quota.
 export class ResourceQuotaSpec {
   // hard is the set of desired hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/
-  public hard?: {[key: string]: pkgApiResource.Quantity};
+  public hard?: { [key: string]: pkgApiResource.Quantity };
 
   // scopeSelector is also a collection of filters like scopes that must match each object tracked by a quota but expressed using ScopeSelectorOperator in combination with possible values. For a resource to match, both scopes AND scopeSelector (if specified in spec), must be matched.
   public scopeSelector?: ScopeSelector;
@@ -3853,19 +3929,19 @@ export class ResourceQuotaSpec {
 // ResourceQuotaStatus defines the enforced hard limits and observed use.
 export class ResourceQuotaStatus {
   // Hard is the set of enforced hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/
-  public hard?: {[key: string]: pkgApiResource.Quantity};
+  public hard?: { [key: string]: pkgApiResource.Quantity };
 
   // Used is the current observed total usage of the resource in the namespace.
-  public used?: {[key: string]: pkgApiResource.Quantity};
+  public used?: { [key: string]: pkgApiResource.Quantity };
 }
 
 // ResourceRequirements describes the compute resource requirements.
 export class ResourceRequirements {
   // Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
-  public limits?: {[key: string]: pkgApiResource.Quantity};
+  public limits?: { [key: string]: pkgApiResource.Quantity };
 
   // Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
-  public requests?: {[key: string]: pkgApiResource.Quantity};
+  public requests?: { [key: string]: pkgApiResource.Quantity };
 }
 
 // SELinuxOptions are the labels to be applied to the container
@@ -4005,7 +4081,7 @@ export class Secret implements KubernetesObject {
   public apiVersion: string;
 
   // Data contains the secret data. Each key must consist of alphanumeric characters, '-', '_' or '.'. The serialized form of the secret data is a base64 encoded string, representing the arbitrary (possibly non-string) data value here. Described in https://tools.ietf.org/html/rfc4648#section-4
-  public data?: {[key: string]: string};
+  public data?: { [key: string]: string };
 
   // Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
   public kind: string;
@@ -4014,7 +4090,7 @@ export class Secret implements KubernetesObject {
   public metadata: apisMetaV1.ObjectMeta;
 
   // stringData allows specifying non-binary secret data in string form. It is provided as a write-only convenience method. All keys and values are merged into the data field on write, overwriting any existing values. It is never output when reading from the API.
-  public stringData?: {[key: string]: string};
+  public stringData?: { [key: string]: string };
 
   // Used to facilitate programmatic handling of secret data.
   public type?: string;
@@ -4034,25 +4110,25 @@ export function isSecret(o: any): o is Secret {
 }
 
 export namespace Secret {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "Secret";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'Secret';
 
   // named constructs a Secret with metadata.name set to name.
   export function named(name: string): Secret {
-    return new Secret({metadata: {name}});
+    return new Secret({ metadata: { name } });
   }
   // Secret holds secret data of a certain type. The total bytes of the values in the Data field must be less than MaxSecretSize bytes.
   export interface Interface {
     // Data contains the secret data. Each key must consist of alphanumeric characters, '-', '_' or '.'. The serialized form of the secret data is a base64 encoded string, representing the arbitrary (possibly non-string) data value here. Described in https://tools.ietf.org/html/rfc4648#section-4
-    data?: {[key: string]: string};
+    data?: { [key: string]: string };
 
     // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
     metadata: apisMetaV1.ObjectMeta;
 
     // stringData allows specifying non-binary secret data in string form. It is provided as a write-only convenience method. All keys and values are merged into the data field on write, overwriting any existing values. It is never output when reading from the API.
-    stringData?: {[key: string]: string};
+    stringData?: { [key: string]: string };
 
     // Used to facilitate programmatic handling of secret data.
     type?: string;
@@ -4060,7 +4136,7 @@ export namespace Secret {
 }
 
 // SecretEnvSource selects a Secret to populate the environment variables with.
-// 
+//
 // The contents of the target Secret's Data field will represent the key-value pairs as environment variables.
 export class SecretEnvSource {
   // Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
@@ -4111,14 +4187,16 @@ export class SecretList {
 }
 
 export function isSecretList(o: any): o is SecretList {
-  return o && o.apiVersion === SecretList.apiVersion && o.kind === SecretList.kind;
+  return (
+    o && o.apiVersion === SecretList.apiVersion && o.kind === SecretList.kind
+  );
 }
 
 export namespace SecretList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "SecretList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'SecretList';
 
   // SecretList is a list of Secret.
   export interface Interface {
@@ -4131,7 +4209,7 @@ export namespace SecretList {
 }
 
 // Adapts a secret into a projected volume.
-// 
+//
 // The contents of the target Secret's Data field will be presented in a projected volume as files using the keys in the Data field as the file names. Note that this is identical to a secret volume source without the default mode.
 export class SecretProjection {
   // If unspecified, each key-value pair in the Data field of the referenced Secret will be projected into the volume as a file whose name is the key and content is the value. If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present. If a key is specified which is not present in the Secret, the volume setup will error unless it is marked optional. Paths must be relative and may not contain the '..' path or start with '..'.
@@ -4154,7 +4232,7 @@ export class SecretReference {
 }
 
 // Adapts a Secret into a volume.
-// 
+//
 // The contents of the target Secret's Data field will be presented in a volume as files using the keys in the Data field as the file names. Secret volumes support ownership management and SELinux relabeling.
 export class SecretVolumeSource {
   // Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
@@ -4234,14 +4312,14 @@ export function isService(o: any): o is Service {
 }
 
 export namespace Service {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "Service";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'Service';
 
   // named constructs a Service with metadata.name set to name.
   export function named(name: string): Service {
-    return new Service({metadata: {name}});
+    return new Service({ metadata: { name } });
   }
   // Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
   export interface Interface {
@@ -4287,18 +4365,22 @@ export class ServiceAccount implements KubernetesObject {
 }
 
 export function isServiceAccount(o: any): o is ServiceAccount {
-  return o && o.apiVersion === ServiceAccount.apiVersion && o.kind === ServiceAccount.kind;
+  return (
+    o &&
+    o.apiVersion === ServiceAccount.apiVersion &&
+    o.kind === ServiceAccount.kind
+  );
 }
 
 export namespace ServiceAccount {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ServiceAccount";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ServiceAccount';
 
   // named constructs a ServiceAccount with metadata.name set to name.
   export function named(name: string): ServiceAccount {
-    return new ServiceAccount({metadata: {name}});
+    return new ServiceAccount({ metadata: { name } });
   }
   // ServiceAccount binds together: * a name, understood by users, and perhaps by peripheral systems, for an identity * a principal that can be authenticated and authorized * a set of secrets
   export interface Interface {
@@ -4339,14 +4421,18 @@ export class ServiceAccountList {
 }
 
 export function isServiceAccountList(o: any): o is ServiceAccountList {
-  return o && o.apiVersion === ServiceAccountList.apiVersion && o.kind === ServiceAccountList.kind;
+  return (
+    o &&
+    o.apiVersion === ServiceAccountList.apiVersion &&
+    o.kind === ServiceAccountList.kind
+  );
 }
 
 export namespace ServiceAccountList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ServiceAccountList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ServiceAccountList';
 
   // ServiceAccountList is a list of ServiceAccount objects
   export interface Interface {
@@ -4399,14 +4485,16 @@ export class ServiceList {
 }
 
 export function isServiceList(o: any): o is ServiceList {
-  return o && o.apiVersion === ServiceList.apiVersion && o.kind === ServiceList.kind;
+  return (
+    o && o.apiVersion === ServiceList.apiVersion && o.kind === ServiceList.kind
+  );
 }
 
 export namespace ServiceList {
-  export const apiVersion = "v1";
-  export const group = "";
-  export const version = "v1";
-  export const kind = "ServiceList";
+  export const apiVersion = 'v1';
+  export const group = '';
+  export const version = 'v1';
+  export const kind = 'ServiceList';
 
   // ServiceList holds a list of services.
   export interface Interface {
@@ -4477,7 +4565,7 @@ export class ServiceSpec {
   public publishNotReadyAddresses?: boolean;
 
   // Route service traffic to pods with label keys and values matching this selector. If empty or not present, the service is assumed to have an external process managing its endpoints, which Kubernetes will not modify. Only applies to types ClusterIP, NodePort, and LoadBalancer. Ignored if type is ExternalName. More info: https://kubernetes.io/docs/concepts/services-networking/service/
-  public selector?: {[key: string]: string};
+  public selector?: { [key: string]: string };
 
   // Supports "ClientIP" and "None". Used to maintain session affinity. Enable client IP based session affinity. Must be ClientIP or None. Defaults to None. More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
   public sessionAffinity?: string;

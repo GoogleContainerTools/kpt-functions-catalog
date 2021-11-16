@@ -23,14 +23,18 @@ export class KMSCryptoKeyList {
 }
 
 export function isKMSCryptoKeyList(o: any): o is KMSCryptoKeyList {
-  return o && o.apiVersion === KMSCryptoKeyList.apiVersion && o.kind === KMSCryptoKeyList.kind;
+  return (
+    o &&
+    o.apiVersion === KMSCryptoKeyList.apiVersion &&
+    o.kind === KMSCryptoKeyList.kind
+  );
 }
 
 export namespace KMSCryptoKeyList {
-  export const apiVersion = "kms.cnrm.cloud.google.com/v1beta1";
-  export const group = "kms.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "KMSCryptoKeyList";
+  export const apiVersion = 'kms.cnrm.cloud.google.com/v1beta1';
+  export const group = 'kms.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'KMSCryptoKeyList';
 
   // KMSCryptoKeyList is a list of KMSCryptoKey
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace KMSCryptoKeyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,18 @@ export class KMSKeyRingList {
 }
 
 export function isKMSKeyRingList(o: any): o is KMSKeyRingList {
-  return o && o.apiVersion === KMSKeyRingList.apiVersion && o.kind === KMSKeyRingList.kind;
+  return (
+    o &&
+    o.apiVersion === KMSKeyRingList.apiVersion &&
+    o.kind === KMSKeyRingList.kind
+  );
 }
 
 export namespace KMSKeyRingList {
-  export const apiVersion = "kms.cnrm.cloud.google.com/v1beta1";
-  export const group = "kms.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "KMSKeyRingList";
+  export const apiVersion = 'kms.cnrm.cloud.google.com/v1beta1';
+  export const group = 'kms.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'KMSKeyRingList';
 
   // KMSKeyRingList is a list of KMSKeyRing
   export interface Interface {
@@ -112,7 +120,7 @@ export namespace KMSKeyRingList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

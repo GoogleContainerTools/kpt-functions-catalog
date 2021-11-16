@@ -36,14 +36,18 @@ export class PriorityClass implements KubernetesObject {
 }
 
 export function isPriorityClass(o: any): o is PriorityClass {
-  return o && o.apiVersion === PriorityClass.apiVersion && o.kind === PriorityClass.kind;
+  return (
+    o &&
+    o.apiVersion === PriorityClass.apiVersion &&
+    o.kind === PriorityClass.kind
+  );
 }
 
 export namespace PriorityClass {
-  export const apiVersion = "scheduling.k8s.io/v1beta1";
-  export const group = "scheduling.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "PriorityClass";
+  export const apiVersion = 'scheduling.k8s.io/v1beta1';
+  export const group = 'scheduling.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'PriorityClass';
 
   // DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
   export interface Interface {
@@ -87,14 +91,18 @@ export class PriorityClassList {
 }
 
 export function isPriorityClassList(o: any): o is PriorityClassList {
-  return o && o.apiVersion === PriorityClassList.apiVersion && o.kind === PriorityClassList.kind;
+  return (
+    o &&
+    o.apiVersion === PriorityClassList.apiVersion &&
+    o.kind === PriorityClassList.kind
+  );
 }
 
 export namespace PriorityClassList {
-  export const apiVersion = "scheduling.k8s.io/v1beta1";
-  export const group = "scheduling.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "PriorityClassList";
+  export const apiVersion = 'scheduling.k8s.io/v1beta1';
+  export const group = 'scheduling.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'PriorityClassList';
 
   // PriorityClassList is a collection of priority classes.
   export interface Interface {

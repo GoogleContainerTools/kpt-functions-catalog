@@ -22,15 +22,21 @@ export class SourceRepoRepositoryList {
   }
 }
 
-export function isSourceRepoRepositoryList(o: any): o is SourceRepoRepositoryList {
-  return o && o.apiVersion === SourceRepoRepositoryList.apiVersion && o.kind === SourceRepoRepositoryList.kind;
+export function isSourceRepoRepositoryList(
+  o: any
+): o is SourceRepoRepositoryList {
+  return (
+    o &&
+    o.apiVersion === SourceRepoRepositoryList.apiVersion &&
+    o.kind === SourceRepoRepositoryList.kind
+  );
 }
 
 export namespace SourceRepoRepositoryList {
-  export const apiVersion = "sourcerepo.cnrm.cloud.google.com/v1beta1";
-  export const group = "sourcerepo.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "SourceRepoRepositoryList";
+  export const apiVersion = 'sourcerepo.cnrm.cloud.google.com/v1beta1';
+  export const group = 'sourcerepo.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'SourceRepoRepositoryList';
 
   // SourceRepoRepositoryList is a list of SourceRepoRepository
   export interface Interface {
@@ -52,7 +58,7 @@ export namespace SourceRepoRepositoryList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

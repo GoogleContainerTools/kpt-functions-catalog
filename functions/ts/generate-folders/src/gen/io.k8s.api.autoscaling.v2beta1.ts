@@ -90,19 +90,25 @@ export class HorizontalPodAutoscaler implements KubernetesObject {
   }
 }
 
-export function isHorizontalPodAutoscaler(o: any): o is HorizontalPodAutoscaler {
-  return o && o.apiVersion === HorizontalPodAutoscaler.apiVersion && o.kind === HorizontalPodAutoscaler.kind;
+export function isHorizontalPodAutoscaler(
+  o: any
+): o is HorizontalPodAutoscaler {
+  return (
+    o &&
+    o.apiVersion === HorizontalPodAutoscaler.apiVersion &&
+    o.kind === HorizontalPodAutoscaler.kind
+  );
 }
 
 export namespace HorizontalPodAutoscaler {
-  export const apiVersion = "autoscaling/v2beta1";
-  export const group = "autoscaling";
-  export const version = "v2beta1";
-  export const kind = "HorizontalPodAutoscaler";
+  export const apiVersion = 'autoscaling/v2beta1';
+  export const group = 'autoscaling';
+  export const version = 'v2beta1';
+  export const kind = 'HorizontalPodAutoscaler';
 
   // named constructs a HorizontalPodAutoscaler with metadata.name set to name.
   export function named(name: string): HorizontalPodAutoscaler {
-    return new HorizontalPodAutoscaler({metadata: {name}});
+    return new HorizontalPodAutoscaler({ metadata: { name } });
   }
   // HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
   export interface Interface {
@@ -165,15 +171,21 @@ export class HorizontalPodAutoscalerList {
   }
 }
 
-export function isHorizontalPodAutoscalerList(o: any): o is HorizontalPodAutoscalerList {
-  return o && o.apiVersion === HorizontalPodAutoscalerList.apiVersion && o.kind === HorizontalPodAutoscalerList.kind;
+export function isHorizontalPodAutoscalerList(
+  o: any
+): o is HorizontalPodAutoscalerList {
+  return (
+    o &&
+    o.apiVersion === HorizontalPodAutoscalerList.apiVersion &&
+    o.kind === HorizontalPodAutoscalerList.kind
+  );
 }
 
 export namespace HorizontalPodAutoscalerList {
-  export const apiVersion = "autoscaling/v2beta1";
-  export const group = "autoscaling";
-  export const version = "v2beta1";
-  export const kind = "HorizontalPodAutoscalerList";
+  export const apiVersion = 'autoscaling/v2beta1';
+  export const group = 'autoscaling';
+  export const version = 'v2beta1';
+  export const kind = 'HorizontalPodAutoscalerList';
 
   // HorizontalPodAutoscaler is a list of horizontal pod autoscaler objects.
   export interface Interface {

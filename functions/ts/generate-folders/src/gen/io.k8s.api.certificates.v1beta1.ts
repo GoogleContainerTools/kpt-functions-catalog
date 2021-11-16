@@ -26,19 +26,25 @@ export class CertificateSigningRequest implements KubernetesObject {
   }
 }
 
-export function isCertificateSigningRequest(o: any): o is CertificateSigningRequest {
-  return o && o.apiVersion === CertificateSigningRequest.apiVersion && o.kind === CertificateSigningRequest.kind;
+export function isCertificateSigningRequest(
+  o: any
+): o is CertificateSigningRequest {
+  return (
+    o &&
+    o.apiVersion === CertificateSigningRequest.apiVersion &&
+    o.kind === CertificateSigningRequest.kind
+  );
 }
 
 export namespace CertificateSigningRequest {
-  export const apiVersion = "certificates.k8s.io/v1beta1";
-  export const group = "certificates.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "CertificateSigningRequest";
+  export const apiVersion = 'certificates.k8s.io/v1beta1';
+  export const group = 'certificates.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'CertificateSigningRequest';
 
   // named constructs a CertificateSigningRequest with metadata.name set to name.
   export function named(name: string): CertificateSigningRequest {
-    return new CertificateSigningRequest({metadata: {name}});
+    return new CertificateSigningRequest({ metadata: { name } });
   }
   // Describes a certificate signing request
   export interface Interface {
@@ -92,15 +98,21 @@ export class CertificateSigningRequestList {
   }
 }
 
-export function isCertificateSigningRequestList(o: any): o is CertificateSigningRequestList {
-  return o && o.apiVersion === CertificateSigningRequestList.apiVersion && o.kind === CertificateSigningRequestList.kind;
+export function isCertificateSigningRequestList(
+  o: any
+): o is CertificateSigningRequestList {
+  return (
+    o &&
+    o.apiVersion === CertificateSigningRequestList.apiVersion &&
+    o.kind === CertificateSigningRequestList.kind
+  );
 }
 
 export namespace CertificateSigningRequestList {
-  export const apiVersion = "certificates.k8s.io/v1beta1";
-  export const group = "certificates.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "CertificateSigningRequestList";
+  export const apiVersion = 'certificates.k8s.io/v1beta1';
+  export const group = 'certificates.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'CertificateSigningRequestList';
 
   export interface Interface {
     items: CertificateSigningRequest[];
@@ -112,7 +124,7 @@ export namespace CertificateSigningRequestList {
 // This information is immutable after the request is created. Only the Request and Usages fields can be set on creation, other fields are derived by Kubernetes and cannot be modified by users.
 export class CertificateSigningRequestSpec {
   // Extra information about the requesting user. See user.Info interface for details.
-  public extra?: {[key: string]: string[]};
+  public extra?: { [key: string]: string[] };
 
   // Group information about the requesting user. See user.Info interface for details.
   public groups?: string[];

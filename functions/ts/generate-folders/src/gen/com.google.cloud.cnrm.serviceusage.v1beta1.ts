@@ -23,14 +23,16 @@ export class ServiceList {
 }
 
 export function isServiceList(o: any): o is ServiceList {
-  return o && o.apiVersion === ServiceList.apiVersion && o.kind === ServiceList.kind;
+  return (
+    o && o.apiVersion === ServiceList.apiVersion && o.kind === ServiceList.kind
+  );
 }
 
 export namespace ServiceList {
-  export const apiVersion = "serviceusage.cnrm.cloud.google.com/v1beta1";
-  export const group = "serviceusage.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ServiceList";
+  export const apiVersion = 'serviceusage.cnrm.cloud.google.com/v1beta1';
+  export const group = 'serviceusage.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ServiceList';
 
   // ServiceList is a list of Service
   export interface Interface {
@@ -52,7 +54,7 @@ export namespace ServiceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

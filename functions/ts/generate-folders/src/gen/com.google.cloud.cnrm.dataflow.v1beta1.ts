@@ -23,14 +23,18 @@ export class DataflowJobList {
 }
 
 export function isDataflowJobList(o: any): o is DataflowJobList {
-  return o && o.apiVersion === DataflowJobList.apiVersion && o.kind === DataflowJobList.kind;
+  return (
+    o &&
+    o.apiVersion === DataflowJobList.apiVersion &&
+    o.kind === DataflowJobList.kind
+  );
 }
 
 export namespace DataflowJobList {
-  export const apiVersion = "dataflow.cnrm.cloud.google.com/v1beta1";
-  export const group = "dataflow.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "DataflowJobList";
+  export const apiVersion = 'dataflow.cnrm.cloud.google.com/v1beta1';
+  export const group = 'dataflow.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'DataflowJobList';
 
   // DataflowJobList is a list of DataflowJob
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace DataflowJobList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

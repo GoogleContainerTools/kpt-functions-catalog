@@ -23,14 +23,18 @@ export class StorageStateList {
 }
 
 export function isStorageStateList(o: any): o is StorageStateList {
-  return o && o.apiVersion === StorageStateList.apiVersion && o.kind === StorageStateList.kind;
+  return (
+    o &&
+    o.apiVersion === StorageStateList.apiVersion &&
+    o.kind === StorageStateList.kind
+  );
 }
 
 export namespace StorageStateList {
-  export const apiVersion = "migration.k8s.io/v1alpha1";
-  export const group = "migration.k8s.io";
-  export const version = "v1alpha1";
-  export const kind = "StorageStateList";
+  export const apiVersion = 'migration.k8s.io/v1alpha1';
+  export const group = 'migration.k8s.io';
+  export const version = 'v1alpha1';
+  export const kind = 'StorageStateList';
 
   // StorageStateList is a list of StorageState
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace StorageStateList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -82,15 +86,21 @@ export class StorageVersionMigrationList {
   }
 }
 
-export function isStorageVersionMigrationList(o: any): o is StorageVersionMigrationList {
-  return o && o.apiVersion === StorageVersionMigrationList.apiVersion && o.kind === StorageVersionMigrationList.kind;
+export function isStorageVersionMigrationList(
+  o: any
+): o is StorageVersionMigrationList {
+  return (
+    o &&
+    o.apiVersion === StorageVersionMigrationList.apiVersion &&
+    o.kind === StorageVersionMigrationList.kind
+  );
 }
 
 export namespace StorageVersionMigrationList {
-  export const apiVersion = "migration.k8s.io/v1alpha1";
-  export const group = "migration.k8s.io";
-  export const version = "v1alpha1";
-  export const kind = "StorageVersionMigrationList";
+  export const apiVersion = 'migration.k8s.io/v1alpha1';
+  export const group = 'migration.k8s.io';
+  export const version = 'v1alpha1';
+  export const kind = 'StorageVersionMigrationList';
 
   // StorageVersionMigrationList is a list of StorageVersionMigration
   export interface Interface {
@@ -112,7 +122,7 @@ export namespace StorageVersionMigrationList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

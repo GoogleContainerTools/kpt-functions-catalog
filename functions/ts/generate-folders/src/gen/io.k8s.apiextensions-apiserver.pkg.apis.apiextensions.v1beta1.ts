@@ -75,15 +75,21 @@ export class CustomResourceDefinition implements KubernetesObject {
   }
 }
 
-export function isCustomResourceDefinition(o: any): o is CustomResourceDefinition {
-  return o && o.apiVersion === CustomResourceDefinition.apiVersion && o.kind === CustomResourceDefinition.kind;
+export function isCustomResourceDefinition(
+  o: any
+): o is CustomResourceDefinition {
+  return (
+    o &&
+    o.apiVersion === CustomResourceDefinition.apiVersion &&
+    o.kind === CustomResourceDefinition.kind
+  );
 }
 
 export namespace CustomResourceDefinition {
-  export const apiVersion = "apiextensions.k8s.io/v1beta1";
-  export const group = "apiextensions.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "CustomResourceDefinition";
+  export const apiVersion = 'apiextensions.k8s.io/v1beta1';
+  export const group = 'apiextensions.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'CustomResourceDefinition';
 
   // CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>. Deprecated in v1.16, planned for removal in v1.19. Use apiextensions.k8s.io/v1 CustomResourceDefinition instead.
   export interface Interface {
@@ -144,15 +150,21 @@ export class CustomResourceDefinitionList {
   }
 }
 
-export function isCustomResourceDefinitionList(o: any): o is CustomResourceDefinitionList {
-  return o && o.apiVersion === CustomResourceDefinitionList.apiVersion && o.kind === CustomResourceDefinitionList.kind;
+export function isCustomResourceDefinitionList(
+  o: any
+): o is CustomResourceDefinitionList {
+  return (
+    o &&
+    o.apiVersion === CustomResourceDefinitionList.apiVersion &&
+    o.kind === CustomResourceDefinitionList.kind
+  );
 }
 
 export namespace CustomResourceDefinitionList {
-  export const apiVersion = "apiextensions.k8s.io/v1beta1";
-  export const group = "apiextensions.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "CustomResourceDefinitionList";
+  export const apiVersion = 'apiextensions.k8s.io/v1beta1';
+  export const group = 'apiextensions.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'CustomResourceDefinitionList';
 
   // CustomResourceDefinitionList is a list of CustomResourceDefinition objects.
   export interface Interface {
@@ -350,9 +362,9 @@ export class JSONSchemaProps {
   // default is a default value for undefined object fields. Defaulting is a beta feature under the CustomResourceDefaulting feature gate. CustomResourceDefinitions with defaults must be created using the v1 (or newer) CustomResourceDefinition API.
   public default?: JSON;
 
-  public definitions?: {[key: string]: JSONSchemaProps};
+  public definitions?: { [key: string]: JSONSchemaProps };
 
-  public dependencies?: {[key: string]: JSONSchemaPropsOrStringArray};
+  public dependencies?: { [key: string]: JSONSchemaPropsOrStringArray };
 
   public description?: string;
 
@@ -398,9 +410,9 @@ export class JSONSchemaProps {
 
   public pattern?: string;
 
-  public patternProperties?: {[key: string]: JSONSchemaProps};
+  public patternProperties?: { [key: string]: JSONSchemaProps };
 
-  public properties?: {[key: string]: JSONSchemaProps};
+  public properties?: { [key: string]: JSONSchemaProps };
 
   public required?: string[];
 
@@ -448,20 +460,20 @@ export class WebhookClientConfig {
   public caBundle?: string;
 
   // service is a reference to the service for this webhook. Either service or url must be specified.
-  // 
+  //
   // If the webhook is running within the cluster, then you should use `service`.
   public service?: ServiceReference;
 
   // url gives the location of the webhook, in standard URL form (`scheme://host:port/path`). Exactly one of `url` or `service` must be specified.
-  // 
+  //
   // The `host` should not refer to a service running in the cluster; use the `service` field instead. The host might be resolved via external DNS in some apiservers (e.g., `kube-apiserver` cannot resolve in-cluster DNS as that would be a layering violation). `host` may also be an IP address.
-  // 
+  //
   // Please note that using `localhost` or `127.0.0.1` as a `host` is risky unless you take great care to run this webhook on all hosts which run an apiserver which might need to make calls to this webhook. Such installs are likely to be non-portable, i.e., not easy to turn up in a new cluster.
-  // 
+  //
   // The scheme must be "https"; the URL must begin with "https://".
-  // 
+  //
   // A path is optional, and if present may be any string permissible in a URL. You may use the path to pass an arbitrary string to the webhook, for example, a cluster identifier.
-  // 
+  //
   // Attempting to use a user or basic auth e.g. "user:password@" is not allowed. Fragments ("#...") and query parameters ("?...") are not allowed, either.
   public url?: string;
 }

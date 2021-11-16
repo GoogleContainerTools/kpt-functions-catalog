@@ -23,14 +23,18 @@ export class SpannerDatabaseList {
 }
 
 export function isSpannerDatabaseList(o: any): o is SpannerDatabaseList {
-  return o && o.apiVersion === SpannerDatabaseList.apiVersion && o.kind === SpannerDatabaseList.kind;
+  return (
+    o &&
+    o.apiVersion === SpannerDatabaseList.apiVersion &&
+    o.kind === SpannerDatabaseList.kind
+  );
 }
 
 export namespace SpannerDatabaseList {
-  export const apiVersion = "spanner.cnrm.cloud.google.com/v1beta1";
-  export const group = "spanner.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "SpannerDatabaseList";
+  export const apiVersion = 'spanner.cnrm.cloud.google.com/v1beta1';
+  export const group = 'spanner.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'SpannerDatabaseList';
 
   // SpannerDatabaseList is a list of SpannerDatabase
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace SpannerDatabaseList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,18 @@ export class SpannerInstanceList {
 }
 
 export function isSpannerInstanceList(o: any): o is SpannerInstanceList {
-  return o && o.apiVersion === SpannerInstanceList.apiVersion && o.kind === SpannerInstanceList.kind;
+  return (
+    o &&
+    o.apiVersion === SpannerInstanceList.apiVersion &&
+    o.kind === SpannerInstanceList.kind
+  );
 }
 
 export namespace SpannerInstanceList {
-  export const apiVersion = "spanner.cnrm.cloud.google.com/v1beta1";
-  export const group = "spanner.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "SpannerInstanceList";
+  export const apiVersion = 'spanner.cnrm.cloud.google.com/v1beta1';
+  export const group = 'spanner.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'SpannerInstanceList';
 
   // SpannerInstanceList is a list of SpannerInstance
   export interface Interface {
@@ -112,7 +120,7 @@ export namespace SpannerInstanceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

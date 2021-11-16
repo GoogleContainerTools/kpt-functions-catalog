@@ -7,7 +7,7 @@ export class ContainerMetrics {
   public name: string;
 
   // The memory usage is the memory working set.
-  public usage: {[key: string]: pkgApiResource.Quantity_v2};
+  public usage: { [key: string]: pkgApiResource.Quantity_v2 };
 
   constructor(desc: ContainerMetrics) {
     this.name = desc.name;
@@ -29,7 +29,7 @@ export class NodeMetrics {
   public timestamp: apisMetaV1.Time;
 
   // The memory usage is the memory working set.
-  public usage: {[key: string]: pkgApiResource.Quantity_v2};
+  public usage: { [key: string]: pkgApiResource.Quantity_v2 };
 
   public window: apisMetaV1.Duration;
 
@@ -44,14 +44,16 @@ export class NodeMetrics {
 }
 
 export function isNodeMetrics(o: any): o is NodeMetrics {
-  return o && o.apiVersion === NodeMetrics.apiVersion && o.kind === NodeMetrics.kind;
+  return (
+    o && o.apiVersion === NodeMetrics.apiVersion && o.kind === NodeMetrics.kind
+  );
 }
 
 export namespace NodeMetrics {
-  export const apiVersion = "metrics.k8s.io/v1beta1";
-  export const group = "metrics.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "NodeMetrics";
+  export const apiVersion = 'metrics.k8s.io/v1beta1';
+  export const group = 'metrics.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'NodeMetrics';
 
   // NodeMetrics sets resource usage metrics of a node.
   export interface Interface {
@@ -61,7 +63,7 @@ export namespace NodeMetrics {
     timestamp: apisMetaV1.Time;
 
     // The memory usage is the memory working set.
-    usage: {[key: string]: pkgApiResource.Quantity_v2};
+    usage: { [key: string]: pkgApiResource.Quantity_v2 };
 
     window: apisMetaV1.Duration;
   }
@@ -90,14 +92,18 @@ export class NodeMetricsList {
 }
 
 export function isNodeMetricsList(o: any): o is NodeMetricsList {
-  return o && o.apiVersion === NodeMetricsList.apiVersion && o.kind === NodeMetricsList.kind;
+  return (
+    o &&
+    o.apiVersion === NodeMetricsList.apiVersion &&
+    o.kind === NodeMetricsList.kind
+  );
 }
 
 export namespace NodeMetricsList {
-  export const apiVersion = "metrics.k8s.io/v1beta1";
-  export const group = "metrics.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "NodeMetricsList";
+  export const apiVersion = 'metrics.k8s.io/v1beta1';
+  export const group = 'metrics.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'NodeMetricsList';
 
   // NodeMetricsList is a list of NodeMetrics.
   export interface Interface {
@@ -138,14 +144,16 @@ export class PodMetrics {
 }
 
 export function isPodMetrics(o: any): o is PodMetrics {
-  return o && o.apiVersion === PodMetrics.apiVersion && o.kind === PodMetrics.kind;
+  return (
+    o && o.apiVersion === PodMetrics.apiVersion && o.kind === PodMetrics.kind
+  );
 }
 
 export namespace PodMetrics {
-  export const apiVersion = "metrics.k8s.io/v1beta1";
-  export const group = "metrics.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "PodMetrics";
+  export const apiVersion = 'metrics.k8s.io/v1beta1';
+  export const group = 'metrics.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'PodMetrics';
 
   // PodMetrics sets resource usage metrics of a pod.
   export interface Interface {
@@ -184,14 +192,18 @@ export class PodMetricsList {
 }
 
 export function isPodMetricsList(o: any): o is PodMetricsList {
-  return o && o.apiVersion === PodMetricsList.apiVersion && o.kind === PodMetricsList.kind;
+  return (
+    o &&
+    o.apiVersion === PodMetricsList.apiVersion &&
+    o.kind === PodMetricsList.kind
+  );
 }
 
 export namespace PodMetricsList {
-  export const apiVersion = "metrics.k8s.io/v1beta1";
-  export const group = "metrics.k8s.io";
-  export const version = "v1beta1";
-  export const kind = "PodMetricsList";
+  export const apiVersion = 'metrics.k8s.io/v1beta1';
+  export const group = 'metrics.k8s.io';
+  export const version = 'v1beta1';
+  export const kind = 'PodMetricsList';
 
   // PodMetricsList is a list of PodMetrics.
   export interface Interface {

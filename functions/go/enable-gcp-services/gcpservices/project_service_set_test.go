@@ -41,6 +41,7 @@ metadata:
   annotations:
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
+    internal.config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
   - compute.googleapis.com
@@ -52,6 +53,7 @@ metadata:
   name: project-services-compute
   annotations:
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
+    internal.config.kubernetes.io/path: 'service_project-services-compute.yaml'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -77,6 +79,7 @@ metadata:
   name: project-services
   annotations:
     config.kubernetes.io/path: 'ps.yaml'
+    internal.config.kubernetes.io/path: 'ps.yaml'
     config.kubernetes.io/local-config: 'true'
 spec:
   services:
@@ -89,6 +92,7 @@ metadata:
   name: project-services-compute
   annotations:
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
+    internal.config.kubernetes.io/path: 'service_project-services-compute.yaml'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -99,6 +103,7 @@ metadata:
   name: project-services-redis
   annotations:
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
+    internal.config.kubernetes.io/path: 'service_project-services-redis.yaml'
     config.kubernetes.io/path: 'service_project-services-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
@@ -130,6 +135,7 @@ metadata:
     cnrm.cloud.google.com/disable-dependent-services: "false"
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
+    internal.config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
   - compute.googleapis.com
@@ -142,6 +148,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
+    internal.config.kubernetes.io/path: 'service_project-services-compute.yaml'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -174,6 +181,7 @@ metadata:
     cnrm.cloud.google.com/disable-dependent-services: "false"
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
+    internal.config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
   - compute.googleapis.com
@@ -186,6 +194,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
+    internal.config.kubernetes.io/path: 'foo/service_project-services-compute.yaml'
     config.kubernetes.io/path: 'foo/service_project-services-compute.yaml'
   namespace: foo
 spec:
@@ -226,6 +235,7 @@ metadata:
     config.kubernetes.io/local-config: "true"
     new: anno
     config.kubernetes.io/path: 'ps.yaml'
+    internal.config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
   - compute.googleapis.com
@@ -238,6 +248,7 @@ metadata:
   annotations:
     new: 'anno'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
+    internal.config.kubernetes.io/path: 'service_project-services-compute.yaml'
     config.kubernetes.io/path: 'service_project-services-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -295,6 +306,7 @@ metadata:
   name: mungebot1
   annotations:
     config.kubernetes.io/path: 'deploy1.yaml'
+    internal.config.kubernetes.io/path: 'deploy1.yaml'
 ---
 apiVersion: blueprints.cloud.google.com/v1alpha1
 kind: ProjectServiceSet
@@ -303,6 +315,7 @@ metadata:
   annotations:
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps.yaml'
+    internal.config.kubernetes.io/path: 'ps.yaml'
 spec:
   services:
   - redis.googleapis.com
@@ -314,6 +327,7 @@ metadata:
   name: project-services-redis
   annotations:
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services'
+    internal.config.kubernetes.io/path: 'service_project-services-redis.yaml'
     config.kubernetes.io/path: 'service_project-services-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
@@ -362,6 +376,7 @@ metadata:
     cnrm.cloud.google.com/disable-dependent-services: "false"
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps1.yaml'
+    internal.config.kubernetes.io/path: 'ps1.yaml'
 spec:
   services:
   - compute.googleapis.com
@@ -376,6 +391,7 @@ metadata:
     cnrm.cloud.google.com/disable-dependent-services: "false"
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps2.yaml'
+    internal.config.kubernetes.io/path: 'ps2.yaml'
 spec:
   services:
   - redis.googleapis.com
@@ -388,6 +404,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-one'
+    internal.config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
     config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
   namespace: foo
 spec:
@@ -402,6 +419,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-two'
+    internal.config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
     config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
   namespace: bar
 spec:
@@ -463,6 +481,7 @@ metadata:
     cnrm.cloud.google.com/disable-dependent-services: "false"
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps1.yaml'
+    internal.config.kubernetes.io/path: 'ps1.yaml'
 spec:
   services:
   - compute.googleapis.com
@@ -477,6 +496,7 @@ metadata:
     cnrm.cloud.google.com/disable-dependent-services: "false"
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps2.yaml'
+    internal.config.kubernetes.io/path: 'ps2.yaml'
 spec:
   services:
   - redis.googleapis.com
@@ -489,6 +509,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-one'
+    internal.config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
     config.kubernetes.io/path: 'foo/service_project-services-one-compute.yaml'
   namespace: foo
 spec:
@@ -503,6 +524,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-two'
+    internal.config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
     config.kubernetes.io/path: 'bar/service_project-services-two-redis.yaml'
   namespace: bar
 spec:
@@ -548,6 +570,7 @@ metadata:
     cnrm.cloud.google.com/disable-dependent-services: "false"
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'ps1.yaml'
+    internal.config.kubernetes.io/path: 'ps1.yaml'
 spec:
   services:
   - compute.googleapis.com
@@ -561,6 +584,7 @@ metadata:
     cnrm.cloud.google.com/disable-dependent-services: "false"
     config.kubernetes.io/local-config: "true"
     config.kubernetes.io/path: 'subpkg/ps2.yaml'
+    internal.config.kubernetes.io/path: 'subpkg/ps2.yaml'
 spec:
   services:
   - redis.googleapis.com
@@ -573,6 +597,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-one'
+    internal.config.kubernetes.io/path: 'service_project-services-one-compute.yaml'
     config.kubernetes.io/path: 'service_project-services-one-compute.yaml'
 spec:
   resourceID: compute.googleapis.com
@@ -586,6 +611,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/disable-dependent-services: 'false'
     blueprints.cloud.google.com/ownerReference: 'blueprints.cloud.google.com/ProjectServiceSet/project-services-two'
+    internal.config.kubernetes.io/path: 'subpkg/service_project-services-two-redis.yaml'
     config.kubernetes.io/path: 'subpkg/service_project-services-two-redis.yaml'
 spec:
   resourceID: redis.googleapis.com
@@ -630,6 +656,7 @@ metadata:
   name: custom-compute
   annotations:
     config.kubernetes.io/path: 'compute.yaml'
+    internal.config.kubernetes.io/path: 'compute.yaml'
 spec:
   resourceID: compute.googleapis.com
   projectRef:
@@ -643,6 +670,7 @@ metadata:
   name: mungebot1
   annotations:
     config.kubernetes.io/path: 'deploy1.yaml'
+    internal.config.kubernetes.io/path: 'deploy1.yaml'
 `,
 			results: []framework.ResultItem{},
 		},

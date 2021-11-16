@@ -34,18 +34,20 @@ export class ClusterRole implements KubernetesObject {
 }
 
 export function isClusterRole(o: any): o is ClusterRole {
-  return o && o.apiVersion === ClusterRole.apiVersion && o.kind === ClusterRole.kind;
+  return (
+    o && o.apiVersion === ClusterRole.apiVersion && o.kind === ClusterRole.kind
+  );
 }
 
 export namespace ClusterRole {
-  export const apiVersion = "rbac.authorization.k8s.io/v1";
-  export const group = "rbac.authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "ClusterRole";
+  export const apiVersion = 'rbac.authorization.k8s.io/v1';
+  export const group = 'rbac.authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'ClusterRole';
 
   // named constructs a ClusterRole with metadata.name set to name.
   export function named(name: string): ClusterRole {
-    return new ClusterRole({metadata: {name}});
+    return new ClusterRole({ metadata: { name } });
   }
   // ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
   export interface Interface {
@@ -87,14 +89,18 @@ export class ClusterRoleBinding implements KubernetesObject {
 }
 
 export function isClusterRoleBinding(o: any): o is ClusterRoleBinding {
-  return o && o.apiVersion === ClusterRoleBinding.apiVersion && o.kind === ClusterRoleBinding.kind;
+  return (
+    o &&
+    o.apiVersion === ClusterRoleBinding.apiVersion &&
+    o.kind === ClusterRoleBinding.kind
+  );
 }
 
 export namespace ClusterRoleBinding {
-  export const apiVersion = "rbac.authorization.k8s.io/v1";
-  export const group = "rbac.authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "ClusterRoleBinding";
+  export const apiVersion = 'rbac.authorization.k8s.io/v1';
+  export const group = 'rbac.authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'ClusterRoleBinding';
 
   // ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
   export interface Interface {
@@ -132,14 +138,18 @@ export class ClusterRoleBindingList {
 }
 
 export function isClusterRoleBindingList(o: any): o is ClusterRoleBindingList {
-  return o && o.apiVersion === ClusterRoleBindingList.apiVersion && o.kind === ClusterRoleBindingList.kind;
+  return (
+    o &&
+    o.apiVersion === ClusterRoleBindingList.apiVersion &&
+    o.kind === ClusterRoleBindingList.kind
+  );
 }
 
 export namespace ClusterRoleBindingList {
-  export const apiVersion = "rbac.authorization.k8s.io/v1";
-  export const group = "rbac.authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "ClusterRoleBindingList";
+  export const apiVersion = 'rbac.authorization.k8s.io/v1';
+  export const group = 'rbac.authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'ClusterRoleBindingList';
 
   // ClusterRoleBindingList is a collection of ClusterRoleBindings
   export interface Interface {
@@ -174,14 +184,18 @@ export class ClusterRoleList {
 }
 
 export function isClusterRoleList(o: any): o is ClusterRoleList {
-  return o && o.apiVersion === ClusterRoleList.apiVersion && o.kind === ClusterRoleList.kind;
+  return (
+    o &&
+    o.apiVersion === ClusterRoleList.apiVersion &&
+    o.kind === ClusterRoleList.kind
+  );
 }
 
 export namespace ClusterRoleList {
-  export const apiVersion = "rbac.authorization.k8s.io/v1";
-  export const group = "rbac.authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "ClusterRoleList";
+  export const apiVersion = 'rbac.authorization.k8s.io/v1';
+  export const group = 'rbac.authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'ClusterRoleList';
 
   // ClusterRoleList is a collection of ClusterRoles
   export interface Interface {
@@ -246,14 +260,14 @@ export function isRole(o: any): o is Role {
 }
 
 export namespace Role {
-  export const apiVersion = "rbac.authorization.k8s.io/v1";
-  export const group = "rbac.authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "Role";
+  export const apiVersion = 'rbac.authorization.k8s.io/v1';
+  export const group = 'rbac.authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'Role';
 
   // named constructs a Role with metadata.name set to name.
   export function named(name: string): Role {
-    return new Role({metadata: {name}});
+    return new Role({ metadata: { name } });
   }
   // Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
   export interface Interface {
@@ -292,14 +306,16 @@ export class RoleBinding implements KubernetesObject {
 }
 
 export function isRoleBinding(o: any): o is RoleBinding {
-  return o && o.apiVersion === RoleBinding.apiVersion && o.kind === RoleBinding.kind;
+  return (
+    o && o.apiVersion === RoleBinding.apiVersion && o.kind === RoleBinding.kind
+  );
 }
 
 export namespace RoleBinding {
-  export const apiVersion = "rbac.authorization.k8s.io/v1";
-  export const group = "rbac.authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "RoleBinding";
+  export const apiVersion = 'rbac.authorization.k8s.io/v1';
+  export const group = 'rbac.authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'RoleBinding';
 
   // RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
   export interface Interface {
@@ -337,14 +353,18 @@ export class RoleBindingList {
 }
 
 export function isRoleBindingList(o: any): o is RoleBindingList {
-  return o && o.apiVersion === RoleBindingList.apiVersion && o.kind === RoleBindingList.kind;
+  return (
+    o &&
+    o.apiVersion === RoleBindingList.apiVersion &&
+    o.kind === RoleBindingList.kind
+  );
 }
 
 export namespace RoleBindingList {
-  export const apiVersion = "rbac.authorization.k8s.io/v1";
-  export const group = "rbac.authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "RoleBindingList";
+  export const apiVersion = 'rbac.authorization.k8s.io/v1';
+  export const group = 'rbac.authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'RoleBindingList';
 
   // RoleBindingList is a collection of RoleBindings
   export interface Interface {
@@ -383,10 +403,10 @@ export function isRoleList(o: any): o is RoleList {
 }
 
 export namespace RoleList {
-  export const apiVersion = "rbac.authorization.k8s.io/v1";
-  export const group = "rbac.authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "RoleList";
+  export const apiVersion = 'rbac.authorization.k8s.io/v1';
+  export const group = 'rbac.authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'RoleList';
 
   // RoleList is a collection of Roles
   export interface Interface {

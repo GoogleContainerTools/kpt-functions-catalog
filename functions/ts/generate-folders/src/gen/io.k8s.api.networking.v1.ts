@@ -39,18 +39,22 @@ export class NetworkPolicy implements KubernetesObject {
 }
 
 export function isNetworkPolicy(o: any): o is NetworkPolicy {
-  return o && o.apiVersion === NetworkPolicy.apiVersion && o.kind === NetworkPolicy.kind;
+  return (
+    o &&
+    o.apiVersion === NetworkPolicy.apiVersion &&
+    o.kind === NetworkPolicy.kind
+  );
 }
 
 export namespace NetworkPolicy {
-  export const apiVersion = "networking.k8s.io/v1";
-  export const group = "networking.k8s.io";
-  export const version = "v1";
-  export const kind = "NetworkPolicy";
+  export const apiVersion = 'networking.k8s.io/v1';
+  export const group = 'networking.k8s.io';
+  export const version = 'v1';
+  export const kind = 'NetworkPolicy';
 
   // named constructs a NetworkPolicy with metadata.name set to name.
   export function named(name: string): NetworkPolicy {
-    return new NetworkPolicy({metadata: {name}});
+    return new NetworkPolicy({ metadata: { name } });
   }
   // NetworkPolicy describes what network traffic is allowed for a set of Pods
   export interface Interface {
@@ -103,14 +107,18 @@ export class NetworkPolicyList {
 }
 
 export function isNetworkPolicyList(o: any): o is NetworkPolicyList {
-  return o && o.apiVersion === NetworkPolicyList.apiVersion && o.kind === NetworkPolicyList.kind;
+  return (
+    o &&
+    o.apiVersion === NetworkPolicyList.apiVersion &&
+    o.kind === NetworkPolicyList.kind
+  );
 }
 
 export namespace NetworkPolicyList {
-  export const apiVersion = "networking.k8s.io/v1";
-  export const group = "networking.k8s.io";
-  export const version = "v1";
-  export const kind = "NetworkPolicyList";
+  export const apiVersion = 'networking.k8s.io/v1';
+  export const group = 'networking.k8s.io';
+  export const version = 'v1';
+  export const kind = 'NetworkPolicyList';
 
   // NetworkPolicyList is a list of NetworkPolicy objects.
   export interface Interface {
@@ -128,12 +136,12 @@ export class NetworkPolicyPeer {
   public ipBlock?: IPBlock;
 
   // Selects Namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.
-  // 
+  //
   // If PodSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects all Pods in the Namespaces selected by NamespaceSelector.
   public namespaceSelector?: apisMetaV1.LabelSelector;
 
   // This is a label selector which selects Pods. This field follows standard label selector semantics; if present but empty, it selects all pods.
-  // 
+  //
   // If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the Pods matching PodSelector in the policy's own Namespace.
   public podSelector?: apisMetaV1.LabelSelector;
 }

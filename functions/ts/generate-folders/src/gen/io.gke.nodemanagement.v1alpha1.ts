@@ -23,14 +23,18 @@ export class UpdateInfoList {
 }
 
 export function isUpdateInfoList(o: any): o is UpdateInfoList {
-  return o && o.apiVersion === UpdateInfoList.apiVersion && o.kind === UpdateInfoList.kind;
+  return (
+    o &&
+    o.apiVersion === UpdateInfoList.apiVersion &&
+    o.kind === UpdateInfoList.kind
+  );
 }
 
 export namespace UpdateInfoList {
-  export const apiVersion = "nodemanagement.gke.io/v1alpha1";
-  export const group = "nodemanagement.gke.io";
-  export const version = "v1alpha1";
-  export const kind = "UpdateInfoList";
+  export const apiVersion = 'nodemanagement.gke.io/v1alpha1';
+  export const group = 'nodemanagement.gke.io';
+  export const version = 'v1alpha1';
+  export const kind = 'UpdateInfoList';
 
   // UpdateInfoList is a list of UpdateInfo
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace UpdateInfoList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

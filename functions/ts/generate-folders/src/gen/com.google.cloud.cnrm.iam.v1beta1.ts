@@ -23,14 +23,18 @@ export class IAMCustomRoleList {
 }
 
 export function isIAMCustomRoleList(o: any): o is IAMCustomRoleList {
-  return o && o.apiVersion === IAMCustomRoleList.apiVersion && o.kind === IAMCustomRoleList.kind;
+  return (
+    o &&
+    o.apiVersion === IAMCustomRoleList.apiVersion &&
+    o.kind === IAMCustomRoleList.kind
+  );
 }
 
 export namespace IAMCustomRoleList {
-  export const apiVersion = "iam.cnrm.cloud.google.com/v1beta1";
-  export const group = "iam.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "IAMCustomRoleList";
+  export const apiVersion = 'iam.cnrm.cloud.google.com/v1beta1';
+  export const group = 'iam.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'IAMCustomRoleList';
 
   // IAMCustomRoleList is a list of IAMCustomRole
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace IAMCustomRoleList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,18 @@ export class IAMPolicyList {
 }
 
 export function isIAMPolicyList(o: any): o is IAMPolicyList {
-  return o && o.apiVersion === IAMPolicyList.apiVersion && o.kind === IAMPolicyList.kind;
+  return (
+    o &&
+    o.apiVersion === IAMPolicyList.apiVersion &&
+    o.kind === IAMPolicyList.kind
+  );
 }
 
 export namespace IAMPolicyList {
-  export const apiVersion = "iam.cnrm.cloud.google.com/v1beta1";
-  export const group = "iam.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "IAMPolicyList";
+  export const apiVersion = 'iam.cnrm.cloud.google.com/v1beta1';
+  export const group = 'iam.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'IAMPolicyList';
 
   // IAMPolicyList is a list of IAMPolicy
   export interface Interface {
@@ -112,7 +120,7 @@ export namespace IAMPolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -143,14 +151,18 @@ export class IAMPolicyMemberList {
 }
 
 export function isIAMPolicyMemberList(o: any): o is IAMPolicyMemberList {
-  return o && o.apiVersion === IAMPolicyMemberList.apiVersion && o.kind === IAMPolicyMemberList.kind;
+  return (
+    o &&
+    o.apiVersion === IAMPolicyMemberList.apiVersion &&
+    o.kind === IAMPolicyMemberList.kind
+  );
 }
 
 export namespace IAMPolicyMemberList {
-  export const apiVersion = "iam.cnrm.cloud.google.com/v1beta1";
-  export const group = "iam.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "IAMPolicyMemberList";
+  export const apiVersion = 'iam.cnrm.cloud.google.com/v1beta1';
+  export const group = 'iam.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'IAMPolicyMemberList';
 
   // IAMPolicyMemberList is a list of IAMPolicyMember
   export interface Interface {
@@ -172,7 +184,7 @@ export namespace IAMPolicyMemberList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -204,15 +216,21 @@ export class IAMServiceAccountKeyList {
   }
 }
 
-export function isIAMServiceAccountKeyList(o: any): o is IAMServiceAccountKeyList {
-  return o && o.apiVersion === IAMServiceAccountKeyList.apiVersion && o.kind === IAMServiceAccountKeyList.kind;
+export function isIAMServiceAccountKeyList(
+  o: any
+): o is IAMServiceAccountKeyList {
+  return (
+    o &&
+    o.apiVersion === IAMServiceAccountKeyList.apiVersion &&
+    o.kind === IAMServiceAccountKeyList.kind
+  );
 }
 
 export namespace IAMServiceAccountKeyList {
-  export const apiVersion = "iam.cnrm.cloud.google.com/v1beta1";
-  export const group = "iam.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "IAMServiceAccountKeyList";
+  export const apiVersion = 'iam.cnrm.cloud.google.com/v1beta1';
+  export const group = 'iam.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'IAMServiceAccountKeyList';
 
   // IAMServiceAccountKeyList is a list of IAMServiceAccountKey
   export interface Interface {
@@ -234,7 +252,7 @@ export namespace IAMServiceAccountKeyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -263,14 +281,18 @@ export class IAMServiceAccountList {
 }
 
 export function isIAMServiceAccountList(o: any): o is IAMServiceAccountList {
-  return o && o.apiVersion === IAMServiceAccountList.apiVersion && o.kind === IAMServiceAccountList.kind;
+  return (
+    o &&
+    o.apiVersion === IAMServiceAccountList.apiVersion &&
+    o.kind === IAMServiceAccountList.kind
+  );
 }
 
 export namespace IAMServiceAccountList {
-  export const apiVersion = "iam.cnrm.cloud.google.com/v1beta1";
-  export const group = "iam.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "IAMServiceAccountList";
+  export const apiVersion = 'iam.cnrm.cloud.google.com/v1beta1';
+  export const group = 'iam.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'IAMServiceAccountList';
 
   // IAMServiceAccountList is a list of IAMServiceAccount
   export interface Interface {
@@ -292,7 +314,7 @@ export namespace IAMServiceAccountList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

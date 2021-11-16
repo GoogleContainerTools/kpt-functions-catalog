@@ -23,14 +23,18 @@ export class CapacityRequestList {
 }
 
 export function isCapacityRequestList(o: any): o is CapacityRequestList {
-  return o && o.apiVersion === CapacityRequestList.apiVersion && o.kind === CapacityRequestList.kind;
+  return (
+    o &&
+    o.apiVersion === CapacityRequestList.apiVersion &&
+    o.kind === CapacityRequestList.kind
+  );
 }
 
 export namespace CapacityRequestList {
-  export const apiVersion = "internal.autoscaling.k8s.io/v1alpha1";
-  export const group = "internal.autoscaling.k8s.io";
-  export const version = "v1alpha1";
-  export const kind = "CapacityRequestList";
+  export const apiVersion = 'internal.autoscaling.k8s.io/v1alpha1';
+  export const group = 'internal.autoscaling.k8s.io';
+  export const version = 'v1alpha1';
+  export const kind = 'CapacityRequestList';
 
   // CapacityRequestList is a list of CapacityRequest
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace CapacityRequestList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
