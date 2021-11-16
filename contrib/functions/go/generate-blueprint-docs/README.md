@@ -108,7 +108,7 @@ A Google Cloud Storage bucket
 | project-id    | blueprints-project | str  |     2 |
 | storage-class | standard           | str  |     1 |
 
-## Subpackages
+## Sub-packages
 
 This package has no sub-packages.
 

@@ -76,7 +76,7 @@ Config Connector.
 | project-id         | project-id           | str  |     2 |
 | projects-namespace | projects             | str  |     1 |
 
-## Subpackages
+## Sub-packages
 
 This package has no sub-packages.
 
@@ -369,7 +369,7 @@ metadata:
   annotations:
     internal.config.kubernetes.io/path: barsubpkg/Kptfile
 `,
-			want: `## Subpackages
+			want: `## Sub-packages
 
 - [barsubpkg](barsubpkg)
 - [foosubpkg](foosubpkg)
@@ -405,7 +405,7 @@ metadata:
   annotations:
     internal.config.kubernetes.io/path: foo/bar/baz/Kptfile
 `,
-			want: `## Subpackages
+			want: `## Sub-packages
 
 - [deepnested](foo/bar/baz)
 - [foosubpkg](foosubpkg)
@@ -421,7 +421,7 @@ metadata:
   annotations:
     internal.config.kubernetes.io/path: Kptfile
 `,
-			want: `## Subpackages
+			want: `## Sub-packages
 
 This package has no sub-packages.
 `,

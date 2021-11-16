@@ -85,7 +85,7 @@ func generateSubPkgSection(r *blueprintReadme) error {
 		subPkgLinks = append(subPkgLinks, getMdLink(pkg.Name, pkgPath))
 	}
 
-	r.write(getMdHeading("Subpackages", 2))
+	r.write(getMdHeading("Sub-packages", 2))
 	if len(subPkgLinks) == 0 {
 		r.writeLn("This package has no sub-packages.")
 	} else {
