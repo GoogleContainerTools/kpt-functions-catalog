@@ -4,6 +4,6 @@ metadata:
   name: cis-k8s-1.5.1
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-enforcement-action:unstable
+    - image: gcr.io/kpt-fn/set-enforcement-action:v0.1
       configMap:
         enforcementAction: dryrun
