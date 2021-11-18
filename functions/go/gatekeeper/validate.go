@@ -21,6 +21,8 @@ import (
 	"strconv"
 
 	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
+	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1"
+	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1alpha1"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1beta1"
 	opaclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
@@ -56,15 +58,16 @@ func createClient() (*opaclient.Client, error) {
 func gatherTemplates(objects []runtime.Object) ([]*templates.ConstraintTemplate, error) {
 	var templs []*templates.ConstraintTemplate
 	for _, obj := range objects {
-		ct, isConstraintTemplate := obj.(*v1beta1.ConstraintTemplate)
-		if !isConstraintTemplate {
+		templ := &templates.ConstraintTemplate{}
+		switch obj.(type) {
+		case *v1.ConstraintTemplate, *v1beta1.ConstraintTemplate, *v1alpha1.ConstraintTemplate:
+			if err := scheme.Convert(obj, templ, nil); err != nil {
+				return nil, err
+			}
+			templs = append(templs, templ)
+		default:
 			continue
 		}
-		templ := &templates.ConstraintTemplate{}
-		if err := scheme.Convert(ct, templ, nil); err != nil {
-			return nil, err
-		}
-		templs = append(templs, templ)
 	}
 	return templs, nil
 }
@@ -150,9 +153,7 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 		switch r.EnforcementAction {
 		case string(opautil.Dryrun):
 			item.Severity = framework.Info
-		// TODO(mengqiy): Warn start to be available in gatekeeper v3.4.0-rc1, we should upgrade to it when v3.4.0 is released.
-		// https://github.com/open-policy-agent/gatekeeper/blob/f1eda8f381aaaf7fc12db1782d41498b57431a5d/pkg/util/enforcement_action.go#L14
-		case "warn":
+		case string(opautil.Warn):
 			item.Severity = framework.Warning
 		default:
 			item.Severity = framework.Error
