@@ -4,4 +4,4 @@ metadata:
   name: enable-gcp-services-advanced
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/enable-gcp-services:unstable
+    - image: gcr.io/kpt-fn/enable-gcp-services:v0.1

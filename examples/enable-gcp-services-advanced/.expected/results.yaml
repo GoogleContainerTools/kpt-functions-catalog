@@ -4,7 +4,7 @@ metadata:
   name: fnresults
 exitCode: 0
 items:
-  - image: gcr.io/kpt-fn/enable-gcp-services:unstable
+  - image: gcr.io/kpt-fn/enable-gcp-services:v0.1
     exitCode: 0
     results:
       - message: pruned service
