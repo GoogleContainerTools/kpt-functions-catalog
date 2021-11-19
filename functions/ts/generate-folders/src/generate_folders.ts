@@ -5,8 +5,10 @@ import {
   kubernetesObjectResult,
   SOURCE_PATH_ANNOTATION,
   SOURCE_INDEX_ANNOTATION,
+  ID_ANNOTATION,
   LEGACY_SOURCE_PATH_ANNOTATION,
   LEGACY_SOURCE_INDEX_ANNOTATION,
+  LEGACY_ID_ANNOTATION,
 } from 'kpt-functions';
 import {
   isResourceHierarchy as isV3ResourceHierarchy,
@@ -175,6 +177,8 @@ function filterNonInheritableAnnotations(
   delete copy['config.kubernetes.io/local-config'];
   delete copy['config.k8s.io/function'];
   // Do not inherit kpt SDK's internal annotations.
+  delete copy[ID_ANNOTATION];
+  delete copy[LEGACY_ID_ANNOTATION];
   delete copy[SOURCE_PATH_ANNOTATION];
   delete copy[LEGACY_SOURCE_PATH_ANNOTATION];
   delete copy[SOURCE_INDEX_ANNOTATION];

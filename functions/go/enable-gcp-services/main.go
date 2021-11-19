@@ -30,24 +30,20 @@ type ProjectServiceSetFunction struct{}
 
 func (psf *ProjectServiceSetFunction) Process(resourceList *framework.ResourceList) error {
 	var pslr gcpservices.ProjectServiceSetRunner
-
-	resourceList.Result = &framework.Result{
-		Name: "enable-gcp-services",
-	}
 	var err error
 	resourceList.Items, err = pslr.Filter(resourceList.Items)
 	if err != nil {
-		resourceList.Result.Items = getErrorItem(err.Error())
+		resourceList.Results = getErrorItem(err.Error())
 		return err
 	}
-	resourceList.Result.Items = pslr.GetResults()
-	sortResultItems(resourceList.Result.Items)
+	resourceList.Results = pslr.GetResults()
+	sortResultItems(resourceList.Results)
 	return nil
 }
 
 // getErrorItem returns the item for an error message
-func getErrorItem(errMsg string) []framework.ResultItem {
-	return []framework.ResultItem{
+func getErrorItem(errMsg string) []*framework.Result {
+	return []*framework.Result{
 		{
 			Message:  fmt.Sprintf("failed to add services: %s", errMsg),
 			Severity: framework.Error,
@@ -57,7 +53,7 @@ func getErrorItem(errMsg string) []framework.ResultItem {
 
 // from https://github.com/GoogleContainerTools/kpt/issues/2195
 // refactor once upstreamed
-func sortResultItems(items []framework.ResultItem) {
+func sortResultItems(items []*framework.Result) {
 	sort.SliceStable(items, func(i, j int) bool {
 		if fileLess(items, i, j) != 0 {
 			return fileLess(items, i, j) < 0
@@ -66,7 +62,7 @@ func sortResultItems(items []framework.ResultItem) {
 	})
 }
 
-func fileLess(items []framework.ResultItem, i, j int) int {
+func fileLess(items []*framework.Result, i, j int) int {
 	if items[i].File.Path != items[j].File.Path {
 		if items[i].File.Path < items[j].File.Path {
 			return -1
@@ -77,7 +73,7 @@ func fileLess(items []framework.ResultItem, i, j int) int {
 	return items[i].File.Index - items[j].File.Index
 }
 
-func resultItemToString(item framework.ResultItem) string {
+func resultItemToString(item *framework.Result) string {
 	return fmt.Sprintf("resource-ref:%s,field:%s,message:%s",
 		item.ResourceRef, item.Field, item.Message)
 }
