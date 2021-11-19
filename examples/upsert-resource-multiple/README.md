@@ -8,7 +8,7 @@ function.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource-multiple
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource-multiple@upsert-resource/v0.2
 ```
 
 kpt CLI accepts only one resource as fn-config. Hence, `upsert-resource` function 
@@ -20,7 +20,7 @@ You can find an example of `List` at `.expected/fn-config.yaml`
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval -i upsert-resource:unstable --fn-config .expected/fn-config.yaml
+$ kpt fn eval -i upsert-resource:v0.2 --fn-config .expected/fn-config.yaml
 ```
 
 ### Expected result

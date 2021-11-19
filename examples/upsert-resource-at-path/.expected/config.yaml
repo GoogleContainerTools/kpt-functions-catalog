@@ -1,3 +1,3 @@
 testType: eval
-image: upsert-resource:unstable
+image: upsert-resource:v0.2
 fnConfig: fn-config.yaml
