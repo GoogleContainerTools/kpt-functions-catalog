@@ -22,8 +22,6 @@ import (
 
 	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1alpha1"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1beta1"
 	opaclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
@@ -38,6 +36,12 @@ import (
 )
 
 var scheme = runtime.NewScheme()
+
+// All versions (v1alpha1, v1beta1 and v1) of the ConstraintTemplate have implemented this interface.
+// We use it as suggested in https://github.com/GoogleContainerTools/kpt-functions-catalog/pull/649#discussion_r752553926.
+type versionless interface {
+	ToVersionless() (*templates.ConstraintTemplate, error)
+}
 
 func init() {
 	err := opaapis.AddToScheme(scheme)
@@ -58,16 +62,19 @@ func createClient() (*opaclient.Client, error) {
 func gatherTemplates(objects []runtime.Object) ([]*templates.ConstraintTemplate, error) {
 	var templs []*templates.ConstraintTemplate
 	for _, obj := range objects {
-		templ := &templates.ConstraintTemplate{}
-		switch obj.(type) {
-		case *v1.ConstraintTemplate, *v1beta1.ConstraintTemplate, *v1alpha1.ConstraintTemplate:
-			if err := scheme.Convert(obj, templ, nil); err != nil {
-				return nil, err
-			}
-			templs = append(templs, templ)
-		default:
+		gvk := obj.GetObjectKind().GroupVersionKind()
+		if gvk.Group != v1.SchemeGroupVersion.Group || gvk.Kind != "ConstraintTemplate" {
 			continue
 		}
+		v, isVersionless := obj.(versionless)
+		if !isVersionless {
+			continue
+		}
+		template, err := v.ToVersionless()
+		if err != nil {
+			return nil, fmt.Errorf("unable to convert the ConstraintTemplate: %w", err)
+		}
+		templs = append(templs, template)
 	}
 	return templs, nil
 }
