@@ -7,6 +7,8 @@ import (
 	"path"
 	"testing"
 
+	"sigs.k8s.io/kustomize/kyaml/yaml"
+
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio"
@@ -18,7 +20,7 @@ func TestProjectServiceSet_Filter(t *testing.T) {
 		name        string
 		resourceMap map[string]string
 		expected    string
-		results     []framework.ResultItem
+		results     []*framework.Result
 		errMsg      string
 	}{
 		{
@@ -60,7 +62,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{getResult(generateAction, "project-services-compute", "", "service_project-services-compute.yaml")},
+			results: []*framework.Result{getResult(generateAction, "project-services-compute", "", "service_project-services-compute.yaml")},
 		},
 		{
 			name: "simple no project, without local config anno",
@@ -108,7 +110,7 @@ metadata:
 spec:
   resourceID: redis.googleapis.com
 `,
-			results: []framework.ResultItem{
+			results: []*framework.Result{
 				getResult(generateAction, "project-services-compute", "", "service_project-services-compute.yaml"),
 				getResult(generateAction, "project-services-redis", "", "service_project-services-redis.yaml"),
 			},
@@ -155,7 +157,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{getResult(generateAction, "project-services-compute", "", "service_project-services-compute.yaml")},
+			results: []*framework.Result{getResult(generateAction, "project-services-compute", "", "service_project-services-compute.yaml")},
 		},
 		{
 			name: "simple with annotations with ns",
@@ -202,7 +204,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{getResult(generateAction, "project-services-compute", "foo", "foo/service_project-services-compute.yaml")},
+			results: []*framework.Result{getResult(generateAction, "project-services-compute", "foo", "foo/service_project-services-compute.yaml")},
 		},
 		{
 			name: "simple with existing service generated",
@@ -255,7 +257,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{getResult(recreateAction, "project-services-compute", "", "service_project-services-compute.yaml")},
+			results: []*framework.Result{getResult(recreateAction, "project-services-compute", "", "service_project-services-compute.yaml")},
 		},
 
 		{
@@ -334,7 +336,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{
+			results: []*framework.Result{
 				getResult(generateAction, "project-services-redis", "", "service_project-services-redis.yaml"),
 				getResult(pruneAction, "project-services-compute", "foo", "compute.yaml"),
 				getResult(pruneAction, "project-services-bigquery", "", "bq.yaml"),
@@ -427,7 +429,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{
+			results: []*framework.Result{
 				getResult(generateAction, "project-services-one-compute", "foo", "foo/service_project-services-one-compute.yaml"),
 				getResult(generateAction, "project-services-two-redis", "bar", "bar/service_project-services-two-redis.yaml"),
 			},
@@ -532,7 +534,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{
+			results: []*framework.Result{
 				getResult(generateAction, "project-services-one-compute", "foo", "foo/service_project-services-one-compute.yaml"),
 				getResult(recreateAction, "project-services-two-redis", "bar", "bar/service_project-services-two-redis.yaml"),
 			},
@@ -618,7 +620,7 @@ spec:
   projectRef:
     external: test
 `,
-			results: []framework.ResultItem{
+			results: []*framework.Result{
 				getResult(generateAction, "project-services-one-compute", "", "service_project-services-one-compute.yaml"),
 				getResult(generateAction, "project-services-two-redis", "", "subpkg/service_project-services-two-redis.yaml"),
 			},
@@ -672,7 +674,7 @@ metadata:
     config.kubernetes.io/path: 'deploy1.yaml'
     internal.config.kubernetes.io/path: 'deploy1.yaml'
 `,
-			results: []framework.ResultItem{},
+			results: []*framework.Result{},
 		},
 	}
 	for _, tt := range tests {
@@ -720,15 +722,22 @@ func setupInputs(t *testing.T, resourceMap map[string]string) string {
 	return baseDir
 }
 
-func getResult(action actionType, name, ns, fp string) framework.ResultItem {
-	r := framework.ResultItem{
-		File:     framework.File{Path: fp},
+func getResult(action actionType, name, ns, fp string) *framework.Result {
+	r := &framework.Result{
+		File:     &framework.File{Path: fp},
 		Message:  action.String(),
-		Severity: framework.Info}
-	r.ResourceRef.Name = name
-	r.ResourceRef.Namespace = ns
-	r.ResourceRef.APIVersion = serviceUsageAPIVersion
-	r.ResourceRef.Kind = serviceUsageKind
+		Severity: framework.Info,
+		ResourceRef: &yaml.ResourceIdentifier{
+			TypeMeta: yaml.TypeMeta{
+				APIVersion: serviceUsageAPIVersion,
+				Kind:       serviceUsageKind,
+			},
+			NameMeta: yaml.NameMeta{
+				Name:      name,
+				Namespace: ns,
+			},
+		},
+	}
 	return r
 }
 
