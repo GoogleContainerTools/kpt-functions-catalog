@@ -1,5 +1,5 @@
 diff --git a/GENERATED.md b/GENERATED.md
-index 800f955..1f1fd31 100644
+index 800f955..6b5c9fc 100644
 --- a/GENERATED.md
 +++ b/GENERATED.md
 @@ -1,6 +1,71 @@
@@ -37,14 +37,14 @@ index 800f955..1f1fd31 100644
 +## Usage
 +
 +1.  Clone the package:
-+    ```
++    ```shell
 +    kpt pkg get https://github.com/GoogleCloudPlatform/blueprints.git/catalog/bucket@${VERSION}
 +    ```
 +    Replace `${VERSION}` with the desired repo branch or tag
 +    (for example, `main`).
 +
 +1.  Move into the local package:
-+    ```
++    ```shell
 +    cd "./bucket/"
 +    ```
 +
@@ -52,24 +52,24 @@ index 800f955..1f1fd31 100644
 +    - setters.yaml
 +
 +1.  Execute the function pipeline
-+    ```
++    ```shell
 +    kpt fn render
 +    ```
 +
 +1.  Initialize the resource inventory
-+    ```
++    ```shell
 +    kpt live init --namespace ${NAMESPACE}"
 +    ```
 +    Replace `${NAMESPACE}` with the namespace in which to manage
 +    the inventory ResourceGroup (for example, `config-control`).
 +
 +1.  Apply the package resources to your cluster
-+    ```
++    ```shell
 +    kpt live apply
 +    ```
 +
 +1.  Wait for the resources to be ready
-+    ```
++    ```shell
 +    kpt live status --output table --poll-until current
 +    ```
  

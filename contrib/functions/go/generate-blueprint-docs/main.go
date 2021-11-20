@@ -25,7 +25,6 @@ func main() {
 	cmd.Long = generated.GenerateBlueprintDocsLong
 	cmd.Example = generated.GenerateBlueprintDocsExamples
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }

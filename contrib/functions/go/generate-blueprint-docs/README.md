@@ -4,9 +4,9 @@
 
 <!--mdtogo:Short-->
 
-The `generate-blueprint-docs` function generates opinionated documentation for a [blueprint](https://github.com/GoogleCloudPlatform/blueprints).
+The `generate-blueprint-docs` function generates opinionated documentation for a [blueprint kpt package](https://github.com/GoogleCloudPlatform/blueprints).
 
-It works by analyzing a blueprint kpt package to generate markdown documentation and writes it to a file.
+It works by analyzing the kpt package to generate markdown documentation and writes it to a file.
 
 <!--mdtogo-->
 
@@ -17,7 +17,7 @@ It works by analyzing a blueprint kpt package to generate markdown documentation
 The `generate-blueprint-docs` function is expected to be executed imperatively like:
 
 ```shell
-kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
+$ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
 --mount type=bind,src="$(pwd)",dst="/tmp",rw=true
 ```
 
@@ -25,7 +25,7 @@ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-
 
 This function supports `ConfigMap` `functionConfig`.
 
-- A `readme-path` can be provided to write to a specific file. If a `readme-path` is not provided, it defaults to `tmp/README.md`. If the file specified via `readme-path` does not exist, readme generation is skipped with a warning.
+- A `readme-path` can be provided to write to a specific file. If a `readme-path` is not provided, it defaults to `/tmp/README.md`. If the file specified via `readme-path` does not exist, readme generation is skipped with a warning.
 
 - A `repo-path` can be provided to include in usage section. This will generate a usage section with sample commands like `kpt pkg get ${repo-path}/{pkgname}@version`. If a `repo-path` is not provided, it defaults to `https://github.com/GoogleCloudPlatform/blueprints.git/catalog`.
 
@@ -62,7 +62,9 @@ pipeline:
   mutators:
     - image: gcr.io/kpt-fn/apply-setters:v0.1
       configPath: setters.yaml
----
+```
+
+```yaml
 # bucket.yaml
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
@@ -78,7 +80,9 @@ spec:
   uniformBucketLevelAccess: true
   versioning:
     enabled: false
----
+```
+
+```yaml
 # setters.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -105,13 +109,13 @@ and a sample readme with HTML markers.
 Invoke the function:
 
 ```shell
-kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
+$ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
 --mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- readme-path=/tmp/README.md
 ```
 
 The following readme will be created:
 
-```
+```markdown
 <!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
 # Google Cloud Storage Bucket blueprint
 
@@ -145,14 +149,14 @@ This package has no sub-packages.
 ## Usage
 
 1.  Clone the package:
-    ```
+    ```shell
     kpt pkg get https://github.com/GoogleCloudPlatform/blueprints.git/catalog/bucket@${VERSION}
     ```
     Replace `${VERSION}` with the desired repo branch or tag
     (for example, `main`).
 
 1.  Move into the local package:
-    ```
+    ```shell
     cd "./bucket/"
     ```
 
@@ -160,24 +164,24 @@ This package has no sub-packages.
     - setters.yaml
 
 1.  Execute the function pipeline
-    ```
+    ```shell
     kpt fn render
     ```
 
 1.  Initialize the resource inventory
-    ```
+    ```shell
     kpt live init --namespace ${NAMESPACE}"
     ```
     Replace `${NAMESPACE}` with the namespace in which to manage
     the inventory ResourceGroup (for example, `config-control`).
 
 1.  Apply the package resources to your cluster
-    ```
+    ```shell
     kpt live apply
     ```
 
 1.  Wait for the resources to be ready
-    ```
+    ```shell
     kpt live status --output table --poll-until current
     ```
 <!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->
