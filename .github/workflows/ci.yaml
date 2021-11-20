@@ -11,6 +11,10 @@ on:
   schedule:
     - cron:  '0 17 * * *'
 
+concurrency:
+  group: '${{ github.head_ref || github.ref }}-ci'
+  cancel-in-progress: true
+
 jobs:
   shell-ci:
     strategy:
