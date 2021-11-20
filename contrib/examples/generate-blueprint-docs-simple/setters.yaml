@@ -13,12 +13,10 @@
 # limitations under the License.
 apiVersion: v1
 kind: ConfigMap
-metadata: # kpt-merge: /setters
+metadata:
   name: setters
-  annotations:
-    internal.config.kubernetes.io/path: 'setters.yaml'
 data:
-  name: bucket2
+  name: bucket
   namespace: config-control
   project-id: project-id
   storage-class: standard

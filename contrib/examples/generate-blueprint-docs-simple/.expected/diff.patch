@@ -1,5 +1,5 @@
 diff --git a/GENERATED.md b/GENERATED.md
-index 800f955..6b5c9fc 100755
+index 800f955..543a793 100755
 --- a/GENERATED.md
 +++ b/GENERATED.md
 @@ -1,6 +1,71 @@
@@ -13,12 +13,12 @@ index 800f955..6b5c9fc 100755
 +
 +## Setters
 +
-+|     Name      |       Value        | Type | Count |
-+|---------------|--------------------|------|-------|
-+| name          | bucket             | str  |     1 |
-+| namespace     | config-control     | str  |     1 |
-+| project-id    | blueprints-project | str  |     2 |
-+| storage-class | standard           | str  |     1 |
++|     Name      |     Value      | Type | Count |
++|---------------|----------------|------|-------|
++| name          | bucket         | str  |     1 |
++| namespace     | config-control | str  |     1 |
++| project-id    | project-id     | str  |     2 |
++| storage-class | standard       | str  |     1 |
 +
 +## Sub-packages
 +
@@ -26,9 +26,9 @@ index 800f955..6b5c9fc 100755
 +
 +## Resources
 +
-+|    File     |              APIVersion               |     Kind      |           Name            |   Namespace    |
-+|-------------|---------------------------------------|---------------|---------------------------|----------------|
-+| bucket.yaml | storage.cnrm.cloud.google.com/v1beta1 | StorageBucket | blueprints-project-bucket | config-control |
++|    File     |              APIVersion               |     Kind      |       Name        |   Namespace    |
++|-------------|---------------------------------------|---------------|-------------------|----------------|
++| bucket.yaml | storage.cnrm.cloud.google.com/v1beta1 | StorageBucket | project-id-bucket | config-control |
 +
 +## Resource References
 +
