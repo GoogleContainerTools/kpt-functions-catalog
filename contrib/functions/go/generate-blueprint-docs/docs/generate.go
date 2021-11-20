@@ -13,15 +13,15 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-// GenerateBlueprintReadme generates markdown readme for a blueprint
-func GenerateBlueprintReadme(nodes []*yaml.RNode, repoPath string) (string, error) {
+// GenerateBlueprintReadme generates markdown readme and title if present for a blueprint
+func GenerateBlueprintReadme(nodes []*yaml.RNode, repoPath string) (string, string, error) {
 	r, err := newBlueprintReadme(nodes, repoPath)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	// individual sections in the readme
 	blueprintSections := []generateSection{
-		generateHeaderSection,
+		generateDescriptionSection,
 		generateSetterTableSection,
 		generateSubPkgSection,
 		generateResourceTableSection,
@@ -34,15 +34,19 @@ func GenerateBlueprintReadme(nodes []*yaml.RNode, repoPath string) (string, erro
 	// render readme
 	err = r.render()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return r.string(), nil
+
+	return getBlueprintTitle(r.bp.rootKf), r.string(), nil
 
 }
 
-// generateHeaderSection generates the title header and description
-func generateHeaderSection(r *blueprintReadme) error {
-	r.write(getMdHeading(getBlueprintTitle(r.bp.rootKf), 1))
+// generateDescriptionSection generates the description
+func generateDescriptionSection(r *blueprintReadme) error {
+	// empty description
+	if r.bp.rootKf.Info.Description == "" {
+		return nil
+	}
 	// literal style description will include a newline
 	if strings.HasSuffix(r.bp.rootKf.Info.Description, "\n") {
 		r.write(r.bp.rootKf.Info.Description)
@@ -59,17 +63,21 @@ func generateSetterTableSection(r *blueprintReadme) error {
 	if err != nil {
 		return err
 	}
-	setters := ls.GetResults()
-
-	buf := &bytes.Buffer{}
-	table := newMarkdownTable([]string{"Name", "Value", "Type", "Count"}, buf)
-	for _, setter := range setters {
-		table.Append([]string{setter.Name, setter.Value, setter.Type, fmt.Sprintf("%d", setter.Count)})
-	}
 	r.write(getMdHeading("Setters", 2))
-	table.Render()
-	r.write(buf.String())
-	return nil
+	setters := ls.GetResults()
+	if len(setters) == 0 {
+		r.writeLn("This package has no top-level setters. See sub-packages.")
+		return nil
+	} else {
+		buf := &bytes.Buffer{}
+		table := newMarkdownTable([]string{"Name", "Value", "Type", "Count"}, buf)
+		for _, setter := range setters {
+			table.Append([]string{setter.Name, setter.Value, setter.Type, fmt.Sprintf("%d", setter.Count)})
+		}
+		table.Render()
+		r.write(buf.String())
+		return nil
+	}
 }
 
 // generateResourceTableSection generates subpkg section with links to subpkgs if any

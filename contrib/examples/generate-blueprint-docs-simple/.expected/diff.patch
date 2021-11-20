@@ -1,11 +1,14 @@
 diff --git a/GENERATED.md b/GENERATED.md
-new file mode 100755
-index 0000000..8990355
---- /dev/null
+index 800f955..1f1fd31 100644
+--- a/GENERATED.md
 +++ b/GENERATED.md
-@@ -0,0 +1,65 @@
+@@ -1,6 +1,71 @@
+ <!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
 +# Google Cloud Storage Bucket blueprint
 +
+ 
+ <!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
+ <!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->
 +A Google Cloud Storage bucket
 +
 +## Setters
@@ -69,3 +72,5 @@ index 0000000..8990355
 +    ```
 +    kpt live status --output table --poll-until current
 +    ```
+ 
+ <!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->

@@ -6,7 +6,7 @@ This example shows how the [generate-blueprint-docs] function works.
 
 Running `generate-blueprint-docs` function on the example package will:
 
-1. Generate a `GENERATED.md` file with the blueprint readme.
+1. Update `GENERATED.md` file with the blueprint readme.
 
 ### Fetch the example package
 
@@ -27,6 +27,6 @@ kpt fn eval -i gcr.io/kpt-fn-contrib/blueprint-docs:unstable --include-meta-reso
 
 ### Expected result
 
-1. File `GENERATED.md` will be created with the generated readme.
+1. File `GENERATED.md` will be updated with the generated readme.
 
 [generate-blueprint-docs] https://catalog.kpt.dev/generate-blueprint-docs/v0.1/?id=definitions

@@ -9,10 +9,11 @@ import (
 
 func TestGenerateReadme(t *testing.T) {
 	tests := []struct {
-		name string
-		r    string
-		want string
-		err  string
+		name      string
+		r         string
+		wantTitle string
+		wantDoc   string
+		err       string
 	}{
 		{
 			name: "simple",
@@ -61,9 +62,10 @@ data:
   # These defaults can be kept
   folder-namespace: hierarchy
 `,
-			want: `# Project blueprint
+			wantTitle: `# Project blueprint
 
-A project and a project namespace in which to manage project resources with
+`,
+			wantDoc: `A project and a project namespace in which to manage project resources with
 Config Connector.
 
 ## Setters
@@ -224,13 +226,14 @@ spec:
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			res := getRNodesFromStr(t, tt.r)
-			got, err := GenerateBlueprintReadme(res, "https://github.com/GoogleCloudPlatform/blueprints.git/catalog/")
+			gotTitle, gotDoc, err := GenerateBlueprintReadme(res, "https://github.com/GoogleCloudPlatform/blueprints.git/catalog/")
 			require := require.New(t)
 			if tt.err != "" {
 				require.EqualError(err, tt.err)
 			} else {
 				require.NoError(err)
-				require.Equal(strings.NewReplacer("¬", "`").Replace(tt.want), got)
+				require.Equal(tt.wantTitle, gotTitle)
+				require.Equal(strings.NewReplacer("¬", "`").Replace(tt.wantDoc), gotDoc)
 			}
 
 		})

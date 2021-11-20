@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -36,14 +37,35 @@ func (rp *ReadmeProcessor) Process(resourceList *framework.ResourceList) error {
 		Name: "generate-blueprint-docs",
 	}
 	readmePath, repoPath := parseFnCfg(resourceList.FunctionConfig)
-	doc, err := docs.GenerateBlueprintReadme(resourceList.Items, repoPath)
+
+	currentDoc, err := ioutil.ReadFile(readmePath)
 	if err != nil {
-		resourceList.Result.Items = getErrorItem(err.Error())
+		if errors.Is(err, os.ErrNotExist) {
+			resourceList.Result.Items = getResultItem(fmt.Sprintf("Skipping readme generation: %s", err), framework.Warning)
+			return nil
+		} else {
+			resourceList.Result.Items = getResultItem(err.Error(), framework.Error)
+		}
+	}
+	err = generateReadme(repoPath, readmePath, string(currentDoc), resourceList)
+	if err != nil {
+		resourceList.Result.Items = getResultItem(err.Error(), framework.Error)
 		return err
 	}
-	err = ioutil.WriteFile(readmePath, []byte(doc), os.ModePerm)
+	return nil
+}
+
+func generateReadme(repoPath, readmePath, currentDoc string, resourceList *framework.ResourceList) error {
+	title, generatedDoc, err := docs.GenerateBlueprintReadme(resourceList.Items, repoPath)
 	if err != nil {
-		resourceList.Result.Items = getErrorItem(err.Error())
+		return err
+	}
+	readme, err := docs.InsertIntoReadme(title, currentDoc, generatedDoc)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(readmePath, []byte(readme), os.ModePerm)
+	if err != nil {
 		return err
 	}
 	return nil
@@ -63,12 +85,12 @@ func parseFnCfg(r *yaml.RNode) (string, string) {
 
 }
 
-// getErrorItem returns the item for input error message
-func getErrorItem(errMsg string) []framework.ResultItem {
+// getResultItem returns the item for input error message
+func getResultItem(msg string, severity framework.Severity) []framework.ResultItem {
 	return []framework.ResultItem{
 		{
-			Message:  fmt.Sprintf("failed to generate doc: %s", errMsg),
-			Severity: framework.Error,
+			Message:  fmt.Sprintf("failed to generate doc: %s", msg),
+			Severity: severity,
 		},
 	}
 }

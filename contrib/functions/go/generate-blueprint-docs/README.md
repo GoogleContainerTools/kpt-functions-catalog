@@ -25,14 +25,19 @@ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-
 
 This function supports `ConfigMap` `functionConfig`.
 
-- A `readme-path` can be provided to write to a specific file. If a `readme-path` is not provided, it defaults to `tmp/README.md`.
+- A `readme-path` can be provided to write to a specific file. If a `readme-path` is not provided, it defaults to `tmp/README.md`. If the file specified via `readme-path` does not exist, readme generation is skipped with a warning.
 
 - A `repo-path` can be provided to include in usage section. This will generate a usage section with sample commands like `kpt pkg get ${repo-path}/{pkgname}@version`. If a `repo-path` is not provided, it defaults to `https://github.com/GoogleCloudPlatform/blueprints.git/catalog`.
 
 The `generate-blueprint-docs` function does the following:
 
 1. Scans the package contents including meta resources like Kptfile(s) and function configs.
-1. Generates readme contents in markdown format.
+1. Generates readme contents in markdown format and inserts it between HTML comments.
+
+    - Generated title content is inserted between the markers `<!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->` and `<!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->` if present.
+    - Generated body content is inserted between the markers `<!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->` and `<!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->` if present.
+    - Any additional content not between the markers are preserved.
+
 1. Writes the generated readme to `readme-path`.
 
 <!--mdtogo-->
@@ -86,6 +91,17 @@ data:
   storage-class: standard
 ```
 
+and a sample readme with HTML markers.
+
+```markdown
+<!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
+
+<!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
+<!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->
+
+<!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->
+```
+
 Invoke the function:
 
 ```shell
@@ -95,8 +111,12 @@ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-
 
 The following readme will be created:
 
+```
+<!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
 # Google Cloud Storage Bucket blueprint
 
+<!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
+<!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->
 A Google Cloud Storage bucket
 
 ## Setters
@@ -160,5 +180,6 @@ This package has no sub-packages.
     ```
     kpt live status --output table --poll-until current
     ```
-
+<!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:BODY -->
+```
 <!--mdtogo-->

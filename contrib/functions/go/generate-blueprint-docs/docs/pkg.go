@@ -52,11 +52,11 @@ func getFnCfgPaths(kf *kptfilev1.KptFile) []string {
 	return fnCfgPaths
 }
 
-// getBlueprintTitle returns the title of a blueprint falling back to pkg name
+// getBlueprintTitle returns the title of a blueprint as markdown heading falling back to pkg name
 func getBlueprintTitle(kf *kptfilev1.KptFile) string {
 	title, exists := kf.Annotations[bpTitleAnnotation]
 	if exists {
-		return title
+		return getMdHeading(title, 1)
 	}
-	return kf.Name
+	return getMdHeading(kf.Name, 1)
 }
