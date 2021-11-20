@@ -8,5 +8,5 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.12.0
+	sigs.k8s.io/kustomize/kyaml v0.13.0
 )

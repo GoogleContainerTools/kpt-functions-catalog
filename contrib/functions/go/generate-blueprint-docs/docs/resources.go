@@ -18,6 +18,7 @@ func findResourcePath(r *yaml.RNode) (string, error) {
 	if exists {
 		return path, nil
 	}
+	//nolint
 	path, exists = anno[kioutil.LegacyPathAnnotation]
 	if exists {
 		return path, nil

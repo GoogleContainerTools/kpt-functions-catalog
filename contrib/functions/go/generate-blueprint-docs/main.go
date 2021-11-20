@@ -32,23 +32,20 @@ func main() {
 type ReadmeProcessor struct{}
 
 func (rp *ReadmeProcessor) Process(resourceList *framework.ResourceList) error {
-	resourceList.Result = &framework.Result{
-		Name: "generate-blueprint-docs",
-	}
 	readmePath, repoPath := parseFnCfg(resourceList.FunctionConfig)
 
 	currentDoc, err := ioutil.ReadFile(readmePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			resourceList.Result.Items = getResultItem(fmt.Sprintf("Skipping readme generation: %s", err), framework.Warning)
+			resourceList.Results = getResults(fmt.Sprintf("Skipping readme generation: %s", err), framework.Warning)
 			return nil
 		} else {
-			resourceList.Result.Items = getResultItem(err.Error(), framework.Error)
+			resourceList.Results = getResults(err.Error(), framework.Error)
 		}
 	}
 	err = generateReadme(repoPath, readmePath, string(currentDoc), resourceList)
 	if err != nil {
-		resourceList.Result.Items = getResultItem(err.Error(), framework.Error)
+		resourceList.Results = getResults(err.Error(), framework.Error)
 		return err
 	}
 	return nil
@@ -84,9 +81,9 @@ func parseFnCfg(r *yaml.RNode) (string, string) {
 
 }
 
-// getResultItem returns the item for input error message
-func getResultItem(msg string, severity framework.Severity) []framework.ResultItem {
-	return []framework.ResultItem{
+// getResults returns the item for input error message
+func getResults(msg string, severity framework.Severity) []*framework.Result {
+	return []*framework.Result{
 		{
 			Message:  fmt.Sprintf("failed to generate doc: %s", msg),
 			Severity: severity,
