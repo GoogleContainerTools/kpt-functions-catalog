@@ -1,0 +1,111 @@
+diff --git a/apply-setters.yaml b/apply-setters.yaml
+index af149ac..310375f 100644
+--- a/apply-setters.yaml
++++ b/apply-setters.yaml
+@@ -3,40 +3,5 @@ kind: ConfigMap
+ metadata:
+   name: Setters
+ data:
+-  image: 'ENC[AES256_GCM,data:Nevhh244Hwir24nH,iv:YlLb3rVn843hH2L8feswrnDyQr6njqwj3GFnrDdHaUo=,tag:UqZGkhl8iiyKUQTK2En+8g==,type:str]'
+-  tag: 'ENC[AES256_GCM,data:iQfQ4g4w,iv:UgeZfbUz74aiF6Su8q4nBkMuJfZ9vKDxom9o8GVE0rg=,tag:VeYTP00eLIzikf6YyWV5EA==,type:str]'
+-sops:
+-  kms: []
+-  gcp_kms: []
+-  azure_kv: []
+-  hc_vault: []
+-  age:
+-  - recipient: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
+-    enc: |
+-      -----BEGIN AGE ENCRYPTED FILE-----
+-      YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiQVVVamRpS1pEUGMrS3ll
+-      WmE1UHkrRFdJM21OZ0IwQ1pGcDJsSVR1bVRVCi8rQWpXTzMwYVorc0czQmtGb3VL
+-      Ti9ReUFZYlZGZHNlS1kzdTY1MFBZMXcKLS0tIE5FVFhid21pS0tyZFV6azJpQm1H
+-      cGVxNjFwS3kxTGoyR1pFam9Rci9zL0EKTM8MCUMALa9aD+VrT7AWOfjRQjRWBwPh
+-      +X0KcCwkJLmg5tokqt1L08+A/VSgfsGW5BQcuCOZ4NgJC//nIb/i/g==
+-      -----END AGE ENCRYPTED FILE-----
+-  lastmodified: '2021-08-19T21:32:30Z'
+-  mac: 'ENC[AES256_GCM,data:w585ujDo4XnyWP7PWLxNQat2OUPZlfaWU32X40FJlMmdDtz93qc1NhlLBBScK7snHRIycnR+bEkiedhuhOArVdLx68ZqYos/eUZW6d7p33SqxLW9WgNoM31ZoWqxSrqA4UC+SpJSKx+TjHmrMocEbxvqewacNLtzVhm6l8UVaHA=,iv:LaIGzW+WtZdfpqeHHmeZDpotPX8acxqp6Vr5iScPkEA=,tag:8avQ8q4kOx/Fu6eyIRguhw==,type:str]'
+-  pgp:
+-  - created_at: '2021-08-19T21:32:30Z'
+-    enc: |
+-      -----BEGIN PGP MESSAGE-----
+-
+-      hQEMAyUpShfNkFB/AQf8Dt86pcdd8MA41GjgFxYAWwLwePPOO6J2uZkJ7uofoySZ
+-      5ARo4WlT9mvaP+anNiO8R5CNwUquhB+hP9V/n9xnbN3PRlPGd78yMPsVKy37nVrK
+-      KJ/PjOZdlWyjBRZpQmEOlfNir2SqdlT3VS1VgR3IsbK4d97Al69x5NUWfRONdQHe
+-      C6IMTsOlo0YADSz6VKCqfhs+MmJxANcYFhZd7/Vc/8zImT04cPuy48KIyo01XgSq
+-      MPGA8w5LU2u0w5miHdijcnlm2L/+Jm40d/HX2PsAGJ5avwv7isQTRFgdelMSG//t
+-      T0kAfrHx6Cx9bbbkvl7MZEPFwC5bRg3lpY/pxvoSS9JcAVpxqDLFSgy8WswRY0TM
+-      u95SbB5uGc/h7QJPisCk2+3qEkF7G6T29BJKepnQQws39ZedikonqrZXgo2X2ZBH
+-      pyEYubxscrQkc+vs8xZqv5gETiS0vW/kdkXmh5E=
+-      =WV7z
+-      -----END PGP MESSAGE-----
+-    fp: FBC7B9E2A4F9289AC0C1D4843D16CEE4A27381B4
+-  unencrypted_regex: ^(kind|apiVersion|group|metadata)$
+-  version: 3.7.1
++  image: secret-nginx
++  tag: 1.14.1
+diff --git a/deployment.yaml b/deployment.yaml
+index 657fef9..21cebd1 100644
+--- a/deployment.yaml
++++ b/deployment.yaml
+@@ -16,53 +16,18 @@ kind: Deployment
+ metadata:
+   name: my-nginx
+ spec:
+-  replicas: 'ENC[AES256_GCM,data:oA==,iv:CZtM3egA1RE3Asxo/KlqkesOrh75iHU+cSa55bUJ7qE=,tag:1OXv92cE7OiIHcaZsmYkTQ==,type:int]'
++  replicas: 4
+   selector:
+     matchLabels:
+-      app: 'ENC[AES256_GCM,data:YtNx0GY=,iv:sMdJ6U5heD2idv37wcDM2CLR3kmYnQOwxfPvSnCf1C8=,tag:GfBwM+C/EDbZ2CXr5V3D1g==,type:str]'
++      app: nginx
+   template:
+     metadata:
+       labels:
+         app: nginx
+     spec:
+       containers:
+-        - name: 'ENC[AES256_GCM,data:1X3BA0A=,iv:x8ahM1ryOKD9ssSTliF/Vk25/Y8XnFXY00VOVNiz5Oo=,tag:ZwsBalcduWqp9O4HhLzVBA==,type:str]'
+-          image: 'ENC[AES256_GCM,data:mOuBTWlwFpFp,iv:/9loinwPgvmivL+rkYOiDcLME4lluvOQ9yZZFfpLEy8=,tag:qM+0kW94NyI4liuONT561Q==,type:str]' # kpt-set: ${image}:${tag}
++        - name: nginx
++          image: 'nginx:tag' # kpt-set: ${image}:${tag}
+           ports:
+-            - protocol: 'ENC[AES256_GCM,data:R3yP,iv:QW0gBWKHBDwKgXE8AV3a3L7QKik6O5iRtjLVKCkSByA=,tag:rLB4XRBCJaqlWiJbmXWZyg==,type:str]'
+-              containerPort: 'ENC[AES256_GCM,data:WEY=,iv:hXPhue1Orq1+VJgXpQCXm5xIQhbWOg7XMcNlyCkad2U=,tag:SO4F/VvWWhjRdj2MOwj5qA==,type:int]'
+-sops:
+-  kms: []
+-  gcp_kms: []
+-  azure_kv: []
+-  hc_vault: []
+-  age:
+-    - recipient: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
+-      enc: |
+-        -----BEGIN AGE ENCRYPTED FILE-----
+-        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBPQlJ3Vkh6UFBqQnhURzZz
+-        bVBMdXdEU2llVFBhUTNlS09RcWJ3dnVCOXhFCmRvNG40MGd2Y3ExMjZ4eUQraFR0
+-        RnplRnRjQSs5enYrMjk3bGtZS0NxbE0KLS0tIE1VS2I4bWZlbDJwZHhIa21Idyty
+-        TlhwL0h0NWhiVjdxeStTUVVRRDY1K00KkvcsNFXY9MxxI0FiDWhcvYlTf2a9MAmh
+-        nlwPyaXb2DkRcN7mneklAW5NsvkYwJu2cWZ9TiEuDh+whuN/pnsqJw==
+-        -----END AGE ENCRYPTED FILE-----
+-  lastmodified: '2021-08-19T21:32:30Z'
+-  mac: 'ENC[AES256_GCM,data:Pkf0b5eXSEnpE/jJR6m4NvxQIuzRuQBsaHOH4EUEBkcmf0S2/rBVoUesqJADLuw1oZxTZyvsuA5/r5Dki7+5r69ED+s7KYoVodwkw7QIbrpfVjgM8qaqzt32iFFsJy1lkhaA7/6xzILk8LKHDOyfHDB3itLUnTp5bVzNKs42kWo=,iv:QKdcSMYT45bFYYvyEVSQWq9Rpzy7sD2p3FdDZbOHR0U=,tag:LqR69BP6Vg4rkTQPk41AEg==,type:str]'
+-  pgp:
+-    - created_at: '2021-08-19T21:32:30Z'
+-      enc: |
+-        -----BEGIN PGP MESSAGE-----
+-
+-        hQEMAyUpShfNkFB/AQgAooiCdEjrfY03kqh0NtDT6QpqLI8vNFbyuR17M1kc0kHa
+-        rf96hU6SfA84HL8o9uCDZ+7mlo5XLWD9w8vjXIhWYLz1iVj0YVMSlFeg8xxQAHIU
+-        /CXFWIB7tZhm4XpWbufU1rL9JgyDiqLLeQpl/qyq6dTyTXvgfZk+CIYxZvfljsl9
+-        iABdn7nlcNXHIpdZfgUqSKMMj63sXIniMmmyMdW11bF/feHXaoWpGskMulxM/cdH
+-        MT0oCqcsNDmWB8kBst0UHBSSgj38CoTcJ1Ikcb5E/eqXzlyR1cFCqPd5hLUBlcYu
+-        ThXTK62SBMyqR87bN3HGRoZBhVcudrLGNZObCoHYndJeAfDBuIxxlXitTlvSnEsH
+-        /8MwRP1XdA6tpXOISDI69/6bYhK8AtGDPHNz4hUkXwxYToJrG9gLibyBmHO0io+W
+-        lI1DoU1KiEroY5UiL/d3nd5d6JzsbxJaltBkbmq+8g==
+-        =/VHl
+-        -----END PGP MESSAGE-----
+-      fp: FBC7B9E2A4F9289AC0C1D4843D16CEE4A27381B4
+-  unencrypted_regex: ^(kind|apiVersion|group|metadata)$
+-  version: 3.7.1
++            - protocol: TCP
++              containerPort: 80

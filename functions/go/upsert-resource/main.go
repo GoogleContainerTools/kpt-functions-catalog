@@ -29,7 +29,7 @@ type UpsertResourceProcessor struct{}
 
 func (urp *UpsertResourceProcessor) Process(resourceList *framework.ResourceList) error {
 	ur := &upsertresource.UpsertResource{
-		Resource: resourceList.FunctionConfig,
+		List: resourceList.FunctionConfig,
 	}
 	var err error
 	resourceList.Items, err = ur.Filter(resourceList.Items)

@@ -18,7 +18,6 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -54,8 +53,6 @@ func (ensp *EnsureNameSubstringProcessor) Process(resourceList *framework.Resour
 	}
 
 	ens.AdditionalNameFields = append(ensp.tc.FieldSpecs, ens.AdditionalNameFields...)
-
-	fmt.Fprintf(os.Stderr, "ens.AdditionalNameFields: %#v\n", ens.AdditionalNameFields)
 
 	resourceFactory := resource.NewFactory(&hasher.Hasher{})
 	resourceFactory.IncludeLocalConfigs = true

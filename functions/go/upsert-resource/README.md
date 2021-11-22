@@ -12,9 +12,9 @@ Insert a resource, or if the resource already exists, update the existing resour
 
 <!--mdtogo:Long-->
 
-Upsert is an operation that adds a resource(uniquely identified by Group, Kind, Name and Namespace)
-if it does not already exist, or replaces it if it already exists in the input list of resources.
-`upsert-resource` function offers a safe way to upsert a resource to the list of input resources.
+Upsert is an operation that adds resources(uniquely identified by Group, Kind, Name, Namespace and Path)
+if they do not already exist, or replaces them if they already exist in the input list of resources.
+`upsert-resource` function offers a safe way to upsert a resources to the list of input resources.
 
 <!--mdtogo-->
 

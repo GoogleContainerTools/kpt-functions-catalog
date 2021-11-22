@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/qri-io/starlib/util"
+	"go.starlark.net/resolve"
 	"go.starlark.net/starlark"
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil"
@@ -107,8 +108,14 @@ func (sf *Filter) Run(reader io.Reader, writer io.Writer) error {
 
 // runStarlark runs the starlark script
 func runStarlark(name, starlarkProgram string, resourceList starlark.Value) error {
+	// Enabled some non-standard starlark features (https://pkg.go.dev/go.starlark.net/resolve#pkg-variables).
+	// LoadBindsGlobally is not enabled, since it has been deprecated.
+	resolve.AllowSet = true
+	resolve.AllowGlobalReassign = true
+	resolve.AllowRecursion = true
+
 	// run the starlark as program as transformation function
-	thread := &starlark.Thread{Name: name}
+	thread := &starlark.Thread{Name: name, Load: load}
 
 	ctx := &Context{resourceList: resourceList}
 	pd, err := ctx.predeclared()
@@ -139,16 +146,11 @@ func (sf *Filter) readResourceList(reader io.Reader) (starlark.Value, error) {
 
 // rnodeToStarlarkValue converts a RNode to a starlark value.
 func rnodeToStarlarkValue(rn *yaml.RNode) (starlark.Value, error) {
-	b, err := yaml.Marshal(rn.Document()) // convert to bytes
+	m, err := rn.Map()
 	if err != nil {
 		return nil, errors.Wrap(err)
 	}
-	var in map[string]interface{}
-	err = yaml.Unmarshal(b, &in) // convert to map[string]interface{}
-	if err != nil {
-		return nil, errors.Wrap(err)
-	}
-	return util.Marshal(in) // convert to starlark value
+	return util.Marshal(m) // convert to starlark value
 }
 
 // starlarkValueToRNode converts the output of the starlark program to a RNode.

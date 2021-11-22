@@ -1,0 +1,13 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
+metadata:
+  name: set-namespace-to-prod
+source: |
+  load('encoding/json.star', 'json')
+
+  def updateReplicas(resources):
+    for resource in resources:
+      if resource["kind"] == "Deployment":
+        obj = json.decode(resource["metadata"]["annotations"]["last-applied"])
+        resource["spec"]["replicas"] = obj["spec"]["replicas"]+1
+  updateReplicas(ctx.resource_list["items"])

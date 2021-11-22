@@ -34,7 +34,7 @@ pairs:
 
 ### Function invocation
 
-Get this example and try it out by running the following commands:
+Try it out by running the following commands:
 
 ```shell
 $ kpt fn render kubeval-simple --results-dir /tmp

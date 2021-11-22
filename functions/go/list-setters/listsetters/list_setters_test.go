@@ -42,7 +42,7 @@ metadata:
   name: test
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         app: my-app
 `, "test.yaml": `apiVersion: v1
@@ -78,7 +78,7 @@ metadata:
     app: my-app # kpt-set: ${app}
   name: mungebot
 `},
-			errMsg: "unable to read Kptfile: please make sure the package has a valid 'v1' Kptfile: yaml: unmarshal errors:\n  line 8: field foo not found in type v1.KptFile",
+			errMsg: "unable to read Kptfile: invalid 'v1' Kptfile: yaml: unmarshal errors:\n  line 8: field foo not found in type v1.KptFile",
 		},
 		{
 			name: "Scalar Simple missing apply-setters",
@@ -133,7 +133,7 @@ metadata:
   name: test
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
 `, "test.yaml": `apiVersion: v1
 kind: Service
 metadata:
@@ -156,7 +156,7 @@ metadata:
   name: test
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configPath: setters.yaml
 `, "test.yaml": `apiVersion: v1
 kind: Service
@@ -180,7 +180,7 @@ metadata:
   name: test
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         app: my-app
         foo: bar
@@ -194,7 +194,7 @@ kind: Deployment
 metadata:
   labels:
     app: my-app # kpt-set: ${app}
-  name: mungebot			
+  name: mungebot
 `},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}, {Name: "foo", Value: "bar", Count: 0, Type: "str"}},
 		},
@@ -206,11 +206,11 @@ metadata:
   name: test
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         app: my-app-old
         foo: bar
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         app: my-app
         baz: qux
@@ -224,7 +224,7 @@ kind: Deployment
 metadata:
   labels:
     app: my-app # kpt-set: ${app}
-  name: mungebot			
+  name: mungebot
 `},
 			expectedResult: []*Result{{Name: "app", Value: "my-app", Count: 2, Type: "str"}, {Name: "foo", Value: "bar", Count: 0, Type: "str"}, {Name: "baz", Value: "qux", Count: 0, Type: "str"}},
 		},
@@ -250,7 +250,7 @@ metadata:
   name: test
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configPath: setters.yaml
 `, "setters.yaml": `apiVersion: v1
 kind: ConfigMap
@@ -279,9 +279,9 @@ metadata:
   name: test
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configPath: setters.yaml
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         baz: qux
 `, "setters.yaml": `apiVersion: v1
@@ -342,7 +342,7 @@ metadata:
   name: project-package
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configPath: setters.yaml
 `, "setters.yaml": `apiVersion: v1
 kind: ConfigMap
@@ -393,7 +393,7 @@ metadata:
   name: vpc-package
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configPath: setters.yaml
 `},
 			expectedResult: []*Result{

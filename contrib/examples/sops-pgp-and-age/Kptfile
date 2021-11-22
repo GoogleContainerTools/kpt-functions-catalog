@@ -1,0 +1,10 @@
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: age-example
+info:
+  description: null
+pipeline:
+  mutators:
+    - image: 'gcr.io/kpt-fn/apply-setters:unstable'
+      configPath: apply-setters.yaml

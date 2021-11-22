@@ -275,7 +275,7 @@ data:
 
 If neither ${SCHEMA_LOCATION} nor ${ADDITIONAL_SCHEMA_LOCATIONS} is provided, we
 will convert the baked-in OpenAPI document to json schemas and use them.
-The baked-in OpenAPI document is from a GKE cluster with version v1.19.8. The
-OpenAPI document contains kubernetes built-in types and some GCP CRDs (e.g.
-BackendConfig), but it currently doesn't contain Config Connector CRDs.
+The baked-in OpenAPI document is from a GKE cluster with version v1.20.10. The
+OpenAPI document contains kubernetes built-in types and GCP CRDs (including
+Config Connector resources).
 `;

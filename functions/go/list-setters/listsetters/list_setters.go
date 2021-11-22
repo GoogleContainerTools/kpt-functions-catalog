@@ -7,7 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	kptv1 "github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix/v1"
+	kptfilev1 "github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/api/kptfile/v1"
+	kptutil "github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/api/util"
 	"sigs.k8s.io/kustomize/kyaml/errors"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
@@ -84,10 +85,14 @@ const (
 )
 
 // FindKptfile discovers Kptfile of the root package from slice of nodes
-func FindKptfile(nodes []*yaml.RNode) (*kptv1.KptFile, error) {
+func FindKptfile(nodes []*yaml.RNode) (*kptfilev1.KptFile, error) {
 	for _, node := range nodes {
-		if node.GetAnnotations()[kioutil.PathAnnotation] == kptv1.KptFileName {
-			kf, err := kptv1.ReadFile(node)
+		if node.GetAnnotations()[kioutil.PathAnnotation] == kptfilev1.KptFileName {
+			s, err := node.String()
+			if err != nil {
+				return nil, errors.WrapPrefixf(err, "unable to read Kptfile")
+			}
+			kf, err := kptutil.DecodeKptfile(s)
 			return kf, errors.WrapPrefixf(err, "unable to read Kptfile")
 		}
 	}
