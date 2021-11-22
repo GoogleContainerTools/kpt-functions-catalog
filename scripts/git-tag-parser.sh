@@ -44,14 +44,16 @@ function get_versions {
 # it stops and exit with 0.
 # It GIT_TAG is set, it splits the GIT_TAG by "/" and returns the desired part
 # depending on the input argument.
+# The format of GIT_TAG can be either functions/<fn-lang>/<fn-name>/<version>
+# (recommended) or <fn-lang>/<fn-name>/<version>.
 # example 1:
-# Invocation: GIT_TAG=ts/kubeval/v1.2.3 parse_git_tag lang
+# Invocation: GIT_TAG=functions/ts/kubeval/v1.2.3 parse_git_tag lang
 # Return: ts
 # example 2:
-# Invocation: GIT_TAG=ts/kubeval/v1.2.3 parse_git_tag fn_name
+# Invocation: GIT_TAG=functions/ts/kubeval/v1.2.3 parse_git_tag fn_name
 # Return: kubeval
 # example 3:
-# Invocation: GIT_TAG=ts/kubeval/v1.2.3 parse_git_tag fn_ver
+# Invocation: GIT_TAG=functions/ts/kubeval/v1.2.3 parse_git_tag fn_ver
 # Return: v1.2.3
 function parse_git_tag {
   # If GIT_TAG is not set, just skip processing.
@@ -63,9 +65,19 @@ function parse_git_tag {
   # Split GIT_TAG by '/'. e.g. if GIT_TAG is "go/set-namespace/v1.2.3", we will
   # get "go", "set-namespace" and "v1.2.3".
   IFS='/' read -ra GIT_TAG_ARRAY <<< "${GIT_TAG}"
-  fn_lang=${GIT_TAG_ARRAY[0]}
-  fn_name=${GIT_TAG_ARRAY[1]}
-  fn_ver=${GIT_TAG_ARRAY[2]}
+  if [ "${GIT_TAG_ARRAY[0]}" == "functions" ]; then
+    fn_lang=${GIT_TAG_ARRAY[1]}
+    fn_name=${GIT_TAG_ARRAY[2]}
+    fn_ver=${GIT_TAG_ARRAY[3]}
+  elif [ "${GIT_TAG_ARRAY[0]}" == "contrib" ]; then
+    fn_lang=${GIT_TAG_ARRAY[2]}
+    fn_name=${GIT_TAG_ARRAY[3]}
+    fn_ver=${GIT_TAG_ARRAY[4]}
+  else
+    fn_lang=${GIT_TAG_ARRAY[0]}
+    fn_name=${GIT_TAG_ARRAY[1]}
+    fn_ver=${GIT_TAG_ARRAY[2]}
+  fi
 
   case "$1" in
     lang)

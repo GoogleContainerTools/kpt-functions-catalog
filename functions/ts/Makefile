@@ -24,6 +24,7 @@ help: ## Print this help
 
 # Edit this list to contain all ts functions
 FUNCTIONS := \
+	generate-folders \
 	kubeval
 
 # Targets for running all function tests

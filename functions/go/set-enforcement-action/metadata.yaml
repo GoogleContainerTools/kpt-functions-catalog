@@ -1,0 +1,11 @@
+image: gcr.io/kpt-fn/set-enforcement-action
+description: Sets the enforcement action for policy constraints to deny or dryrun
+tags:
+  - mutator
+  - Config Sync
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/functions/go/set-enforcement-action
+examplePackageURLs:
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-enforcement-action-simple
+emails:
+  - kpt-team@google.com
+license: Apache-2.0

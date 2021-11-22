@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: List
+metadata:
+  name: upsert-multiple-resources-config
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: myService
+    namespace: mySpace
+  spec:
+    selector:
+      app: bar
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: myDeployment2
+    namespace: mySpace
+  spec:
+    replicas: 10

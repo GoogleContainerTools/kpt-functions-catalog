@@ -19,7 +19,7 @@ We have a `ReplicationController` in `app.yaml` that has 2 schema violations:
 
 ### Function invocation
 
-Get this example and try it out by running the following commands:
+Try it out by running the following command:
 
 ```shell
 # We set `strict=true` to disallow unknown field and `skip_kinds=MyCustom,MyOtherCustom` to skip 2 kinds that we don't have schemas.

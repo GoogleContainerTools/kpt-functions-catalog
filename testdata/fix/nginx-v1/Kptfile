@@ -28,7 +28,7 @@ info:
   man: nginx man text
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-setters:v0.1
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
       configPath: setters.yaml
     - image: gcr.io/kpt-fn/set-annotations:v0.1
       configPath: my-annotations.yaml

@@ -21,7 +21,7 @@ import (
 	"strconv"
 
 	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1beta1"
+	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1"
 	opaclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
@@ -36,6 +36,12 @@ import (
 )
 
 var scheme = runtime.NewScheme()
+
+// All versions (v1alpha1, v1beta1 and v1) of the ConstraintTemplate have implemented this interface.
+// We use it as suggested in https://github.com/GoogleContainerTools/kpt-functions-catalog/pull/649#discussion_r752553926.
+type versionless interface {
+	ToVersionless() (*templates.ConstraintTemplate, error)
+}
 
 func init() {
 	err := opaapis.AddToScheme(scheme)
@@ -56,15 +62,19 @@ func createClient() (*opaclient.Client, error) {
 func gatherTemplates(objects []runtime.Object) ([]*templates.ConstraintTemplate, error) {
 	var templs []*templates.ConstraintTemplate
 	for _, obj := range objects {
-		ct, isConstraintTemplate := obj.(*v1beta1.ConstraintTemplate)
-		if !isConstraintTemplate {
+		gvk := obj.GetObjectKind().GroupVersionKind()
+		if gvk.Group != v1.SchemeGroupVersion.Group || gvk.Kind != "ConstraintTemplate" {
 			continue
 		}
-		templ := &templates.ConstraintTemplate{}
-		if err := scheme.Convert(ct, templ, nil); err != nil {
-			return nil, err
+		v, isVersionless := obj.(versionless)
+		if !isVersionless {
+			continue
 		}
-		templs = append(templs, templ)
+		template, err := v.ToVersionless()
+		if err != nil {
+			return nil, fmt.Errorf("unable to convert the ConstraintTemplate: %w", err)
+		}
+		templs = append(templs, template)
 	}
 	return templs, nil
 }
@@ -150,9 +160,7 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 		switch r.EnforcementAction {
 		case string(opautil.Dryrun):
 			item.Severity = framework.Info
-		// TODO(mengqiy): Warn start to be available in gatekeeper v3.4.0-rc1, we should upgrade to it when v3.4.0 is released.
-		// https://github.com/open-policy-agent/gatekeeper/blob/f1eda8f381aaaf7fc12db1782d41498b57431a5d/pkg/util/enforcement_action.go#L14
-		case "warn":
+		case string(opautil.Warn):
 			item.Severity = framework.Warning
 		default:
 			item.Severity = framework.Error

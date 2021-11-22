@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: Setters
+data:
+  image: 'ENC[AES256_GCM,data:8K5PExeHq2mMnnRp,iv:/dg+XreWqLwuPSvD/8AFxzNAhtr3OyTJAlI+os8CAjw=,tag:2EB/uVcPXFR7zZ9Sp/JQcw==,type:str]'
+  tag: 'ENC[AES256_GCM,data:uByzbSSa,iv:1YSzsC7uInnHryH2VyfoqYYvMQ5GqmWMks12Dr+rX3Q=,tag:Ycf3f/jhIbDAz0X+VTlp1Q==,type:str]'
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+  - recipient: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
+    enc: |
+      -----BEGIN AGE ENCRYPTED FILE-----
+      YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBVTndUN0l4OWFCZzRmSTBw
+      N2pYMmJFL1U2MmpHeEw2cGVxcTZUdS9MSHdrCm1qWU5nOTBFNWQ1aldGMHgvWS9u
+      WGZxU2VWSTIwZUVGelRWbFBuOGlHYlUKLS0tIG9kSW9MMnZoMkFxT1FqSmFKODUw
+      eTluYkYxUXZRWjNSSXVqNjJWcmM1ZVEKm2UdU3ljCxAzDr78pKzuTlz1AXHl5mge
+      VxidXQDm3omse9hcGlkH8TBtqfkySH1v03t+VSEsClQds7bExE8cxA==
+      -----END AGE ENCRYPTED FILE-----
+  lastmodified: '2021-08-16T22:01:26Z'
+  mac: 'ENC[AES256_GCM,data:Zx77KpO98SKH3HidQVeWXTaqvmg0xLi/B26DsUwTRsccBsnnibjpxvCq2LcPoFzYvBU/drT8SBAT9xykLmo3OlWLseuqbjGc9ndl3gqkC5j1/TfeQ5Pw8DkESTAfaDCIrre61SvnzN4mblCwrZZx1a/oviad+SBNEc1GHQRqCfw=,iv:IYxNAWBOrDuNwatNNQ6WDmS+LjnlN/Ov8fj0/U0TBqk=,tag:OZ+qu1miHVDonIHMhGuprw==,type:str]'
+  pgp: []
+  unencrypted_regex: ^(kind|apiVersion|group|metadata)$
+  version: 3.7.1

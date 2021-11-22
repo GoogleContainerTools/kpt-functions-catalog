@@ -15,7 +15,7 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"
+      href="https://cdn.jsdelivr.net/npm/docsify-themeable@0.8.4/dist/css/theme-simple.css"
     />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
@@ -100,19 +100,41 @@
             });
 
             hook.doneEach(function () {
-              const functionName = vm.route.path.split("/")[1];
+              let isContribFn = false;
+              if (vm.route.path.includes("contrib")) {
+                isContribFn = true
+              }
+              const pathElements = vm.route.path.split("/")
+              let functionName;
+              if (isContribFn) {
+                functionName = pathElements[2];
+              } else {
+                functionName = pathElements[1];
+              }
               if (!functionName) {
                 return;
               }
 
-              window.Docsify.get(`/catalog.json`).then(function (
+              let catalogPath;
+              if (isContribFn) {
+                catalogPath = "/contrib/catalog.json";
+              } else {
+                catalogPath = "/catalog.json";
+              }
+              window.Docsify.get(catalogPath).then(function (
                 catalogResponse
               ) {
                 const catalog = JSON.parse(catalogResponse);
                 const versions = catalog[functionName];
                 let versionDropdown = "";
 
-                const versionName = vm.route.path.split("/")[2];
+                let versionName;
+                if (isContribFn) {
+                  versionName = pathElements[3];
+                } else {
+                  versionName = pathElements[2];
+                }
+
                 const currentVersion = versionName.replaceAll("v", "");
                 const sortedSemvers = Object.keys(versions)
                   .sort((a, b) => compareVersions(a, b))
@@ -138,7 +160,13 @@
                   .getElementsByClassName("github-corner")
                   .item(0);
                 const exampleNames = Object.keys(examples).sort();
-                const currentEx = vm.route.path.split("/")[3];
+                let currentEx;
+                if (isContribFn) {
+                  currentEx = pathElements[4];
+                } else {
+                  currentEx = pathElements[3];
+                }
+
                 // Change the GH icon to point to the current example if it exists.
                 if (currentEx) {
                   ghElement.href = examples[currentEx].RemoteExamplePath;

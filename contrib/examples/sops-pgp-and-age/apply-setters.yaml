@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: Setters
+data:
+  image: 'ENC[AES256_GCM,data:Nevhh244Hwir24nH,iv:YlLb3rVn843hH2L8feswrnDyQr6njqwj3GFnrDdHaUo=,tag:UqZGkhl8iiyKUQTK2En+8g==,type:str]'
+  tag: 'ENC[AES256_GCM,data:iQfQ4g4w,iv:UgeZfbUz74aiF6Su8q4nBkMuJfZ9vKDxom9o8GVE0rg=,tag:VeYTP00eLIzikf6YyWV5EA==,type:str]'
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+  - recipient: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
+    enc: |
+      -----BEGIN AGE ENCRYPTED FILE-----
+      YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiQVVVamRpS1pEUGMrS3ll
+      WmE1UHkrRFdJM21OZ0IwQ1pGcDJsSVR1bVRVCi8rQWpXTzMwYVorc0czQmtGb3VL
+      Ti9ReUFZYlZGZHNlS1kzdTY1MFBZMXcKLS0tIE5FVFhid21pS0tyZFV6azJpQm1H
+      cGVxNjFwS3kxTGoyR1pFam9Rci9zL0EKTM8MCUMALa9aD+VrT7AWOfjRQjRWBwPh
+      +X0KcCwkJLmg5tokqt1L08+A/VSgfsGW5BQcuCOZ4NgJC//nIb/i/g==
+      -----END AGE ENCRYPTED FILE-----
+  lastmodified: '2021-08-19T21:32:30Z'
+  mac: 'ENC[AES256_GCM,data:w585ujDo4XnyWP7PWLxNQat2OUPZlfaWU32X40FJlMmdDtz93qc1NhlLBBScK7snHRIycnR+bEkiedhuhOArVdLx68ZqYos/eUZW6d7p33SqxLW9WgNoM31ZoWqxSrqA4UC+SpJSKx+TjHmrMocEbxvqewacNLtzVhm6l8UVaHA=,iv:LaIGzW+WtZdfpqeHHmeZDpotPX8acxqp6Vr5iScPkEA=,tag:8avQ8q4kOx/Fu6eyIRguhw==,type:str]'
+  pgp:
+  - created_at: '2021-08-19T21:32:30Z'
+    enc: |
+      -----BEGIN PGP MESSAGE-----
+
+      hQEMAyUpShfNkFB/AQf8Dt86pcdd8MA41GjgFxYAWwLwePPOO6J2uZkJ7uofoySZ
+      5ARo4WlT9mvaP+anNiO8R5CNwUquhB+hP9V/n9xnbN3PRlPGd78yMPsVKy37nVrK
+      KJ/PjOZdlWyjBRZpQmEOlfNir2SqdlT3VS1VgR3IsbK4d97Al69x5NUWfRONdQHe
+      C6IMTsOlo0YADSz6VKCqfhs+MmJxANcYFhZd7/Vc/8zImT04cPuy48KIyo01XgSq
+      MPGA8w5LU2u0w5miHdijcnlm2L/+Jm40d/HX2PsAGJ5avwv7isQTRFgdelMSG//t
+      T0kAfrHx6Cx9bbbkvl7MZEPFwC5bRg3lpY/pxvoSS9JcAVpxqDLFSgy8WswRY0TM
+      u95SbB5uGc/h7QJPisCk2+3qEkF7G6T29BJKepnQQws39ZedikonqrZXgo2X2ZBH
+      pyEYubxscrQkc+vs8xZqv5gETiS0vW/kdkXmh5E=
+      =WV7z
+      -----END PGP MESSAGE-----
+    fp: FBC7B9E2A4F9289AC0C1D4843D16CEE4A27381B4
+  unencrypted_regex: ^(kind|apiVersion|group|metadata)$
+  version: 3.7.1

@@ -8,21 +8,64 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-// UpsertResource upserts resource to input list of resources
-// resources are uniquely identifies by Group, Kind, Name and Namespace
+// UpsertResource upserts resources to input list of resources
+// resources are uniquely identifies by Group, Kind, Name, Namespace and input file path
 type UpsertResource struct {
-	// Resource is the input resource for upsert
-	Resource *yaml.RNode
+	// List input resources to upsert
+	List *yaml.RNode
 }
+
+const (
+	DestPathAnnotation = "config.kubernetes.io/target-path"
+	ListKind           = "List"
+)
 
 // Filter implements UpsertResource as a yaml.Filter
 func (ur UpsertResource) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	replaced, err := ReplaceResource(nodes, ur.Resource)
+	resources, err := unwrap(ur.List)
+	if err != nil {
+		return nodes, err
+	}
+	for _, resource := range resources {
+		nodes, err = UpsertSingleResource(nodes, resource)
+		if err != nil {
+			return nodes, err
+		}
+	}
+	return nodes, nil
+}
+
+// unwrap unwraps List and returns the list to input resources to upsert
+func unwrap(node *yaml.RNode) ([]*yaml.RNode, error) {
+	rm, err := node.GetMeta()
+	if err != nil {
+		return nil, err
+	}
+	var resources []*yaml.RNode
+	if rm.Kind == ListKind {
+		items := node.Field("items")
+		if items != nil {
+			for i := range items.Value.Content() {
+				// add items
+				resources = append(resources, yaml.NewRNode(items.Value.Content()[i]))
+			}
+			return resources, nil
+		}
+		// the list has no items
+		return []*yaml.RNode{}, nil
+	}
+	// the resource is a plain single node to upsert
+	return []*yaml.RNode{node}, nil
+}
+
+// UpsertSingleResource upserts input resource to the list of nodes
+func UpsertSingleResource(nodes []*yaml.RNode, resource *yaml.RNode) ([]*yaml.RNode, error) {
+	replaced, err := ReplaceResource(nodes, resource)
 	if err != nil {
 		return nodes, err
 	}
 	if !replaced {
-		return AddResource(nodes, ur.Resource)
+		return AddResource(nodes, resource)
 	}
 	return nodes, nil
 }
@@ -66,8 +109,8 @@ func ReplaceResource(nodes []*yaml.RNode, inputResource *yaml.RNode) (bool, erro
 // it also cleans up the meta annotations so that resource is created in new file
 // by the function orchestrator
 func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode, error) {
-	new := inputResource.Copy()
-	meta, err := new.GetMeta()
+	newNode := inputResource.Copy()
+	meta, err := newNode.GetMeta()
 	if err != nil {
 		return nodes, err
 	}
@@ -75,23 +118,36 @@ func AddResource(nodes []*yaml.RNode, inputResource *yaml.RNode) ([]*yaml.RNode,
 	// removing path and index annotations makes orchestrator write resource
 	// to a new file
 	removeFnPathIndexAnnotations(meta.Annotations)
-	err = new.SetAnnotations(meta.Annotations)
+	path := inputResource.GetAnnotations()[DestPathAnnotation]
+	if path != "" {
+		meta.Annotations[kioutil.PathAnnotation] = path
+	}
+	delete(meta.Annotations, DestPathAnnotation)
+	err = newNode.SetAnnotations(meta.Annotations)
 	if err != nil {
 		return nodes, err
 	}
-	nodes = append(nodes, new)
+	nodes = append(nodes, newNode)
 	return nodes, nil
 }
 
 // IsSameResource returns true if metadata of two resources
 // have same Group, Kind, Name, Namespace
 // TODO: phanimarupaka move this to common util https://github.com/GoogleContainerTools/kpt/issues/2043
-func IsSameResource(meta1, meta2 yaml.ResourceMeta) bool {
-	g1, _ := ParseGroupVersion(meta1.APIVersion)
-	g2, _ := ParseGroupVersion(meta1.APIVersion)
-	return g1 == g2 && meta1.Kind == meta2.Kind &&
-		meta1.Name == meta2.Name &&
-		meta1.Namespace == meta2.Namespace
+func IsSameResource(inputResourceMeta, targetResourceMeta yaml.ResourceMeta) bool {
+	g1, _ := ParseGroupVersion(inputResourceMeta.APIVersion)
+	g2, _ := ParseGroupVersion(targetResourceMeta.APIVersion)
+	return g1 == g2 && inputResourceMeta.Kind == targetResourceMeta.Kind &&
+		inputResourceMeta.Name == targetResourceMeta.Name &&
+		inputResourceMeta.Namespace == targetResourceMeta.Namespace &&
+		upsertPathMatch(inputResourceMeta, targetResourceMeta)
+}
+
+// upsertPathMatch checks if the target-path specified by user in input resource matches
+// the path of target resource
+func upsertPathMatch(inputResourceMeta, targetResourceMeta yaml.ResourceMeta) bool {
+	return inputResourceMeta.Annotations[DestPathAnnotation] == "" ||
+		inputResourceMeta.Annotations[DestPathAnnotation] == targetResourceMeta.Annotations[kioutil.PathAnnotation]
 }
 
 // ParseGroupVersion parses a KRM metadata apiVersion field.
@@ -123,6 +179,9 @@ func combineInputAndMatchedAnnotations(inputResourceAnno, matchedResourceAnno ma
 	// remove function meta annotations from the result as they should
 	// not be written to output resource
 	removeFnAnnotations(res)
+	// this annotation should be used to only determine the path to write resource to
+	// and should be removed from the output resource
+	delete(res, DestPathAnnotation)
 	return res
 }
 

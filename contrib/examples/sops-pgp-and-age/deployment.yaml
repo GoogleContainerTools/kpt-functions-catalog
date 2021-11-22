@@ -1,0 +1,68 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  replicas: 'ENC[AES256_GCM,data:oA==,iv:CZtM3egA1RE3Asxo/KlqkesOrh75iHU+cSa55bUJ7qE=,tag:1OXv92cE7OiIHcaZsmYkTQ==,type:int]'
+  selector:
+    matchLabels:
+      app: 'ENC[AES256_GCM,data:YtNx0GY=,iv:sMdJ6U5heD2idv37wcDM2CLR3kmYnQOwxfPvSnCf1C8=,tag:GfBwM+C/EDbZ2CXr5V3D1g==,type:str]'
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: 'ENC[AES256_GCM,data:1X3BA0A=,iv:x8ahM1ryOKD9ssSTliF/Vk25/Y8XnFXY00VOVNiz5Oo=,tag:ZwsBalcduWqp9O4HhLzVBA==,type:str]'
+          image: 'ENC[AES256_GCM,data:mOuBTWlwFpFp,iv:/9loinwPgvmivL+rkYOiDcLME4lluvOQ9yZZFfpLEy8=,tag:qM+0kW94NyI4liuONT561Q==,type:str]' # kpt-set: ${image}:${tag}
+          ports:
+            - protocol: 'ENC[AES256_GCM,data:R3yP,iv:QW0gBWKHBDwKgXE8AV3a3L7QKik6O5iRtjLVKCkSByA=,tag:rLB4XRBCJaqlWiJbmXWZyg==,type:str]'
+              containerPort: 'ENC[AES256_GCM,data:WEY=,iv:hXPhue1Orq1+VJgXpQCXm5xIQhbWOg7XMcNlyCkad2U=,tag:SO4F/VvWWhjRdj2MOwj5qA==,type:int]'
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1yt3tfqlfrwdwx0z0ynwplcr6qxcxfaqycuprpmy89nr83ltx74tqdpszlw
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBPQlJ3Vkh6UFBqQnhURzZz
+        bVBMdXdEU2llVFBhUTNlS09RcWJ3dnVCOXhFCmRvNG40MGd2Y3ExMjZ4eUQraFR0
+        RnplRnRjQSs5enYrMjk3bGtZS0NxbE0KLS0tIE1VS2I4bWZlbDJwZHhIa21Idyty
+        TlhwL0h0NWhiVjdxeStTUVVRRDY1K00KkvcsNFXY9MxxI0FiDWhcvYlTf2a9MAmh
+        nlwPyaXb2DkRcN7mneklAW5NsvkYwJu2cWZ9TiEuDh+whuN/pnsqJw==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: '2021-08-19T21:32:30Z'
+  mac: 'ENC[AES256_GCM,data:Pkf0b5eXSEnpE/jJR6m4NvxQIuzRuQBsaHOH4EUEBkcmf0S2/rBVoUesqJADLuw1oZxTZyvsuA5/r5Dki7+5r69ED+s7KYoVodwkw7QIbrpfVjgM8qaqzt32iFFsJy1lkhaA7/6xzILk8LKHDOyfHDB3itLUnTp5bVzNKs42kWo=,iv:QKdcSMYT45bFYYvyEVSQWq9Rpzy7sD2p3FdDZbOHR0U=,tag:LqR69BP6Vg4rkTQPk41AEg==,type:str]'
+  pgp:
+    - created_at: '2021-08-19T21:32:30Z'
+      enc: |
+        -----BEGIN PGP MESSAGE-----
+
+        hQEMAyUpShfNkFB/AQgAooiCdEjrfY03kqh0NtDT6QpqLI8vNFbyuR17M1kc0kHa
+        rf96hU6SfA84HL8o9uCDZ+7mlo5XLWD9w8vjXIhWYLz1iVj0YVMSlFeg8xxQAHIU
+        /CXFWIB7tZhm4XpWbufU1rL9JgyDiqLLeQpl/qyq6dTyTXvgfZk+CIYxZvfljsl9
+        iABdn7nlcNXHIpdZfgUqSKMMj63sXIniMmmyMdW11bF/feHXaoWpGskMulxM/cdH
+        MT0oCqcsNDmWB8kBst0UHBSSgj38CoTcJ1Ikcb5E/eqXzlyR1cFCqPd5hLUBlcYu
+        ThXTK62SBMyqR87bN3HGRoZBhVcudrLGNZObCoHYndJeAfDBuIxxlXitTlvSnEsH
+        /8MwRP1XdA6tpXOISDI69/6bYhK8AtGDPHNz4hUkXwxYToJrG9gLibyBmHO0io+W
+        lI1DoU1KiEroY5UiL/d3nd5d6JzsbxJaltBkbmq+8g==
+        =/VHl
+        -----END PGP MESSAGE-----
+      fp: FBC7B9E2A4F9289AC0C1D4843D16CEE4A27381B4
+  unencrypted_regex: ^(kind|apiVersion|group|metadata)$
+  version: 3.7.1

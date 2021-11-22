@@ -50,9 +50,6 @@ type Result struct {
 
 // Filter implements Set as a yaml.Filter
 func (as *ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
-	if len(as.Setters) == 0 {
-		return nodes, fmt.Errorf("input setters list cannot be empty")
-	}
 	for i := range nodes {
 		filePath, _, err := kioutil.GetFileAnnotations(nodes[i])
 		if err != nil {
