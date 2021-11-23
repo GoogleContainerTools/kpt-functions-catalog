@@ -29,19 +29,20 @@ const (
 type SetAnnotationsProcessor struct{}
 
 func (sap *SetAnnotationsProcessor) Process(resourceList *framework.ResourceList) error {
-	err := run(resourceList)
+	resourceList.Result = &framework.Result{
+		Name: "set-annotations",
+	}
+	items, err := run(resourceList)
 	if err != nil {
-		resourceList.Result = &framework.Result{
-			Name: "set-annotations",
-			Items: []framework.ResultItem{
-				{
-					Message:  err.Error(),
-					Severity: framework.Error,
-				},
+		resourceList.Result.Items = []framework.ResultItem{
+			{
+				Message:  err.Error(),
+				Severity: framework.Error,
 			},
 		}
 		return resourceList.Result
 	}
+	resourceList.Result.Items = items
 	return nil
 }
 
@@ -110,6 +111,26 @@ func (f *setAnnotationFunction) validGVK(rn *kyaml.RNode, apiVersion, kind strin
 	return true
 }
 
+// resultsToItems converts the Search and Replace results to
+// equivalent items([]framework.Item)
+func (f *setAnnotationFunction) resultsToItems() ([]framework.ResultItem, error) {
+	var items []framework.ResultItem
+	if len(f.plugin.Results) == 0 {
+		items = append(items, framework.ResultItem{
+			Message: "no matches for input setter(s)",
+		})
+		return items, nil
+	}
+	for _, res := range f.plugin.Results {
+		items = append(items, framework.ResultItem{
+			Message: fmt.Sprintf("set annotation value to %q", res.Value),
+			Field:   framework.Field{Path: res.FieldPath},
+			File:    framework.File{Path: res.FilePath},
+		})
+	}
+	return items, nil
+}
+
 func getDefaultConfig() (transformerConfig, error) {
 	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonannotations"]
 	var tc transformerConfig
@@ -135,16 +156,16 @@ func main() {
 	}
 }
 
-func run(resourceList *framework.ResourceList) error {
+func run(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
 	var fn setAnnotationFunction
 	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		return fmt.Errorf("failed to configure function: %w", err)
+		return nil, fmt.Errorf("failed to configure function: %w", err)
 	}
 
 	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
-		return fmt.Errorf("failed to run function: %w", err)
+		return nil, fmt.Errorf("failed to run function: %w", err)
 	}
-	return nil
+	return fn.resultsToItems()
 }
