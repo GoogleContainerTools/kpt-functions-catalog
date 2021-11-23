@@ -1,0 +1,33 @@
+diff --git a/local-config.yaml b/local-config.yaml
+index b8d83d1..1619258 100644
+--- a/local-config.yaml
++++ b/local-config.yaml
+@@ -4,5 +4,11 @@ metadata:
+   name: local-config-map
+   annotations:
+     config.kubernetes.io/local-config: "true"
++    color: orange
++    fruit: apple
+ data:
+   some-key: some-value
++  selector:
++    annotations:
++      color: orange
++      fruit: apple
+diff --git a/resources.yaml b/resources.yaml
+index 3127bfa..1397bfd 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,5 +2,12 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: the-map
++  annotations:
++    color: orange
++    fruit: apple
+ data:
+   some-key: some-value
++  selector:
++    annotations:
++      color: orange
++      fruit: apple

@@ -29,7 +29,7 @@ const (
 type SetAnnotationsProcessor struct{}
 
 func (sap *SetAnnotationsProcessor) Process(resourceList *framework.ResourceList) error {
-	err := run(resourceList)
+	results, err := run(resourceList)
 	if err != nil {
 		resourceList.Results = framework.Results{
 			&framework.Result{
@@ -39,6 +39,7 @@ func (sap *SetAnnotationsProcessor) Process(resourceList *framework.ResourceList
 		}
 		return resourceList.Results
 	}
+	resourceList.Results = results
 	return nil
 }
 
@@ -107,6 +108,26 @@ func (f *setAnnotationFunction) validGVK(rn *kyaml.RNode, apiVersion, kind strin
 	return true
 }
 
+// resultsToItems converts the set annotation results to
+// equivalent framework.Results
+func (f *setAnnotationFunction) resultsToItems() (framework.Results, error) {
+	var results framework.Results
+	if len(f.plugin.Results) == 0 {
+		results = append(results, &framework.Result{
+			Message: "no annotations applied",
+		})
+		return results, nil
+	}
+	for _, res := range f.plugin.Results {
+		results = append(results, &framework.Result{
+			Message: fmt.Sprintf("set annotation value to %q", res.Value),
+			Field:   &framework.Field{Path: res.FieldPath},
+			File:    &framework.File{Path: res.FilePath},
+		})
+	}
+	return results, nil
+}
+
 func getDefaultConfig() (transformerConfig, error) {
 	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonannotations"]
 	var tc transformerConfig
@@ -132,16 +153,16 @@ func main() {
 	}
 }
 
-func run(resourceList *framework.ResourceList) error {
+func run(resourceList *framework.ResourceList) (framework.Results, error) {
 	var fn setAnnotationFunction
 	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		return fmt.Errorf("failed to configure function: %w", err)
+		return nil, fmt.Errorf("failed to configure function: %w", err)
 	}
 
 	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
-		return fmt.Errorf("failed to run function: %w", err)
+		return nil, fmt.Errorf("failed to run function: %w", err)
 	}
-	return nil
+	return fn.resultsToItems()
 }

@@ -1,0 +1,49 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 0
+items:
+  - image: gcr.io/kpt-fn/set-annotations:unstable
+    exitCode: 0
+    results:
+      - message: set annotation value to "orange"
+        field:
+          path: data.selector.annotations.color
+        file:
+          path: local-config.yaml
+      - message: set annotation value to "orange"
+        field:
+          path: metadata.annotations.color
+        file:
+          path: local-config.yaml
+      - message: set annotation value to "apple"
+        field:
+          path: data.selector.annotations.fruit
+        file:
+          path: local-config.yaml
+      - message: set annotation value to "apple"
+        field:
+          path: metadata.annotations.fruit
+        file:
+          path: local-config.yaml
+      - message: set annotation value to "orange"
+        field:
+          path: data.selector.annotations.color
+        file:
+          path: resources.yaml
+      - message: set annotation value to "orange"
+        field:
+          path: metadata.annotations.color
+        file:
+          path: resources.yaml
+      - message: set annotation value to "apple"
+        field:
+          path: data.selector.annotations.fruit
+        file:
+          path: resources.yaml
+      - message: set annotation value to "apple"
+        field:
+          path: metadata.annotations.fruit
+        file:
+          path: resources.yaml

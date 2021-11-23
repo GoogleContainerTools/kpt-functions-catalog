@@ -6,10 +6,13 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"sigs.k8s.io/kustomize/api/filters/annotations"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/types"
+	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
 )
 
@@ -21,6 +24,23 @@ type plugin struct {
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 	// AdditionalAnnotationFields is used to specify additional fields to add annotations.
 	AdditionalAnnotationFields []types.FieldSpec `json:"additionalAnnotationFields,omitempty" yaml:"additionalAnnotationFields,omitempty"`
+	// Results are the results of applying annotations
+	Results []*Result
+}
+
+// Result holds result of set annotation operation
+type Result struct {
+	// FilePath is the file path of the annotation
+	FilePath string
+	// FieldPath is field path of the annotation
+	FieldPath string
+	// Value of the annotation
+	Value string
+}
+
+func (r *Result) String() string {
+	return fmt.Sprintf("FilePath: '%s', FieldPath: '%s', Value: '%s'\n",
+		r.FilePath, r.FieldPath, r.Value)
 }
 
 //noinspection GoUnusedGlobalVariable
@@ -48,9 +68,20 @@ func (p *plugin) Transform(m resmap.ResMap) error {
 		return nil
 	}
 	for _, r := range m.Resources() {
-		err := r.ApplyFilter(annotations.Filter{
-			Annotations: p.Annotations,
+		filePath, _, err := kioutil.GetFileAnnotations(&r.RNode)
+		if err != nil {
+			return err
+		}
+		err = r.ApplyFilter(annotations.Filter{
 			FsSlice:     p.AdditionalAnnotationFields,
+			Annotations: p.Annotations,
+			SetEntryCallback: func(key, value, tag string, node *kyaml.RNode) {
+				p.Results = append(p.Results, &Result{
+					Value:     value,
+					FieldPath: strings.Join(append(node.FieldPath(), key), "."),
+					FilePath:  filePath,
+				})
+			},
 		})
 		if err != nil {
 			return err
