@@ -31,16 +31,13 @@ type SetAnnotationsProcessor struct{}
 func (sap *SetAnnotationsProcessor) Process(resourceList *framework.ResourceList) error {
 	err := run(resourceList)
 	if err != nil {
-		resourceList.Result = &framework.Result{
-			Name: "set-annotations",
-			Items: []framework.ResultItem{
-				{
-					Message:  err.Error(),
-					Severity: framework.Error,
-				},
+		resourceList.Results = framework.Results{
+			&framework.Result{
+				Message:  err.Error(),
+				Severity: framework.Error,
 			},
 		}
-		return resourceList.Result
+		return resourceList.Results
 	}
 	return nil
 }
