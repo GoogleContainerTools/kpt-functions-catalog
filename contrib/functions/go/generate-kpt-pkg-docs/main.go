@@ -21,9 +21,9 @@ func main() {
 	rp := ReadmeProcessor{}
 	cmd := command.Build(&rp, command.StandaloneEnabled, false)
 
-	cmd.Short = generated.GenerateBlueprintDocsShort
-	cmd.Long = generated.GenerateBlueprintDocsLong
-	cmd.Example = generated.GenerateBlueprintDocsExamples
+	cmd.Short = generated.GenerateKptPkgDocsShort
+	cmd.Long = generated.GenerateKptPkgDocsLong
+	cmd.Example = generated.GenerateKptPkgDocsExamples
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

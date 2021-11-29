@@ -1,10 +1,10 @@
-# generate-blueprint-docs: Simple Example
+# generate-kpt-pkg-docs: Simple Example
 
 ### Overview
 
-This example shows how the [generate-blueprint-docs] function works.
+This example shows how the [generate-kpt-pkg-docs] function works.
 
-Running `generate-blueprint-docs` function on the example package will:
+Running `generate-kpt-pkg-docs` function on the example package will:
 
 1. Update `GENERATED.md` file with the blueprint readme.
 
@@ -13,7 +13,7 @@ Running `generate-blueprint-docs` function on the example package will:
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/generate-blueprint-docs-simple
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/generate-kpt-pkg-docs-simple
 ```
 
 ### Function invocation
@@ -29,4 +29,4 @@ $ kpt fn eval -i gcr.io/kpt-fn-contrib/blueprint-docs:unstable --include-meta-re
 
 1. File `GENERATED.md` will be updated with the generated readme.
 
-[generate-blueprint-docs]: https://catalog.kpt.dev/generate-blueprint-docs/v0.1
+[generate-kpt-pkg-docs]: https://catalog.kpt.dev/generate-kpt-pkg-docs/v0.1

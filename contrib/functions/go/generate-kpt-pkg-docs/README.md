@@ -1,10 +1,10 @@
-# generate-blueprint-docs
+# generate-kpt-pkg-docs
 
 ## Overview
 
 <!--mdtogo:Short-->
 
-The `generate-blueprint-docs` function generates opinionated documentation for a [blueprint kpt package](https://github.com/GoogleCloudPlatform/blueprints).
+The `generate-kpt-pkg-docs` function generates opinionated documentation for a [kpt package](https://kpt.dev/book/02-concepts/01-packages).
 
 It works by analyzing the kpt package to generate markdown documentation and writes it to a file.
 
@@ -14,10 +14,10 @@ It works by analyzing the kpt package to generate markdown documentation and wri
 
 ## Usage
 
-The `generate-blueprint-docs` function is expected to be executed imperatively like:
+The `generate-kpt-pkg-docs` function is expected to be executed imperatively like:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
+$ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-kpt-pkg-docs:unstable --include-meta-resources \
 --mount type=bind,src="$(pwd)",dst="/tmp",rw=true
 ```
 
@@ -29,7 +29,7 @@ This function supports `ConfigMap` `functionConfig`.
 
 - A `repo-path` can be provided to include in usage section. This will generate a usage section with sample commands like `kpt pkg get ${repo-path}/{pkgname}@version`. If a `repo-path` is not provided, it defaults to `https://github.com/GoogleCloudPlatform/blueprints.git/catalog`.
 
-The `generate-blueprint-docs` function does the following:
+The `generate-kpt-pkg-docs` function does the following:
 
 1. Scans the package contents including meta resources like Kptfile(s) and function configs.
 1. Generates readme contents in markdown format and inserts it between HTML comments.
@@ -109,7 +109,7 @@ and a sample readme with HTML markers.
 Invoke the function:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-blueprint-docs:unstable --include-meta-resources \
+$ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-kpt-pkg-docs:unstable --include-meta-resources \
 --mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- readme-path=/tmp/README.md
 ```
 
