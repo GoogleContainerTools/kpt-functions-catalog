@@ -29,4 +29,4 @@ $ kpt fn eval -i gcr.io/kpt-fn-contrib/blueprint-docs:unstable --include-meta-re
 
 1. File `GENERATED.md` will be updated with the generated readme.
 
-[generate-blueprint-docs]: https://catalog.kpt.dev/generate-blueprint-docs/v0.1/?id=definitions
+[generate-blueprint-docs]: https://catalog.kpt.dev/generate-blueprint-docs/v0.1
