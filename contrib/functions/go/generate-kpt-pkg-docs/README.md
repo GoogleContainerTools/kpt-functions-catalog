@@ -98,6 +98,7 @@ data:
 and a sample readme with HTML markers.
 
 ```markdown
+[//]: #README.md
 <!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
 
 <!-- END OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
@@ -116,6 +117,7 @@ $ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-kpt-pkg-docs:unstable --include-
 The following readme will be created:
 
 ```markdown
+[//]: #README.md
 <!-- BEGINNING OF PRE-COMMIT-BLUEPRINT DOCS HOOK:TITLE -->
 # Google Cloud Storage Bucket blueprint
 
