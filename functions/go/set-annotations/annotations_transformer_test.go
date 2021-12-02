@@ -205,6 +205,7 @@ kind: Service
 metadata:
   annotations:
     internal.config.kubernetes.io/path: foo.yaml
+    internal.config.kubernetes.io/index: 0
   name: myService
 spec:
   ports:
@@ -215,6 +216,7 @@ kind: Deployment
 metadata:
   annotations:
     internal.config.kubernetes.io/path: bar.yaml
+    internal.config.kubernetes.io/index: 1
   name: mungebot
   labels:
     app: mungebot
@@ -229,22 +231,22 @@ spec:
       - name: nginx
         image: nginx
 `
-	expectedResults := []*Result{
+	expectedResults := AnnotationResults{
 		{
 			FilePath:  "foo.yaml",
-			FieldPath: "metadata.annotations.app",
-			Value:     "myApp",
-		},
+			FileIndex: "0",
+			FieldPath: "metadata.annotations",
+		}: {"app": "myApp"},
 		{
 			FilePath:  "bar.yaml",
-			FieldPath: "metadata.annotations.app",
-			Value:     "myApp",
-		},
+			FileIndex: "1",
+			FieldPath: "metadata.annotations",
+		}: {"app": "myApp"},
 		{
 			FilePath:  "bar.yaml",
-			FieldPath: "spec.template.metadata.annotations.app",
-			Value:     "myApp",
-		},
+			FileIndex: "1",
+			FieldPath: "spec.template.metadata.annotations",
+		}: {"app": "myApp"},
 	}
 	runAnnotationTransformer(t, config, input)
 	if !reflect.DeepEqual(KustomizePlugin.Results, expectedResults) {

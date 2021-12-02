@@ -25,23 +25,24 @@ type plugin struct {
 	// AdditionalAnnotationFields is used to specify additional fields to add annotations.
 	AdditionalAnnotationFields []types.FieldSpec `json:"additionalAnnotationFields,omitempty" yaml:"additionalAnnotationFields,omitempty"`
 	// Results are the results of applying annotations
-	Results []*Result
+	Results AnnotationResults
 }
 
-// Result holds result of set annotation operation
-type Result struct {
-	// FilePath is the file path of the annotation
+// AnnotationResults maps annotation paths to key/value pairs
+type AnnotationResults map[AnnotationResultKey]AnnotationValues
+
+// AnnotationResultKey is a unique representation for an annotations field path
+type AnnotationResultKey struct {
+	// FilePath is the file path of the resource
 	FilePath string
-	// FieldPath is field path of the annotation
+	// FileIndex is the file index of the resource
+	FileIndex string
+	// FieldPath is field path of the annotations
 	FieldPath string
-	// Value of the annotation
-	Value string
 }
 
-func (r *Result) String() string {
-	return fmt.Sprintf("FilePath: '%s', FieldPath: '%s', Value: '%s'\n",
-		r.FilePath, r.FieldPath, r.Value)
-}
+// AnnotationValues represents annotation key/value pairs
+type AnnotationValues map[string]string
 
 //noinspection GoUnusedGlobalVariable
 var KustomizePlugin plugin
@@ -67,8 +68,11 @@ func (p *plugin) Transform(m resmap.ResMap) error {
 	if len(p.Annotations) == 0 {
 		return nil
 	}
+	if p.Results == nil {
+		p.Results = make(AnnotationResults)
+	}
 	for _, r := range m.Resources() {
-		filePath, _, err := kioutil.GetFileAnnotations(&r.RNode)
+		filePath, fileIndex, err := kioutil.GetFileAnnotations(&r.RNode)
 		if err != nil {
 			return err
 		}
@@ -76,11 +80,17 @@ func (p *plugin) Transform(m resmap.ResMap) error {
 			FsSlice:     p.AdditionalAnnotationFields,
 			Annotations: p.Annotations,
 			SetEntryCallback: func(key, value, tag string, node *kyaml.RNode) {
-				p.Results = append(p.Results, &Result{
-					Value:     value,
-					FieldPath: strings.Join(append(node.FieldPath(), key), "."),
+				resultKey := AnnotationResultKey{
+					FieldPath: strings.Join(node.FieldPath(), "."),
 					FilePath:  filePath,
-				})
+					FileIndex: fileIndex,
+				}
+				result, ok := p.Results[resultKey]
+				if ok {
+					result[key] = value
+				} else {
+					p.Results[resultKey] = AnnotationValues{key: value}
+				}
 			},
 		})
 		if err != nil {

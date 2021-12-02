@@ -7,43 +7,35 @@ items:
   - image: gcr.io/kpt-fn/set-annotations:unstable
     exitCode: 0
     results:
-      - message: set annotation value to "orange"
+      - message: 'set annotations: {"color":"orange","fruit":"apple"}'
         field:
-          path: data.selector.annotations.color
+          path: data.selector.annotations
         file:
           path: local-config.yaml
-      - message: set annotation value to "orange"
+      - message: 'set annotations: {"color":"orange","fruit":"apple"}'
         field:
-          path: metadata.annotations.color
+          path: metadata.annotations
         file:
           path: local-config.yaml
-      - message: set annotation value to "apple"
+      - message: 'set annotations: {"color":"orange","fruit":"apple"}'
         field:
-          path: data.selector.annotations.fruit
-        file:
-          path: local-config.yaml
-      - message: set annotation value to "apple"
-        field:
-          path: metadata.annotations.fruit
-        file:
-          path: local-config.yaml
-      - message: set annotation value to "orange"
-        field:
-          path: data.selector.annotations.color
+          path: data.selector.annotations
         file:
           path: resources.yaml
-      - message: set annotation value to "orange"
+      - message: 'set annotations: {"color":"orange","fruit":"apple"}'
         field:
-          path: metadata.annotations.color
+          path: metadata.annotations
         file:
           path: resources.yaml
-      - message: set annotation value to "apple"
+      - message: 'set annotations: {"color":"orange","fruit":"apple"}'
         field:
-          path: data.selector.annotations.fruit
+          path: data.selector.annotations
         file:
           path: resources.yaml
-      - message: set annotation value to "apple"
+          index: 1
+      - message: 'set annotations: {"color":"orange","fruit":"apple"}'
         field:
-          path: metadata.annotations.fruit
+          path: metadata.annotations
         file:
           path: resources.yaml
+          index: 1

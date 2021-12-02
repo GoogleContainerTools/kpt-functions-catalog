@@ -7,13 +7,8 @@ items:
   - image: gcr.io/kpt-fn/set-annotations:unstable
     exitCode: 0
     results:
-      - message: set annotation value to "orange"
+      - message: 'set annotations: {"color":"orange","fruit":"apple"}'
         field:
-          path: metadata.annotations.color
-        file:
-          path: resources.yaml
-      - message: set annotation value to "apple"
-        field:
-          path: metadata.annotations.fruit
+          path: metadata.annotations
         file:
           path: resources.yaml

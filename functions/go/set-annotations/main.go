@@ -3,8 +3,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-annotations/generated"
 	"sigs.k8s.io/kustomize/api/hasher"
@@ -118,13 +120,19 @@ func (f *setAnnotationFunction) resultsToItems() (framework.Results, error) {
 		})
 		return results, nil
 	}
-	for _, res := range f.plugin.Results {
+	for resKey, annoVals := range f.plugin.Results {
+		fileIndex, _ := strconv.Atoi(resKey.FileIndex)
+		annotationJson, err := json.Marshal(annoVals)
+		if err != nil {
+			return nil, err
+		}
 		results = append(results, &framework.Result{
-			Message: fmt.Sprintf("set annotation value to %q", res.Value),
-			Field:   &framework.Field{Path: res.FieldPath},
-			File:    &framework.File{Path: res.FilePath},
+			Message: fmt.Sprintf("set annotations: %s", annotationJson),
+			Field:   &framework.Field{Path: resKey.FieldPath},
+			File:    &framework.File{Path: resKey.FilePath, Index: fileIndex},
 		})
 	}
+	results.Sort()
 	return results, nil
 }
 
