@@ -117,9 +117,9 @@
 
               let catalogPath;
               if (isContribFn) {
-                catalogPath = "/contrib/catalog.json";
+                catalogPath = "/contrib/catalog-v2.json";
               } else {
-                catalogPath = "/catalog.json";
+                catalogPath = "/catalog-v2.json";
               }
               window.Docsify.get(catalogPath).then(function (
                 catalogResponse
@@ -135,7 +135,8 @@
                   versionName = pathElements[2];
                 }
 
-                const currentVersion = versionName.replaceAll("v", "");
+                const patchSemver = versions[versionName]['LatestPatchVersion']
+                const currentVersion = patchSemver.replaceAll("v", "");
                 const sortedSemvers = Object.keys(versions)
                   .sort((a, b) => compareVersions(a, b))
                   .reverse();
@@ -146,7 +147,7 @@
                 <ol class="dropdown-menu">`;
                 sortedSemvers.forEach(
                   (ver, ix) =>
-                    (versionDropdown += `<li><a href="/${functionName}/${ver}/">${ver.replace(
+                    (versionDropdown += `<li><a href="/${functionName}/${ver}/">${versions[ver]['LatestPatchVersion'].replace(
                       "v",
                       ""
                     )}${ix ? "" : " (latest)"}</a></li>`)
@@ -155,7 +156,7 @@
                 </ol>
               </div>`;
 
-                const examples = catalog[functionName][versionName];
+                const examples = catalog[functionName][versionName]['Examples'];
                 const ghElement = document
                   .getElementsByClassName("github-corner")
                   .item(0);
