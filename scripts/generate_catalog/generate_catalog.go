@@ -76,7 +76,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	err = writeExampleIndexV2(curatedFns, source, dest)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+
 	err = writeExampleIndex(contribFns, source, filepath.Join(dest, "contrib"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+
+	err = writeExampleIndexV2(contribFns, source, filepath.Join(dest, "contrib"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
@@ -109,10 +121,18 @@ type metadata struct {
 	Hidden             bool
 }
 
+type catalogEntry struct {
+	// LatestPatchVersion is the latest Patch semver for a MajorMinor semver
+	LatestPatchVersion string
+	// Examples maps exampleName->example
+	Examples map[string]example
+}
+
 var (
 	// Match start of a version such as v1.9.1
 	branchSemverPrefix = regexp.MustCompile(`[-\w]*\/(v\d*\.\d*)`)
 	functionDirPrefix  = regexp.MustCompile(`.+/functions/`)
+	patchTagPattern    = regexp.MustCompile(`.*(go|ts)\/[-\w]*\/(v\d*\.\d*\.\d*)`)
 )
 
 func getBranches() ([]string, error) {
@@ -143,6 +163,68 @@ func getBranches() ([]string, error) {
 		}
 	}
 	return verBranches, err
+}
+
+type functionRelease struct {
+	FunctionName string
+	MajorMinor   string
+}
+
+type patchVersionReader struct {
+	latestPatchVersions map[functionRelease]string
+}
+
+// NewPatchVersionReader constructs a new patchVersionReader
+func NewPatchVersionReader() (*patchVersionReader, error) {
+	pvr := &patchVersionReader{}
+	err := pvr.Init()
+	return pvr, err
+}
+
+// Init initializes patchVersionReader
+func (pvr *patchVersionReader) Init() error {
+	pvr.latestPatchVersions = make(map[functionRelease]string)
+
+	var buf bytes.Buffer
+	cmd := exec.Command("git", "tag")
+	cmd.Stdout = &buf
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	for _, tag := range strings.Split(buf.String(), "\n") {
+		segments := strings.Split(tag, "/")
+		// e.g. functions/go/some-fn/v1.2.3, go/some-fn/v1.2.3
+		if len(segments) < 3 || !patchTagPattern.MatchString(tag) {
+			continue
+		}
+
+		patchVersion := segments[len(segments)-1]
+		fr := functionRelease{
+			FunctionName: segments[len(segments)-2],
+			MajorMinor:   semver.MajorMinor(patchVersion),
+		}
+		ver, ok := pvr.latestPatchVersions[fr]
+		if !ok {
+			pvr.latestPatchVersions[fr] = patchVersion
+		} else if semver.Compare(patchVersion, ver) == 1 {
+			pvr.latestPatchVersions[fr] = patchVersion
+		}
+	}
+	return nil
+}
+
+// LatestPatchVersion for a given major/minor version of a function
+func (pvr *patchVersionReader) LatestPatchVersion(funcName, majorMinor string) (string, error) {
+	val, ok := pvr.latestPatchVersions[functionRelease{
+		FunctionName: funcName,
+		MajorMinor:   majorMinor,
+	}]
+	if !ok {
+		return "", fmt.Errorf("could not find patch version for %s %s\n",
+			funcName, majorMinor)
+	}
+	return val, nil
 }
 
 func getFunctions(branches []string, source string, dest string) []function {
@@ -434,5 +516,45 @@ func writeExampleIndex(functions []function, source string, dest string) error {
 	}
 
 	err = ioutil.WriteFile(filepath.Join(dest, "catalog.json"), funcJson, 0600)
+	return err
+}
+
+// writeExampleIndexV2 forms and writes the output for catalog-v2.json
+func writeExampleIndexV2(functions []function, source string, dest string) error {
+	// Map functionName->majorMinor->catalogEntry
+	functionVersionMap := make(map[string]map[string]catalogEntry)
+	pvr, err := NewPatchVersionReader()
+	if err != nil {
+		return err
+	}
+	for _, f := range functions {
+		// majorMinor->CatalogEntry
+		catalogEntryMap := make(map[string]catalogEntry)
+		for majorMinor, examples := range f.VersionToExamples {
+			// exampleName->example
+			exampleMap := make(map[string]example)
+			for exName, ex := range examples {
+				e := ex
+				e.LocalExamplePath = strings.Replace(ex.LocalExamplePath, filepath.Join(source, "site"), "", 1)
+				exampleMap[exName] = e
+			}
+			patch, err := pvr.LatestPatchVersion(f.FunctionName, majorMinor)
+			if err != nil {
+				return err
+			}
+			catalogEntryMap[majorMinor] = catalogEntry{
+				LatestPatchVersion: patch,
+				Examples:           exampleMap,
+			}
+		}
+		functionVersionMap[f.FunctionName] = catalogEntryMap
+	}
+
+	funcJson, err := json.Marshal(functionVersionMap)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(dest, "catalog-v2.json"), funcJson, 0600)
 	return err
 }
