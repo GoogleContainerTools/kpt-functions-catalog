@@ -1,3 +1,1 @@
 exitCode: 1
-stdErr: |
-  Invalid type. Expected: [integer,null], given: string in object "v1/ReplicationController/bob" in file "replicationcontroller.yaml" in field "spec.replicas"
