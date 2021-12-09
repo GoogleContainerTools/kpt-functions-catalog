@@ -73,6 +73,10 @@ func gitCheckout(branch string) error {
 	return err
 }
 
+func gitTag() (string, error) {
+	return runCmd("git", "tag")
+}
+
 func gitAdd() error {
 	_, err := runCmd("git", "add", "-u")
 	return err
@@ -92,7 +96,9 @@ func gitShow() error {
 }
 
 var (
+	// pattern of release branches, e.g. apply-setters/v1.0
 	releaseBranchPattern = regexp.MustCompile(`[-\w]*\/(v\d*\.\d*)`)
+	// pattern of release tags, e.g. functions/go/apply-setters/v1.0.1
 	releaseTagPattern    = regexp.MustCompile(`.*(go|ts)\/[-\w]*\/(v\d*\.\d*\.\d*)`)
 )
 
@@ -119,6 +125,7 @@ func newFunctionRelease(branch string) (*functionRelease, error) {
 		return nil, fmt.Errorf("invalid branch format")
 	}
 	segments := strings.Split(branch, "/")
+	// assume branch format: */<func_name>/<minor_version>
 	fr.MinorVersion = segments[len(segments)-1]
 	fr.FunctionName = segments[len(segments)-2]
 	if err := fr.readLatestPatchVersion(); err != nil {
@@ -135,7 +142,7 @@ func (fr *functionRelease) readLatestPatchVersion() error {
 	if fr.FunctionName == "" || fr.MinorVersion == "" {
 		return fmt.Errorf("missing function name and/or minor version")
 	}
-	tags, err := runCmd("git", "tag")
+	tags, err := gitTag()
 	if err != nil {
 		return err
 	}
@@ -168,15 +175,29 @@ func (fr *functionRelease) readDocPaths() error {
 		return err
 	}
 	repoBase := filepath.Dir(filepath.Dir(filepath.Dir(executablePath)))
-	fr.FunctionPath = filepath.Join(repoBase, "functions", fr.Language, fr.FunctionName)
-	examplesPath := filepath.Join(repoBase, "examples")
-
-	if !dirExists(fr.FunctionPath) {
-		fr.FunctionPath = filepath.Join(repoBase, "contrib", "functions", fr.Language, fr.FunctionName)
-		examplesPath = filepath.Join(repoBase, "contrib", "examples")
-		if !dirExists(fr.FunctionPath) {
-			return fmt.Errorf("function doc paths not found %s", fr.FunctionPath)
+	pathsToTry := []struct{
+		functionPath string
+		examplesPath string
+	}{
+		{
+			functionPath: filepath.Join(repoBase, "functions", fr.Language, fr.FunctionName),
+			examplesPath: filepath.Join(repoBase, "examples"),
+		},
+		{
+			functionPath: filepath.Join(repoBase, "contrib", "functions", fr.Language, fr.FunctionName),
+			examplesPath: filepath.Join(repoBase, "contrib", "examples"),
+		},
+	}
+	var examplesPath string
+	for _, pathToTry := range pathsToTry {
+		if dirExists(pathToTry.functionPath) {
+			fr.FunctionPath = pathToTry.functionPath
+			examplesPath = pathToTry.examplesPath
+			break
 		}
+	}
+	if fr.FunctionPath == "" {
+		return fmt.Errorf("function doc paths not found from %+v", pathsToTry)
 	}
 	if err = fr.parseMetadata(examplesPath); err != nil {
 		return err
