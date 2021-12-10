@@ -117,7 +117,7 @@ func (fr *functionRelease) readLatestPatchVersion() error {
 	return nil
 }
 
-// readDocPaths and set FunctionPath and ExamplePaths
+// readDocPaths and set documentation paths
 func (fr *functionRelease) readDocPaths() error {
 	executablePath, err := os.Executable()
 	if err != nil {
@@ -158,7 +158,7 @@ func (fr *functionRelease) readDocPaths() error {
 	return nil
 }
 
-// parseMetadata from metadata.yaml and set ExamplePaths
+// parseMetadata from metadata.yaml and set example paths
 func (fr *functionRelease) parseMetadata(examplesPath string) error {
 	type metadata struct {
 		ExamplePackageUrls []string `yaml:"examplePackageURLs"`
