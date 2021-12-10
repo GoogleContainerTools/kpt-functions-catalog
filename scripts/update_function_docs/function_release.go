@@ -29,9 +29,9 @@ var (
 	// pattern of release branches, e.g. apply-setters/v1.0
 	releaseBranchPattern = regexp.MustCompile(`[-\w]*/(v\d*\.\d*)`)
 	// pattern of release tags, e.g. functions/go/apply-setters/v1.0.1
-	releaseTagPattern    = regexp.MustCompile(`.*(go|ts)/[-\w]*/(v\d*\.\d*\.\d*)`)
+	releaseTagPattern = regexp.MustCompile(`.*(go|ts)/[-\w]*/(v\d*\.\d*\.\d*)`)
 	// pattern for version tags, e.g. unstable, v0.1.1, v0.1
-	versionGroup         = `unstable|v\d*\.\d*\.\d*|v\d*\.\d*`
+	versionGroup = `unstable|v\d*\.\d*\.\d*|v\d*\.\d*`
 )
 
 func dirExists(path string) bool {
@@ -124,7 +124,7 @@ func (fr *functionRelease) readDocPaths() error {
 		return err
 	}
 	repoBase := filepath.Dir(filepath.Dir(filepath.Dir(executablePath)))
-	pathsToTry := []struct{
+	pathsToTry := []struct {
 		functionPath string
 		examplesPath string
 		isContrib    bool
@@ -132,12 +132,12 @@ func (fr *functionRelease) readDocPaths() error {
 		{
 			functionPath: filepath.Join(repoBase, "functions", fr.Language, fr.FunctionName),
 			examplesPath: filepath.Join(repoBase, "examples"),
-			isContrib: false,
+			isContrib:    false,
 		},
 		{
 			functionPath: filepath.Join(repoBase, "contrib", "functions", fr.Language, fr.FunctionName),
 			examplesPath: filepath.Join(repoBase, "contrib", "examples"),
-			isContrib: true,
+			isContrib:    true,
 		},
 	}
 	var examplesPath string

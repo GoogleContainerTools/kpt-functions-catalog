@@ -31,6 +31,7 @@ func exitWithErr(err error) {
 	fmt.Fprintf(os.Stderr, "%v\n", err)
 	os.Exit(1)
 }
+
 func main() {
 	var err error
 	if len(os.Args) < 2 {
