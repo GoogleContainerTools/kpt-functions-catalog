@@ -117,9 +117,9 @@
 
               let catalogPath;
               if (isContribFn) {
-                catalogPath = "/contrib/catalog-v2.json";
+                catalogPath = "/contrib/catalog.json";
               } else {
-                catalogPath = "/catalog-v2.json";
+                catalogPath = "/catalog.json";
               }
               window.Docsify.get(catalogPath).then(function (
                 catalogResponse
@@ -135,10 +135,8 @@
                   versionName = pathElements[2];
                 }
 
-                const patchSemver = versions[versionName]['LatestPatchVersion']
-                const currentVersion = patchSemver.replaceAll("v", "");
+                const currentVersion = versionName.replaceAll("v", "");
                 const sortedSemvers = Object.keys(versions)
-                  .map((minor) => versions[minor]['LatestPatchVersion'])
                   .sort((a, b) => compareVersions(a, b))
                   .reverse();
                 versionDropdown += `
@@ -157,7 +155,7 @@
                 </ol>
               </div>`;
 
-                const examples = catalog[functionName][versionName]['Examples'];
+                const examples = catalog[functionName][versionName];
                 const ghElement = document
                   .getElementsByClassName("github-corner")
                   .item(0);
