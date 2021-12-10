@@ -100,6 +100,8 @@ var (
 	releaseBranchPattern = regexp.MustCompile(`[-\w]*\/(v\d*\.\d*)`)
 	// pattern of release tags, e.g. functions/go/apply-setters/v1.0.1
 	releaseTagPattern    = regexp.MustCompile(`.*(go|ts)\/[-\w]*\/(v\d*\.\d*\.\d*)`)
+	// pattern for version tags, e.g. unstable, v0.1.1, v0.1
+	versionGroup         = `unstable|v\d*\.\d*\.\d*|v\d*\.\d*`
 )
 
 func dirExists(path string) bool {
@@ -109,13 +111,30 @@ func dirExists(path string) bool {
 	return false
 }
 
+type functionExample struct {
+	ExamplePath string
+	ExampleName string
+}
+
+type functionExamples []functionExample
+
+// exampleNames returns a list of the functionExample names
+func (fe functionExamples) exampleNames() []string {
+	var exampleNames []string
+	for _, example := range fe {
+		exampleNames = append(exampleNames, example.ExampleName)
+	}
+	return exampleNames
+}
+
 type functionRelease struct {
 	FunctionName       string
 	MinorVersion       string
 	Language           string
 	LatestPatchVersion string
 	FunctionPath       string
-	ExamplePaths       []string
+	Examples           functionExamples
+	IsContrib          bool
 }
 
 // newFunctionRelease allocates and initializes a functionRelease
@@ -178,20 +197,24 @@ func (fr *functionRelease) readDocPaths() error {
 	pathsToTry := []struct{
 		functionPath string
 		examplesPath string
+		isContrib    bool
 	}{
 		{
 			functionPath: filepath.Join(repoBase, "functions", fr.Language, fr.FunctionName),
 			examplesPath: filepath.Join(repoBase, "examples"),
+			isContrib: false,
 		},
 		{
 			functionPath: filepath.Join(repoBase, "contrib", "functions", fr.Language, fr.FunctionName),
 			examplesPath: filepath.Join(repoBase, "contrib", "examples"),
+			isContrib: true,
 		},
 	}
 	var examplesPath string
 	for _, pathToTry := range pathsToTry {
 		if dirExists(pathToTry.functionPath) {
 			fr.FunctionPath = pathToTry.functionPath
+			fr.IsContrib = pathToTry.isContrib
 			examplesPath = pathToTry.examplesPath
 			break
 		}
@@ -232,46 +255,88 @@ func (fr *functionRelease) parseMetadata(examplesPath string) error {
 		if !dirExists(examplePath) {
 			return fmt.Errorf("example dir does not exist: %s", examplePath)
 		}
-		fr.ExamplePaths = append(fr.ExamplePaths, examplePath)
+		fr.Examples = append(fr.Examples, functionExample{
+			ExamplePath: examplePath,
+			ExampleName: exampleName,
+		})
 	}
 	return nil
 }
 
-// updateDoc with the latest version in place at specified path
-func (fr *functionRelease) updateDoc(path string) error {
-	contents, err := ioutil.ReadFile(path)
+// replace tags with patch e.g. apply-setters:v1.0.1, apply-setters/v1.0.1
+func (fr *functionRelease) replaceTags(contents []byte) []byte {
+	tagPattern := regexp.MustCompile(
+		fmt.Sprintf(`(%s)(:|/)(%s)`, fr.FunctionName, versionGroup))
+	contents = tagPattern.ReplaceAll(contents,
+		[]byte(fmt.Sprintf(`${1}${2}%s`, fr.LatestPatchVersion)))
+	return contents
+}
+
+// replace url with minor e.g. https://catalog.kpt.dev/apply-setters/v1.0
+func (fr *functionRelease) replaceURLs(contents []byte) []byte {
+	urlPattern := regexp.MustCompile(
+		fmt.Sprintf(`(https://catalog\.kpt\.dev/%s/)(%s)`, fr.FunctionName, versionGroup))
+	contents = urlPattern.ReplaceAll(contents,
+		[]byte(fmt.Sprintf(`${1}%s`, fr.MinorVersion)))
+	return contents
+}
+
+// replace kpt package names for all examples, e.g.
+// https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters-simple ->
+// https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters-simple@apply-setters/v1.0.1
+func (fr *functionRelease) replaceKptPackages(contents []byte) []byte {
+	exampleGroup := strings.Join(fr.Examples.exampleNames(), "|")
+	exampleSubPath := "examples"
+	if fr.IsContrib {
+		exampleSubPath = "contrib/examples"
+	}
+	kptPkgPattern := regexp.MustCompile(
+		fmt.Sprintf(`(https://github\.com/GoogleContainerTools/kpt-functions-catalog\.git/%s/)(%s)(\s+)`,
+			exampleSubPath, exampleGroup))
+	contents = kptPkgPattern.ReplaceAll(contents,
+		[]byte(fmt.Sprintf(`${1}${2}@%s/%s${3}`, fr.FunctionName, fr.LatestPatchVersion)))
+	return contents
+}
+
+// Perform in place search/replace operations on a documentation file
+func (fr *functionRelease) updateDoc(filePath string) error {
+	contents, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
-	versionGroup := `(unstable|v\d*\.\d*\.\d*|v\d*\.\d*)`
-	// replace tags with patch e.g. apply-setters:v1.0.1, apply-setters/v1.0.1
-	tagPattern := regexp.MustCompile(
-		fmt.Sprintf(`%s(:|/)%s`, fr.FunctionName, versionGroup))
-	contents = tagPattern.ReplaceAll(contents,
-		[]byte(fmt.Sprintf(`%s${1}%s`, fr.FunctionName, fr.LatestPatchVersion)))
-	// replace url with minor e.g. https://catalog.kpt.dev/apply-setters/v1.0
-	urlPattern := regexp.MustCompile(
-		fmt.Sprintf(`https://catalog\.kpt\.dev/%s/%s`, fr.FunctionName, versionGroup))
-	contents = urlPattern.ReplaceAll(contents,
-		[]byte(fmt.Sprintf(`https://catalog.kpt.dev/%s/%s`, fr.FunctionName, fr.MinorVersion)))
-
-	if err = os.WriteFile(path, contents, 0644); err != nil {
+	contents = fr.replaceTags(contents)
+	contents = fr.replaceURLs(contents)
+	contents = fr.replaceKptPackages(contents)
+	if err = os.WriteFile(filePath, contents, 0644); err != nil {
 		return err
 	}
 	return nil
 }
 
-// updateDocs calls updateDoc for each function doc
-func (fr *functionRelease) updateDocs() error {
+// updateFunctionDoc updates the function docs for the functionRelease
+func (fr *functionRelease) updateFunctionDoc() error {
 	functionReadme := filepath.Join(fr.FunctionPath, "README.md")
-	if err := fr.updateDoc(functionReadme); err != nil {
-		return err
-	}
-	for _, example := range fr.ExamplePaths {
-		exampleReadme := filepath.Join(example, "README.md")
+	return fr.updateDoc(functionReadme)
+}
+
+// updateExampleDocs updates the example docs for the functionRelease
+func (fr *functionRelease) updateExampleDocs() error {
+	for _, example := range fr.Examples {
+		exampleReadme := filepath.Join(example.ExamplePath, "README.md")
 		if err := fr.updateDoc(exampleReadme); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+// updateDocs updates all the docs for the functionRelease on the filesystem
+func (fr *functionRelease) updateDocs() error {
+	if err := fr.updateFunctionDoc(); err != nil {
+		return err
+	}
+	if err := fr.updateExampleDocs(); err != nil {
+		return err
 	}
 	return nil
 }
