@@ -27,9 +27,9 @@ import (
 
 var (
 	// pattern of release branches, e.g. apply-setters/v1.0
-	releaseBranchPattern = regexp.MustCompile(`[-\w]*\/(v\d*\.\d*)`)
+	releaseBranchPattern = regexp.MustCompile(`[-\w]*/(v\d*\.\d*)`)
 	// pattern of release tags, e.g. functions/go/apply-setters/v1.0.1
-	releaseTagPattern    = regexp.MustCompile(`.*(go|ts)\/[-\w]*\/(v\d*\.\d*\.\d*)`)
+	releaseTagPattern    = regexp.MustCompile(`.*(go|ts)/[-\w]*/(v\d*\.\d*\.\d*)`)
 	// pattern for version tags, e.g. unstable, v0.1.1, v0.1
 	versionGroup         = `unstable|v\d*\.\d*\.\d*|v\d*\.\d*`
 )
