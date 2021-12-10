@@ -147,7 +147,7 @@
                 <ol class="dropdown-menu">`;
                 sortedSemvers.forEach(
                   (ver, ix) =>
-                    (versionDropdown += `<li><a href="/${functionName}/${ver}/">${versions[ver]['LatestPatchVersion'].replace(
+                    (versionDropdown += `<li><a href="${isContribFn ? "/contrib" : ""}/${functionName}/${ver}/">${versions[ver]['LatestPatchVersion'].replace(
                       "v",
                       ""
                     )}${ix ? "" : " (latest)"}</a></li>`)
