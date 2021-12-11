@@ -22,7 +22,7 @@
     "kpt:type-create": "kpt type-create"
   },
   "dependencies": {
-    "kpt-functions": "^0.15.1"
+    "kpt-functions": "^0.16.1"
   },
   "devDependencies": {
     "@types/jasmine": "^3.10.2",
