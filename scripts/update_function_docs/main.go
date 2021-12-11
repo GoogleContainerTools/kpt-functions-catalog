@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// Usage: update_function_docs <RELEASE_BRANCH>
+// Usage: update_function_docs -branch <RELEASE_BRANCH>
 //
-// e.g. update_function_docs origin/apply-setters/v0.2
+// e.g. update_function_docs -branch origin/apply-setters/v0.2
 //
 // The command will checkout the release branch and update the function/example
 // docs with the latest patch version for the release. If the docs are updated
@@ -23,6 +23,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 )
@@ -32,22 +33,49 @@ func exitWithErr(err error) {
 	os.Exit(1)
 }
 
+type arguments struct {
+	ReleaseBranch string
+}
+
+// validate command line arguments
+func (a arguments) validate() error {
+	if a.ReleaseBranch == "" {
+		return fmt.Errorf("release branch not set")
+	}
+	return nil
+}
+
+// parse command line arguments
+func parseArgs() (arguments, error) {
+	args := arguments{}
+	flag.StringVar(&args.ReleaseBranch, "branch", os.Getenv("RELEASE_BRANCH"),
+		"release branch (can also use RELEASE_BRANCH environment variable)")
+
+	flag.Parse()
+
+	err := args.validate()
+	if err != nil {
+		flag.Usage()
+	}
+	return args, err
+}
+
 func main() {
 	var err error
-	if len(os.Args) < 2 {
-		exitWithErr(fmt.Errorf("usage: update_function_docs <RELEASE_BRANCH>"))
+	args, err := parseArgs()
+	if err != nil {
+		exitWithErr(err)
 	}
-	releaseBranch := os.Args[1]
 	if !isCleanRepo() {
 		exitWithErr(fmt.Errorf("dirty repo"))
 	}
 	if err = gitFetch(); err != nil {
 		exitWithErr(err)
 	}
-	if err = gitCheckout(releaseBranch); err != nil {
+	if err = gitCheckout(args.ReleaseBranch); err != nil {
 		exitWithErr(err)
 	}
-	fr, err := newFunctionRelease(releaseBranch)
+	fr, err := newFunctionRelease(args.ReleaseBranch)
 	if err != nil {
 		exitWithErr(err)
 	}
