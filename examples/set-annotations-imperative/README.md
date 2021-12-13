@@ -10,7 +10,7 @@ on all resources by running [`set-annotations`] function imperatively.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations-imperative@set-annotations/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations-imperative@set-annotations/v0.1.4
 ```
 
 ### Function invocation
@@ -18,7 +18,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval set-annotations-imperative --image gcr.io/kpt-fn/set-annotations:v0.1 -- color=orange fruit=apple
+$ kpt fn eval set-annotations-imperative --image gcr.io/kpt-fn/set-annotations:v0.1.4 -- color=orange fruit=apple
 ```
 
 The labels provided in key-value pairs after `--` will be converted to a

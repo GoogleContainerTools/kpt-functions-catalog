@@ -10,7 +10,7 @@ to upsert annotations to the `.metadata.annotations` field on all resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations-simple@set-annotations/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations-simple@set-annotations/v0.1.4
 ```
 
 We use the following `Kptfile` to configure the function.
@@ -22,7 +22,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-annotations:v0.1
+    - image: gcr.io/kpt-fn/set-annotations:v0.1.4
       configMap:
         color: orange
         fruit: apple
