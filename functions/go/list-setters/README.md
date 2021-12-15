@@ -17,7 +17,7 @@ Refer to the [create-setters] function documentation for information about creat
 `list-setters` function is expected to be executed imperatively like
 
 ```shell
-$ kpt fn eval -i list-setters:v0.1
+$ kpt fn eval -i list-setters:v0.1.0
 ```
 
 `list-setters` function performs the following steps:
@@ -62,7 +62,7 @@ spec:
 Invoke the function:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/list-setters:v0.1
+$ kpt fn eval --image gcr.io/kpt-fn/list-setters:v0.1.0
 ```
 
 Output looks like the following:
