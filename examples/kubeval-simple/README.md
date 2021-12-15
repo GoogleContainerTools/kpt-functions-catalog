@@ -10,7 +10,7 @@ validate KRM resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval-simple@kubeval/v0.2
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval-simple@kubeval/v0.2.0
 ```
 
 The following is the `Kptfile` in this example: 
@@ -22,7 +22,7 @@ metadata:
   name: example
 pipeline:
   validators:
-    - image: gcr.io/kpt-fn/kubeval:v0.2
+    - image: gcr.io/kpt-fn/kubeval:v0.2.0
       configMap:
         strict: 'true'
 ```
@@ -51,7 +51,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/kubeval:v0.2
+  - image: gcr.io/kpt-fn/kubeval:v0.2.0
     exitCode: 1
     results:
       - message: Additional property templates is not allowed
@@ -82,4 +82,4 @@ There are validation error in the `resources.yaml` file, to fix them:
 
 Rerun the command, and it should succeed now.
 
-[`kubeval`]: https://catalog.kpt.dev/kubeval/v0.1/
+[`kubeval`]: https://catalog.kpt.dev/kubeval/v0.2/
