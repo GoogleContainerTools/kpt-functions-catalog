@@ -17,7 +17,7 @@ the services necessary in a single resource and have tighter control over which 
 `enable-gcp-services` function can be used both declaratively and imperatively.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:v0.1
+$ kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:v0.1.0
 ```
 
 The `enable-gcp-services` function does the following:
@@ -84,7 +84,7 @@ spec:
 Invoke the function:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:v0.1
+$ kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:v0.1.0
 ```
 
 Generated resources looks like the following:

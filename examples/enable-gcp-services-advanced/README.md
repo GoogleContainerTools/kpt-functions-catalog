@@ -9,7 +9,7 @@ In this example, we will see how to generate [project services](https://cloud.go
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enable-gcp-services-advanced@enable-gcp-services/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enable-gcp-services-advanced@enable-gcp-services/v0.1.0
 ```
 
 Explore the package by running:
@@ -41,8 +41,8 @@ $ kpt fn render enable-gcp-services-advanced
 
 ```shell
 Package "enable-gcp-services-advanced": 
-[RUNNING] "gcr.io/kpt-fn/enable-gcp-services:v0.1"
-[PASS] "gcr.io/kpt-fn/enable-gcp-services:v0.1"
+[RUNNING] "gcr.io/kpt-fn/enable-gcp-services:v0.1.0"
+[PASS] "gcr.io/kpt-fn/enable-gcp-services:v0.1.0"
   Results:
     [INFO] pruned service in object "serviceusage.cnrm.cloud.google.com/v1beta1/Service/proj1-service-bigquery" in file "service_proj1-service-bigquery.yaml"
     [INFO] recreated service in object "serviceusage.cnrm.cloud.google.com/v1beta1/Service/proj1-service-compute" in file "service_proj1-service-compute.yaml"
