@@ -10,7 +10,7 @@ function to render a helm chart that lives in your local filesystem.
 Run the following command to fetch the example package:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/render-helm-chart-local@render-helm-chart/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/render-helm-chart-local@render-helm-chart/v0.1.0
 ```
 
 ```shell
@@ -21,7 +21,7 @@ Run the following commands to render the helm chart in your local
 filesystem.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.1 \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.1.0 \
 --mount type=bind,src=$(pwd),dst=/tmp/charts \
 -- name=helloworld-chart \
 releaseName=test
@@ -30,7 +30,7 @@ releaseName=test
 You can optionally provide your own values files using `--valuesFile`.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.1 \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.1.0 \
 --mount type=bind,src=$(pwd),dst=/tmp/charts -- \
 name=helloworld-chart \
 releaseName=test \
