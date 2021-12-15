@@ -10,7 +10,7 @@ resource fields parameterized by `kpt-set` comments.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters-simple@apply-setters/v0.2
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters-simple@apply-setters/v0.2.0
 ```
 
 We use `ConfigMap` to configure the `apply-setters` function. The desired
