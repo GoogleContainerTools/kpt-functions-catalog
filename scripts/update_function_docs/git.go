@@ -61,8 +61,7 @@ func gitAdd() error {
 }
 
 func gitCommit(msg string) error {
-	formattedMsg := fmt.Sprintf("\"%s\"", msg)
-	stdout, err := runCmd("git", "commit", "-m", formattedMsg)
+	stdout, err := runCmd("git", "commit", "-m", msg)
 	fmt.Printf("%v\n", stdout)
 	return err
 }
