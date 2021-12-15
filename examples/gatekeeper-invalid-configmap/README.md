@@ -10,7 +10,7 @@ function to validate resources using gatekeeper constraints.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-invalid-configmap@gatekeeper/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-invalid-configmap@gatekeeper/v0.1.3
 ```
 
 There are 3 resources: a `ConstraintTemplate`, a `K8sBannedConfigMapKeysV1` and
@@ -25,7 +25,7 @@ metadata:
   name: example
 pipeline:
   validators:
-    - image: gcr.io/kpt-fn/gatekeeper:v0.1
+    - image: gcr.io/kpt-fn/gatekeeper:v0.1.3
 ```
 
 ### Function invocation
@@ -47,7 +47,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/gatekeeper:v0.1
+  - image: gcr.io/kpt-fn/gatekeeper:v0.1.3
     stderr: |-
       The following banned keys are being used in the ConfigMap: {"private_key"}
       violatedConstraint: no-secrets-in-configmap

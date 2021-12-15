@@ -10,7 +10,7 @@ running [`gatekeeper`] function imperatively.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-imperative@gatekeeper/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/gatekeeper-imperative@gatekeeper/v0.1.3
 ```
 
 To ensure ConfigMaps do not contain fields with name `private_key`, we express
@@ -26,7 +26,7 @@ We have a `ConfigMap` in `config-map.yaml` that violates the policy.
 Run the function with `--results-dir` flag:
 
 ```shell
-$ kpt fn eval gatekeeper-imperative --image gcr.io/kpt-fn/gatekeeper:v0.1 --results-dir /tmp
+$ kpt fn eval gatekeeper-imperative --image gcr.io/kpt-fn/gatekeeper:v0.1.3 --results-dir /tmp
 ```
 
 ### Expected result
@@ -40,7 +40,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/gatekeeper:v0.1
+  - image: gcr.io/kpt-fn/gatekeeper:v0.1.3
     stderr: |-
       The following banned keys are being used in the ConfigMap: {"private_key"}
       violatedConstraint: no-secrets-in-configmap
