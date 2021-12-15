@@ -10,7 +10,7 @@ resource fields using `create-setters` function.
 Get the example package by running the following command:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/create-setters-simple@create-setters/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/create-setters-simple@create-setters/v0.1.0
 ```
 
 We use `ConfigMap` to configure the `create-setters` function.
