@@ -12,7 +12,7 @@ This is an advanced example depicting [setter] creation process using `search-re
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace-create-setters@search-replace/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/search-replace-create-setters@search-replace/v0.1.1
 ```
 
 Let's start with the input resource
@@ -37,7 +37,7 @@ You can target specific values using path expression and regex capture groups,
 and add setter comments as per your intent.
 
 ```shell
-$ kpt fn eval search-replace-create-setters --image gcr.io/kpt-fn/search-replace:v0.1 -- \
+$ kpt fn eval search-replace-create-setters --image gcr.io/kpt-fn/search-replace:v0.1.1 -- \
 by-path='data.**' by-value-regex='(.*)nginx.com(.*)' put-comment='kpt-set: ${1}${host}${2}'
 ```
 

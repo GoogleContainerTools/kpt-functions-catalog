@@ -202,7 +202,7 @@ def validate_example_md(fn_name, dir_name, example_name, branch):
                 desired_pkg_url = f'{git_url_prefix}/{example_path}'
                 if branch != 'master':
                     desired_pkg_url = desired_pkg_url + f'@{branch}'
-                if item != desired_pkg_url:
+                if not item.startswith(desired_pkg_url):
                     raise Exception(f'the desired package url in {md_file_path} is {desired_pkg_url}, but found {item}')
 
             if gcr_prefix in item:
