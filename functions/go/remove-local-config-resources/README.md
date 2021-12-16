@@ -24,7 +24,7 @@ The function will execute as follows:
 `remove-local-config-resources` function can be executed imperatively as follows:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:v0.1
+$ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:v0.1.0
 ```
 
 To execute `remove-local-config-resources` declaratively include the function in kpt package pipeline as follows:
@@ -32,7 +32,7 @@ To execute `remove-local-config-resources` declaratively include the function in
 ...
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/remove-local-config-resources:v0.1
+    - image: gcr.io/kpt-fn/remove-local-config-resources:v0.1.0
 ...
 ```
 
@@ -78,7 +78,7 @@ spec:
 Invoke the function in the package directory:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:v0.1
+$ kpt fn eval -i gcr.io/kpt-fn/remove-local-config-resources:v0.1.0
 ```
 
 The resulting package structure would look like this:

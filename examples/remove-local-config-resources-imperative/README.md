@@ -10,7 +10,7 @@ supplied resource list.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/remove-local-config-resources-imperative@remove-local-config-resources/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/remove-local-config-resources-imperative@remove-local-config-resources/v0.1.0
 ```
 
 ### Function invocation
@@ -18,7 +18,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following command:
 
 ```shell
-$ kpt fn eval remove-local-config-resources-imperative -i gcr.io/kpt-fn/remove-local-config-resources:v0.1
+$ kpt fn eval remove-local-config-resources-imperative -i gcr.io/kpt-fn/remove-local-config-resources:v0.1.0
 ```
 
 ### Expected result
