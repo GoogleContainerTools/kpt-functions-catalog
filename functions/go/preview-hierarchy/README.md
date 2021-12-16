@@ -53,13 +53,13 @@ data:
 For SVG output
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn/preview-hierarchy:v0.1 -- output=test.svg
+$ kpt fn eval -i gcr.io/kpt-fn/preview-hierarchy:v0.1.0 -- output=test.svg
 ```
 
 To print tree visualization to stdout 
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn/preview-hierarchy:v0.1 -- renderer=text
+$ kpt fn eval -i gcr.io/kpt-fn/preview-hierarchy:v0.1.0 -- renderer=text
 ```
 
 `preview-hierarchy` function performs the following steps:
