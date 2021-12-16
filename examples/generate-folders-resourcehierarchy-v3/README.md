@@ -12,7 +12,7 @@ resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/generate-folders-resourcehierarchy-v3@generate-folders/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/generate-folders-resourcehierarchy-v3@generate-folders/v0.1.1
 ```
 
 ### Function invocation
