@@ -9,7 +9,7 @@ In this example, we will see how to generate [project services](https://cloud.go
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enable-gcp-services-simple@enable-gcp-services/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/enable-gcp-services-simple@enable-gcp-services/v0.1.0
 ```
 
 ### Function invocation
@@ -23,8 +23,8 @@ $ kpt fn render enable-gcp-services-simple
 ### Expected result
 
 ```shell
-[RUNNING] "gcr.io/kpt-fn/enable-gcp-services:v0.1"
-[PASS] "gcr.io/kpt-fn/enable-gcp-services:v0.1"
+[RUNNING] "gcr.io/kpt-fn/enable-gcp-services:v0.1.0"
+[PASS] "gcr.io/kpt-fn/enable-gcp-services:v0.1.0"
   Results:
     [INFO] generated service in object "serviceusage.cnrm.cloud.google.com/v1beta1/Service/proj1-service-compute"
     [INFO] generated service in object "serviceusage.cnrm.cloud.google.com/v1beta1/Service/proj1-service-redis"
