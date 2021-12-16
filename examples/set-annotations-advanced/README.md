@@ -14,7 +14,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-annotations:v0.1
+    - image: gcr.io/kpt-fn/set-annotations:v0.1.4
       configPath: fn-config.yaml
 ```
 
@@ -45,7 +45,7 @@ specify it in field `additionalAnnotationFields`.
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations-advanced@set-annotations/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-annotations-advanced@set-annotations/v0.1.4
 $ kpt fn render set-annotations-advanced
 ```
 
