@@ -90,13 +90,13 @@ data:
 Invoke the function:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config.yaml
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1.0 --fn-config ./create-setters-fn-config.yaml
 ```
 
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 -- replicas=4 tag=1.1.2
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1.0 -- replicas=4 tag=1.1.2
 ```
 
 Modified resource looks like the following:
@@ -171,7 +171,7 @@ data:
 ```
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1 --fn-config ./create-setters-fn-config.yaml
+$ kpt fn eval --image gcr.io/kpt-fn/create-setters:v0.1.0 --fn-config ./create-setters-fn-config.yaml
 ```
 
 Modified resource looks like the following:
