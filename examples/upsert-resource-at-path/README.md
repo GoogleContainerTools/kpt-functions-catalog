@@ -7,7 +7,7 @@ In this example, we will see how to add a resource at specified path using `upse
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource-at-path@upsert-resource/v0.2
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/upsert-resource-at-path@upsert-resource/v0.2.0
 ```
 
 The input resource is present at path `.expected/fn-config.yaml`. It has an annotation
@@ -19,7 +19,7 @@ should be upserted.
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval -i upsert-resource:v0.2 --fn-config .expected/fn-config.yaml
+$ kpt fn eval -i upsert-resource:v0.2.0 --fn-config .expected/fn-config.yaml
 ```
 
 ### Expected result
