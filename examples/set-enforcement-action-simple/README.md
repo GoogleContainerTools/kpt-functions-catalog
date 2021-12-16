@@ -10,7 +10,7 @@ dryrun for auditing purposes.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-enforcement-action-simple@set-enforcement-action/v0.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-enforcement-action-simple@set-enforcement-action/v0.1.0
 ```
 
 ### Function invocation

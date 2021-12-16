@@ -28,7 +28,7 @@ The function will execute as follows:
 `set-enforcement-action` function can be executed imperatively as follows:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn/set-enforcement-action:v0.1 -- enforcementAction=deny
+$ kpt fn eval -i gcr.io/kpt-fn/set-enforcement-action:v0.1.0 -- enforcementAction=deny
 ```
 
 To execute `set-enforcement-action` declaratively include the function in kpt package pipeline as follows:
@@ -36,7 +36,7 @@ To execute `set-enforcement-action` declaratively include the function in kpt pa
 ...
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-enforcement-action:v0.1
+    - image: gcr.io/kpt-fn/set-enforcement-action:v0.1.0
       configMap:
         enforcementAction: deny
 ...
