@@ -13,7 +13,7 @@ The `sops` KRM config function encrypts and decrypts resources using the sops to
 
 Get the example package by running the following commands:
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/sops-age@sops/v0.3
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/sops-age@sops/v0.3.0
 ```
 
 The package resources, e.g. [deployment.yaml](deployment.yaml) as well as some meta-resources, e.g. [apply-setters.yaml](apply-setters.yaml)
@@ -27,7 +27,7 @@ Invoke the decryption by running the following command:
 $ kpt fn eval \
         --fn-config sops-age/decrypt.yaml \
         --env SOPS_IMPORT_AGE="$(cat sops-age/age_keys.txt)" \
-        --image gcr.io/kpt-fn-contrib/sops:v0.3 \
+        --image gcr.io/kpt-fn-contrib/sops:v0.3.0 \
         --include-meta-resources \
         sops-age/
 ```
@@ -50,7 +50,7 @@ Invoke the encryption by running the following command:
 $ kpt fn eval \
         --fn-config sops-age/encrypt.yaml \
         --include-meta-resources \
-        --image gcr.io/kpt-fn-contrib/sops:v0.3 \
+        --image gcr.io/kpt-fn-contrib/sops:v0.3.0 \
         sops-age/
 ```
 
