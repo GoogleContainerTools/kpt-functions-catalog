@@ -8,7 +8,7 @@ and make it compatible with kpt 1.0
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/fix-simple@fix/v0.2
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/fix-simple@fix/v0.2.1
 ```
 
 Let's start with the input resources
@@ -93,7 +93,7 @@ The transformed package is compatible with kpt 1.0 binary.
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval fix-simple --image gcr.io/kpt-fn/fix:v0.2 --include-meta-resources
+$ kpt fn eval fix-simple --image gcr.io/kpt-fn/fix:v0.2.1 --include-meta-resources
 ```
 
 ### Expected result
