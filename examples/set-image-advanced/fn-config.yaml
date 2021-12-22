@@ -1,0 +1,14 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: SetImage
+metadata:
+  name: my-func-config
+image:
+  name: nginx
+  newName: bitnami/nginx
+  newTag: 1.21.4
+additionalImageFields:
+  - kind: MyKind
+    create: false
+    group: dev.example.com
+    path: spec/manifest/images[]/image
+    version: v1

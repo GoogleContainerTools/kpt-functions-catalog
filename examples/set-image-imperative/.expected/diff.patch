@@ -1,0 +1,19 @@
+diff --git a/app.yaml b/app.yaml
+index 05416b5..d045239 100644
+--- a/app.yaml
++++ b/app.yaml
+@@ -5,7 +5,7 @@ metadata:
+ spec:
+   containers:
+   - name: server
+-    image: nginx:1.20.2
++    image: bitnami/nginx:1.21.4
+   - name: store
+     image: postgres:14.1
+ ---
+@@ -18,4 +18,4 @@ spec:
+   - name: store
+     image: redis:6.2.6
+   - name: server
+-    image: nginx:1.20.2
++    image: bitnami/nginx:1.21.4
