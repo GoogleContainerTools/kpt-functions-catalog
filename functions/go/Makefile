@@ -33,6 +33,7 @@ FUNCTIONS := \
 	search-replace \
 	set-annotations \
 	set-enforcement-action \
+	set-image \
 	set-labels \
 	set-namespace \
 	set-project-id \
