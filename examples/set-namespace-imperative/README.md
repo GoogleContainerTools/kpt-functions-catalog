@@ -11,7 +11,7 @@ are known to be cluster-scoped will be skipped.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-imperative
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-imperative@set-namespace/v0.2.0
 ```
 
 ### Function invocation
@@ -19,7 +19,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval set-namespace-imperative --image gcr.io/kpt-fn/set-namespace:unstable -- namespace=example-ns
+$ kpt fn eval set-namespace-imperative --image gcr.io/kpt-fn/set-namespace:v0.2.0 -- namespace=example-ns
 ```
 
 The desired namespace is provided after `--` and it will be converted to
@@ -29,4 +29,4 @@ The desired namespace is provided after `--` and it will be converted to
 
 Check all resources have `metadata.namespace` set to `example-ns`:
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.2/
