@@ -41,6 +41,13 @@ func dirExists(path string) bool {
 	return false
 }
 
+func fileExists(path string) bool {
+	if _, err := os.Stat(path); err == nil {
+		return true
+	}
+	return false
+}
+
 type functionExample struct {
 	ExamplePath string
 	ExampleName string
@@ -207,7 +214,14 @@ func (fr *functionRelease) updateDocs() error {
 // updateFunctionDoc updates the function docs for the functionRelease
 func (fr *functionRelease) updateFunctionDoc() error {
 	functionReadme := filepath.Join(fr.FunctionPath, "README.md")
-	return fr.updateDoc(functionReadme)
+	if err := fr.updateDoc(functionReadme); err != nil {
+		return err
+	}
+	functionMetadata := filepath.Join(fr.FunctionPath, "metadata.yaml")
+	if err := fr.updateDoc(functionMetadata); err != nil {
+		return err
+	}
+	return nil
 }
 
 // updateExampleDocs updates the example docs for the functionRelease
@@ -216,6 +230,12 @@ func (fr *functionRelease) updateExampleDocs() error {
 		exampleReadme := filepath.Join(example.ExamplePath, "README.md")
 		if err := fr.updateDoc(exampleReadme); err != nil {
 			return err
+		}
+		exampleKptfile := filepath.Join(example.ExamplePath, "Kptfile")
+		if fileExists(exampleKptfile) {
+			if err := fr.updateDoc(exampleKptfile); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -230,6 +250,7 @@ func (fr *functionRelease) updateDoc(filePath string) error {
 	contents = fr.replaceTags(contents)
 	contents = fr.replaceURLs(contents)
 	contents = fr.replaceKptPackages(contents)
+	contents = fr.replaceGithubURLs(contents)
 	if err = os.WriteFile(filePath, contents, 0644); err != nil {
 		return err
 	}
@@ -254,19 +275,46 @@ func (fr *functionRelease) replaceURLs(contents []byte) []byte {
 	return contents
 }
 
+// get sub-path to examples e.g. examples, contrib/examples
+func (fr *functionRelease) exampleSubPath() string {
+	exampleSubPath := "examples"
+	if fr.IsContrib {
+		exampleSubPath = "contrib/examples"
+	}
+	return exampleSubPath
+}
+
 // replace kpt package names for all examples, e.g.
 // https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters-simple ->
 // https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-setters-simple@apply-setters/v1.0.1
 func (fr *functionRelease) replaceKptPackages(contents []byte) []byte {
 	exampleGroup := strings.Join(fr.Examples.exampleNames(), "|")
-	exampleSubPath := "examples"
-	if fr.IsContrib {
-		exampleSubPath = "contrib/examples"
-	}
+	exampleSubPath := fr.exampleSubPath()
 	kptPkgPattern := regexp.MustCompile(
 		fmt.Sprintf(`(https://github\.com/GoogleContainerTools/kpt-functions-catalog\.git/%s/)(%s)(\s+)`,
 			exampleSubPath, exampleGroup))
 	contents = kptPkgPattern.ReplaceAll(contents,
 		[]byte(fmt.Sprintf(`${1}${2}@%s/%s${3}`, fr.FunctionName, fr.LatestPatchVersion)))
+	return contents
+}
+
+// replace branch name with release branch for all GitHub URLs, e.g.
+// https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/set-namespace-simple ->
+// https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.2/examples/set-namespace-simple
+func (fr *functionRelease) replaceGithubURLs(contents []byte) []byte {
+	exampleSubPath := fr.exampleSubPath()
+	suffixes := []string{
+		fmt.Sprintf(`/functions/%s/%s`, fr.Language, fr.FunctionName),
+	}
+	for _, ex := range fr.Examples.exampleNames() {
+		suffixes = append(suffixes, fmt.Sprintf(`/%s/%s`, exampleSubPath, ex))
+	}
+	suffixGroup := strings.Join(suffixes, "|")
+	refGroup := fmt.Sprintf(`master|%s/v\d*\.\d*`, fr.FunctionName)
+	githubURLPattern := regexp.MustCompile(
+		fmt.Sprintf(`(https://github\.com/GoogleContainerTools/kpt-functions-catalog/tree/)(%s)(%s)`,
+			refGroup, suffixGroup))
+	contents = githubURLPattern.ReplaceAll(contents,
+		[]byte(fmt.Sprintf(`${1}%s/%s${3}`, fr.FunctionName, fr.MinorVersion)))
 	return contents
 }
