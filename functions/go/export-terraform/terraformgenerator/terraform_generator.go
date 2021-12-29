@@ -30,10 +30,14 @@ var templates embed.FS
 // Filter implements ProjectServiceSetRunner as a yaml.Filter
 func Processor(rl *sdk.ResourceList) error {
 	var resources terraformResources
+	supportedKinds := map[string]bool{"Folder": true, "Organization": true}
 
 	for _, item := range rl.Items {
-
 		if !strings.Contains(item.APIVersion(), "cnrm.cloud.google.com") {
+			continue
+		}
+
+		if _, ok := supportedKinds[item.Kind()]; !ok {
 			continue
 		}
 
