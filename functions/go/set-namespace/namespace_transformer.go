@@ -6,12 +6,15 @@ package main
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"sigs.k8s.io/kustomize/api/filters/namespace"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/filtersutil"
+	"sigs.k8s.io/kustomize/kyaml/resid"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
 )
@@ -21,6 +24,21 @@ const (
 	serviceAccountKind     = "ServiceAccount"
 	roleBindingKind        = "RoleBinding"
 	clusterRoleBindingKind = "ClusterRoleBinding"
+	dependsOnAnnotation    = "config.kubernetes.io/depends-on"
+)
+
+// Constants for namespaced resources
+const (
+	groupIdx     = 0
+	namespaceIdx = 2
+	kindIdx      = 3
+	nameIdx      = 4
+)
+
+var (
+	// Assumes alphanumeric characters, '-', or '.'
+	// <group>/namespaces/<namespace>/<kind>/<name>
+	namespacedResourcePattern = regexp.MustCompile(`\A([-.\w]*)/namespaces/([-.\w]*)/([-.\w]*)/([-.\w]*)\z`)
 )
 
 // Change or set the namespace of non-cluster level resources.
@@ -31,6 +49,8 @@ type plugin struct {
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 	// AdditionalNamespaceFields is used to specify additional fields to set namespace.
 	AdditionalNamespaceFields []types.FieldSpec `json:"additionalNamespaceFields,omitempty" yaml:"additionalNamespaceFields,omitempty"`
+	// inputResourceLookup is used internally to track input resources
+	inputResourceLookup resourceLookup
 }
 
 //noinspection GoUnusedGlobalVariable
@@ -57,8 +77,7 @@ func (p *plugin) Transform(m resmap.ResMap) error {
 	if len(p.Namespace) == 0 {
 		return nil
 	}
-	sal := serviceAccountLookup{}
-	sal.FromResMap(m)
+	p.inputResourceLookup.FromResMap(m)
 	for _, r := range m.Resources() {
 		if r.IsNilOrEmpty() {
 			// Don't mutate empty objects?
@@ -71,19 +90,63 @@ func (p *plugin) Transform(m resmap.ResMap) error {
 		if err != nil {
 			return err
 		}
-		if err = p.roleBindingHack(r, sal); err != nil {
+		if err = p.updateRoleBinding(r); err != nil {
+			return err
+		}
+		if err = p.updateDependsOnAnnotation(r); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-// roleBindingHack extends the behavior of the upstream kustomize filter
+// set namespace if input matches <group>/namespaces/<namespace>/<kind>/<name>
+// returns (string, bool) where the bool indicates if namespace was set
+func (p *plugin) setDependsOnNamespace(dependsOn string) (string, bool) {
+	if !namespacedResourcePattern.MatchString(dependsOn) {
+		return dependsOn, false
+	}
+	segments := strings.Split(dependsOn, "/")
+	rk := resourceKey{
+		Group: segments[groupIdx],
+		Kind:  segments[kindIdx],
+		Name:  segments[nameIdx],
+	}
+	// Only update namespace if the referenced resource is included in input
+	if !p.inputResourceLookup.HasResource(rk) {
+		return dependsOn, false
+	}
+	segments[namespaceIdx] = p.Namespace
+	dependsOn = strings.Join(segments, "/")
+	return dependsOn, true
+}
+
+// updateDependsOnAnnotation updates the namespace for the depends-on annotation
+// if the annotation is for a namespaced resource. The expected syntax for a
+// namespaced resource is <group>/namespaces/<namespace>/<kind>/<name>
+func (p *plugin) updateDependsOnAnnotation(r *resource.Resource) error {
+	annotations := r.GetAnnotations()
+	dependsOn, ok := annotations[dependsOnAnnotation]
+	if !ok {
+		return nil
+	}
+	dependsOn, ok = p.setDependsOnNamespace(dependsOn)
+	if !ok {
+		return nil
+	}
+	annotations[dependsOnAnnotation] = dependsOn
+	if err := r.SetAnnotations(annotations); err != nil {
+		return err
+	}
+	return nil
+}
+
+// updateRoleBinding extends the behavior of the upstream kustomize filter
 // This extension adds the following behavior:
 // Given a ServiceAccount is present in the ResourceList, additionally set the
 // namespace for that ServiceAccount where it is referenced in the "subjects"
 // field of a RoleBinding or ClusterRoleBinding
-func (p *plugin) roleBindingHack(r *resource.Resource, sal serviceAccountLookup) error {
+func (p *plugin) updateRoleBinding(r *resource.Resource) error {
 	kind := r.GetKind()
 	if kind != roleBindingKind && kind != clusterRoleBindingKind {
 		return nil
@@ -98,13 +161,11 @@ func (p *plugin) roleBindingHack(r *resource.Resource, sal serviceAccountLookup)
 		if subjectKind != serviceAccountKind {
 			return nil
 		}
-		var nameRN *kyaml.RNode
-		nameRN, err = o.Pipe(kyaml.Lookup("name"))
-		if err != nil || kyaml.IsMissingOrNull(nameRN) {
-			return err
+		rk := resourceKey{}
+		if err := rk.FromRNode(o); err != nil {
+			return nil
 		}
-		nameStr := kyaml.GetValue(nameRN)
-		if !sal.HasServiceAccount(nameStr) {
+		if !p.inputResourceLookup.HasResource(rk) {
 			return nil
 		}
 		v := kyaml.NewScalarRNode(p.Namespace)
@@ -116,22 +177,49 @@ func (p *plugin) roleBindingHack(r *resource.Resource, sal serviceAccountLookup)
 	return err
 }
 
-// ServiceAccountLookup provides an API for tracking ServiceAccount resources
-type serviceAccountLookup struct {
-	serviceAccountMap map[string]bool
+// resourceKey provides a key for looking up resources in resourceLookup
+type resourceKey struct {
+	Group string
+	Kind  string
+	Name  string
 }
 
-// FromResMap reads through a ResMap to populate ServiceAccountLookup
-func (sal *serviceAccountLookup) FromResMap(m resmap.ResMap) {
-	sal.serviceAccountMap = make(map[string]bool)
+// FromRNode populates the fields of resourceKey from the provided RNode
+func (rk *resourceKey) FromRNode(r *kyaml.RNode) error {
+	gvk := resid.GvkFromNode(r)
+	nameRN, err := r.Pipe(kyaml.Lookup("name"))
+	if err != nil {
+		return err
+	}
+	if kyaml.IsMissingOrNull(nameRN) {
+		s, _ := r.String()
+		return fmt.Errorf("RNode name missing or null from: %s", s)
+	}
+	rk.Kind = gvk.Kind
+	rk.Group = gvk.Group
+	rk.Name = kyaml.GetValue(nameRN)
+	return nil
+}
+
+// resourceLookup provides an API for tracking resources
+type resourceLookup struct {
+	resourceMap map[resourceKey]bool
+}
+
+// FromResMap reads through a ResMap to populate ResourceLookup
+func (rl *resourceLookup) FromResMap(m resmap.ResMap) {
+	rl.resourceMap = make(map[resourceKey]bool)
 	for _, r := range m.Resources() {
-		if r.GetKind() == serviceAccountKind {
-			sal.serviceAccountMap[r.GetName()] = true
-		}
+		gvk := r.GetGvk()
+		rl.resourceMap[resourceKey{
+			Group: gvk.Group,
+			Kind:  gvk.Kind,
+			Name:  r.GetName(),
+		}] = true
 	}
 }
 
-// HasServiceAccount returns whether a ServiceAccount with the provided name is present
-func (sal *serviceAccountLookup) HasServiceAccount(name string) bool {
-	return sal.serviceAccountMap[name]
+// HasResource returns whether a Resource with the provided resourceKey is present
+func (rl *resourceLookup) HasResource(rk resourceKey) bool {
+	return rl.resourceMap[rk]
 }
