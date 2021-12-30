@@ -23,6 +23,6 @@ To execute ` + "`" + `set-enforcement-action` + "`" + ` declaratively include th
     mutators:
       - image: gcr.io/kpt-fn/set-enforcement-action:unstable
         configMap:
-            enforcementAction: deny
+          enforcementAction: deny
   ...
 `
