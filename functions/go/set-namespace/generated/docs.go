@@ -30,18 +30,34 @@ target the namespace. There are a few cases that worth pointing out:
 
 - If there is a ` + "`" + `Namespace` + "`" + ` resource, its ` + "`" + `metadata.name` + "`" + ` field will be updated.
 - If there's a ` + "`" + `RoleBinding` + "`" + ` or ` + "`" + `ClusterRoleBinding` + "`" + ` resource, the function will
-  update the namespace in the ` + "`" + `ServiceAccount` + "`" + ` if and only if the subject
-  element ` + "`" + `name` + "`" + ` is ` + "`" + `default` + "`" + `. In the following example, the ` + "`" + `set-namespace` + "`" + `
-  function will update ` + "`" + `subjects.namespace` + "`" + ` since the
-  corresponding ` + "`" + `subjects.name` + "`" + ` is ` + "`" + `default` + "`" + `.
+  update the namespace in the ` + "`" + `ServiceAccount` + "`" + ` if one of the following are true:
+  1) the subject element ` + "`" + `name` + "`" + ` is ` + "`" + `default` + "`" + `.
+  2) the subject element ` + "`" + `name` + "`" + ` matches the name of a ` + "`" + `ServiceAccount` + "`" + ` resource declared in the package.
+  
+In the following example, the ` + "`" + `set-namespace` + "`" + ` function will update:
+- ` + "`" + `subjects[0].namespace` + "`" + ` since ` + "`" + `subjects[0].name` + "`" + ` is ` + "`" + `default` + "`" + `.
+- ` + "`" + `subjects[1].namespace` + "`" + ` since ` + "`" + `subjects[1].name` + "`" + ` matches a ` + "`" + `ServiceAccount` + "`" + `
+  name declared in the package.
 
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: service-account
+    namespace: original-namespace
+  ---
   kind: RoleBinding
   apiVersion: rbac.authorization.k8s.io/v1
   metadata:
     ...
   subjects:
     - kind: ServiceAccount
-      name: default # <======== using name default here
+      name: default # <================== name default is used
+      namespace: original-namespace # <== this will be updated
+    - kind: ServiceAccount
+      name: service-account # <========== name matches above ServiceAccount
+      namespace: original-namespace # <== this will be updated
+    - kind: ServiceAccount
+      name: other-service-account # <==== this will NOT be updated
       namespace: original-namespace
   roleRef:
     kind: Role
