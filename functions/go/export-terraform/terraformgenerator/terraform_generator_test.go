@@ -19,9 +19,9 @@ import (
 	"path"
 	"testing"
 
+	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk/testutil"
 	"github.com/stretchr/testify/require"
-	"sigs.k8s.io/kustomize/kyaml/fn/sdk"
-	"sigs.k8s.io/kustomize/kyaml/fn/sdk/testutil"
 )
 
 const testDir = "testdata"

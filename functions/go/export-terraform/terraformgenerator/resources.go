@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"sigs.k8s.io/kustomize/kyaml/fn/sdk"
+	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
 )
 
 type terraformResource struct {

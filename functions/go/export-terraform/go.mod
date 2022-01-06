@@ -2,11 +2,11 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/export
 
 go 1.16
 
-replace sigs.k8s.io/kustomize/kyaml v0.11.1 => github.com/mengqiy/kustomize/kyaml v0.15.0
+replace github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk v0.0.0-20220106201853-53d6f3d583fe => ../../../thirdparty/kyaml/fnsdk
 
 require (
+	github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk v0.0.0-20220106201853-53d6f3d583fe
 	github.com/stretchr/testify v1.7.0
-	k8s.io/api v0.22.3
-	k8s.io/apimachinery v0.22.3
-	sigs.k8s.io/kustomize/kyaml v0.11.1
+	k8s.io/api v0.23.1
+	k8s.io/apimachinery v0.23.1
 )

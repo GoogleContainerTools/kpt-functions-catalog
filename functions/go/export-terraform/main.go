@@ -18,7 +18,7 @@ import (
 	"os"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/export-terraform/terraformgenerator"
-	"sigs.k8s.io/kustomize/kyaml/fn/sdk"
+	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
 )
 
 func main() {

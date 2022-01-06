@@ -21,7 +21,7 @@ import (
 	"strings"
 	"text/template"
 
-	"sigs.k8s.io/kustomize/kyaml/fn/sdk"
+	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
 )
 
 type terraformResources struct {
