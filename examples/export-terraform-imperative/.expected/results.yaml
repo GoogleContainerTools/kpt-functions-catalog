@@ -5,7 +5,7 @@ metadata:
 exitCode: 0
 items:
   - image: gcr.io/kpt-fn/export-terraform:unstable
-    stderr: |
+    stderr: |-
       found matching template for Folder/child-folder: true
       found matching template for Folder/parent-folder: true
     exitCode: 0
