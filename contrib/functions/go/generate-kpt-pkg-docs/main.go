@@ -32,7 +32,7 @@ func main() {
 type ReadmeProcessor struct{}
 
 func (rp *ReadmeProcessor) Process(resourceList *framework.ResourceList) error {
-	readmePath, repoPath := parseFnCfg(resourceList.FunctionConfig)
+	readmePath, repoPath, pkgName := parseFnCfg(resourceList.FunctionConfig)
 
 	currentDoc, err := ioutil.ReadFile(readmePath)
 	if err != nil {
@@ -43,7 +43,7 @@ func (rp *ReadmeProcessor) Process(resourceList *framework.ResourceList) error {
 			resourceList.Results = getResults(err.Error(), framework.Error)
 		}
 	}
-	err = generateReadme(repoPath, readmePath, string(currentDoc), resourceList)
+	err = generateReadme(repoPath, readmePath, pkgName, string(currentDoc), resourceList)
 	if err != nil {
 		resourceList.Results = getResults(err.Error(), framework.Error)
 		return err
@@ -51,8 +51,8 @@ func (rp *ReadmeProcessor) Process(resourceList *framework.ResourceList) error {
 	return nil
 }
 
-func generateReadme(repoPath, readmePath, currentDoc string, resourceList *framework.ResourceList) error {
-	title, generatedDoc, err := docs.GenerateBlueprintReadme(resourceList.Items, repoPath)
+func generateReadme(repoPath, readmePath, pkgName, currentDoc string, resourceList *framework.ResourceList) error {
+	title, generatedDoc, err := docs.GenerateBlueprintReadme(resourceList.Items, repoPath, pkgName)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func generateReadme(repoPath, readmePath, currentDoc string, resourceList *frame
 	return nil
 }
 
-func parseFnCfg(r *yaml.RNode) (string, string) {
+func parseFnCfg(r *yaml.RNode) (string, string, string) {
 	cm := r.GetDataMap()
 	readme, exists := cm["readme-path"]
 	if !exists {
@@ -77,7 +77,8 @@ func parseFnCfg(r *yaml.RNode) (string, string) {
 	if !exists {
 		repoPath = defaultRepoPath
 	}
-	return readme, repoPath
+	pkgName := cm["pkg-name"]
+	return readme, repoPath, pkgName
 
 }
 

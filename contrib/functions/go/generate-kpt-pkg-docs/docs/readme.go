@@ -11,6 +11,7 @@ import (
 // blueprint represents a kpt pkg with a root kptfile, resources and any additional subpackages.
 type blueprint struct {
 	rootKf   *kptfilev1.KptFile
+	pkgName  string
 	kfs      map[string]*kptfilev1.KptFile
 	nodes    []*yaml.RNode
 	repoPath string
@@ -28,7 +29,7 @@ type blueprintReadme struct {
 type generateSection func(*blueprintReadme) error
 
 // newBlueprintReadme initializes a blueprint readme
-func newBlueprintReadme(n []*yaml.RNode, repoPath string) (blueprintReadme, error) {
+func newBlueprintReadme(n []*yaml.RNode, repoPath, pkgName string) (blueprintReadme, error) {
 	// deep copy resources to prevent any changes to resources
 	nodes := []*yaml.RNode{}
 	for _, r := range n {
@@ -49,7 +50,11 @@ func newBlueprintReadme(n []*yaml.RNode, repoPath string) (blueprintReadme, erro
 	for _, fnCfg := range getFnCfgPaths(rootKf) {
 		skipFiles[fnCfg] = true
 	}
-	b := blueprint{rootKf: rootKf, kfs: pkgs, nodes: nodes, repoPath: repoPath}
+	// if no explicit pkg name, use kf pkgname
+	if pkgName == "" {
+		pkgName = rootKf.Name
+	}
+	b := blueprint{rootKf: rootKf, kfs: pkgs, nodes: nodes, repoPath: repoPath, pkgName: pkgName}
 	return blueprintReadme{content: &strings.Builder{}, bp: b, filteredNodes: filterResources(nodes, skipFiles)}, nil
 }
 

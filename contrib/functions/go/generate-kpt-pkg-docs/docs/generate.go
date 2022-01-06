@@ -14,8 +14,8 @@ import (
 )
 
 // GenerateBlueprintReadme generates markdown readme and title if present for a blueprint
-func GenerateBlueprintReadme(nodes []*yaml.RNode, repoPath string) (string, string, error) {
-	r, err := newBlueprintReadme(nodes, repoPath)
+func GenerateBlueprintReadme(nodes []*yaml.RNode, repoPath, pkgName string) (string, string, error) {
+	r, err := newBlueprintReadme(nodes, repoPath, pkgName)
 	if err != nil {
 		return "", "", err
 	}
@@ -117,8 +117,12 @@ func generateResourceTableSection(r *blueprintReadme) error {
 		table.Append([]string{path, r.GetApiVersion(), r.GetKind(), r.GetName(), r.GetNamespace()})
 	}
 	r.write(getMdHeading("Resources", 2))
-	table.Render()
-	r.write(buf.String())
+	if len(r.filteredNodes) == 0 {
+		r.writeLn("This package has no top-level resources. See sub-packages.")
+	} else {
+		table.Render()
+		r.write(buf.String())
+	}
 	return nil
 }
 
@@ -149,7 +153,7 @@ func generateResourceRefsSection(r *blueprintReadme) error {
 
 	r.write(getMdHeading("Resource References", 2))
 	if len(resourcesLinks) == 0 {
-		r.writeLn("This package has no resources.")
+		r.writeLn("This package has no top-level resources. See sub-packages.")
 	} else {
 		sort.Strings(resourcesLinks)
 		for _, l := range resourcesLinks {
@@ -203,11 +207,12 @@ func generateUsageSection(r *blueprintReadme) error {
 		return err
 	}
 	r.write(getMdHeading("Usage", 2))
+
 	err = t.Execute(r.content, struct {
 		Pkgname  string
 		RepoPath string
 	}{
-		Pkgname:  r.bp.rootKf.Name,
+		Pkgname:  r.bp.pkgName,
 		RepoPath: r.bp.repoPath,
 	},
 	)

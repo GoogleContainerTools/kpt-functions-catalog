@@ -11,6 +11,7 @@ func TestGenerateReadme(t *testing.T) {
 	tests := []struct {
 		name      string
 		r         string
+		pkgName   string
 		wantTitle string
 		wantDoc   string
 		err       string
@@ -133,6 +134,124 @@ This package has no sub-packages.
 `,
 		},
 		{
+			name: "simple with custom pkg name",
+			r: `apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: project
+  annotations:
+    blueprints.cloud.google.com/title: Project blueprint
+    internal.config.kubernetes.io/path: Kptfile
+info:
+  description: |
+    A project and a project namespace in which to manage project resources with
+    Config Connector.
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.1
+      configPath: setters.yaml
+---
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Project
+metadata:
+  name: project-id # kpt-set: ${project-id}
+  namespace: projects # kpt-set: ${projects-namespace}
+  annotations:
+    cnrm.cloud.google.com/auto-create-network: "false"
+    cnrm.cloud.google.com/blueprint: cnrm/landing-zone:project/v0.4.1
+    internal.config.kubernetes.io/path: project.yaml
+spec:
+  name: project-id # kpt-set: ${project-id}
+  billingAccountRef:
+    external: "AAAAAA-BBBBBB-CCCCCC" # kpt-set: ${billing-account-id}
+  folderRef:
+    name: name.of.folder # kpt-set: ${folder-name}
+    namespace: hierarchy # kpt-set: ${folder-namespace}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: setters
+  annotations:
+    internal.config.kubernetes.io/path: setters.yaml
+data:
+  folder-name: name.of.folder
+  project-id: project-id
+  # These defaults can be kept
+  folder-namespace: hierarchy
+`,
+			pkgName: "foopkg",
+			wantTitle: `# Project blueprint
+
+`,
+			wantDoc: `A project and a project namespace in which to manage project resources with
+Config Connector.
+
+## Setters
+
+|        Name        |        Value         | Type | Count |
+|--------------------|----------------------|------|-------|
+| billing-account-id | AAAAAA-BBBBBB-CCCCCC | str  |     1 |
+| folder-name        | name.of.folder       | str  |     1 |
+| folder-namespace   | hierarchy            | str  |     1 |
+| project-id         | project-id           | str  |     2 |
+| projects-namespace | projects             | str  |     1 |
+
+## Sub-packages
+
+This package has no sub-packages.
+
+## Resources
+
+|     File     |                  APIVersion                   |  Kind   |    Name    | Namespace |
+|--------------|-----------------------------------------------|---------|------------|-----------|
+| project.yaml | resourcemanager.cnrm.cloud.google.com/v1beta1 | Project | project-id | projects  |
+
+## Resource References
+
+- [Project](https://cloud.google.com/config-connector/docs/reference/resource-docs/resourcemanager/project)
+
+## Usage
+
+1.  Clone the package:
+    ¬¬¬shell
+    kpt pkg get https://github.com/GoogleCloudPlatform/blueprints.git/catalog/foopkg@${VERSION}
+    ¬¬¬
+    Replace ¬${VERSION}¬ with the desired repo branch or tag
+    (for example, ¬main¬).
+
+1.  Move into the local package:
+    ¬¬¬shell
+    cd "./foopkg/"
+    ¬¬¬
+
+1.  Edit the function config file(s):
+    - setters.yaml
+
+1.  Execute the function pipeline
+    ¬¬¬shell
+    kpt fn render
+    ¬¬¬
+
+1.  Initialize the resource inventory
+    ¬¬¬shell
+    kpt live init --namespace ${NAMESPACE}"
+    ¬¬¬
+    Replace ¬${NAMESPACE}¬ with the namespace in which to manage
+    the inventory ResourceGroup (for example, ¬config-control¬).
+
+1.  Apply the package resources to your cluster
+    ¬¬¬shell
+    kpt live apply
+    ¬¬¬
+
+1.  Wait for the resources to be ready
+    ¬¬¬shell
+    kpt live status --output table --poll-until current
+    ¬¬¬
+`,
+		},
+		{
 			name: "missing root kf",
 			r: `
 apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
@@ -226,7 +345,7 @@ spec:
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			res := getRNodesFromStr(t, tt.r)
-			gotTitle, gotDoc, err := GenerateBlueprintReadme(res, "https://github.com/GoogleCloudPlatform/blueprints.git/catalog/")
+			gotTitle, gotDoc, err := GenerateBlueprintReadme(res, "https://github.com/GoogleCloudPlatform/blueprints.git/catalog/", tt.pkgName)
 			require := require.New(t)
 			if tt.err != "" {
 				require.EqualError(err, tt.err)
@@ -327,7 +446,7 @@ subjects:
 			resources: "",
 			want: `## Resource References
 
-This package has no resources.
+This package has no top-level resources. See sub-packages.
 `,
 		},
 	}
