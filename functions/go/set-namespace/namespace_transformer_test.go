@@ -162,7 +162,7 @@ subjects:
   namespace: test
 - kind: ServiceAccount
   name: service-account
-  namespace: system
+  namespace: test
 - kind: ServiceAccount
   name: another
   namespace: random
