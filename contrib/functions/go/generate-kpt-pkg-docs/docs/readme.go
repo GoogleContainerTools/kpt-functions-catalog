@@ -2,6 +2,7 @@ package docs
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	kptfilev1 "github.com/GoogleContainerTools/kpt-functions-sdk/go/pkg/api/kptfile/v1"
@@ -45,10 +46,15 @@ func newBlueprintReadme(n []*yaml.RNode, repoPath, pkgName string) (blueprintRea
 	if !hasRootKf {
 		return blueprintReadme{}, fmt.Errorf("unable to find root Kptfile, please include --include-meta-resources flag if a Kptfile is present")
 	}
-	// specific files we want to omit from readme including Kptfile and any fn configs
+	// specific files we want to omit from readme including Kptfile, subpkgs and any fn configs
 	skipFiles := map[string]bool{kptfilev1.KptFileName: true}
 	for _, fnCfg := range getFnCfgPaths(rootKf) {
 		skipFiles[fnCfg] = true
+	}
+	for pkgPath := range pkgs {
+		if pkgPath != kptfilev1.KptFileName {
+			skipFiles[path.Dir(pkgPath)] = true
+		}
 	}
 	// if no explicit pkg name, use kf pkgname
 	if pkgName == "" {

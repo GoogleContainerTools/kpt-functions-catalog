@@ -2,6 +2,7 @@ package docs
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
@@ -71,15 +72,9 @@ func filterResources(nodes []*yaml.RNode, skipFiles map[string]bool) []*yaml.RNo
 
 // shouldSkipResource returns true if resource path is present in skipFiles
 func shouldSkipResource(r *yaml.RNode, skipFiles map[string]bool) bool {
-	path, err := findResourcePath(r)
+	rPath, err := findResourcePath(r)
 	if err != nil {
 		return true
 	}
-	// only include resources that are part of the root pkg
-	pathParts := strings.Split(path, "/")
-	if len(pathParts) > 1 {
-		return true
-	}
-	_, shouldSkip := skipFiles[path]
-	return shouldSkip
+	return skipFiles[rPath] || skipFiles[path.Dir(rPath)]
 }
