@@ -24,6 +24,8 @@ func ResourceListFromDirectory(dir string, fnConfigFile string) (*fnsdk.Resource
 	reader := &kio.LocalPackageReader{
 		PackagePath:        dir,
 		IncludeSubpackages: true,
+		// TODO(mengqiy): We should figure out how to let the user control this behavior.
+		OmitReaderAnnotations: true,
 	}
 	items, err := reader.Read()
 	if err != nil {
