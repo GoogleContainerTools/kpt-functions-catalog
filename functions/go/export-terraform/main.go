@@ -30,12 +30,6 @@ func main() {
 func Process(resourceList *sdk.ResourceList) error {
 
 	err := terraformgenerator.Processor(resourceList)
-
-	// resourceList.Results = &framework.Result{
-	// 	Name: "export-terraform",
-	// }
-	// var err error
-	// resourceList.Items, err = runner.Filter(resourceList.Items)
 	if err != nil {
 		return sdk.ErrorResult(err)
 	}

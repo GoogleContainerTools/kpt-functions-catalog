@@ -27,7 +27,6 @@ import (
 //go:embed templates
 var templates embed.FS
 
-// Filter implements ProjectServiceSetRunner as a yaml.Filter
 func Processor(rl *sdk.ResourceList) error {
 	var resources terraformResources
 	supportedKinds := map[string]bool{"Folder": true, "Organization": true}
@@ -69,11 +68,6 @@ func Processor(rl *sdk.ResourceList) error {
 				"config.kubernetes.io/local-config":  "true",
 				"blueprints.cloud.google.com/syntax": "hcl",
 				"blueprints.cloud.google.com/flavor": "terraform",
-				"config.kubernetes.io/index":         "0",
-				"config.kubernetes.io/path":          "terraform.yaml",
-				// TODO: I should't need to insert these, but currently the test framework expects them
-				"internal.config.kubernetes.io/index": "0",
-				"internal.config.kubernetes.io/path":  "terraform.yaml",
 			},
 		},
 		Data: data,
