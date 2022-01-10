@@ -6,11 +6,14 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"sigs.k8s.io/kustomize/api/filters/labels"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/filtersutil"
+	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
 )
 
@@ -22,7 +25,25 @@ type plugin struct {
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 	// AdditionalLabelFields is used to specify additional fields to add labels.
 	AdditionalLabelFields []types.FieldSpec `json:"additionalLabelFields,omitempty" yaml:"additionalLabelFields,omitempty"`
+	// Results is used to track labels that have been applied
+	Results LabelResults
 }
+
+// LabelResults maps label paths to key/value pairs
+type LabelResults map[LabelResultKey]LabelValues
+
+// LabelResultKey is a unique representation for a label field path
+type LabelResultKey struct {
+	// FilePath is the file path of the resource
+	FilePath string
+	// FileIndex is the file index of the resource
+	FileIndex string
+	// FieldPath is field path of the labels
+	FieldPath string
+}
+
+// LabelValues represents label key/value pairs
+type LabelValues map[string]string
 
 //noinspection GoUnusedGlobalVariable
 var KustomizePlugin plugin
@@ -45,10 +66,31 @@ func (p *plugin) Config(
 }
 
 func (p *plugin) Transform(m resmap.ResMap) error {
+	if p.Results == nil {
+		p.Results = make(LabelResults)
+	}
 	for _, r := range m.Resources() {
-		err := filtersutil.ApplyToJSON(labels.Filter{
+		filePath, fileIndex, err := kioutil.GetFileAnnotations(&r.RNode)
+		if err != nil {
+			return err
+		}
+
+		err = filtersutil.ApplyToJSON(labels.Filter{
 			Labels:  p.Labels,
 			FsSlice: p.AdditionalLabelFields,
+			SetEntryCallback: func(key, value, tag string, node *kyaml.RNode) {
+				resultKey := LabelResultKey{
+					FieldPath: strings.Join(node.FieldPath(), "."),
+					FilePath:  filePath,
+					FileIndex: fileIndex,
+				}
+				result, ok := p.Results[resultKey]
+				if ok {
+					result[key] = value
+				} else {
+					p.Results[resultKey] = LabelValues{key: value}
+				}
+			},
 		}, r)
 		if err != nil {
 			return err
