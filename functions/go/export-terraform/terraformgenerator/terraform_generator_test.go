@@ -16,6 +16,7 @@ package terraformgenerator
 
 import (
 	"fmt"
+	"io/ioutil"
 	"path"
 	"testing"
 
@@ -67,15 +68,33 @@ func TestTerraformGeneration(t *testing.T) {
 			require.NoError(err)
 			require.EqualValues(fmt.Sprint(expectedTerraform), fmt.Sprint(actualTerraform))
 
-			// final check on yaml
-			actualYAML, err := actualRL.ToYAML()
+			// We convert the output ResourceList to individual resource files in the
+			// file system first.
+			// In the next step, ideally, we should compare the content in the
+			// expected directory and the actual directory. But I haven't found a good
+			// golang pkg for that yet. Maybe we can rely on some external tool (e.g.
+			// diff command) to do it. This will be addressed in the next iteration.
+			// The workaround is that we read the resource files as a ResourceList and
+			// then compare this ResourceList with the expected ResourceList.
+			tmpDir, err := ioutil.TempDir("", "export-terraform-test-*")
+			fmt.Println(tmpDir)
+			//defer os.RemoveAll(tmpDir)
 			require.NoError(err)
-			require.NotEmpty(actualYAML)
+			err = testutil.ResourceListToDirectory(actualRL, tmpDir)
+			require.NoError(err)
+
+			tmpDirRL, err := testutil.ResourceListFromDirectory(tmpDir, "")
+			require.NoError(err)
+
+			// final check on yaml
+			tmpDirYAML, err := tmpDirRL.ToYAML()
+			require.NoError(err)
+			require.NotEmpty(tmpDirYAML)
 			expectedYAML, err := expectedRL.ToYAML()
 			require.NoError(err)
 			require.NotEmpty(expectedYAML)
 
-			require.YAMLEqf(string(expectedYAML), string(actualYAML), "output yaml doesn't match")
+			require.YAMLEqf(string(expectedYAML), string(tmpDirYAML), "output yaml doesn't match")
 		})
 	}
 }

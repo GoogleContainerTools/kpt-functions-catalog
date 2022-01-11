@@ -68,6 +68,7 @@ func Processor(rl *sdk.ResourceList) error {
 				"config.kubernetes.io/local-config":  "true",
 				"blueprints.cloud.google.com/syntax": "hcl",
 				"blueprints.cloud.google.com/flavor": "terraform",
+				"internal.config.kubernetes.io/path": "terraform.yaml",
 			},
 		},
 		Data: data,

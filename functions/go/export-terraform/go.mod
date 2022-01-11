@@ -3,7 +3,7 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/export
 go 1.17
 
 require (
-	github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk v0.0.0-20220107213846-8f48c08a1d99
+	github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk v0.0.0-20220111011035-c598c94c9a02
 	github.com/stretchr/testify v1.7.0
 	k8s.io/api v0.23.1
 	k8s.io/apimachinery v0.23.1
