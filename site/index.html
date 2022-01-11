@@ -135,20 +135,22 @@
                   versionName = pathElements[2];
                 }
 
-                const patchSemver = versions[versionName]['LatestPatchVersion'];
+                const patchSemver = versions[versionName]['LatestPatchVersion']
+                const currentVersion = patchSemver.replaceAll("v", "");
                 const sortedSemvers = Object.keys(versions)
                   .sort((a, b) => compareVersions(a, b))
                   .reverse();
                 versionDropdown += `
               <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${patchSemver}
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Version: ${currentVersion}
                 <span class="caret"></span></button>
                 <ol class="dropdown-menu">`;
                 sortedSemvers.forEach(
                   (ver, ix) =>
-                    (versionDropdown += `<li><a href="${isContribFn ? "/contrib" : ""}/${functionName}/${ver}/">` +
-                        `${versions[ver]['LatestPatchVersion']}${ix ? "" : " (latest)"}` +
-                        `</a></li>`)
+                    (versionDropdown += `<li><a href="${isContribFn ? "/contrib" : ""}/${functionName}/${ver}/">${versions[ver]['LatestPatchVersion'].replace(
+                      "v",
+                      ""
+                    )}${ix ? "" : " (latest)"}</a></li>`)
                 );
                 versionDropdown += `
                 </ol>
