@@ -23,6 +23,7 @@ FUNCTIONS := \
 	create-setters \
 	enable-gcp-services \
 	ensure-name-substring \
+	export-terraform \
 	fix \
 	format \
 	gatekeeper \
