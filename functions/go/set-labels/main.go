@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/generated"
 	"sigs.k8s.io/kustomize/api/hasher"
@@ -39,7 +41,7 @@ func main() {
 type SetLabelsProcessor struct{}
 
 func (slp *SetLabelsProcessor) Process(resourceList *framework.ResourceList) error {
-	err := run(resourceList)
+	results, err := run(resourceList)
 	if err != nil {
 		resourceList.Results = framework.Results{
 			{
@@ -49,6 +51,7 @@ func (slp *SetLabelsProcessor) Process(resourceList *framework.ResourceList) err
 		}
 		return resourceList.Results
 	}
+	resourceList.Results = results
 	return nil
 }
 
@@ -117,6 +120,32 @@ func (f *setLabelFunction) validGVK(rn *kyaml.RNode, apiVersion, kind string) bo
 	return true
 }
 
+// resultsToItems converts the set labels results to
+// equivalent framework.Results
+func (f *setLabelFunction) resultsToItems() (framework.Results, error) {
+	var results framework.Results
+	if len(f.plugin.Results) == 0 {
+		results = append(results, &framework.Result{
+			Message: "no labels applied",
+		})
+		return results, nil
+	}
+	for resKey, labelVals := range f.plugin.Results {
+		fileIndex, _ := strconv.Atoi(resKey.FileIndex)
+		labelJson, err := json.Marshal(labelVals)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, &framework.Result{
+			Message: fmt.Sprintf("set labels: %s", labelJson),
+			Field:   &framework.Field{Path: resKey.FieldPath},
+			File:    &framework.File{Path: resKey.FilePath, Index: fileIndex},
+		})
+	}
+	results.Sort()
+	return results, nil
+}
+
 func getDefaultConfig() (transformerConfig, error) {
 	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonlabels"]
 	var tc transformerConfig
@@ -130,16 +159,16 @@ func newResMapFactory() *resmap.Factory {
 	return resmap.NewFactory(resourceFactory)
 }
 
-func run(resourceList *framework.ResourceList) error {
+func run(resourceList *framework.ResourceList) (framework.Results, error) {
 	var fn setLabelFunction
 	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		return fmt.Errorf("failed to configure function: %w", err)
+		return nil, fmt.Errorf("failed to configure function: %w", err)
 	}
 
 	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
-		return fmt.Errorf("failed to run function: %w", err)
+		return nil, fmt.Errorf("failed to run function: %w", err)
 	}
-	return nil
+	return fn.resultsToItems()
 }
