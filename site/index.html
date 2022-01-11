@@ -220,6 +220,19 @@
                   examplesDropdown +
                   "</div>";
 
+                const latestImage =
+                    `<div>` +
+                    `<p>Image URL: ` +
+                    `<code class="lang-shell language-shell">` +
+                    `gcr.io/kpt-fn${isContribFn ? "-contrib" : ""}/${functionName}:${patchSemver}` +
+                    `</code>` +
+                    `</p>` +
+                    `</div>`
+
+                const imageElement = document.createElement("div");
+                document.getElementById(functionName).insertAdjacentElement('afterend', imageElement)
+                imageElement.outerHTML = latestImage
+
                 const dropdownContainer = document.createElement("div");
                 const content = document.getElementsByClassName("markdown-section").item(0);
                 content.prepend(dropdownContainer);
