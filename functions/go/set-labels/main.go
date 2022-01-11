@@ -41,16 +41,13 @@ type SetLabelsProcessor struct{}
 func (slp *SetLabelsProcessor) Process(resourceList *framework.ResourceList) error {
 	err := run(resourceList)
 	if err != nil {
-		resourceList.Result = &framework.Result{
-			Name: "set-labels",
-			Items: []framework.ResultItem{
-				{
+		resourceList.Results = framework.Results{
+			{
 					Message:  err.Error(),
 					Severity: framework.Error,
-				},
 			},
 		}
-		return resourceList.Result
+		return resourceList.Results
 	}
 	return nil
 }

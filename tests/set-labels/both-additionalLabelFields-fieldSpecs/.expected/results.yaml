@@ -5,7 +5,7 @@ metadata:
 exitCode: 1
 items:
   - image: gcr.io/kpt-fn/set-labels:unstable
-    stderr: '[error] : failed to configure function: `fieldSpecs` has been deprecated, please rename it to `additionalLabelFields`'
+    stderr: '[error]: failed to configure function: `fieldSpecs` has been deprecated, please rename it to `additionalLabelFields`'
     exitCode: 1
     results:
       - message: 'failed to configure function: `fieldSpecs` has been deprecated, please rename it to `additionalLabelFields`'
