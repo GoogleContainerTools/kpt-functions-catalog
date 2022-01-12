@@ -1,9 +1,10 @@
-package annotateapplytimemutations
+package pkg
 
 import (
-	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"sigs.k8s.io/cli-utils/pkg/object/mutation"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
@@ -11,12 +12,12 @@ import (
 func TestApplySettersReferenceParse(t *testing.T) {
 	testCases := []struct {
 		s          string
-		wantStruct RefStruct
+		wantStruct mutation.ResourceReference
 		wantPath   string
 	}{
 		{
 			s: "${foo.bar.com/namespaces/example-namespace/aKind/example-name:$.my.field}",
-			wantStruct: RefStruct{
+			wantStruct: mutation.ResourceReference{
 				Group:     "foo.bar.com",
 				Kind:      "aKind",
 				Name:      "example-name",
@@ -26,8 +27,8 @@ func TestApplySettersReferenceParse(t *testing.T) {
 		},
 		{
 			s: "${foo.bar.com/v1alpha1/namespaces/example-namespace/aKind/example-name:$.my.field}",
-			wantStruct: RefStruct{
-				ApiVersion: "foo.bar.com/v1alpha1",
+			wantStruct: mutation.ResourceReference{
+				APIVersion: "foo.bar.com/v1alpha1",
 				Kind:       "aKind",
 				Name:       "example-name",
 				Namespace:  "example-namespace",
@@ -66,8 +67,8 @@ func TestCommentToTokenField(t *testing.T) {
 		{
 			s:          "prefix-${foo.bar.com/namespaces/example-namespace/aKind/example-name:$.my.field}-suffix",
 			givenIndex: 5,
-			wantValue:  "prefix-$ref5-suffix",
-			wantToken:  "$ref5",
+			wantValue:  "prefix-${ref5}-suffix",
+			wantToken:  "${ref5}",
 		},
 		{
 			s:          "${foo.bar.com/v1alpha1/namespaces/example-namespace/aKind/example-name:$.my.field}",
@@ -90,11 +91,10 @@ func TestCommentToTokenField(t *testing.T) {
 	}
 }
 
-func TestAnnotateResourceOutput(t *testing.T) {
+func TestCommentScan(t *testing.T) {
 	testCases := []struct {
-		config            string
-		expectAnnotations map[string]string
-		expectResults     []framework.ResultItem
+		config        string
+		expectResults map[string]ScanResult
 	}{
 		{
 			config: `apiVersion: bar.foo/v1beta1
@@ -107,19 +107,22 @@ metadata:
 spec:
     a: 0 # apply-time-mutation: ${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}
 `,
-			expectAnnotations: map[string]string{
-				"config.kubernetes.io/apply-time-mutation": `- sourceRef:
-    apiVersion: foo.bar/v0
-    kind: OtherKind
-    name: example-name2
-    namespace: example-namespace
-  sourcePath: $.status.count
-  targetPath: $.spec.a
-`,
-				"unmodified-key": "foobarbaz",
-			},
-			expectResults: []framework.ResultItem{
-				{Message: fmt.Sprintf("Parsed mutation in file %q field %q", "test.yaml", "spec.a"), Severity: framework.Info},
+			expectResults: map[string]ScanResult{
+				"spec.a": {
+					Path:    "spec.a",
+					Value:   0,
+					Comment: "# apply-time-mutation: ${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}",
+					Substitution: mutation.FieldSubstitution{
+						SourceRef: mutation.ResourceReference{
+							APIVersion: "foo.bar/v0",
+							Kind:       "OtherKind",
+							Name:       "example-name2",
+							Namespace:  "example-namespace",
+						},
+						SourcePath: "$.status.count",
+						TargetPath: "$.spec.a",
+					},
+				},
 			},
 		},
 	}
@@ -127,32 +130,20 @@ spec:
 	for _, test := range testCases {
 		t.Run("", func(t *testing.T) {
 			node, err := kyaml.Parse(test.config)
-			if err != nil {
-				t.Fatal(err)
+			assert.NoError(t, err)
+			meta, err := node.GetMeta()
+			assert.NoError(t, err)
+			scanner := CommentScanner{
+				ObjMeta: meta.GetIdentifier(),
+				ObjFile: framework.File{
+					Path:  "test.yaml",
+					Index: 0,
+				},
 			}
-			ra := ResourceAnnotator{}
-			gotResults, err := ra.AnnotateResource(node, "test.yaml")
-			if err != nil {
-				t.Fatal(err)
-			}
-			gotAnnotations := node.GetAnnotations()
-
-			if len(gotResults) != len(test.expectResults) {
-				t.Fatalf("Got %d results expected %d", len(gotResults), len(test.expectResults))
-			}
-			if len(gotAnnotations) != len(test.expectAnnotations) {
-				t.Fatalf("Got %d annotations expected %d", len(gotAnnotations), len(test.expectAnnotations))
-			}
-			for i, gotResult := range gotResults {
-				if gotResult != test.expectResults[i] {
-					t.Errorf("Got %dth result %v, expected %v", i, gotResult, test.expectResults[i])
-				}
-			}
-			for gotKey, gotVal := range gotAnnotations {
-				if gotVal != test.expectAnnotations[gotKey] {
-					t.Errorf("Got %q: %q, expected value: %q", gotKey, gotVal, test.expectAnnotations[gotKey])
-				}
-			}
+			results := make(map[string]ScanResult)
+			err = scanner.Scan(node, results)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expectResults, results)
 		})
 	}
 }
