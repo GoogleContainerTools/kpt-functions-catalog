@@ -220,6 +220,23 @@
                   examplesDropdown +
                   "</div>";
 
+                const latestImage =
+                    `<div>` +
+                    `<p>Image URL: ` +
+                    `<code class="lang-shell language-shell">` +
+                    `gcr.io/kpt-fn${isContribFn ? "-contrib" : ""}/${functionName}:${patchSemver}` +
+                    `</code>` +
+                    `</p>` +
+                    `</div>`
+
+                const functionTitle = document.getElementById(functionName);
+                // Render image URL section on function doc page (not examples)
+                if (functionTitle) {
+                  const imageElement = document.createElement("div");
+                  functionTitle.insertAdjacentElement('afterend', imageElement);
+                  imageElement.outerHTML = latestImage
+                }
+
                 const dropdownContainer = document.createElement("div");
                 const content = document.getElementsByClassName("markdown-section").item(0);
                 content.prepend(dropdownContainer);
