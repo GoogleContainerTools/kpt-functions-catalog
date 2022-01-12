@@ -27,3 +27,11 @@ index b521905..0d10662 100644
 +  - prod
    - dev
 -  - stage
+@@ -24,5 +24,5 @@ kind: MyKind
+ metadata:
+   name: bar
+ environments: # kpt-set: ${env}
++  - key: some-other-key
+     value: some-other-value
+-  - key: some-key
+     value: some-value
