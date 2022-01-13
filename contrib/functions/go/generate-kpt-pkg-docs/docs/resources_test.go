@@ -71,7 +71,20 @@ metadata:
   annotations:
     cnrm.cloud.google.com/project-id: project-id # kpt-set: ${project-id}
     internal.config.kubernetes.io/path: foo/bar.yaml`,
-			want: true,
+			want:      true,
+			skipFiles: map[string]bool{"foo": true},
+		},
+		{
+			name: "should skip file",
+			r: `apiVersion: v1
+kind: Namespace
+metadata:
+  name: project-id # kpt-set: ${project-id}
+  annotations:
+    cnrm.cloud.google.com/project-id: project-id # kpt-set: ${project-id}
+    internal.config.kubernetes.io/path: foo/bar.yaml`,
+			want:      true,
+			skipFiles: map[string]bool{"foo/bar.yaml": true},
 		},
 		{
 			name: "should skip setter cfg",

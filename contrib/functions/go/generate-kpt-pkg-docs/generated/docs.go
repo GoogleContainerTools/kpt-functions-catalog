@@ -20,7 +20,9 @@ This function supports ` + "`" + `ConfigMap` + "`" + ` ` + "`" + `functionConfig
 
 - A ` + "`" + `readme-path` + "`" + ` can be provided to write to a specific file. If a ` + "`" + `readme-path` + "`" + ` is not provided, it defaults to ` + "`" + `/tmp/README.md` + "`" + `. If the file specified via ` + "`" + `readme-path` + "`" + ` does not exist, readme generation is skipped with a warning.
 
-- A ` + "`" + `repo-path` + "`" + ` can be provided to include in usage section. This will generate a usage section with sample commands like ` + "`" + `kpt pkg get ${repo-path}/{pkgname}@version` + "`" + `. If a ` + "`" + `repo-path` + "`" + ` is not provided, it defaults to ` + "`" + `https://github.com/GoogleCloudPlatform/blueprints.git/catalog` + "`" + `.
+- A ` + "`" + `repo-path` + "`" + ` can be provided to include in usage section. This will generate a usage section with sample commands like ` + "`" + `kpt pkg get ${repo-path}/{pkg-name}@version` + "`" + `. If a ` + "`" + `repo-path` + "`" + ` is not provided, it defaults to ` + "`" + `https://github.com/GoogleCloudPlatform/blueprints.git/catalog` + "`" + `.
+
+- A ` + "`" + `pkg-name` + "`" + ` can be provided to include in usage section. This will generate a usage section with sample commands like ` + "`" + `kpt pkg get ${repo-path}/{pkg-name}@version` + "`" + `. If a ` + "`" + `pkg-name` + "`" + ` is not provided, it defaults to the name specified in the Kptfile.
 
 The ` + "`" + `generate-kpt-pkg-docs` + "`" + ` function does the following:
 
