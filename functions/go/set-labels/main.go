@@ -45,8 +45,8 @@ func (slp *SetLabelsProcessor) Process(resourceList *framework.ResourceList) err
 	if err != nil {
 		resourceList.Results = framework.Results{
 			{
-					Message:  err.Error(),
-					Severity: framework.Error,
+				Message:  err.Error(),
+				Severity: framework.Error,
 			},
 		}
 		return resourceList.Results
