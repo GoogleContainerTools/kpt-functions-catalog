@@ -1,0 +1,20 @@
+diff --git a/resources.yaml b/resources.yaml
+index c15f5ab..2f33677 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -5,7 +5,7 @@ metadata:
+ spec:
+   containers:
+   - name: server
+-    image: nginx:1.20.2
++    image: bitnami/nginx:1.21.4
+   - name: store
+     image: postgres:14.1
+ ---
+@@ -17,5 +17,5 @@ metadata:
+ spec:
+   manifest:
+     images:
+-    - image: nginx:1.20.2
++    - image: bitnami/nginx:1.21.4
+     - image: postgres:14.1

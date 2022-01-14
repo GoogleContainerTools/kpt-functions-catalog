@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: the-pod
+spec:
+  containers:
+  - name: server
+    image: nginx:1.20.2
+  - name: store
+    image: postgres:14.1
+---
+apiVersion: dev.example.com/v1
+kind: MyKind
+metadata:
+  name: the-resource
+  namespace: the-namespace
+spec:
+  manifest:
+    images:
+    - image: nginx:1.20.2
+    - image: postgres:14.1
