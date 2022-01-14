@@ -1,0 +1,20 @@
+diff --git a/resources.yaml b/resources.yaml
+index 3a85025..05722e9 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -40,5 +40,15 @@ kind: IAMPolicyMember
+ metadata:
+   name: my-policy
+   namespace: example-namespace
++  annotations:
++    config.kubernetes.io/apply-time-mutation: |
++      - sourcePath: $.status.number
++        sourceRef:
++          group: resourcemanager.cnrm.cloud.google.com
++          kind: Project
++          name: my-project
++          namespace: example-namespace
++        targetPath: $.spec.member
++        token: ${project-number}
+ spec:
+   member: serviceAccount:service-${project-number}@container-engine-robot.iam.gserviceaccount.com
