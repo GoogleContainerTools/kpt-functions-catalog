@@ -105,11 +105,16 @@ structure [here][e2e test harness doc].
 You can choose to put the e2e test in either the `examples/` directory or in the
 `tests/` directory depending on if it is worthwhile to be shown as an example.
 
+**Note**: The e2e tests don't build the images. So you need to ensure you have built
+the latest image(s) before running any e2e tests.
+
 To test a specific example or the e2e test, run
 
 ```shell
 $ cd tests/e2etest
 $ go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
+# To test the example in contrib
+$ go test -v ./... -run TestE2E/../../contrib/examples/$EXAMPLE_NAME
 ```
 
 If you encounter some test failure saying something like "actual diff doesn't
@@ -119,6 +124,8 @@ expected `diff.patch` or `results.yaml` by running the following commands:
 ```shell
 # Update one example
 $ KPT_E2E_UPDATE_EXPECTED=true go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
+# Update one example in contrib 
+$ KPT_E2E_UPDATE_EXPECTED=true go test -v ./... -run TestE2E/../../contrib/examples/$EXAMPLE_NAME
 
 # Update all examples
 $ KPT_E2E_UPDATE_EXPECTED=true go test -v ./...
