@@ -49,6 +49,10 @@ field. e.g. if the name of a `ConfigMap` got updated and this `ConfigMap` is
 being referenced in `Volumes` in a `Pod`, field `spec.volumes.configMap.name`
 will also be updated.
 
+If there is a [`depends-on`] annotation for a resource, the name section of the
+annotation will be updated if the referenced resource is also declared in the
+package.
+
 This function can be used both declaratively and imperatively.
 
 ### FunctionConfig
@@ -122,3 +126,5 @@ additionalNameFields:
 [namereference]: https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/namereference.go#L7
 
 [defaultnamefields]: https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/nameprefix.go#L7
+
+[depends-on]: https://kpt.dev/reference/annotations/depends-on/
