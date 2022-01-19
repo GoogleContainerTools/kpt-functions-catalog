@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func runNamespaceTransformerE(config, input string) (string, error) {
@@ -299,5 +301,240 @@ metadata:
 		fmt.Println("Expected:")
 		fmt.Println(expected)
 		t.Fatalf("Actual doesn't equal to expected")
+	}
+}
+
+func TestNamespaceTransformerDependsOn(t *testing.T) {
+	config := `
+namespace: test
+`
+	testCases := []struct {
+		TestName string
+		Input    string
+		Expected string
+	}{
+		{
+			TestName: "update depends-on annotation if referenced resource is core, namespaced, and included",
+			Input: `apiVersion: v1
+kind: Deployment
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: /namespaces/default/StatefulSet/wordpress-mysql
+  labels:
+    app: wordpress
+  name: wordpress
+  namespace: default
+---
+apiVersion: v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: wordpress
+  name: wordpress-mysql
+  namespace: default
+`,
+			Expected: `apiVersion: v1
+kind: Deployment
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: /namespaces/test/StatefulSet/wordpress-mysql
+  labels:
+    app: wordpress
+  name: wordpress
+  namespace: test
+---
+apiVersion: v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: wordpress
+  name: wordpress-mysql
+  namespace: test
+`,
+		},
+		{
+			TestName: "update depends-on annotation if referenced resource is namespaced and included",
+			Input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/wordpress-mysql
+  labels:
+    app: wordpress
+  name: wordpress
+  namespace: default
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: wordpress
+  name: wordpress-mysql
+  namespace: default
+`,
+			Expected: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: apps/namespaces/test/StatefulSet/wordpress-mysql
+  labels:
+    app: wordpress
+  name: wordpress
+  namespace: test
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: wordpress
+  name: wordpress-mysql
+  namespace: test
+`,
+		},
+		{
+			TestName: "not update depends-on annotation if referenced resource is namespaced but not included",
+			Input: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/wordpress-mysql
+  labels:
+    app: wordpress
+  name: wordpress
+  namespace: default
+`,
+			Expected: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/wordpress-mysql
+  labels:
+    app: wordpress
+  name: wordpress
+  namespace: test
+`,
+		},
+		{
+			TestName: "not update depends-on annotation referencing a cluster scoped resource",
+			Input: `apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: rbac.authorization.k8s.io/ClusterRole/secret-reader
+  name: read-secrets-global
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secret-reader
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: admin
+`,
+			Expected: `apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: rbac.authorization.k8s.io/ClusterRole/secret-reader
+  name: read-secrets-global
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secret-reader
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: admin
+`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("namespace transformer should %s", tc.TestName), func(t *testing.T) {
+			actual := runNamespaceTransformer(t, config, tc.Input)
+			assert.Equal(t, tc.Expected, actual)
+		})
+	}
+}
+
+func TestSetDependsOnNamespace(t *testing.T) {
+	testCases := []struct {
+		TestName       string
+		Input          string
+		ResourceLookup resourceLookup
+		Expected       string
+		IsSet          bool
+	}{
+		{
+			TestName: "set the namespace portion for a namespaced resource which was included in the input",
+			Input:    "group/namespaces/ns/kind/name",
+			ResourceLookup: resourceLookup{
+				resourceMap: map[resourceKey]bool{
+					{
+						Group: "group",
+						Kind:  "kind",
+						Name:  "name",
+					}: true,
+				},
+			},
+			Expected: "group/namespaces/new-ns/kind/name",
+			IsSet:    true,
+		},
+		{
+			TestName: "set the namespace portion for a core namespaced resource which was included in the input",
+			Input:    "/namespaces/ns/kind/name",
+			ResourceLookup: resourceLookup{
+				resourceMap: map[resourceKey]bool{
+					{
+						Group: "",
+						Kind:  "kind",
+						Name:  "name",
+					}: true,
+				},
+			},
+			Expected: "/namespaces/new-ns/kind/name",
+			IsSet:    true,
+		},
+		{
+			TestName: "not set the namespace portion for a namespaced resource which was not included in the input",
+			Input:    "group/namespaces/ns/kind/name",
+			Expected: "group/namespaces/ns/kind/name",
+			IsSet:    false,
+		},
+		{
+			TestName: "not set namespace for cluster scoped resource",
+			Input:    "group/kind/name",
+			Expected: "group/kind/name",
+			IsSet:    false,
+		},
+		{
+			TestName: "not set namespace for resource with unexpected prefix",
+			Input:    "some-prefix/group/namespaces/ns/kind/name",
+			Expected: "some-prefix/group/namespaces/ns/kind/name",
+			IsSet:    false,
+		},
+		{
+			TestName: "not set namespace for resource with unexpected suffix",
+			Input:    "group/namespaces/ns/kind/name/some-suffix",
+			Expected: "group/namespaces/ns/kind/name/some-suffix",
+			IsSet:    false,
+		},
+		{
+			TestName: "not set namespace for resource without the 'namespaces' substring",
+			Input:    "group/oops/ns/kind/name/some-suffix",
+			Expected: "group/oops/ns/kind/name/some-suffix",
+			IsSet:    false,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("setDependsOnNamespaces should %s", tc.TestName), func(t *testing.T) {
+			myPlugin := plugin{
+				Namespace:           "new-ns",
+				inputResourceLookup: tc.ResourceLookup,
+			}
+			actual, set := myPlugin.setDependsOnNamespace(tc.Input)
+			assert.Equal(t, tc.IsSet, set)
+			assert.Equal(t, tc.Expected, actual)
+		})
 	}
 }

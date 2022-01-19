@@ -3,6 +3,7 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-na
 go 1.17
 
 require (
+	github.com/stretchr/testify v1.7.0
 	sigs.k8s.io/kustomize/api v0.8.11-0.20210614195535-7e8ba62e9fd9
 	sigs.k8s.io/kustomize/kyaml v0.10.21
 	sigs.k8s.io/yaml v1.2.0
@@ -23,7 +24,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/cobra v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/xlab/treeprint v0.0.0-20181112141820-a009c3971eca // indirect
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/text v0.3.2 // indirect

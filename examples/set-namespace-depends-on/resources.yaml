@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/wordpress-mysql
+  labels:
+    app: wordpress
+  name: wordpress
+  namespace: default
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: wordpress
+  name: wordpress-mysql
+  namespace: default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/outside-resource
+  labels:
+    app: bar
+  name: bar
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    config.kubernetes.io/depends-on: rbac.authorization.k8s.io/ClusterRole/secret-reader
+  name: read-secrets-global
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secret-reader
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: admin
