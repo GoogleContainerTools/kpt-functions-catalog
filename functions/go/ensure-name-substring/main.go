@@ -54,9 +54,7 @@ func (ensp *EnsureNameSubstringProcessor) Process(resourceList *framework.Resour
 
 	ens.AdditionalNameFields = append(ensp.tc.FieldSpecs, ens.AdditionalNameFields...)
 
-	resourceFactory := resource.NewFactory(&hasher.Hasher{})
-	resourceFactory.IncludeLocalConfigs = true
-	resmapFactory := resmap.NewFactory(resourceFactory)
+	resmapFactory := newResMapFactory()
 
 	resMap, err := resmapFactory.NewResMapFromRNodeSlice(resourceList.Items)
 	if err != nil {
@@ -79,6 +77,12 @@ func (ensp *EnsureNameSubstringProcessor) Process(resourceList *framework.Resour
 		return fmt.Errorf("failed to convert resource map to items: %w", err)
 	}
 	return nil
+}
+
+func newResMapFactory() *resmap.Factory {
+	resourceFactory := resource.NewFactory(&hasher.Hasher{})
+	resourceFactory.IncludeLocalConfigs = true
+	return resmap.NewFactory(resourceFactory)
 }
 
 type transformerConfig struct {
