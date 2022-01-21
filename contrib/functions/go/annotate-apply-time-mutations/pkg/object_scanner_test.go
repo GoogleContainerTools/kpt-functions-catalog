@@ -15,7 +15,7 @@ func TestObjectScan(t *testing.T) {
 		expectResult *ApplyTimeMutation
 	}{
 		{
-			config: `apiVersion: function.kpt.dev/v1alpha1
+			config: `apiVersion: fn.kpt.dev/v1alpha1
 kind: ApplyTimeMutation
 metadata:
   name: example
@@ -34,7 +34,7 @@ spec:
 `,
 			expectResult: &ApplyTimeMutation{
 				TypeMeta: v1.TypeMeta{
-					APIVersion: "function.kpt.dev/v1alpha1",
+					APIVersion: "fn.kpt.dev/v1alpha1",
 					Kind:       "ApplyTimeMutation",
 				},
 				ObjectMeta: v1.ObjectMeta{

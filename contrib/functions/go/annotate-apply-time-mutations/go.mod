@@ -3,6 +3,14 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/contrib/functions/g
 go 1.17
 
 require (
+	github.com/stretchr/testify v1.7.0
+	k8s.io/apimachinery v0.22.2
+	sigs.k8s.io/cli-utils v0.27.0
+	sigs.k8s.io/kustomize/kyaml v0.13.2-0.20220110181313-a1a0a4982226
+	sigs.k8s.io/yaml v1.3.0
+)
+
+require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -31,7 +39,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/cobra v1.2.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.7.0
 	github.com/xlab/treeprint v1.1.0 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
 	golang.org/x/net v0.0.0-20220111093109-d55c255bac03 // indirect
@@ -47,16 +54,12 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/api v0.22.2 // indirect
-	k8s.io/apimachinery v0.22.2
 	k8s.io/cli-runtime v0.22.2 // indirect
 	k8s.io/client-go v0.22.2 // indirect
 	k8s.io/klog/v2 v2.10.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20220112074636-c1fc1de9c3c8 // indirect
 	k8s.io/kubectl v0.22.2 // indirect
 	k8s.io/utils v0.0.0-20210820185131-d34e5cb4466e // indirect
-	sigs.k8s.io/cli-utils v0.27.0
 	sigs.k8s.io/kustomize/api v0.10.2-0.20220110181313-a1a0a4982226 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.13.2-0.20220110181313-a1a0a4982226
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
-	sigs.k8s.io/yaml v1.3.0
 )

@@ -17,7 +17,7 @@ const (
 	sourceRegex               = `\${(?P<group>[^/]+)/((?P<version>[^/]+)/)?namespaces/(?P<namespace>[^/]+)/(?P<kind>[^/]+)/(?P<name>[^:]+):(?P<path>[^}]+)}`
 	onlySourceRegex           = "^" + sourceRegex + "$"
 	mutationCommentIdentifier = "# apply-time-mutation: "
-	ResourceGroup             = "function.kpt.dev"
+	ResourceGroup             = "fn.kpt.dev"
 	ResourceVersion           = "v1alpha1"
 )
 

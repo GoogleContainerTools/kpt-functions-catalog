@@ -1,4 +1,4 @@
-apiVersion: function.kpt.dev/v1alpha1
+apiVersion: fn.kpt.dev/v1alpha1
 kind: ApplyTimeMutation
 metadata:
   name: example

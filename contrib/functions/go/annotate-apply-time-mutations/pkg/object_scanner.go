@@ -15,7 +15,7 @@ func (os *ObjectScanner) Scan(obj *yaml.RNode) (*ApplyTimeMutation, error) {
 		// no match
 		return nil, nil
 	}
-	if obj.GetApiVersion() != "function.kpt.dev/v1alpha1" {
+	if obj.GetApiVersion() != "fn.kpt.dev/v1alpha1" {
 		// no match
 		return nil, nil
 	}

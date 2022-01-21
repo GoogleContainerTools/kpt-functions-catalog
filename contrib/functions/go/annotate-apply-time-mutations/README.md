@@ -44,7 +44,7 @@ The function does not perform the mutation on the target object itself. The
 mutation is performed by `kpt live apply`, which reads the annotation as input.
 So the function should be run by the user before applying.
 
-## Inline Field Comment Input
+### Inline Field Comment Input
 
 Inline field comments can be used as an alternate way to specify mutations. This
 function will convert `apply-time-mutation` comments into apply-time-mutation
@@ -57,25 +57,43 @@ don't need to be explicitly specified.
 
 Inline field comments can be specified with the following format:
 
-```
-# apply-time-mutation: [prefix]${[group]/[version]/namespaces/[source-namespace]/[kind]/[source-name]:[source-field-path]}[suffix]
-```
-
-`prefix` and `suffix` are optional. They are constant strings that surround dynamic
-content from the source field. When specified, the function will copy them into
-the field itself, surrounding a generated token.
-
-```
-field: [prefix]$ref[suffix] # apply-time-mutation: ...
+```yaml
+field: "" # apply-time-mutation: [PREFIX]${GROUP/[VERSION/][namespaces/NAMESPACE/]KIND/NAME:FIELD_PATH}[SUFFIX]
 ```
 
-`version` is also optional. It's generally recommended to avoid specifying the
-version. This allows the object reference to apply to any version of the
-resource API, which makes the reference less brittle and can survive CRD version
-updates. If you specify the version, only that API version will match when
-looking up the source object.
+Fields and delimiters surrounded in square brackets (`[]`) are optional. Your
+comment should include the curly braces (`${}`) but NOT the square brackets.
 
-## Custom Resource Object Input
+- `PREFIX` (Optional) - A string to prepend to the substituted value.
+- `GROUP` - The API group of the source object. For "core" resources, the group
+  is the empty string, with the trailing slash (`/`) delimiter retained.
+- `VERSION` (Optional) - The API version of the source object. When supplied, it
+  will match only objects using this exact API version. It's recommended to
+  just use `GROUP` without version to make the reference less brittle and able
+  to survive CRD version updates.
+- `NAMESPACE` (Optional) - The namespace of the source object, required for 
+  namespace-scoped resources
+- `KIND` - The kind of the source object
+- `NAME` - The name of the source object
+- `FIELD_PATH` - A JSONPath expression that identifies the source object field
+- `SUFFIX` (Optional) - A string to append to the substituted value
+
+When the function runs, if `PREFIX` or `SUFFIX` is specified, the field value
+will be replaced with a string including the `PREFIX` and `SUFFIX`, surrounding
+a generated token for substitution.
+
+```yaml
+field: "[PREFIX]${ref1}[SUFFIX]" # apply-time-mutation: ...
+```
+
+When the function runs, if neither `PREFIX` nor `SUFFIX` are specified, the
+field value will not be replaced and no token will be specified, causing the
+whole field value to be replaced, using the type of the source object field.
+
+The apply-time-mutation comment will be preserved so that the function is
+idempotent, producing the same output when run multiple times.
+
+### Custom Resource Object Input
 
 Custom resource objects can be used to specify mutations. This function will
 convert `ApplyTimeMutation` objects into apply-time-mutation annotations.
@@ -88,7 +106,7 @@ used to configure the source and target object references (ex: name & namespace)
 `ApplyTimeMutation` resource objects can be specified with the following format:
 
 ```yaml
-apiVersion: function.kpt.dev/v1alpha1
+apiVersion: fn.kpt.dev/v1alpha1
 kind: ApplyTimeMutation
 metadata:
   name: example
@@ -237,7 +255,7 @@ spec:
 Specify the mutation with an `ApplyTimeMutation` object:
 
 ```yaml
-apiVersion: function.kpt.dev/v1alpha1
+apiVersion: fn.kpt.dev/v1alpha1
 kind: ApplyTimeMutation
 metadata:
   name: example

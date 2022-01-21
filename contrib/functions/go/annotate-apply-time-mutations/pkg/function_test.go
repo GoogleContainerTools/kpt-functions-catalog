@@ -90,7 +90,7 @@ spec:
 		"ApplyTimeMutation object": {
 			configs: [][]string{
 				{
-					`apiVersion: function.kpt.dev/v1alpha1
+					`apiVersion: fn.kpt.dev/v1alpha1
 kind: ApplyTimeMutation
 metadata:
   name: example
@@ -131,7 +131,7 @@ spec:
 			},
 			expectedConfigs: [][]string{
 				{
-					`apiVersion: function.kpt.dev/v1alpha1
+					`apiVersion: fn.kpt.dev/v1alpha1
 kind: ApplyTimeMutation
 metadata:
   name: example
@@ -184,7 +184,7 @@ spec:
 					Severity: "info",
 					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
-							APIVersion: "function.kpt.dev/v1alpha1",
+							APIVersion: "fn.kpt.dev/v1alpha1",
 							Kind:       "ApplyTimeMutation",
 						},
 						NameMeta: yaml.NameMeta{
