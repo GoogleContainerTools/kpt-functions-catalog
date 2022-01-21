@@ -54,7 +54,7 @@ spec:
 				},
 			},
 			expectedResults: framework.Results{
-				{
+				&framework.Result{
 					Message:  "Found valid apply-time-mutation comment (item: 0): # apply-time-mutation: ${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}",
 					Severity: "info",
 					ResourceRef: &yaml.ResourceIdentifier{
@@ -67,10 +67,10 @@ spec:
 							Namespace: "test-namespace",
 						},
 					},
-					Field: &framework.Field{Path: "spec.a", CurrentValue: 0, ProposedValue: nil},
+					Field: &framework.Field{Path: "$.spec.a", CurrentValue: 0, ProposedValue: nil},
 					File:  &framework.File{Path: "file-0.yaml", Index: 0},
 				},
-				{
+				&framework.Result{
 					Message:  "Wrote apply-time-mutation annotation (item: 0)",
 					Severity: "info",
 					ResourceRef: &yaml.ResourceIdentifier{
@@ -179,7 +179,7 @@ spec:
 				},
 			},
 			expectedResults: framework.Results{
-				{
+				&framework.Result{
 					Message:  "Found valid ApplyTimeMutation object (item: 0)",
 					Severity: "info",
 					ResourceRef: &yaml.ResourceIdentifier{
@@ -193,7 +193,7 @@ spec:
 					},
 					File: &framework.File{Path: "file-0.yaml", Index: 0},
 				},
-				{
+				&framework.Result{
 					Message:  "Wrote apply-time-mutation annotation (item: 2)",
 					Severity: "info",
 					ResourceRef: &yaml.ResourceIdentifier{

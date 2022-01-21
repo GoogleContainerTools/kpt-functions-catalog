@@ -41,87 +41,102 @@ type ScanResult struct {
 }
 
 // Scan searches for mutation markup comments and parses them as substitutions.
-func (cs *CommentScanner) Scan(obj *yaml.RNode, results map[string]ScanResult, fieldPath ...interface{}) error {
+func (cs *CommentScanner) Scan(obj *yaml.RNode) ([]ScanResult, error) {
+	return cs.scanAny(obj, &PathBuilder{}, &indexer{})
+}
+
+func (cs *CommentScanner) scanAny(obj *yaml.RNode, fieldPath *PathBuilder, ix *indexer) ([]ScanResult, error) {
+	var results []ScanResult
 	switch obj.YNode().Kind {
 	case yaml.MappingNode:
 		// iterate over map (key->value)
 		err := obj.VisitFields(func(node *yaml.MapNode) error {
 			key, err := nodeValue(node.Key)
 			if err != nil {
-				return fmt.Errorf("invalid map key %q (path: %q): %w", node.Key.YNode().Value, fieldPath, err)
+				return fmt.Errorf("invalid map key (path: %q, key: %q): %w", fieldPath, node.Key.YNode().Value, err)
 			}
-			return cs.Scan(node.Value, results, append(fieldPath, key)...)
+			fieldPath.Push(key)
+			subResults, err := cs.scanAny(node.Value, fieldPath, ix)
+			if err != nil {
+				return err
+			}
+			results = append(results, subResults...)
+			_ = fieldPath.Pop()
+			return nil
 		})
-		return err
+		return results, err
 	case yaml.SequenceNode:
 		// iterate over sequence (index->value)
 		// Can't use VisitElements, because it doesn't provide the index...
 		els, err := obj.Elements()
 		if err != nil {
-			return fmt.Errorf("invalid sequence (path: %q): %w", fieldPath, err)
+			return results, fmt.Errorf("invalid sequence (path: %q): %w", fieldPath, err)
 		}
 		for i, field := range els {
-			err := cs.Scan(field, results, append(fieldPath, i)...)
+			fieldPath.Push(i)
+			subResults, err := cs.scanAny(field, fieldPath, ix)
 			if err != nil {
-				return err
+				return results, err
 			}
+			results = append(results, subResults...)
+			_ = fieldPath.Pop()
 		}
-		return nil
+		return results, nil
 	case yaml.ScalarNode:
 		// scan the scalar node
-		return cs.scanScalar(obj, results, fieldPath...)
+		return cs.scanScalar(obj, fieldPath, ix)
 	}
-	return nil
+	return results, nil
 }
 
-func (cs *CommentScanner) scanScalar(node *yaml.RNode, results map[string]ScanResult, fieldPath ...interface{}) error {
+func (cs *CommentScanner) scanScalar(node *yaml.RNode, fieldPath *PathBuilder, ix *indexer) ([]ScanResult, error) {
+	var results []ScanResult
+
 	comment := node.YNode().LineComment
 	if comment == "" {
 		// empty or missing comment
-		return nil
+		return results, nil
 	}
 
-	// format field path with JSONPath
-	// TODO: will this break kyaml fn framework? kyaml paths seem to be just maps fields and just period delimiters...
-	fieldPathStr := strings.TrimPrefix(object.FieldPath(fieldPath), ".")
-
-	fmt.Fprintf(os.Stderr, "Parsing comment (field: %q): %s\n", fieldPathStr, comment)
+	fmt.Fprintf(os.Stderr, "Parsing comment (path: %q): %s\n", fieldPath, comment)
 	// Check if comment is a mutation annotation.
 	mutationPattern := extractMutationPattern(comment)
 	if mutationPattern == "" {
 		// The comment is not a mutation annotation.
-		return nil
+		return results, nil
 	}
 	if !hasRef(mutationPattern) {
 		// Mutation comment is tagged but no valid reference found.
-		return fmt.Errorf("apply mutation comment found with no valid reference to source path")
+		return results, fmt.Errorf("apply mutation comment found with no valid reference to source path")
 	}
 
 	resourceRef, refPath := commentToReference(mutationPattern)
 
 	currentValue, err := nodeValue(node)
 	if err != nil {
-		return fmt.Errorf("invalid node value (path: %q): %w", fieldPathStr, err)
+		return results, fmt.Errorf("invalid node value (path: %q): %w", fieldPath, err)
 	}
 
 	// replace the setter names in comment pattern with provided values
-	replacementValue, replacementToken := commentToTokenField(mutationPattern, len(results))
+	replacementValue, replacementToken := commentToTokenField(mutationPattern, ix.Next())
 	if replacementValue != "" {
 		node.YNode().Value = replacementValue
 	}
 
-	results[fieldPathStr] = ScanResult{
+	fieldPathStr := fieldPath.String()
+
+	results = append(results, ScanResult{
 		Path:    fieldPathStr,
 		Value:   currentValue,
 		Comment: comment,
 		Substitution: mutation.FieldSubstitution{
 			SourceRef:  resourceRef,
 			SourcePath: refPath,
-			TargetPath: "$." + fieldPathStr,
+			TargetPath: fieldPathStr,
 			Token:      replacementToken,
 		},
-	}
-	return nil
+	})
+	return results, nil
 }
 
 // hasRef returns whether or not the comment has a source reference embeded.
@@ -177,4 +192,38 @@ func nodeValue(node *yaml.RNode) (interface{}, error) {
 		return value, fmt.Errorf("failed to decode field value: %w", err)
 	}
 	return value, nil
+}
+
+type PathBuilder struct {
+	Fields []interface{}
+}
+
+// String returns a JSONPath expression to the specified field. This conforms
+// to the path syntax used by the apply-time-mutation annotation.
+func (pb *PathBuilder) String() string {
+	return "$" + object.FieldPath(pb.Fields)
+}
+
+// Push appends a field to the path.
+func (pb *PathBuilder) Push(field interface{}) {
+	pb.Fields = append(pb.Fields, field)
+}
+
+// Pop removes and returns the last field in the path. Returns nil if empty.
+func (pb *PathBuilder) Pop() interface{} {
+	if len(pb.Fields) == 0 {
+		return nil
+	}
+	last := pb.Fields[len(pb.Fields)-1]
+	pb.Fields = pb.Fields[:len(pb.Fields)-1]
+	return last
+}
+
+type indexer struct {
+	index int
+}
+
+func (i *indexer) Next() int {
+	i.index++
+	return i.index - 1
 }

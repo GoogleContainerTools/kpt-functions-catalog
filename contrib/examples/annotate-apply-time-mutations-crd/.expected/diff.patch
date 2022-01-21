@@ -1,5 +1,5 @@
 diff --git a/resources.yaml b/resources.yaml
-index 3a85025..05722e9 100644
+index 68fb200..ce6561c 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -40,5 +40,15 @@ kind: IAMPolicyMember

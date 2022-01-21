@@ -8,11 +8,8 @@ import (
 // ApplyTimeMutation is a Kubernetes resource that allows specifying mutations
 // using a seperate KRM object, instead of an annotation string on the target
 // object.
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type ApplyTimeMutation struct {
-	// TODO: Use v1.TypeMetaApplyConfiguration from client-go instead?
-	metav1.TypeMeta `json:",inline"`
-	// TODO: Use *v1.ObjectMetaApplyConfiguration from client-go instead?
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	Spec              ApplyTimeMutationSpec `json:"spec,omitempty"`
 }

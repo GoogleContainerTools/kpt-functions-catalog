@@ -48,7 +48,6 @@ func (rp *Function) Process(resourceList *framework.ResourceList) error {
 			ResourceRef: &objMeta,
 			File:        &objFile,
 		})
-		// TODO: handle duplicates? same target in multiple objects?
 		targetMutations[atm.Spec.TargetRef] = atm.Spec.Substitutions
 		return fnResults, nil
 	})
@@ -91,7 +90,6 @@ func (rp *Function) Process(resourceList *framework.ResourceList) error {
 			ResourceRef: &objMeta,
 			File:        &objFile,
 		})
-		// TODO: handle duplicates? same target in multiple objects?
 		return fnResults, nil
 	})
 	if err != nil {
@@ -108,8 +106,7 @@ func (rp *Function) Process(resourceList *framework.ResourceList) error {
 			ObjMeta: objMeta,
 			ObjFile: objFile,
 		}
-		scanResults := make(map[string]ScanResult)
-		err = scanner.Scan(obj, scanResults)
+		scanResults, err := scanner.Scan(obj)
 		if err != nil {
 			fnResults = append(fnResults, &framework.Result{
 				Severity:    framework.Error,

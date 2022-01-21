@@ -94,22 +94,23 @@ func TestCommentToTokenField(t *testing.T) {
 func TestCommentScan(t *testing.T) {
 	testCases := []struct {
 		config        string
-		expectResults map[string]ScanResult
+		expectResults []ScanResult
 	}{
 		{
 			config: `apiVersion: bar.foo/v1beta1
 kind: MyTestKind
 metadata:
-    name: my-test-resource
-    namespace: test-namespace
-    annotations:
-        unmodified-key: foobarbaz
+  name: my-test-resource
+  namespace: test-namespace
+  annotations:
+    unmodified-key: foobarbaz
 spec:
-    a: 0 # apply-time-mutation: ${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}
+  a: 0 # apply-time-mutation: ${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}
+  b: "" # apply-time-mutation: prefix${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}suffix
 `,
-			expectResults: map[string]ScanResult{
-				"spec.a": {
-					Path:    "spec.a",
+			expectResults: []ScanResult{
+				{
+					Path:    "$.spec.a",
 					Value:   0,
 					Comment: "# apply-time-mutation: ${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}",
 					Substitution: mutation.FieldSubstitution{
@@ -121,6 +122,22 @@ spec:
 						},
 						SourcePath: "$.status.count",
 						TargetPath: "$.spec.a",
+					},
+				},
+				{
+					Path:    "$.spec.b",
+					Value:   "",
+					Comment: "# apply-time-mutation: prefix${foo.bar/v0/namespaces/example-namespace/OtherKind/example-name2:$.status.count}suffix",
+					Substitution: mutation.FieldSubstitution{
+						SourceRef: mutation.ResourceReference{
+							APIVersion: "foo.bar/v0",
+							Kind:       "OtherKind",
+							Name:       "example-name2",
+							Namespace:  "example-namespace",
+						},
+						SourcePath: "$.status.count",
+						TargetPath: "$.spec.b",
+						Token:      "${ref1}",
 					},
 				},
 			},
@@ -140,8 +157,7 @@ spec:
 					Index: 0,
 				},
 			}
-			results := make(map[string]ScanResult)
-			err = scanner.Scan(node, results)
+			results, err := scanner.Scan(node)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expectResults, results)
 		})
