@@ -10,11 +10,11 @@ import (
 )
 
 func TestObjectScan(t *testing.T) {
-	testCases := []struct {
+	testCases := map[string]struct {
 		config       string
 		expectResult *ApplyTimeMutation
 	}{
-		{
+		"one substitution, no token": {
 			config: `apiVersion: fn.kpt.dev/v1alpha1
 kind: ApplyTimeMutation
 metadata:
@@ -62,14 +62,14 @@ spec:
 		},
 	}
 
-	for _, test := range testCases {
-		t.Run("", func(t *testing.T) {
-			node, err := kyaml.Parse(test.config)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			node, err := kyaml.Parse(tc.config)
 			assert.NoError(t, err)
 			scanner := ObjectScanner{}
 			atm, err := scanner.Scan(node)
 			assert.NoError(t, err)
-			assert.Equal(t, test.expectResult, atm)
+			assert.Equal(t, tc.expectResult, atm)
 		})
 	}
 }

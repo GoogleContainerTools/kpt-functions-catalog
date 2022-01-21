@@ -9,12 +9,12 @@ import (
 )
 
 func TestWriteAnnotation(t *testing.T) {
-	testCases := []struct {
+	testCases := map[string]struct {
 		config         string
 		subs           mutation.ApplyTimeMutation
 		expectedResult string
 	}{
-		{
+		"one substitution, no token": {
 			config: `apiVersion: bar.foo/v1beta1
 kind: MyTestKind
 metadata:
@@ -53,17 +53,17 @@ spec: {}
 		},
 	}
 
-	for _, test := range testCases {
-		t.Run("", func(t *testing.T) {
-			node, err := yaml.Parse(test.config)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			node, err := yaml.Parse(tc.config)
 			assert.NoError(t, err)
 
-			err = WriteAnnotation(node, test.subs)
+			err = WriteAnnotation(node, tc.subs)
 			assert.NoError(t, err)
 
 			result, err := node.String()
 			assert.NoError(t, err)
-			assert.Equal(t, test.expectedResult, result)
+			assert.Equal(t, tc.expectedResult, result)
 		})
 	}
 }

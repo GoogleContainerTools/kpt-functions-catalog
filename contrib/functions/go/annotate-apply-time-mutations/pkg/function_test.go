@@ -212,9 +212,9 @@ spec:
 		},
 	}
 
-	for name, test := range testCases {
+	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			items, err := stringsToItems(test.configs)
+			items, err := stringsToItems(tc.configs)
 			assert.NoError(t, err)
 
 			resourceList := &framework.ResourceList{
@@ -225,11 +225,11 @@ spec:
 			err = fn.Process(resourceList)
 			assert.NoError(t, err)
 
-			assert.Equal(t, test.expectedResults, resourceList.Results)
+			assert.Equal(t, tc.expectedResults, resourceList.Results)
 
 			configs, err := itemsToStrings(resourceList.Items)
 			assert.NoError(t, err)
-			testutil.AssertEqual(t, test.expectedConfigs, configs)
+			testutil.AssertEqual(t, tc.expectedConfigs, configs)
 		})
 	}
 }

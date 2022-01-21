@@ -10,12 +10,12 @@ import (
 )
 
 func TestApplySettersReferenceParse(t *testing.T) {
-	testCases := []struct {
+	testCases := map[string]struct {
 		s          string
 		wantStruct mutation.ResourceReference
 		wantPath   string
 	}{
-		{
+		"group": {
 			s: "${foo.bar.com/namespaces/example-namespace/aKind/example-name:$.my.field}",
 			wantStruct: mutation.ResourceReference{
 				Group:     "foo.bar.com",
@@ -25,7 +25,7 @@ func TestApplySettersReferenceParse(t *testing.T) {
 			},
 			wantPath: "$.my.field",
 		},
-		{
+		"apiVersion": {
 			s: "${foo.bar.com/v1alpha1/namespaces/example-namespace/aKind/example-name:$.my.field}",
 			wantStruct: mutation.ResourceReference{
 				APIVersion: "foo.bar.com/v1alpha1",
@@ -37,40 +37,40 @@ func TestApplySettersReferenceParse(t *testing.T) {
 		},
 	}
 
-	for _, test := range testCases {
-		t.Run(test.s, func(t *testing.T) {
-			doesHaveRef := hasRef(test.s)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			doesHaveRef := hasRef(tc.s)
 			if !doesHaveRef {
-				t.Fatalf("String %q doesn't have a valid ref", test.s)
+				t.Fatalf("String %q doesn't have a valid ref", tc.s)
 			}
 
-			gotRef, gotPath := commentToReference(test.s)
+			gotRef, gotPath := commentToReference(tc.s)
 
-			if gotRef != test.wantStruct {
-				t.Errorf("CommentToReference returned struct %v wanted %v", gotRef, test.wantStruct)
+			if gotRef != tc.wantStruct {
+				t.Errorf("CommentToReference returned struct %v wanted %v", gotRef, tc.wantStruct)
 			}
 
-			if gotPath != test.wantPath {
-				t.Errorf("CommentToReference returned path %q wanted %q", gotPath, test.wantPath)
+			if gotPath != tc.wantPath {
+				t.Errorf("CommentToReference returned path %q wanted %q", gotPath, tc.wantPath)
 			}
 		})
 	}
 }
 
 func TestCommentToTokenField(t *testing.T) {
-	testCases := []struct {
+	testCases := map[string]struct {
 		s          string
 		givenIndex int
 		wantValue  string
 		wantToken  string
 	}{
-		{
+		"generated token": {
 			s:          "prefix-${foo.bar.com/namespaces/example-namespace/aKind/example-name:$.my.field}-suffix",
 			givenIndex: 5,
 			wantValue:  "prefix-${ref5}-suffix",
 			wantToken:  "${ref5}",
 		},
-		{
+		"full field replacement": {
 			s:          "${foo.bar.com/v1alpha1/namespaces/example-namespace/aKind/example-name:$.my.field}",
 			givenIndex: 2,
 			wantValue:  "",
@@ -78,25 +78,25 @@ func TestCommentToTokenField(t *testing.T) {
 		},
 	}
 
-	for _, test := range testCases {
-		t.Run(test.s, func(t *testing.T) {
-			gotReplace, gotToken := commentToTokenField(test.s, test.givenIndex)
-			if gotReplace != test.wantValue {
-				t.Errorf("CommentToTokenField returned replacement %q want %q", gotReplace, test.wantValue)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			gotReplace, gotToken := commentToTokenField(tc.s, tc.givenIndex)
+			if gotReplace != tc.wantValue {
+				t.Errorf("CommentToTokenField returned replacement %q want %q", gotReplace, tc.wantValue)
 			}
-			if gotToken != test.wantToken {
-				t.Errorf("CommentToTokenField returned token %q want %q", gotToken, test.wantToken)
+			if gotToken != tc.wantToken {
+				t.Errorf("CommentToTokenField returned token %q want %q", gotToken, tc.wantToken)
 			}
 		})
 	}
 }
 
 func TestCommentScan(t *testing.T) {
-	testCases := []struct {
+	testCases := map[string]struct {
 		config        string
 		expectResults []ScanResult
 	}{
-		{
+		"two fields with comments": {
 			config: `apiVersion: bar.foo/v1beta1
 kind: MyTestKind
 metadata:
@@ -144,9 +144,9 @@ spec:
 		},
 	}
 
-	for _, test := range testCases {
-		t.Run("", func(t *testing.T) {
-			node, err := kyaml.Parse(test.config)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			node, err := kyaml.Parse(tc.config)
 			assert.NoError(t, err)
 			meta, err := node.GetMeta()
 			assert.NoError(t, err)
@@ -159,7 +159,7 @@ spec:
 			}
 			results, err := scanner.Scan(node)
 			assert.NoError(t, err)
-			assert.Equal(t, test.expectResults, results)
+			assert.Equal(t, tc.expectResults, results)
 		})
 	}
 }

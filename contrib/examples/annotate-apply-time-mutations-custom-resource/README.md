@@ -13,7 +13,7 @@ Running `annotate-apply-time-mutations` function on the example package will:
 Get the example package by running the following commands:
 
 ```shell
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/annotate-apply-time-mutations-crd
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/annotate-apply-time-mutations-custom-resource
 ```
 
 ### Function invocation
@@ -21,7 +21,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/co
 Invoke the function with the following command:
 
 ```shell
-kpt fn eval annotate-apply-time-mutations-crd --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+kpt fn eval annotate-apply-time-mutations-custom-resource --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 ### Expected result
