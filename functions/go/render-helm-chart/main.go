@@ -80,7 +80,7 @@ func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {
 	}
 	switch kind {
 	case fnConfigKind:
-		err = f.ConfigHelmArgs(nil, []byte(y))
+		err = f.RenderHelmChartArgs([]byte(y))
 		if err != nil {
 			return err
 		}
@@ -157,8 +157,7 @@ func (f *helmChartInflatorFunction) getKind(rn *kyaml.RNode) (string, error) {
 	return meta.Kind, nil
 }
 
-func (f *helmChartInflatorFunction) ConfigHelmArgs(
-	_ *resmap.PluginHelpers, c []byte) (err error) {
+func (f *helmChartInflatorFunction) RenderHelmChartArgs(c []byte) (err error) {
 	args := &builtins.HelmArgs{}
 	if err = kyaml.Unmarshal(c, args); err != nil {
 		return
@@ -207,13 +206,28 @@ func (f *helmChartInflatorFunction) ConfigMapArgs(
 	if val, ok := m["namespace"]; ok {
 		p.Namespace = val
 	}
-	if val, ok := m["valuesFile"]; ok {
-		p.ValuesFile = val
+	if val, ok := m["createNamespace"]; ok {
+		if val == "true" {
+			p.SkipTests = true
+		}
 	}
 	if val, ok := m["includeCRDs"]; ok {
 		if val == "true" {
 			p.IncludeCRDs = true
 		}
+	}
+	if val, ok := m["skipCRDs"]; ok {
+		if val == "true" {
+			p.SkipCRDs = true
+		}
+	}
+	if val, ok := m["skipTests"]; ok {
+		if val == "true" {
+			p.SkipTests = true
+		}
+	}
+	if val, ok := m["valuesFile"]; ok {
+		p.ValuesFiles = []string{val}
 	}
 	if err := p.ValidateArgs(); err != nil {
 		return err

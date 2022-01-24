@@ -6,6 +6,8 @@ package builtins
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -62,18 +64,14 @@ func (p *HelmChartInflationGeneratorPlugin) establishTmpDir() (err error) {
 }
 
 func (p *HelmChartInflationGeneratorPlugin) ValidateArgs() (err error) {
-	if p.Name == "" {
-		return fmt.Errorf("chart name cannot be empty")
-	}
-
 	// ChartHome might be written to by the function in a container,
 	// so it must be under the `/tmp` directory
 	if p.ChartHome == "" {
 		p.ChartHome = "tmp/charts"
 	}
 
-	if p.ValuesFile == "" {
-		p.ValuesFile = filepath.Join(p.ChartHome, p.Name, "values.yaml")
+	if len(p.ValuesFiles) == 0 {
+		p.ValuesFiles = append(p.ValuesFiles, filepath.Join(p.ChartHome, p.Name, "values.yaml"))
 	}
 
 	if err = p.errIfIllegalValuesMerge(); err != nil {
@@ -135,12 +133,28 @@ func (p *HelmChartInflationGeneratorPlugin) runHelmCommand(
 	return stdout.Bytes(), err
 }
 
-// createNewMergedValuesFile replaces/merges original values file with ValuesInline.
-func (p *HelmChartInflationGeneratorPlugin) createNewMergedValuesFile() (
-	path string, err error) {
+// createNewMergedValuesFiles replaces/merges original values file with ValuesInline.
+func (p *HelmChartInflationGeneratorPlugin) createNewMergedValuesFiles(path string) (
+	string, error) {
+	pValues, err := ioutil.ReadFile(path)
+	if err != nil {
+		if u, err := url.Parse(path); err == nil && (u.Scheme == "http" || u.Scheme == "https") {
+			var hc *http.Client
+			hc = &http.Client{}
+			resp, err := hc.Get(path)
+			if err != nil {
+				return "", err
+			}
+			defer resp.Body.Close()
+			pValues, err = ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return "", err
+			}
+		}
+	}
 	if p.ValuesMerge == valuesMergeOptionMerge ||
 		p.ValuesMerge == valuesMergeOptionOverride {
-		if err = p.replaceValuesInline(); err != nil {
+		if err = p.replaceValuesInline(pValues); err != nil {
 			return "", err
 		}
 	}
@@ -149,14 +163,11 @@ func (p *HelmChartInflationGeneratorPlugin) createNewMergedValuesFile() (
 	if err != nil {
 		return "", err
 	}
-	return p.writeValuesBytes(b)
+	return p.writeValuesBytes(b, path)
 }
 
-func (p *HelmChartInflationGeneratorPlugin) replaceValuesInline() error {
-	pValues, err := ioutil.ReadFile(p.ValuesFile)
-	if err != nil {
-		return err
-	}
+func (p *HelmChartInflationGeneratorPlugin) replaceValuesInline(pValues []byte) error {
+	var err error
 	chValues := make(map[string]interface{})
 	if err = yaml.Unmarshal(pValues, &chValues); err != nil {
 		return err
@@ -172,39 +183,16 @@ func (p *HelmChartInflationGeneratorPlugin) replaceValuesInline() error {
 	return err
 }
 
-// copyValuesFile to avoid branching.  TODO: get rid of this.
-func (p *HelmChartInflationGeneratorPlugin) copyValuesFile() (string, error) {
-	var b []byte
-	var err error
-	b, err = ioutil.ReadFile(p.ValuesFile)
-	if err != nil {
-		path := p.ValuesFile
-		if u, err := url.Parse(path); err == nil && (u.Scheme == "http" || u.Scheme == "https") {
-			var hc *http.Client
-			hc = &http.Client{}
-
-			resp, err := hc.Get(path)
-			if err != nil {
-				return "", err
-			}
-			defer resp.Body.Close()
-			b, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return "", err
-			}
-		}
-	}
-	return p.writeValuesBytes(b)
-}
-
 // Write a absolute path file in the tmp file system.
 func (p *HelmChartInflationGeneratorPlugin) writeValuesBytes(
-	b []byte) (string, error) {
+	b []byte, path string) (string, error) {
 	if err := p.establishTmpDir(); err != nil {
 		return "", fmt.Errorf("cannot create tmp dir to write helm values")
 	}
-	path := filepath.Join(p.tmpDir, p.Name+"-kustomize-values.yaml")
-	return path, ioutil.WriteFile(path, b, 0644)
+	// use a hash of the provided path to generate a unique, valid filename
+	hash := md5.Sum([]byte(path))
+	newPath := filepath.Join(p.tmpDir, p.Name+"-"+hex.EncodeToString(hash[:])+"-kustomize-values.yaml")
+	return newPath, ioutil.WriteFile(newPath, b, 0644)
 }
 
 func (p *HelmChartInflationGeneratorPlugin) cleanup() {
@@ -218,23 +206,21 @@ func (p *HelmChartInflationGeneratorPlugin) Generate() (rm resmap.ResMap, err er
 	if err = p.checkHelmVersion(); err != nil {
 		return nil, err
 	}
-	if path, exists := p.chartExistsLocally(); !exists {
-		if p.Repo == "" {
-			return nil, fmt.Errorf(
-				"no repo specified for pull, no chart found at '%s'", path)
-		}
+	if _, exists := p.chartExistsLocally(); !exists {
 		if _, err := p.runHelmCommand(p.pullCommand()); err != nil {
 			return nil, err
 		}
 	}
-	if len(p.ValuesInline) > 0 {
-		p.ValuesFile, err = p.createNewMergedValuesFile()
-	} else {
-		p.ValuesFile, err = p.copyValuesFile()
+	var valuesFiles []string
+	for _, valuesFile := range p.ValuesFiles {
+		file, err := p.createNewMergedValuesFiles(valuesFile)
+		if err != nil {
+			return nil, err
+		}
+		valuesFiles = append(valuesFiles, file)
 	}
-	if err != nil {
-		return nil, err
-	}
+	p.ValuesFiles = valuesFiles
+
 	var stdout []byte
 	stdout, err = p.runHelmCommand(p.templateCommand())
 	if err != nil {
@@ -263,9 +249,17 @@ func (p *HelmChartInflationGeneratorPlugin) templateCommand() []string {
 	if p.Namespace != "" {
 		args = append(args, "--namespace", p.Namespace)
 	}
-	args = append(args, filepath.Join(p.absChartHome(), p.Name))
-	if p.ValuesFile != "" {
-		args = append(args, "--values", p.ValuesFile)
+	if p.Name != "" {
+		args = append(args, filepath.Join(p.absChartHome(), p.Name))
+	}
+	if p.NameTemplate != "" {
+		args = append(args, "--name-template", p.NameTemplate)
+	}
+	for _, valuesFile := range p.ValuesFiles {
+		args = append(args, "-f", valuesFile)
+	}
+	for _, apiVer := range p.ApiVersions {
+		args = append(args, "--api-versions", apiVer)
 	}
 	if p.ReleaseName == "" {
 		// AFAICT, this doesn't work as intended due to a bug in helm.
@@ -273,8 +267,20 @@ func (p *HelmChartInflationGeneratorPlugin) templateCommand() []string {
 		// I've tried placing the flag before and after the name argument.
 		args = append(args, "--generate-name")
 	}
+	if p.CreateNamespace {
+		args = append(args, "--create-namespace")
+	}
+	if p.Description != "" {
+		args = append(args, "--description", p.Description)
+	}
 	if p.IncludeCRDs {
 		args = append(args, "--include-crds")
+	}
+	if p.SkipCRDs {
+		args = append(args, "--skip-crds")
+	}
+	if p.SkipTests {
+		args = append(args, "--skip-tests")
 	}
 	return args
 }
@@ -283,9 +289,13 @@ func (p *HelmChartInflationGeneratorPlugin) pullCommand() []string {
 	args := []string{
 		"pull",
 		"--untar",
-		"--untardir", p.absChartHome(),
-		"--repo", p.Repo,
-		p.Name}
+		"--untardir", p.absChartHome()}
+	if p.Repo != "" {
+		args = append(args, "--repo", p.Repo)
+	}
+	if p.Name != "" {
+		args = append(args, p.Name)
+	}
 	if p.Version != "" {
 		args = append(args, "--version", p.Version)
 	}

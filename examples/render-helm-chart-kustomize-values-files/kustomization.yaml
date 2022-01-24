@@ -15,14 +15,9 @@ generators:
         version: 0.1.16
         repo: https://bcgov.github.io/helm-charts
       templateOptions:
-        releaseName: moria
         namespace: mynamespace
+        releaseName: moria
         values:
-          valuesInline:
-            releaseNamespace: ""
-            rbac:
-              create: true
-              rules:
-                - apiGroups: [""]
-                  verbs: ["*"]
-                  resources: ["*"]
+          valuesFiles:
+            - https://raw.githubusercontent.com/natasha41575/kpt-functions-catalog/a9c9cd765a05f7a7fb6923dbde4651b62c9c229c/examples/render-helm-chart-kustomize-values-files/file1.yaml
+            - https://raw.githubusercontent.com/natasha41575/kpt-functions-catalog/a9c9cd765a05f7a7fb6923dbde4651b62c9c229c/examples/render-helm-chart-kustomize-values-files/file2.yaml
