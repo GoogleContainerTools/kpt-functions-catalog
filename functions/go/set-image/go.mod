@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk v0.0.0-20220111011035-c598c94c9a02
 	github.com/stretchr/testify v1.7.0
-	sigs.k8s.io/kustomize/api v0.10.1
-	sigs.k8s.io/kustomize/kyaml v0.13.1
+	sigs.k8s.io/kustomize/api v0.11.0
+	sigs.k8s.io/kustomize/kyaml v0.13.3
 )
 
 require (

@@ -22,5 +22,6 @@ func setImageTags(rl *sdk.ResourceList) error {
 		return err
 	}
 	rl.Items = transformedItems
+	rl.Results = si.SdkResults()
 	return nil
 }
