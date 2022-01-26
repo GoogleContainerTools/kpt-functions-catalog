@@ -1,5 +1,5 @@
 diff --git a/GENERATED.md b/GENERATED.md
-index 800f955..543a793 100755
+index 800f955..201cb1d 100755
 --- a/GENERATED.md
 +++ b/GENERATED.md
 @@ -1,6 +1,71 @@
@@ -58,7 +58,7 @@ index 800f955..543a793 100755
 +
 +1.  Initialize the resource inventory
 +    ```shell
-+    kpt live init --namespace ${NAMESPACE}"
++    kpt live init --namespace ${NAMESPACE}
 +    ```
 +    Replace `${NAMESPACE}` with the namespace in which to manage
 +    the inventory ResourceGroup (for example, `config-control`).

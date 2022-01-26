@@ -117,7 +117,7 @@ This package has no sub-packages.
 
 1.  Initialize the resource inventory
     ¬¬¬shell
-    kpt live init --namespace ${NAMESPACE}"
+    kpt live init --namespace ${NAMESPACE}
     ¬¬¬
     Replace ¬${NAMESPACE}¬ with the namespace in which to manage
     the inventory ResourceGroup (for example, ¬config-control¬).
@@ -235,7 +235,7 @@ This package has no sub-packages.
 
 1.  Initialize the resource inventory
     ¬¬¬shell
-    kpt live init --namespace ${NAMESPACE}"
+    kpt live init --namespace ${NAMESPACE}
     ¬¬¬
     Replace ¬${NAMESPACE}¬ with the namespace in which to manage
     the inventory ResourceGroup (for example, ¬config-control¬).
