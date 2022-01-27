@@ -206,19 +206,9 @@ func (f *helmChartInflatorFunction) ConfigMapArgs(
 	if val, ok := m["namespace"]; ok {
 		p.Namespace = val
 	}
-	if val, ok := m["createNamespace"]; ok {
-		if val == "true" {
-			p.SkipTests = true
-		}
-	}
 	if val, ok := m["includeCRDs"]; ok {
 		if val == "true" {
 			p.IncludeCRDs = true
-		}
-	}
-	if val, ok := m["skipCRDs"]; ok {
-		if val == "true" {
-			p.SkipCRDs = true
 		}
 	}
 	if val, ok := m["skipTests"]; ok {

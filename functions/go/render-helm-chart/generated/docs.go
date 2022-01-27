@@ -42,11 +42,8 @@ specified in the ` + "`" + `data` + "`" + ` field:
     repo: string
     releaseName: string
     namespace: string
-    createNamespace: string
-    description: string
     nameTemplate: string
     includeCRDs: string
-    skipCRDs: string
     skipTests: string
     valuesFile: string
 
@@ -60,11 +57,8 @@ specified in the ` + "`" + `data` + "`" + ` field:
 ` + "`" + `repo` + "`" + `            | A URL locating the chart on the internet | https://itzg.github.io/minecraft-server-charts
 ` + "`" + `releaseName` + "`" + `     | Replaces RELEASE_NAME in the chart template output | test
 ` + "`" + `namespace` + "`" + `       | Sets the target namespace for a release (` + "`" + `.Release.Namespace` + "`" + ` in the template) | my-namespace
-` + "`" + `createNamespace` + "`" + ` | Create the release namespace if not present | true
-` + "`" + `description` + "`" + `     | Add a custom description | This is a chart.
 ` + "`" + `nameTemplate` + "`" + `    | Specify the template used to name the release | gatekeeper
 ` + "`" + `includeCRDs` + "`" + `     | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default). | "true"
-` + "`" + `skipCRDs` + "`" + `        | If set, no CRDs will be installed. Legal values: "true", "false" (default). | "true"
 ` + "`" + `skipTests` + "`" + `       | If set, skip tests from templated output. Legal values: "true", "false" (default). | "true"
 ` + "`" + `valuesFile` + "`" + `      | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where ` + "`" + `chartHome` + "`" + ` and ` + "`" + `name` + "`" + ` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
 
@@ -84,11 +78,8 @@ A ` + "`" + `functionConfig` + "`" + ` of kind ` + "`" + `RenderHelmChart` + "`"
       apiVersions: []string
       releaseName: string
       namespace: string
-      createNamespace: bool
-      description: string
       nameTemplate: string
       includeCRDs: bool
-      skipCRDs: bool 
       skipTests: bool
       values:
         valuesFiles: []string
@@ -109,11 +100,8 @@ A ` + "`" + `functionConfig` + "`" + ` of kind ` + "`" + `RenderHelmChart` + "`"
 ` + "`" + `repo` + "`" + `            | A URL locating the chart on the internet | https://itzg.github.io/minecraft-server-charts
 ` + "`" + `releaseName` + "`" + `     | Replaces RELEASE_NAME in the chart template output | test
 ` + "`" + `namespace` + "`" + `       | Sets the target namespace for a release (` + "`" + `.Release.Namespace` + "`" + ` in the template) | my-namespace
-` + "`" + `createNamespace` + "`" + ` | Create the release namespace if not present | true
-` + "`" + `description` + "`" + `     | Add a custom description | This is a chart.
 ` + "`" + `nameTemplate` + "`" + `    | Specify the template used to name the release | gatekeeper
 ` + "`" + `includeCRDs` + "`" + `     | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default). | "true"
-` + "`" + `skipCRDs` + "`" + `        | If set, no CRDs will be installed. Legal values: "true", "false" (default). | "true"
 ` + "`" + `skipTests` + "`" + `       | If set, skip tests from templated output. Legal values: "true", "false" (default). | "true"
 ` + "`" + `values` + "`" + `          | Values to use instead of the default values that accompany the chart. This can be defined inline or in a file. 
 ` + "`" + `valuesInline` + "`" + `    | Values defined inline to use instead of default values that accompany the chart |  global: <br> &emsp; enabled: false <br> tests: <br> &emsp; enabled: false  

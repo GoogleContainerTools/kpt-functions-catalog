@@ -138,18 +138,22 @@ func (p *HelmChartInflationGeneratorPlugin) createNewMergedValuesFiles(path stri
 	string, error) {
 	pValues, err := ioutil.ReadFile(path)
 	if err != nil {
-		if u, err := url.Parse(path); err == nil && (u.Scheme == "http" || u.Scheme == "https") {
-			var hc *http.Client
-			hc = &http.Client{}
-			resp, err := hc.Get(path)
-			if err != nil {
-				return "", err
+		if u, urlErr := url.Parse(path); urlErr == nil {
+			if (u.Scheme == "http" || u.Scheme == "https") {
+				resp, err := http.Get(path)
+				if err != nil {
+					return "", err
+				}
+				defer resp.Body.Close()
+				pValues, err = ioutil.ReadAll(resp.Body)
+				if err != nil {
+					return "", err
+				}
+			} else { // url scheme is not http or https
+				return "", fmt.Errorf("unsupported url type: %s", path)
 			}
-			defer resp.Body.Close()
-			pValues, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return "", err
-			}
+		} else { // invalid path and invalid URL
+			return "", err
 		}
 	}
 	if p.ValuesMerge == valuesMergeOptionMerge ||
@@ -191,7 +195,7 @@ func (p *HelmChartInflationGeneratorPlugin) writeValuesBytes(
 	}
 	// use a hash of the provided path to generate a unique, valid filename
 	hash := md5.Sum([]byte(path))
-	newPath := filepath.Join(p.tmpDir, p.Name+"-"+hex.EncodeToString(hash[:])+"-kustomize-values.yaml")
+	newPath := filepath.Join(p.tmpDir, p.Name+"-kustomize-values-"+hex.EncodeToString(hash[:])+".yaml")
 	return newPath, ioutil.WriteFile(newPath, b, 0644)
 }
 
@@ -249,11 +253,11 @@ func (p *HelmChartInflationGeneratorPlugin) templateCommand() []string {
 	if p.Namespace != "" {
 		args = append(args, "--namespace", p.Namespace)
 	}
-	if p.Name != "" {
-		args = append(args, filepath.Join(p.absChartHome(), p.Name))
-	}
 	if p.NameTemplate != "" {
 		args = append(args, "--name-template", p.NameTemplate)
+	}
+	if p.Name != "" {
+		args = append(args, filepath.Join(p.absChartHome(), p.Name))
 	}
 	for _, valuesFile := range p.ValuesFiles {
 		args = append(args, "-f", valuesFile)
@@ -267,17 +271,11 @@ func (p *HelmChartInflationGeneratorPlugin) templateCommand() []string {
 		// I've tried placing the flag before and after the name argument.
 		args = append(args, "--generate-name")
 	}
-	if p.CreateNamespace {
-		args = append(args, "--create-namespace")
-	}
 	if p.Description != "" {
 		args = append(args, "--description", p.Description)
 	}
 	if p.IncludeCRDs {
 		args = append(args, "--include-crds")
-	}
-	if p.SkipCRDs {
-		args = append(args, "--skip-crds")
 	}
 	if p.SkipTests {
 		args = append(args, "--skip-tests")

@@ -68,9 +68,6 @@ type TemplateOptions struct {
 	// in the helm template
 	Namespace string `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 
-	// CreateNamespace creates the release namespace if it is not present.
-	CreateNamespace bool `json:"createNamespace,omitempty" yaml:"createNamespace,omitempty"`
-
 	// Description is a custom description to add when rendering the helm chart.
 	Description string `json:"description,omitempty" yaml:"description,omitempty"`
 
@@ -80,9 +77,6 @@ type TemplateOptions struct {
 	// IncludeCRDs specifies if Helm should also generate CustomResourceDefinitions.
 	// Defaults to false.
 	IncludeCRDs bool `json:"includeCRDs,omitempty" yaml:"includeCRDs,omitempty"`
-
-	// SkipCRDs means no CRDs will be installed. By default, CRDs are installed.
-	SkipCRDs bool `json:"skipCRDs,omitempty" yaml:"skipCRDs,omitempty"`
 
 	// SkipTests skips tests from templated output.
 	SkipTests bool `json:"skipTests,omitempty" yaml:"skipTests,omitempty"`
