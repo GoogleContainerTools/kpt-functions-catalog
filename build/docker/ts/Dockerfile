@@ -22,6 +22,9 @@ RUN npm run build && \
 
 FROM node:lts-alpine
 
+ARG FILENAME
+ENV FILENAME=${FILENAME}
+
 # Run as non-root user as a best-practices:
 # https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
 USER node
@@ -30,4 +33,4 @@ WORKDIR /home/node/app
 
 COPY --from=builder /home/node/app /home/node/app
 
-ENTRYPOINT ["node", "/home/node/app/dist/generate_folders_run.js"]
+ENTRYPOINT node /home/node/app/dist/${FILENAME}

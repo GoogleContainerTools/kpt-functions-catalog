@@ -41,19 +41,11 @@ scripts_dir="$(dirname "$0")"
 # git-tag-parser.sh has been shell-checked separately.
 # shellcheck source=/dev/null
 source "${scripts_dir}"/git-tag-parser.sh
+# shellcheck source=/dev/null
+source "${scripts_dir}"/docker.sh
 
-UNSTABLE_TAG=unstable
 versions=$(get_versions "${TAG}")
-DEFAULT_GCR=${DEFAULT_GCR:-gcr.io/kpt-fn-contrib}
-GCR_REGISTRY=${GCR_REGISTRY:-${DEFAULT_GCR}}
-
-case "$2" in
-    contrib)
-        cd "${scripts_dir}/../contrib/functions/ts/${CURRENT_FUNCTION}"
-        ;;
-    curated)
-        cd "${scripts_dir}/../functions/ts/${CURRENT_FUNCTION}"
-esac
+FUNCTION_TYPE="$2"
 
 # https://github.com/GoogleContainerTools/kpt/issues/1394
 # This make it work for npm 7.0.0+
@@ -61,16 +53,15 @@ export npm_package_kpt_docker_repo_base="${GCR_REGISTRY}"
 
 case "$1" in
   build)
-    npm run kpt:docker-build -- --tag ${UNSTABLE_TAG}
+    docker_build "${FUNCTION_TYPE}" "ts" "${CURRENT_FUNCTION}"
     for version in ${versions}; do
-      echo tagging "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${version}"
-      docker tag "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${UNSTABLE_TAG}" "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${version}"
+      docker_tag "${CURRENT_FUNCTION}" "${version}"
     done
     ;;
   push)
     for version in ${versions}; do
-      docker tag "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${UNSTABLE_TAG}" "${GCR_REGISTRY}/${CURRENT_FUNCTION}:${version}"
-      npm run kpt:docker-push -- --tag="${version}"
+      docker_tag "${CURRENT_FUNCTION}" "${version}"
+      docker_push "${CURRENT_FUNCTION}" "${version}"
     done
     ;;
   *)

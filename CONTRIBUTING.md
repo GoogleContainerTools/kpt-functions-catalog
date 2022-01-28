@@ -56,7 +56,13 @@ Contributions are required to follow these style guides:
 │     │     └── ts: Home for all typescript-based contrib function source code
 │     └── examples: Home for all contrib function examples.
 ├── scripts
-└── tests: Home for e2e tests
+├── tests: Home for e2e tests
+└── build
+      └── docker
+          ├── go: Home for default golang Dockerfile
+          │    └── Dockerfile
+          └── ts: Home for default typescript Dockerfile
+               └── Dockerfile
 ```
 
 For each function, its files spread in the follow places:
@@ -70,7 +76,9 @@ For each function, its files spread in the follow places:
         - golang-based functions should follow [this template][golang-template].
         - typescript-based functions should follow [this template][ts-template].
     - A metadata.yaml file that follows the function metadata schema.
-    - A Dockerfile to build the docker container.
+    - (Optional) A Dockerfile to build the docker container. If a Dockerfile is
+      not defined, the [default Dockerfile for the language][docker-common] will
+      be used.
 - `examples/` directory: It contains examples for functions, and these examples
   are also being tested as e2e tests. Each function should have at least one
   example here. There must be a README.md file in each example directory, and it
@@ -93,6 +101,19 @@ To run all unit tests
 
 ```shell
 $ make unit-test
+```
+
+#### Building a function image
+
+To build all function images
+```shell
+$ make build
+```
+
+To build a single function image (e.g. `apply-setters`)
+```shell
+$ cd functions/go
+$ make apply-setters-BUILD
 ```
 
 #### E2E Tests
@@ -202,6 +223,8 @@ Do you need a review or release of functions? We’d love to hear from you!
 [golang-template]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/functions/go/_template/README.md
 
 [ts-template]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/functions/ts/_template/README.md
+
+[docker-common]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/build/docker
 
 [example-template]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/examples/_template/README.md
 
