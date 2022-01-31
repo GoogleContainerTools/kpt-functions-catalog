@@ -4,7 +4,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/gatekeeper:unstable
+  - image: gcr.io/kpt-fn/gatekeeper:v0.2.1
     stderr: |-
       [error] v1/ConfigMap/default/super-secret : The following banned keys are being used in the ConfigMap: {"private_key"}
       violatedConstraint: no-secrets-in-configmap
