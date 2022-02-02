@@ -9,7 +9,6 @@ import (
 	"sigs.k8s.io/kustomize/api/resource"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
-	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 const projectIDKey = "projectID"
@@ -17,34 +16,17 @@ const projectIDKey = "projectID"
 
 type Processor struct {}
 
-func getProjectID(resourceList *framework.ResourceList) (string, error) {
-	data := resourceList.FunctionConfig.GetDataMap()
-	if data == nil {
-		return "", fmt.Errorf("missing `data` field in `ConfigMap` FunctionConfig")
-	}
-	projectID, ok := data[projectIDKey]
-	if !ok {
-		return "", fmt.Errorf("missing `.data.%s` field in `ConfigMap` FunctionConfig", projectIDKey)
-	}
-	return projectID, nil
-}
-
 func newResMapFactory() *resmap.Factory {
 	resourceFactory := resource.NewFactory(&hasher.Hasher{})
 	resourceFactory.IncludeLocalConfigs = true
 	return resmap.NewFactory(resourceFactory)
 }
 
-
 func (p *Processor) Process(resourceList *framework.ResourceList) error {
 	err := func() error{
-		// FunctionConfig is ConfigMap kind. No need for Validator, Defaultor struct
-		projectID, err := getProjectID(resourceList)
+		trans := &ProjectIDTransformer{}
+		err := trans.Config(resourceList.FunctionConfig)
 		if err != nil {
-			return err
-		}
-		var trans ProjectIDTransformer
-		if err := yaml.Unmarshal([]byte(projectIDFieldSpecs), &trans); err != nil {
 			return err
 		}
 		resmapFactory := newResMapFactory()
@@ -52,7 +34,7 @@ func (p *Processor) Process(resourceList *framework.ResourceList) error {
 		if err != nil {
 			return fmt.Errorf("failed to convert items to resource map: %w", err)
 		}
-		if err := trans.Transform(resMap, projectID); err != nil {
+		if err := trans.Transform(resMap); err != nil {
 			return err
 		}
 		resourceList.Items = resMap.ToRNodeSlice()
