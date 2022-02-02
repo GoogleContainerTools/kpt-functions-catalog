@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -18,18 +19,26 @@ func itemsToYaml(items []*sdk.KubeObject) string {
 	return result
 }
 
-func runImageTransformerE(input, config string) (string, error) {
+func runImageTransformerResults(input, config string) (*sdk.ResourceList, error) {
 	rl, err := sdk.ParseResourceList([]byte(input))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	functionConfig, err := sdk.ParseKubeObject([]byte(config))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	rl.FunctionConfig = functionConfig
 
 	if err = setImageTags(rl); err != nil {
+		return nil, err
+	}
+	return rl, nil
+}
+
+func runImageTransformerE(input, config string) (string, error) {
+	rl, err := runImageTransformerResults(input, config)
+	if err != nil {
 		return "", err
 	}
 	rl.Sort()
@@ -47,9 +56,9 @@ func runImageTransformer(t *testing.T, input, config string) string {
 
 func TestImageTransformer(t *testing.T) {
 	testCases := []struct {
-		TestName string
+		TestName       string
 		FunctionConfig string
-		Input string
+		Input          string
 		ExpectedOutput string
 	}{
 		{
@@ -64,7 +73,7 @@ data:
   newName: bar
   newTag: 4.5.6
 `,
-      Input: `
+			Input: `
 apiVersion: config.kubernetes.io/v1
 kind: ResourceList
 items:
@@ -78,7 +87,7 @@ items:
     - image: foo:1.2.3
       name: test-container
 `,
-      ExpectedOutput: `apiVersion: v1
+			ExpectedOutput: `apiVersion: v1
 kind: Pod
 metadata:
   name: the-pod
@@ -182,7 +191,7 @@ spec:
 `,
 		},
 	}
-  for _, tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.TestName, func(t *testing.T) {
 			output := runImageTransformer(t, tc.Input, tc.FunctionConfig)
 			assert.Equal(t, tc.ExpectedOutput, output)
@@ -193,9 +202,9 @@ spec:
 
 func TestFunctionConfigErrors(t *testing.T) {
 	testCases := []struct {
-		TestName string
+		TestName       string
 		FunctionConfig string
-		ExpectedError string
+		ExpectedError  string
 	}{
 		{
 			TestName: "set-image should return an error if image name is unset",
@@ -286,6 +295,71 @@ items:
 		t.Run(tc.TestName, func(t *testing.T) {
 			_, err := runImageTransformerE(input, tc.FunctionConfig)
 			assert.EqualError(t, err, tc.ExpectedError)
+		})
+	}
+}
+
+func TestAnnotationsTransformerResults(t *testing.T) {
+	testCases := []struct {
+		TestName        string
+		FunctionConfig  string
+		Input           string
+		ExpectedResults string
+	}{
+		{
+			TestName: `record which image fields were updated`,
+			FunctionConfig: `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-func-config
+data:
+  name: foo
+  newName: bar
+  newTag: 4.5.6
+`,
+			Input: `
+apiVersion: config.kubernetes.io/v1
+kind: ResourceList
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: the-pod
+    namespace: the-namespace
+  spec:
+    containers:
+    - image: foo:1.2.3
+      name: test-container
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: the-pod2
+    namespace: the-namespace
+  spec:
+    containers:
+    - image: foo:1.2.3
+      name: test-container
+    - image: foo:latest
+      name: test-container2
+`,
+			ExpectedResults: `
+[info] v1/Pod/the-namespace/the-pod spec.containers.image: set image from foo:1.2.3 to bar:4.5.6
+[info] v1/Pod/the-namespace/the-pod2 spec.containers.image: set image from foo:1.2.3 to bar:4.5.6
+[info] v1/Pod/the-namespace/the-pod2 spec.containers.image: set image from foo:latest to bar:4.5.6
+`,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.TestName, func(t *testing.T) {
+			rl, err := runImageTransformerResults(tc.Input, tc.FunctionConfig)
+			assert.Equal(t, nil, err)
+			rl.Results.Sort()
+			resultStr := "\n"
+			for _, r := range rl.Results {
+				resultStr += fmt.Sprintf("%s\n", r.String())
+			}
+			assert.Equal(t, tc.ExpectedResults, resultStr)
 		})
 	}
 }
