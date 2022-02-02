@@ -29,6 +29,16 @@ type HelmGlobals struct {
 }
 
 type HelmChart struct {
+	// ChartArgs encapsulates information about the chart being inflated, including
+	// the chart's name, version, and repo.
+	ChartArgs `json:"chartArgs,omitempty" yaml:"chartArgs,omitempty"`
+
+	// TemplateOptions are fields that become flags to `helm template` when
+	// the helm chart is being rendered.
+	TemplateOptions `json:"templateOptions,omitempty" yaml:"templateOptions,omitempty"`
+}
+
+type ChartArgs struct {
 	// Name is the name of the chart, e.g. 'minecraft'.
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
@@ -39,6 +49,11 @@ type HelmChart struct {
 	// This is the argument to helm's  `--repo` flag, e.g.
 	// `https://itzg.github.io/minecraft-server-charts`.
 	Repo string `json:"repo,omitempty" yaml:"repo,omitempty"`
+}
+
+type TemplateOptions struct {
+	// ApiVersions is the kubernetes apiversions used for Capabilities.APIVersions
+	ApiVersions []string `json:"apiVerions,omitempty" yaml:"apiVersions,omitempty"`
 
 	// ReleaseName replaces RELEASE-NAME in chart template output,
 	// making a particular inflation of a chart unique with respect to
@@ -53,10 +68,28 @@ type HelmChart struct {
 	// in the helm template
 	Namespace string `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 
-	// ValuesFile is local file path to a values file to use _instead of_
+	// Description is a custom description to add when rendering the helm chart.
+	Description string `json:"description,omitempty" yaml:"description,omitempty"`
+
+	// NameTemplate is for specifying the name template used to name the release.
+	NameTemplate string `json:"nameTemplate,omitempty" yaml:"nameTemplate,omitempty"`
+
+	// IncludeCRDs specifies if Helm should also generate CustomResourceDefinitions.
+	// Defaults to false.
+	IncludeCRDs bool `json:"includeCRDs,omitempty" yaml:"includeCRDs,omitempty"`
+
+	// SkipTests skips tests from templated output.
+	SkipTests bool `json:"skipTests,omitempty" yaml:"skipTests,omitempty"`
+
+	// Values are values that are specified inline or in a yaml file to use.
+	Values `json:"values,omitempty" yaml:"values,omitempty"`
+}
+
+type Values struct {
+	// ValuesFiles is a list of local file paths to values files to use instead of
 	// the default values that accompanied the chart.
 	// The default values are in '{ChartHome}/{Name}/values.yaml'.
-	ValuesFile string `json:"valuesFile,omitempty" yaml:"valuesFile,omitempty"`
+	ValuesFiles []string `json:"valuesFiles,omitempty" yaml:"valuesFiles,omitempty"`
 
 	// ValuesInline holds value mappings specified directly,
 	// rather than in a separate file.
@@ -66,55 +99,4 @@ type HelmChart struct {
 	// Legal values: 'merge', 'override', 'replace'.
 	// Defaults to 'override'.
 	ValuesMerge string `json:"valuesMerge,omitempty" yaml:"valuesMerge,omitempty"`
-
-	// IncludeCRDs specifies if Helm should also generate CustomResourceDefinitions.
-	// Defaults to false.
-	IncludeCRDs bool `json:"includeCRDs,omitempty" yaml:"includeCRDs,omitempty"`
-}
-
-// HelmChartArgs contains arguments to helm.
-// Deprecated.  Use HelmGlobals and HelmChart instead.
-type HelmChartArgs struct {
-	ChartName        string                 `json:"chartName,omitempty" yaml:"chartName,omitempty"`
-	ChartVersion     string                 `json:"chartVersion,omitempty" yaml:"chartVersion,omitempty"`
-	ChartRepoURL     string                 `json:"chartRepoUrl,omitempty" yaml:"chartRepoUrl,omitempty"`
-	ChartHome        string                 `json:"chartHome,omitempty" yaml:"chartHome,omitempty"`
-	ChartRepoName    string                 `json:"chartRepoName,omitempty" yaml:"chartRepoName,omitempty"`
-	HelmBin          string                 `json:"helmBin,omitempty" yaml:"helmBin,omitempty"`
-	HelmHome         string                 `json:"helmHome,omitempty" yaml:"helmHome,omitempty"`
-	Values           string                 `json:"values,omitempty" yaml:"values,omitempty"`
-	ValuesLocal      map[string]interface{} `json:"valuesLocal,omitempty" yaml:"valuesLocal,omitempty"`
-	ValuesMerge      string                 `json:"valuesMerge,omitempty" yaml:"valuesMerge,omitempty"`
-	ReleaseName      string                 `json:"releaseName,omitempty" yaml:"releaseName,omitempty"`
-	ReleaseNamespace string                 `json:"releaseNamespace,omitempty" yaml:"releaseNamespace,omitempty"`
-	ExtraArgs        []string               `json:"extraArgs,omitempty" yaml:"extraArgs,omitempty"`
-}
-
-// SplitHelmParameters splits helm parameters into
-// per-chart params and global chart-independent parameters.
-func SplitHelmParameters(
-	oldArgs []HelmChartArgs) (charts []HelmChart, globals HelmGlobals) {
-	for _, old := range oldArgs {
-		charts = append(charts, makeHelmChartFromHca(&old))
-		if old.HelmHome != "" {
-			// last non-empty wins
-			globals.ConfigHome = old.HelmHome
-		}
-		if old.ChartHome != "" {
-			// last non-empty wins
-			globals.ChartHome = old.ChartHome
-		}
-	}
-	return charts, globals
-}
-
-func makeHelmChartFromHca(old *HelmChartArgs) (c HelmChart) {
-	c.Name = old.ChartName
-	c.Version = old.ChartVersion
-	c.Repo = old.ChartRepoURL
-	c.ValuesFile = old.Values
-	c.ValuesInline = old.ValuesLocal
-	c.ValuesMerge = old.ValuesMerge
-	c.ReleaseName = old.ReleaseName
-	return
 }
