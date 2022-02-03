@@ -4,9 +4,13 @@
 
 <!--mdtogo:Short-->
 
-The `annotate-apply-time-mutations` function enables authors to use inline
-comments OR custom resource objects to generate
+The `annotate-apply-time-mutations` function enables authors to use alternate
+input methods to generate
 [apply-time-mutation annotations](https://kpt.dev/reference/annotations/apply-time-mutation/).
+
+Input formats:
+- [Inline field comment: apply-time-mutation](#inline-field-comment-input)
+- [Custom resource object: ApplyTimeMutation](#custom-resource-object-input)
 
 This can help simplify the authoring of apply-time-mutation annotations, without
 needing to directly generate, manipulate, or template the YAML strings used by
@@ -18,9 +22,17 @@ those annotations.
 
 ## Usage
 
-The function can be executed declaratively using `kpt fn render`.
+The `annotate-apply-time-mutations` function can be executed by itself or as
+part of a [kpt workflow](https://kpt.dev/book/02-concepts/02-workflows).
 
-To configure this, add the function to the pipeline config in the Kptfile:
+To execute by itself:
+
+```shell
+kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+```
+
+To execute as part of a kpt workflow, first modify the Kptfile to add the
+function to the pipeline:
 
 ```yaml
 apiVersion: kpt.dev/v1
@@ -30,19 +42,19 @@ pipeline:
     - image: gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
-The function can also be executed imperatively:
+Then execute the pipeline:
 
-```shell
-kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+```
+kpt fn render
 ```
 
-The function will generate and write the
-`config.kubernetes.io/apply-time-mutation` annotation on the target object, the
-object with the apply-time-mutation comment on one or more of its fields.
+Either way, the function will read the input files and generate 
+`config.kubernetes.io/apply-time-mutation` annotations on the target object(s).
 
-The function does not perform the mutation on the target object itself. The
-mutation is performed by `kpt live apply`, which reads the annotation as input.
-So the function should be run by the user before applying.
+The `annotate-apply-time-mutations` function does not perform the mutation on
+the target object itself. The mutation is performed by `kpt live apply`, which
+reads the annotation as input. So the function needs to be run by the user
+before applying.
 
 ### Inline Field Comment Input
 
@@ -83,7 +95,7 @@ will be replaced with a string including the `PREFIX` and `SUFFIX`, surrounding
 a generated token for substitution.
 
 ```yaml
-field: "[PREFIX]${ref1}[SUFFIX]" # apply-time-mutation: ...
+field: "PREFIX${ref1}SUFFIX" # apply-time-mutation: ...
 ```
 
 When the function runs, if neither `PREFIX` nor `SUFFIX` are specified, the
@@ -276,6 +288,12 @@ spec:
     sourcePath: $.status.number
     targetPath: $.spec.member
     token: "${project-number}"
+```
+
+Invoke the function:
+
+```shell
+kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 The target object will be updated to the following:
