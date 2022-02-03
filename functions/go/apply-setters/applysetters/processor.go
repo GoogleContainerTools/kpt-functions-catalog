@@ -10,19 +10,16 @@ import (
 type ApplySettersProcessor struct{}
 
 func (asp *ApplySettersProcessor) Process(resourceList *framework.ResourceList) error {
-	resourceList.Result = &framework.Result{
-		Name: "apply-setters",
-	}
 	items, err := run(resourceList)
 	if err != nil {
-		resourceList.Result.Items = getErrorItem(err.Error())
+		resourceList.Results = []*framework.Result{getErrorItem(err.Error())}
 		return err
 	}
-	resourceList.Result.Items = items
+	resourceList.Results = items
 	return nil
 }
 
-func run(resourceList *framework.ResourceList) ([]framework.ResultItem, error) {
+func run(resourceList *framework.ResourceList) ([]*framework.Result, error) {
 	s, err := getSetters(resourceList.FunctionConfig)
 	if err != nil {
 		return nil, err
@@ -47,30 +44,29 @@ func getSetters(fc *kyaml.RNode) (ApplySetters, error) {
 
 // resultsToItems converts the Search and Replace results to
 // equivalent items([]framework.Item)
-func resultsToItems(sr ApplySetters) ([]framework.ResultItem, error) {
-	var items []framework.ResultItem
+func resultsToItems(sr ApplySetters) ([]*framework.Result, error) {
+	var items []*framework.Result
 	if len(sr.Results) == 0 {
-		items = append(items, framework.ResultItem{
-			Message: "no matches for input setter(s)",
+		items = append(items, &framework.Result{
+			Message:  "no matches for input setter(s)",
+			Severity: framework.Warning,
 		})
-		return items, nil
 	}
 	for _, res := range sr.Results {
-		items = append(items, framework.ResultItem{
-			Message: fmt.Sprintf("set field value to %q", res.Value),
-			Field:   framework.Field{Path: res.FieldPath},
-			File:    framework.File{Path: res.FilePath},
+		items = append(items, &framework.Result{
+			Message:  fmt.Sprintf("set field value to %q", res.Value),
+			Severity: framework.Info,
+			Field:    &framework.Field{Path: res.FieldPath},
+			File:     &framework.File{Path: res.FilePath},
 		})
 	}
 	return items, nil
 }
 
 // getErrorItem returns the item for input error message
-func getErrorItem(errMsg string) []framework.ResultItem {
-	return []framework.ResultItem{
-		{
-			Message:  fmt.Sprintf("failed to apply setters: %s", errMsg),
-			Severity: framework.Error,
-		},
+func getErrorItem(errMsg string) *framework.Result {
+	return &framework.Result{
+		Message:  fmt.Sprintf("failed to apply setters: %s", errMsg),
+		Severity: framework.Error,
 	}
 }
