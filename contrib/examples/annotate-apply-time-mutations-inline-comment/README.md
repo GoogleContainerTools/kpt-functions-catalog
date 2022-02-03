@@ -1,4 +1,4 @@
-# annotate-apply-time-mutations: Simple Example
+# annotate-apply-time-mutations: Inline Comment Example
 
 ### Overview
 
@@ -6,14 +6,14 @@ This example shows how the [annotate-apply-time-mutations] function works.
 
 Running `annotate-apply-time-mutations` function on the example package will:
 
-1.  Set `config.k8s.io/apply-time-mutation` annotation on resources with `apply-time-mutation` inline comments.
+1.  Set `config.k8s.io/apply-time-mutation` annotation on resources generated from `apply-time-mutation` inline comments.
 
 ### Fetch the example package
 
 Get the example package by running the following commands:
 
 ```shell
-kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/annotate-apply-time-mutations-simple
+kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/annotate-apply-time-mutations-inline-comment
 ```
 
 ### Function invocation
@@ -21,7 +21,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/co
 Invoke the function with the following command:
 
 ```shell
-kpt fn eval annotate-apply-time-mutations-simple --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+kpt fn eval annotate-apply-time-mutations-inline-comment --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
 ### Expected result
