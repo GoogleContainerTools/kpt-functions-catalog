@@ -12,14 +12,12 @@ projectID:
   group: iam.cnrm.cloud.google.com
   version: v1beta1
   kind: IAMPolicyMember
-  create: true
 
 # Cluster blueprint
 - path: spec/projectRef/external
   group: gkehub.cnrm.cloud.google.com
   version: v1beta1
   kind: GKEHubFeatureMembership
-  create: true
 `
 )
 
