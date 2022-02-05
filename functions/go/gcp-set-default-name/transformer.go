@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-project-id/builtin"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-project-id/fieldspec"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gcp-set-default-name/fieldspec"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gcp-set-default-name/namereference"
 	"sigs.k8s.io/kustomize/api/filters/fsslice"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/resmap"
@@ -55,7 +55,7 @@ func (p *CustomNameTransformer) Config(fnConfigNode *yaml.RNode) error {
 		return err
 	}
 	nameRefs := append(builtinNameRefFs.NameReference, customNameRefFs.NameReference...)
-	p.nameRefTransformer = builtin.NewNameReferenceTransformer(nameRefs)
+	p.nameRefTransformer = namereference.NewNameReferenceTransformer(nameRefs)
 	return nil
 }
 
@@ -74,7 +74,7 @@ func (p *CustomNameTransformer) Transform(m resmap.ResMap) error {
 }
 
 type NameBackRefs struct {
-	NameReference     builtin.NbrSlice      `json:"nameReference,omitempty" yaml:"nameReference,omitempty"`
+	NameReference     namereference.NbrSlice      `json:"nameReference,omitempty" yaml:"nameReference,omitempty"`
 }
 
 var _ kio.Filter = CustomFieldSpecFilter{}
@@ -104,7 +104,7 @@ func (f CustomFieldSpecFilter) filter(node *yaml.RNode) (*yaml.RNode, error) {
 }
 
 func (f CustomFieldSpecFilter) updateMetaNameFn(node *yaml.RNode) error {
-	return node.PipeE(updater{metaName: f.MetaName,})
+	return node.PipeE(updater{metaName: f.MetaName})
 }
 
 type updater struct {

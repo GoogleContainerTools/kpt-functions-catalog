@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-project-id
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gcp-set-default-name
 
 go 1.17
 

@@ -1,11 +1,11 @@
-package builtin
+package namereference
 
 import (
 	"log"
 
-	"sigs.k8s.io/kustomize/api/filters/nameref"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/resource"
+	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/resid"
 )
 
@@ -13,11 +13,16 @@ type nameReferenceTransformer struct {
 	backRefs []NameBackReferences
 }
 
-const doDebug = false
+type NameBackReferences struct {
+	resid.Gvk `json:",inline,omitempty" yaml:",inline,omitempty"`
+	Referrers types.FsSlice `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
+}
+
+type NbrSlice []NameBackReferences
 
 var _ resmap.Transformer = &nameReferenceTransformer{}
 
-type filterMap map[*resource.Resource][]nameref.Filter
+type filterMap map[*resource.Resource][]UnlimitedNameRefFilter
 
 func NewNameReferenceTransformer(
 	br []NameBackReferences) resmap.Transformer {
@@ -39,23 +44,18 @@ func (t *nameReferenceTransformer) Transform(m resmap.ResMap) error {
 			}
 		}
 	}
-
 	return nil
 }
 
 func (t *nameReferenceTransformer) determineFilters(
 	resources []*resource.Resource) (fMap filterMap) {
 	// We cache the resource OrgId values because they don't change and otherwise are very visible in a memory pprof
-	resourceOrgIds := make([]resid.ResId, len(resources))
-	for i, resource := range resources {
-		resourceOrgIds[i] = resource.OrgId()
-	}
 	fMap = make(filterMap)
 	for _, backReference := range t.backRefs {
 		for _, referrerSpec := range backReference.Referrers {
-			for i, res := range resources {
-				if resourceOrgIds[i].IsSelected(&referrerSpec.Gvk) {
-						fMap[res] = append(fMap[res], nameref.Filter{
+			for _, res := range resources {
+				if res.OrgId().IsSelected(&referrerSpec.Gvk) {
+						fMap[res] = append(fMap[res], UnlimitedNameRefFilter{
 							NameFieldToUpdate: referrerSpec,
 							ReferralTarget: backReference.Gvk,
 						})
