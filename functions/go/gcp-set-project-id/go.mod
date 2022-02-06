@@ -1,11 +1,11 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-project-id
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gcp-set-project-id
 
 go 1.17
 
 require (
-	sigs.k8s.io/kustomize/api v0.10.2-0.20211202184144-fe551be87b8d
-	sigs.k8s.io/kustomize/kyaml v0.13.1-0.20211202184144-fe551be87b8d
-	sigs.k8s.io/yaml v1.2.0
+	sigs.k8s.io/kustomize/api v0.11.1
+	sigs.k8s.io/kustomize/kyaml v0.13.3
+	sigs.k8s.io/yaml v1.3.0
 )
 
 require (
@@ -31,3 +31,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e // indirect
 )
+
+replace sigs.k8s.io/kustomize/api => ./thirdparty/kustomize/api
