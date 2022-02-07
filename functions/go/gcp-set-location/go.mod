@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	sigs.k8s.io/kustomize/api v0.10.2-0.20211202184144-fe551be87b8d
-	sigs.k8s.io/kustomize/kyaml v0.13.1-0.20211202184144-fe551be87b8d
+	sigs.k8s.io/kustomize/kyaml v0.13.3
 )
 
 require (
@@ -31,3 +31,5 @@ require (
 	k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
+
+replace sigs.k8s.io/kustomize/api => ./thirdparty/kustomize/api
