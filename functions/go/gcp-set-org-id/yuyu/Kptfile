@@ -1,0 +1,26 @@
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: yuyu
+  annotations:
+    blueprints.cloud.google.com/title: Organizational Foundational IAM
+upstream:
+  type: git
+  git:
+    repo: https://github.com/yuwenma/blueprints
+    directory: /catalog/iam-foundation
+    ref: setter-free-iam-foundation
+  updateStrategy: resource-merge
+upstreamLock:
+  type: git
+  git:
+    repo: https://github.com/yuwenma/blueprints
+    directory: /catalog/iam-foundation
+    ref: setter-free-iam-foundation
+    commit: 79efb9f1d6e4b84bf077ab37361c33b33af7896b
+info:
+  description: This blueprint sets up recommended IAM roles for an enterprise organization in Google Cloud.
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn-demo/set-org-id:v0.1-yuwenma
+      configPath: gcloudconfig.yaml
