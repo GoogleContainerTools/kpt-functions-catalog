@@ -2,10 +2,9 @@ package filedspec
 
 const LocationFieldSpecs = `
 regions:
+# Storage and BigQueryDataset instances.
 - path: spec/location
-  group: storage.cnrm.cloud.google.com
   version: v1beta1
-  kind: StorageBucket
 
 - path: spec/region
   group: redis.cnrm.cloud.google.com
