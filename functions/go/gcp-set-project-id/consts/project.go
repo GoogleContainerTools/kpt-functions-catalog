@@ -10,17 +10,12 @@ projectFieldSpec:
   version: v1beta1
   kind: RedisInstance
 
-# Blueprint cluster
+# Blueprint log export
 - path: spec/resourceRef/external
+  regexPattern: (?P<prefix>projects\/)(?P<projectID>\S+)
   group: iam.cnrm.cloud.google.com
   version: v1beta1
   kind: IAMPolicyMember
-
-# Blueprint cluster
-- path: spec/projectRef/external
-  group: gkehub.cnrm.cloud.google.com
-  version: v1beta1
-  kind: GKEHubFeatureMembership
 `
 
 /*

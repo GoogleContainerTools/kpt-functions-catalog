@@ -1,4 +1,4 @@
-package custom
+package filter
 
 import (
 	"fmt"
@@ -11,14 +11,14 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-var _ kio.Filter = Filter{}
+var _ kio.Filter = ProjectFilter{}
 
-type Filter struct {
+type ProjectFilter struct {
 	ProjectID string
 	FsSlice   []types.FieldSpec
 }
 
-func (f Filter) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
+func (f ProjectFilter) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	_, err := kio.FilterAll(yaml.FilterFunc(
 		func(node *yaml.RNode) (*yaml.RNode, error) {
 			var fns []yaml.Filter
@@ -35,7 +35,7 @@ func (f Filter) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	return nodes, err
 }
 
-func (f Filter) updateProjectIDFn(regexPath string) filtersutil.SetFn {
+func (f ProjectFilter) updateProjectIDFn(regexPath string) filtersutil.SetFn {
 	return func(node *yaml.RNode) (err error) {
 		if regexPath == "" {
 			return node.PipeE(updater{ProjectID: f.ProjectID})
@@ -54,7 +54,14 @@ func (f Filter) updateProjectIDFn(regexPath string) filtersutil.SetFn {
 				namedGroup[name] = match[i]
 			}
 		}
-		newProjectID := namedGroup["prefix"] + f.ProjectID + namedGroup["suffix"]
+		newProjectID := ""
+		if prefix, ok := namedGroup["prefix"]; ok {
+			newProjectID = newProjectID + prefix
+		}
+		newProjectID = newProjectID + f.ProjectID
+		if suffix, ok := namedGroup["suffix"]; ok {
+			newProjectID = newProjectID + suffix
+		}
 		return node.PipeE(updater{ProjectID: newProjectID})
 	}
 }

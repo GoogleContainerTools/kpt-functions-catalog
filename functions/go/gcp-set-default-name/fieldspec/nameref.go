@@ -26,5 +26,36 @@ nameReference:
     kind: SpannerDatabase
     group: spanner.cnrm.cloud.google.com
     version: v1beta1
+
+# Blueprint log-export
+- kind: LoggingLogSink
+  group: logging.cnrm.cloud.google.com
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/memberFrom/logSinkRef/name
+    kind: IAMPolicyMember
+    group: iam.cnrm.cloud.google.com
+    version: v1beta1
+- kind: PubSubTopic
+  group: pubsub.cnrm.cloud.google.com
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/destination/pubSubTopicRef/name
+    kind: LoggingLogSink
+    group: logging.cnrm.cloud.google.com
+    version: v1beta1
+  - path: spec/memberFrom/resourceRef/name
+    kind: IAMPolicyMember
+    group: aim.cnrm.cloud.google.com
+    version: v1beta1
+
+- kind: BigQueryDataset
+  group: bigquery.cnrm.cloud.google.com
+  version: v1beta1
+  fieldSpecs:
+  - path: spec/destination/bigQueryDatasetRef/name
+    kind: LoggingLogSink
+    group: logging.cnrm.cloud.google.com
+    version: v1beta1
 `
 )

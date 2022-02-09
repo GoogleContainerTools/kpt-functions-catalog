@@ -37,9 +37,6 @@ func (p *ProjectIDTransformer) Config(fnConfigNode *yaml.RNode) error {
 	p.custom.ProjectID = projectID
 
 	// Set transformer to update annotation paths (metadata and inner resources' metadata).
-	if err := p.annotation.Config(nil, []byte(consts.AnnotationFieldSpecs)); err != nil {
-		return err
-	}
 	p.annotation.Annotations = map[string]string{ProjectAnnotationKey: projectID}
 	return nil
 }

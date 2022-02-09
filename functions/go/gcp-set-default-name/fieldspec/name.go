@@ -18,6 +18,32 @@ customMetaName:
 - path: metadata/name 
   group: spanner.cnrm.cloud.google.com
 
+- path: metadata/name
+  kind: Service
+  group: serviceusage.cnrm.cloud.google.com
+
+- path: metadata/name
+  kind: LoggingLogSink
+  group: logging.cnrm.cloud.google.com
+
+- path: metadata/name
+  kind: IAMPolicyMember
+  group: iam.cnrm.cloud.google.com
+
+- path: metadata/name
+  kind: PubSubTopic
+  group: pubsub.cnrm.cloud.google.com
+
+- path: metadata/name
+  kind: BigQueryDataset
+  group: bigquery.cnrm.cloud.google.com
+
+- path: annotations/cnrm.cloud.google.com/project-id
+  kind: SetAnnotations
+  group: fn.kpt.dev
+  version: v1alpha1
+
+
 # A fieldSpec object under customMetaName. 
 # - path: <fieldspec>
 #   group: <API Group Name> if ignored, matches all 

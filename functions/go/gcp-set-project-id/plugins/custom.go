@@ -1,7 +1,7 @@
 package plugins
 
 import (
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gcp-set-project-id/custom"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gcp-set-project-id/filter"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/yaml"
@@ -18,7 +18,7 @@ func (f *CustomFieldSpecPlugin) Config(c []byte) error {
 }
 
 func (f *CustomFieldSpecPlugin) Transform(m resmap.ResMap) error {
-	return m.ApplyFilter(custom.Filter{
+	return m.ApplyFilter(filter.ProjectFilter{
 		ProjectID: f.ProjectID,
 		FsSlice:   f.FsSlice,
 	})
