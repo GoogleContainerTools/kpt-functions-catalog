@@ -15,18 +15,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"sort"
 	"strconv"
 
-	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1"
-	opaclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
 	opatypes "github.com/open-policy-agent/frameworks/constraint/pkg/types"
-	"github.com/open-policy-agent/gatekeeper/pkg/target"
+	"github.com/open-policy-agent/gatekeeper/pkg/gator/test"
 	opautil "github.com/open-policy-agent/gatekeeper/pkg/util"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -35,98 +29,25 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-var scheme = runtime.NewScheme()
-
-// All versions (v1alpha1, v1beta1 and v1) of the ConstraintTemplate have implemented this interface.
-// We use it as suggested in https://github.com/GoogleContainerTools/kpt-functions-catalog/pull/649#discussion_r752553926.
-type versionless interface {
-	ToVersionless() (*templates.ConstraintTemplate, error)
-}
-
-func init() {
-	err := opaapis.AddToScheme(scheme)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func createClient() (*opaclient.Client, error) {
-	driver := local.New(local.Tracing(false))
-	backend, err := opaclient.NewBackend(opaclient.Driver(driver))
-	if err != nil {
-		return nil, err
-	}
-	return backend.NewClient(opaclient.Targets(&target.K8sValidationTarget{}))
-}
-
-func gatherTemplates(objects []runtime.Object) ([]*templates.ConstraintTemplate, error) {
-	var templs []*templates.ConstraintTemplate
-	for _, obj := range objects {
-		gvk := obj.GetObjectKind().GroupVersionKind()
-		if gvk.Group != v1.SchemeGroupVersion.Group || gvk.Kind != "ConstraintTemplate" {
-			continue
-		}
-		v, isVersionless := obj.(versionless)
-		if !isVersionless {
-			continue
-		}
-		template, err := v.ToVersionless()
-		if err != nil {
-			return nil, fmt.Errorf("unable to convert the ConstraintTemplate: %w", err)
-		}
-		templs = append(templs, template)
-	}
-	return templs, nil
-}
-
-func gatherConstraints(objects []runtime.Object) ([]*unstructured.Unstructured, error) {
-	var cstrs []*unstructured.Unstructured
-	for _, obj := range objects {
-		gvk := obj.GetObjectKind().GroupVersionKind()
-		if gvk.Group == "constraints.gatekeeper.sh" {
-			cstrs = append(cstrs, obj.(*unstructured.Unstructured))
-		}
-	}
-	return cstrs, nil
-}
-
 // Validate makes sure the configs passed to it comply with any Constraints and
 // Constraint Templates present in the list of configs
 func Validate(objects []runtime.Object) (*framework.Result, error) {
-	client, err := createClient()
-	if err != nil {
-		return nil, err
-	}
-	tmpls, err := gatherTemplates(objects)
-	if err != nil {
-		return nil, err
-	}
-	ctx := context.Background()
-	for _, t := range tmpls {
-		if _, err = client.AddTemplate(ctx, t); err != nil {
-			return nil, err
+	unstrucs := []*unstructured.Unstructured{}
+
+	for _, o := range objects {
+		un, ok := o.(*unstructured.Unstructured)
+		if !ok {
+			return nil, fmt.Errorf("cannot cast runtime.Object of kind %q as unstructured", o.GetObjectKind().GroupVersionKind().Kind)
 		}
-	}
-	cstrs, err := gatherConstraints(objects)
-	if err != nil {
-		return nil, err
-	}
-	for _, c := range cstrs {
-		if _, err = client.AddConstraint(ctx, c); err != nil {
-			return nil, err
-		}
+
+		unstrucs = append(unstrucs, un)
 	}
 
-	for _, obj := range objects {
-		if _, err = client.AddData(ctx, obj); err != nil {
-			return nil, err
-		}
-	}
-
-	resps, err := client.Audit(ctx)
+	resps, err := test.Test(unstrucs)
 	if err != nil {
 		return nil, err
 	}
+
 	results := resps.Results()
 	if len(results) > 0 {
 		return parseResults(results)
