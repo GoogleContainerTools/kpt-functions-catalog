@@ -38,6 +38,10 @@ field. e.g. if the name of a ` + "`" + `ConfigMap` + "`" + ` got updated and thi
 being referenced in ` + "`" + `Volumes` + "`" + ` in a ` + "`" + `Pod` + "`" + `, field ` + "`" + `spec.volumes.configMap.name` + "`" + `
 will also be updated.
 
+If there is a [` + "`" + `depends-on` + "`" + `] annotation for a resource, the name section of the
+annotation will be updated if the referenced resource is also declared in the
+package.
+
 This function can be used both declaratively and imperatively.
 
 ### FunctionConfig
