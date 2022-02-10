@@ -20,7 +20,7 @@ import (
 	"strconv"
 
 	opatypes "github.com/open-policy-agent/frameworks/constraint/pkg/types"
-	"github.com/open-policy-agent/gatekeeper/pkg/gator/test"
+	gatortest "github.com/open-policy-agent/gatekeeper/pkg/gator/test"
 	opautil "github.com/open-policy-agent/gatekeeper/pkg/util"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -43,7 +43,7 @@ func Validate(objects []runtime.Object) (*framework.Result, error) {
 		unstrucs = append(unstrucs, un)
 	}
 
-	resps, err := test.Test(unstrucs)
+	resps, err := gatortest.Test(unstrucs)
 	if err != nil {
 		return nil, err
 	}
