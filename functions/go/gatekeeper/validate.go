@@ -20,6 +20,8 @@ import (
 	"strconv"
 
 	opatypes "github.com/open-policy-agent/frameworks/constraint/pkg/types"
+	// The gatekeeper/pkg/gator/test package is the underlying libraries for
+	// the `gator test` subcommand, not a library for testing golang code.
 	gatortest "github.com/open-policy-agent/gatekeeper/pkg/gator/test"
 	opautil "github.com/open-policy-agent/gatekeeper/pkg/util"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
