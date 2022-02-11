@@ -21,6 +21,7 @@ import (
 	"os"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gatekeeper/generated"
+	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -42,6 +43,15 @@ type GatekeeperProcessor struct {
 
 	inputBuf  *bytes.Buffer
 	outputBuf *bytes.Buffer
+}
+
+var scheme = runtime.NewScheme()
+
+func init() {
+	err := opaapis.AddToScheme(scheme)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (gkp *GatekeeperProcessor) Process(resourceList *framework.ResourceList) error {
