@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20220121182312-5d06dedcafb4
-	github.com/open-policy-agent/gatekeeper v0.0.0-20220208150435-b36e85531dbe // This is v3.7.0. It has a semver major version of 2 or higher and is not a Go module yet.
+	github.com/open-policy-agent/gatekeeper v0.0.0-20220208150435-b36e85531dbe
 	github.com/spf13/cobra v1.2.1
 	k8s.io/apimachinery v0.21.9
 	sigs.k8s.io/kustomize/kyaml v0.10.21
