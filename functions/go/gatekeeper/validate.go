@@ -25,7 +25,6 @@ import (
 	gatortest "github.com/open-policy-agent/gatekeeper/pkg/gator/test"
 	opautil "github.com/open-policy-agent/gatekeeper/pkg/util"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
@@ -33,19 +32,8 @@ import (
 
 // Validate makes sure the configs passed to it comply with any Constraints and
 // Constraint Templates present in the list of configs
-func Validate(objects []runtime.Object) (*framework.Result, error) {
-	unstrucs := []*unstructured.Unstructured{}
-
-	for _, o := range objects {
-		un, ok := o.(*unstructured.Unstructured)
-		if !ok {
-			return nil, fmt.Errorf("cannot cast runtime.Object of kind %q as unstructured", o.GetObjectKind().GroupVersionKind().Kind)
-		}
-
-		unstrucs = append(unstrucs, un)
-	}
-
-	resps, err := gatortest.Test(unstrucs)
+func Validate(objects []*unstructured.Unstructured) (*framework.Result, error) {
+	resps, err := gatortest.Test(objects)
 	if err != nil {
 		return nil, err
 	}

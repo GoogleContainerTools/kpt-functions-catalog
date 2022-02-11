@@ -21,11 +21,8 @@ import (
 	"os"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gatekeeper/generated"
-	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio"
 	k8syaml "sigs.k8s.io/yaml"
@@ -45,42 +42,24 @@ type GatekeeperProcessor struct {
 	outputBuf *bytes.Buffer
 }
 
-var scheme = runtime.NewScheme()
-
-func init() {
-	err := opaapis.AddToScheme(scheme)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (gkp *GatekeeperProcessor) Process(resourceList *framework.ResourceList) error {
 	resourceList.Result = &framework.Result{
 		Name: "gatekeeper",
 	}
-	var objects []runtime.Object
+	var objects []*unstructured.Unstructured
 	for _, item := range resourceList.Items {
-		meta, err := item.GetValidatedMetadata()
-		if err != nil {
-			return err
-		}
-
 		s, err := item.String()
 		if err != nil {
 			return err
 		}
-		obj, err := scheme.New(schema.FromAPIVersionAndKind(meta.APIVersion, meta.Kind))
-		switch {
-		case runtime.IsNotRegisteredError(err):
-			obj = &unstructured.Unstructured{}
-		case err != nil:
-			return err
-		}
-		err = k8syaml.Unmarshal([]byte(s), obj)
+
+		un := &unstructured.Unstructured{}
+		err = k8syaml.Unmarshal([]byte(s), un)
 		if err != nil {
 			return err
 		}
-		objects = append(objects, obj)
+
+		objects = append(objects, un)
 	}
 
 	result, err := Validate(objects)
