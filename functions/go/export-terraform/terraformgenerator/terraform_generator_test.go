@@ -17,6 +17,7 @@ package terraformgenerator
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
 	"testing"
 
@@ -29,17 +30,25 @@ const testDir = "testdata"
 
 type TerraformTest struct {
 	Name string
+	Mode string
 }
 
 var testCases = []TerraformTest{
 	{
 		Name: "team",
+		Mode: "yaml",
 	},
 	{
 		Name: "empty",
+		Mode: "yaml",
 	},
 	{
 		Name: "other_resources",
+		Mode: "yaml",
+	},
+	{
+		Name: "iam",
+		Mode: "terraform",
 	},
 }
 
@@ -48,25 +57,52 @@ func TestTerraformGeneration(t *testing.T) {
 		t.Run(tt.Name, func(t *testing.T) {
 			require := require.New(t)
 			inDir := path.Join("..", testDir, tt.Name, "input")
-			outDir := path.Join("..", testDir, tt.Name, "output")
 
 			actualRL, err := testutil.ResourceListFromDirectory(inDir, "")
 			require.NoError(err)
+			var expectedRL *sdk.ResourceList
 
-			expectedRL, err := testutil.ResourceListFromDirectory(outDir, "")
-			require.NoError(err)
+			if tt.Mode == "terraform" {
+				outDir := path.Join("..", testDir, tt.Name, "tf")
+				expectedTerraformMap, err := getTerraformFromDir(outDir)
+				require.NoError(err)
 
-			// append input items to output
-			expectedRL.Items = append(expectedRL.Items, actualRL.Items...)
+				// build our output list from input
+				tempRL, err := testutil.ResourceListFromDirectory(inDir, "")
+				require.NoError(err)
+				tempRL.UpsertObjectToItems(makeConfigMap(expectedTerraformMap), nil, false)
+
+				// round-trip to disk to make sure all annotations are consistent
+				tmpDir, err := ioutil.TempDir("", "export-terraform-test-*")
+				defer os.RemoveAll(tmpDir)
+				require.NoError(err)
+				err = testutil.ResourceListToDirectory(tempRL, tmpDir)
+				require.NoError(err)
+
+				// gather final resource list from disk
+				expectedRL, err = testutil.ResourceListFromDirectory(tmpDir, "")
+				require.NoError(err)
+			} else {
+				outDir := path.Join("..", testDir, tt.Name, "output")
+				expectedRL, err = testutil.ResourceListFromDirectory(outDir, "")
+				require.NoError(err)
+
+				// append input items to output
+				expectedRL.Items = append(expectedRL.Items, actualRL.Items...)
+			}
 
 			err = Processor(actualRL)
 			require.NoError(err)
 
-			actualTerraform, err := findTerraform(actualRL)
-			require.NoError(err)
 			expectedTerraform, err := findTerraform(expectedRL)
 			require.NoError(err)
-			require.EqualValues(fmt.Sprint(expectedTerraform), fmt.Sprint(actualTerraform))
+			actualTerraform, err := findTerraform(actualRL)
+			require.NoError(err)
+			require.Lenf(actualTerraform, len(expectedTerraform), "Generated Terraform doesn't have required keys")
+			for key, expectedString := range expectedTerraform {
+				actualString := actualTerraform[key]
+				require.Equalf(expectedString, actualString, "Terraform config for %s must match", key)
+			}
 
 			// We convert the output ResourceList to individual resource files in the
 			// file system first.
@@ -97,6 +133,24 @@ func TestTerraformGeneration(t *testing.T) {
 			require.YAMLEqf(string(expectedYAML), string(tmpDirYAML), "output yaml doesn't match")
 		})
 	}
+}
+
+func getTerraformFromDir(sourceDir string) (map[string]string, error) {
+	files, err := ioutil.ReadDir(sourceDir)
+	if err != nil {
+		return nil, err
+	}
+
+	data := make(map[string]string)
+	for _, file := range files {
+		contents, err := os.ReadFile(path.Join(sourceDir, file.Name()))
+		if err != nil {
+			return nil, err
+		}
+		data[file.Name()] = string(contents)
+	}
+
+	return data, nil
 }
 
 func findTerraform(rl *sdk.ResourceList) (map[string]string, error) {

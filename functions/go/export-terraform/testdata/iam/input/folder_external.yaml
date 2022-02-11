@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,18 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-apiVersion: v1
-kind: ConfigMap
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
 metadata:
-  name: terraform
-  annotations:
-    config.kubernetes.io/local-config: "true"
-    blueprints.cloud.google.com/syntax: "hcl"
-    blueprints.cloud.google.com/flavor: "terraform"
-data:
-  folders.tf: |+
-    resource "google_folder" "test" {
-      display_name = "Test Display"
-      parent       = "organizations/123456789012"
-    }
+  name: external-viewer
+  namespace: config-control
+spec:
+  resourceRef:
+    apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+    kind: Folder
+    external: "335620346181"
+  role: roles/viewer
+  member: group:gcp-developers@example.com

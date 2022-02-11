@@ -61,4 +61,3 @@ data:
       display_name = "retail.qa"
       parent       = google_folder.retail.name
     }
-

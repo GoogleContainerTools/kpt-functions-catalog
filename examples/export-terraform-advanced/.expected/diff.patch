@@ -1,0 +1,22 @@
+diff --git a/configmap_terraform.yaml b/configmap_terraform.yaml
+new file mode 100644
+index 0000000..92f809c
+--- /dev/null
++++ b/configmap_terraform.yaml
+@@ -0,0 +1,16 @@
++apiVersion: v1
++kind: ConfigMap
++metadata:
++  name: terraform
++  annotations:
++    blueprints.cloud.google.com/flavor: terraform
++    blueprints.cloud.google.com/syntax: hcl
++    config.kubernetes.io/local-config: "true"
++    internal.config.kubernetes.io/path: terraform.yaml
++data:
++  folders.tf: |
++    resource "google_folder" "test" {
++      display_name = "Test Display"
++      parent       = "organizations/11111111111"
++    }
++  iam.tf: "module \"organization-iam\" {\n  source  = \"terraform-google-modules/iam/google//modules/organizations_iam\"\n  version = \"~> 7.4\"\n\n  organizations = [\"11111111111\"]\n\n  bindings = {\n    \n    \"roles/editor\" = [\n      \"group:gcp-organization-admins@example.com\",\n      \"group:gcp-developers@example.com\",\n    ]\n    \n    \"roles/orgpolicy.policyAdmin\" = [\n      \"group:gcp-organization-admins@example.com\",\n    ]\n    \n  }\n}\n\n\nmodule \"folder-1-iam\" {\n  source  = \"terraform-google-modules/iam/google//modules/folders_iam\"\n  version = \"~> 7.4\"\n\n  folders = [\"folders/335620346181\"]\n\n  bindings = {\n    \n    \"roles/viewer\" = [\n      \"group:gcp-developers@example.com\",\n    ]\n    \n  }\n}\n\n\nmodule \"test-iam\" {\n  source  = \"terraform-google-modules/iam/google//modules/folders_iam\"\n  version = \"~> 7.4\"\n\n  folders = [google_folder.test.name]\n\n  bindings = {\n    \n    \"roles/viewer\" = [\n      \"group:gcp-developers@example.com\",\n    ]\n    \n  }\n}\n"

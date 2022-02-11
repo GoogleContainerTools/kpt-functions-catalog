@@ -29,7 +29,7 @@ var templates embed.FS
 
 func Processor(rl *sdk.ResourceList) error {
 	var resources terraformResources
-	supportedKinds := map[string]bool{"Folder": true, "Organization": true}
+	supportedKinds := map[string]bool{"Folder": true, "Organization": true, "IAMPolicyMember": true}
 
 	for _, item := range rl.Items {
 		if !strings.Contains(item.APIVersion(), "cnrm.cloud.google.com") {
@@ -40,16 +40,10 @@ func Processor(rl *sdk.ResourceList) error {
 			continue
 		}
 
-		myRef := resources.getResourceRef(item.Kind(), strings.TrimSpace(item.Name()), item)
-
-		parentRefKind, parentRefName, err := getParentRef(item)
+		_, err := resources.getResourceRef(item.Kind(), strings.TrimSpace(item.Name()), item)
 		if err != nil {
 			return err
 		}
-		parentRef := resources.getResourceRef(parentRefKind, parentRefName, nil)
-		parentRef.Children = append(parentRef.Children, myRef)
-		myRef.isChild = true
-		myRef.Parent = parentRef
 	}
 
 	data, err := resources.getHCL()
@@ -57,6 +51,12 @@ func Processor(rl *sdk.ResourceList) error {
 		return err
 	}
 
+	configMap := makeConfigMap(data)
+
+	return rl.UpsertObjectToItems(configMap, nil, false)
+}
+
+func makeConfigMap(data map[string]string) interface{} {
 	configMap := corev1.ConfigMap{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ConfigMap",
@@ -73,6 +73,5 @@ func Processor(rl *sdk.ResourceList) error {
 		},
 		Data: data,
 	}
-
-	return rl.UpsertObjectToItems(configMap, nil, false)
+	return configMap
 }
