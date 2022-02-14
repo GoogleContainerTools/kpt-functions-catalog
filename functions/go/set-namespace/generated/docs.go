@@ -33,7 +33,10 @@ target the namespace. There are a few cases that worth pointing out:
   update the namespace in the ` + "`" + `ServiceAccount` + "`" + ` if one of the following are true:
   1) the subject element ` + "`" + `name` + "`" + ` is ` + "`" + `default` + "`" + `.
   2) the subject element ` + "`" + `name` + "`" + ` matches the name of a ` + "`" + `ServiceAccount` + "`" + ` resource declared in the package.
-  
+- If there is a [` + "`" + `depends-on` + "`" + `] annotation for a namespaced resource, the namespace
+  section of the annotation will be updated if the referenced resource is also
+  declared in the package.
+
 In the following example, the ` + "`" + `set-namespace` + "`" + ` function will update:
 - ` + "`" + `subjects[0].namespace` + "`" + ` since ` + "`" + `subjects[0].name` + "`" + ` is ` + "`" + `default` + "`" + `.
 - ` + "`" + `subjects[1].namespace` + "`" + ` since ` + "`" + `subjects[1].name` + "`" + ` matches a ` + "`" + `ServiceAccount` + "`" + `
@@ -42,23 +45,27 @@ In the following example, the ` + "`" + `set-namespace` + "`" + ` function will 
   apiVersion: v1
   kind: ServiceAccount
   metadata:
-    name: service-account
-    namespace: original-namespace
+    name: sa
+    namespace: ns
+    annotations:
+      config.kubernetes.io/depends-on: /namespaces/ns/ServiceAccount/foo # <= this will NOT be updated (resource not declared)
   ---
   kind: RoleBinding
   apiVersion: rbac.authorization.k8s.io/v1
   metadata:
     ...
+    annotations:
+      config.kubernetes.io/depends-on: /namespaces/ns/ServiceAccount/sa # <== this will be updated (resource declared)
   subjects:
     - kind: ServiceAccount
       name: default # <================== name default is used
-      namespace: original-namespace # <== this will be updated
+      namespace: ns # <================== this will be updated
     - kind: ServiceAccount
-      name: service-account # <========== name matches above ServiceAccount
-      namespace: original-namespace # <== this will be updated
+      name: sa # <======================= name matches above ServiceAccount
+      namespace: ns # <================== this will be updated
     - kind: ServiceAccount
-      name: other-service-account # <==== this will NOT be updated
-      namespace: original-namespace
+      name: other-service-account # <==== name does not match any included resource
+      namespace: ns # <================== this will NOT be updated
   roleRef:
     kind: Role
     name: confluent-operator
