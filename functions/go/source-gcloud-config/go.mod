@@ -3,7 +3,7 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source
 go 1.17
 
 require (
-	github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels v0.0.0-20220214234333-6ced329ae456
+	gopkg.in/ini.v1 v1.66.4
 	sigs.k8s.io/kustomize/kyaml v0.13.3
 	sigs.k8s.io/yaml v1.3.0
 )
@@ -13,7 +13,6 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-errors/errors v1.0.1 // indirect
-	github.com/go-gcfg/gcfg v1.2.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.3 // indirect
 	github.com/go-openapi/jsonreference v0.19.3 // indirect
 	github.com/go-openapi/swag v0.19.5 // indirect
@@ -28,9 +27,6 @@ require (
 	github.com/xlab/treeprint v0.0.0-20181112141820-a009c3971eca // indirect
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
 	golang.org/x/text v0.3.5 // indirect
-	gopkg.in/gcfg.v1 v1.2.3 // indirect
-	gopkg.in/ini.v1 v1.66.4 // indirect
-	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e // indirect

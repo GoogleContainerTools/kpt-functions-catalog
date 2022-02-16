@@ -15,10 +15,10 @@ package exec
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"os/exec"
 	"regexp"
-	"strings"
 
 	"gopkg.in/ini.v1"
 )
@@ -93,12 +93,17 @@ func ListGcloudConfig() (string, error) {
 	return cmdOut.String(), nil
 }
 
+type Ancestor struct {
+	ID           string `json:"id,omitempty" yaml:"id,omitempty"`
+	ResourceType string `json:"type,omitempty" yaml:"type,omitempty"`
+}
+
 // getGcloudOrgID queries cloud server to get the `Organization ID`.
 func getGcloudOrgID(projectID string) (string, error) {
-	var buf, err, out bytes.Buffer
+	var err, out bytes.Buffer
 	cmdListAncestors := exec.Command("gcloud", "projects", "get-ancestors",
-		projectID, "--format=get(id)")
-	cmdListAncestors.Stdout = &buf
+		projectID, "--format=json")
+	cmdListAncestors.Stdout = &out
 	cmdListAncestors.Stderr = &err
 	if e := cmdListAncestors.Run(); e != nil {
 		return "", e
@@ -106,16 +111,16 @@ func getGcloudOrgID(projectID string) (string, error) {
 	if err.Len() > 0 {
 		return "", fmt.Errorf(err.String())
 	}
-	cmdOrgID := exec.Command("tail", "-1")
-	cmdOrgID.Stdin = &buf
-	cmdListAncestors.Stderr = &err
-	cmdOrgID.Stdout = &out
-	if e := cmdOrgID.Run(); e != nil {
-		return "", e
+
+	var rh []Ancestor
+	if err := json.Unmarshal(out.Bytes(), &rh); err != nil {
+		return "", err
 	}
-	if err.Len() > 0 {
-		return "", fmt.Errorf(err.String())
+	// A Google Resource Hierarchy can only have one Org and may have multiple folders.
+	for _, a := range rh {
+		if a.ResourceType == "organization" {
+			return a.ID, nil
+		}
 	}
-	raw := out.String()
-	return strings.TrimSpace(raw), nil
+	return "", nil
 }

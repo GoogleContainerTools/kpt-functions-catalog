@@ -18,6 +18,7 @@ import (
 	"os"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/generated"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/generator"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 )
@@ -26,7 +27,7 @@ type Processor struct{}
 
 func (p *Processor) Process(resourceList *framework.ResourceList) error {
 	err := func() error {
-		gen := &GcloudConfigGenerator{}
+		gen := generator.NewGcloudConfigGenerator()
 		updated, err := gen.Generate(resourceList.Items)
 		if err != nil {
 			return err

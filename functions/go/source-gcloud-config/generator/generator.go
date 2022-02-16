@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package main
+package generator
 
 import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/exec"
@@ -24,6 +24,10 @@ import (
 const GcloudMetaName = "gcloud-config.kpt.dev"
 
 var LocalConfigAnnos = map[string]string{filters.LocalConfigAnnotation: "true"}
+
+func NewGcloudConfigGenerator() *GcloudConfigGenerator {
+	return &GcloudConfigGenerator{}
+}
 
 // GcloudConfigGenerator is the generator function to generate a GcloudConfig resource.
 type GcloudConfigGenerator struct{}
