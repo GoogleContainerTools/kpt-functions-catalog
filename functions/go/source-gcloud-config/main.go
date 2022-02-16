@@ -17,38 +17,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/gcloudconfig"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/generated"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/generator"
-	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 )
 
-type Processor struct{}
-
-func (p *Processor) Process(resourceList *framework.ResourceList) error {
-	err := func() error {
-		gen := generator.NewGcloudConfigGenerator()
-		updated, err := gen.Generate(resourceList.Items)
-		if err != nil {
-			return err
-		}
-		resourceList.Items = updated
-		return nil
-	}()
-	if err != nil {
-		resourceList.Results = framework.Results{
-			&framework.Result{
-				Message:  err.Error(),
-				Severity: framework.Error,
-			},
-		}
-		return resourceList.Results
-	}
-	return nil
-}
-
 func main() {
-	cmd := command.Build(&Processor{}, command.StandaloneEnabled, false)
+	cmd := command.Build(gcloudconfig.NewProcessor(), command.StandaloneEnabled, false)
 	cmd.Short = generated.SourceGcloudConfigShort
 	cmd.Long = generated.SourceGcloudConfigLong
 	if err := cmd.Execute(); err != nil {
