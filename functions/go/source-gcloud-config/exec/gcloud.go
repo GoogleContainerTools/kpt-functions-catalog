@@ -83,12 +83,13 @@ func GetGcloudContext() (map[string]string, error) {
 
 // ListGcloudConfig runs `gcloud config list` to read local default gcloud configuration.
 func ListGcloudConfig() (string, error) {
-	var cmdOut bytes.Buffer
+	var cmdOut, cmdErr bytes.Buffer
 	cmd := exec.Command("gcloud", "config", "list")
 	cmd.Stdout = &cmdOut
+	cmd.Stderr = &cmdErr
 	err := cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("unable to run `gcloud config list` %v", err.Error())
+		return "", fmt.Errorf("unable to run `gcloud config list` %v", cmdErr.String())
 	}
 	return cmdOut.String(), nil
 }
@@ -106,7 +107,7 @@ func getGcloudOrgID(projectID string) (string, error) {
 	cmdListAncestors.Stdout = &out
 	cmdListAncestors.Stderr = &err
 	if e := cmdListAncestors.Run(); e != nil {
-		return "", e
+		return "", fmt.Errorf(err.String())
 	}
 	if err.Len() > 0 {
 		return "", fmt.Errorf(err.String())

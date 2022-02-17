@@ -38,9 +38,9 @@ func (g *GcloudConfigGenerator) Generate(nodes []*yaml.RNode) ([]*yaml.RNode, er
 	if err != nil {
 		return nil, err
 	}
+	gcloudGvk := resid.GvkFromNode(gcloudNode)
 	var newNodes []*yaml.RNode
 	for _, curNode := range nodes {
-		gcloudGvk := resid.GvkFromNode(gcloudNode)
 		curNodeGvk := resid.GvkFromNode(curNode)
 		if curNode.GetName() == gcloudNode.GetName() && curNodeGvk.Equals(gcloudGvk) {
 			continue

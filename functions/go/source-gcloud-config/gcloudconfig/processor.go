@@ -56,6 +56,7 @@ func (p *Processor) Process(resourceList *framework.ResourceList) error {
 		}
 		return resourceList.Results
 	}
+
 	// Notify users the gcloud context is stored in `gcloud-config.yaml`.
 	resourceList.Results = append(resourceList.Results, &framework.Result{
 		Message:  "store gcloud context",
