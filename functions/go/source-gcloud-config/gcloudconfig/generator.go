@@ -16,6 +16,7 @@ package gcloudconfig
 import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/exec"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
+	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/resid"
 
 	"sigs.k8s.io/kustomize/kyaml/yaml"
@@ -40,14 +41,20 @@ func (g *GcloudConfigGenerator) Generate(nodes []*yaml.RNode) ([]*yaml.RNode, er
 	}
 	gcloudGvk := resid.GvkFromNode(gcloudNode)
 	var newNodes []*yaml.RNode
+	exist := false
 	for _, curNode := range nodes {
 		curNodeGvk := resid.GvkFromNode(curNode)
 		if curNode.GetName() == gcloudNode.GetName() && curNodeGvk.Equals(gcloudGvk) {
-			continue
+			curNode.SetDataMap(gcloudNode.GetDataMap())
+			if path, ok := curNode.GetAnnotations()[kioutil.PathAnnotation]; ok && path == ResultFile {
+				exist = true
+			}
 		}
 		newNodes = append(newNodes, curNode)
 	}
-	newNodes = append(newNodes, gcloudNode)
+	if !exist {
+		newNodes = append(newNodes, gcloudNode)
+	}
 	return newNodes, nil
 }
 
