@@ -1,7 +1,6 @@
 package custom
 
 import (
-	"fmt"
 	"regexp"
 
 	"sigs.k8s.io/kustomize/api/filters/fieldspec"
@@ -43,7 +42,7 @@ func (f Filter) updateProjectIDFn(regexPath string) filtersutil.SetFn {
 		defer func() {
 			// recover from regex panic.
 			if recover() != nil {
-				err = fmt.Errorf("invalid regex pattern %v", regexPath)
+				// err = fmt.Errorf("invalid regex pattern %v", regexPath)
 			}
 		}()
 		re := regexp.MustCompile(regexPath)
@@ -54,7 +53,14 @@ func (f Filter) updateProjectIDFn(regexPath string) filtersutil.SetFn {
 				namedGroup[name] = match[i]
 			}
 		}
-		newProjectID := namedGroup["prefix"] + f.ProjectID + namedGroup["suffix"]
+		newProjectID := ""
+		if prefix, ok := namedGroup["prefix"]; ok {
+			newProjectID = newProjectID + prefix
+		}
+		newProjectID = newProjectID + f.ProjectID
+		if suffix, ok := namedGroup["suffix"]; ok {
+			newProjectID = newProjectID + suffix
+		}
 		return node.PipeE(updater{ProjectID: newProjectID})
 	}
 }

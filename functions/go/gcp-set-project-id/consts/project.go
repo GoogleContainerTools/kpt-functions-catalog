@@ -21,6 +21,18 @@ projectFieldSpec:
   group: gkehub.cnrm.cloud.google.com
   version: v1beta1
   kind: GKEHubFeatureMembership
+
+- path: spec/googleServiceAccount
+  regexPattern: (?P<prefix>\S+@)(?P<projectID>\S+)(?P<suffix>\.iam\.gserviceaccount\.com)
+  group: core.cnrm.cloud.google.com
+  version: v1beta1
+  kind: ConfigConnectorContext
+
+- path: spec/member
+  regexPattern: (?P<prefix>serviceAccount:\S+\.svc\.id\.goog\[cnrm-system\/cnrm-controller-manager-)(?P<projectID>\S+)(?P<suffix>\])
+  group: iam.cnrm.cloud.google.com
+  version: v1beta1
+  kind: IAMPolicyMember
 `
 
 /*
