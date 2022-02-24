@@ -14,6 +14,8 @@
 package gcloudconfig
 
 import (
+	"errors"
+
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/exec"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
@@ -32,8 +34,11 @@ type GcloudConfigGenerator struct{}
 // Generate executes `gcloud` commands to create a GcloudConfig RNode.
 func (g *GcloudConfigGenerator) Generate(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	gcloudData, err := exec.GetGcloudContextFn()
+	var gcloudErr *exec.GcloudErr
 	if err != nil {
-		return nil, err
+		if !errors.As(err, &gcloudErr) {
+			return nil, err
+		}
 	}
 	gcloudNode, err := NewGcloudConfigNode(gcloudData)
 	if err != nil {
@@ -55,7 +60,10 @@ func (g *GcloudConfigGenerator) Generate(nodes []*yaml.RNode) ([]*yaml.RNode, er
 	if !exist {
 		newNodes = append(newNodes, gcloudNode)
 	}
-	return newNodes, nil
+	if gcloudErr == nil {
+		return newNodes, nil
+	}
+	return newNodes, gcloudErr
 }
 
 // NewGcloudConfigNode creates a `GcloudConfig` RNode resource.

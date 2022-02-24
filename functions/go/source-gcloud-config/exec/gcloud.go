@@ -28,6 +28,18 @@ var domainRegex = regexp.MustCompile(`\S+@(\S+)`)
 // For testing
 var GetGcloudContextFn = GetGcloudContext
 
+func NewGcloudErr(ServerMsg string) *GcloudErr {
+	return &GcloudErr{ServerMsg}
+}
+
+type GcloudErr struct {
+	Msg string
+}
+
+func (g *GcloudErr) Error() string {
+	return g.Msg
+}
+
 // GetGcloudContext executes `gcloud` commands to get default gcloud config value.
 func GetGcloudContext() (map[string]string, error) {
 	var projectID, zone, region, account, domain, orgID string
@@ -55,11 +67,9 @@ func GetGcloudContext() (map[string]string, error) {
 	}
 
 	// Query cloud server to get the OrganizationID which the project ID belongs to.
+	var gcloudErr error
 	if projectID != "" {
-		orgID, err = getGcloudOrgID(projectID)
-		if err != nil {
-			return nil, err
-		}
+		orgID, gcloudErr = getGcloudOrgID(projectID)
 	}
 	if account != "" {
 		// e.g. account `NAME@COMPANY.com` has matching domain `COMPANY.com`
@@ -70,15 +80,22 @@ func GetGcloudContext() (map[string]string, error) {
 			domain = matches[1]
 		}
 	}
-	return map[string]string{
+	data := map[string]string{
 		"namespace": projectID,
 		"projectID": projectID,
 		"zone":      zone,
 		"region":    region,
 		"domain":    domain,
 		"orgID":     orgID,
-	}, nil
-
+	}
+	if gcloudErr != nil {
+		// A common error in getting gcloud config is forgetting to run `gcloud auth login`. We surface the error and its
+		// instructions to users. This won't cause function failure so the function can concatenate with other functions
+		// and run as a pipeline.
+		// Users can rerun this function to update the OrgID once they get the authentication.
+		return data, gcloudErr
+	}
+	return data, nil
 }
 
 // ListGcloudConfig runs `gcloud config list` to read local default gcloud configuration.
@@ -89,7 +106,7 @@ func ListGcloudConfig() (string, error) {
 	cmd.Stderr = &cmdErr
 	err := cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("unable to run `gcloud config list` %v", cmdErr.String())
+		return "", NewGcloudErr(fmt.Sprintf("unable to run `gcloud config list` %v", cmdErr.String()))
 	}
 	return cmdOut.String(), nil
 }
@@ -107,10 +124,10 @@ func getGcloudOrgID(projectID string) (string, error) {
 	cmdListAncestors.Stdout = &out
 	cmdListAncestors.Stderr = &err
 	if e := cmdListAncestors.Run(); e != nil {
-		return "", fmt.Errorf(err.String())
+		return "", NewGcloudErr(fmt.Sprintf("`orgID` is not set: %v", err.String()))
 	}
 	if err.Len() > 0 {
-		return "", fmt.Errorf(err.String())
+		return "", NewGcloudErr(fmt.Sprintf("`orgID` is not set: %v", err.String()))
 	}
 
 	var rh []Ancestor

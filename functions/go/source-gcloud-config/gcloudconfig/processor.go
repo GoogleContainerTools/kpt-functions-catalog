@@ -14,6 +14,10 @@
 package gcloudconfig
 
 import (
+	"errors"
+	"fmt"
+
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator/exec"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 )
@@ -27,16 +31,20 @@ func NewProcessor() *Processor {
 type Processor struct{}
 
 func (p *Processor) Process(resourceList *framework.ResourceList) error {
-	err := func() error {
-		gen := &GcloudConfigGenerator{}
-		updated, err := gen.Generate(resourceList.Items)
-		if err != nil {
-			return err
-		}
+	gen := &GcloudConfigGenerator{}
+	updated, err := gen.Generate(resourceList.Items)
+	var gcloudErr *exec.GcloudErr
+	switch {
+	case err == nil:
 		resourceList.Items = updated
-		return nil
-	}()
-	if err != nil {
+	case errors.As(err, &gcloudErr):
+		resourceList.Items = updated
+		resourceList.Results = append(resourceList.Results,
+			&framework.Result{
+				Message:  err.Error(),
+				Severity: framework.Warning,
+			})
+	default:
 		resourceList.Results = framework.Results{
 			&framework.Result{
 				Message:  err.Error(),
@@ -59,7 +67,7 @@ func (p *Processor) Process(resourceList *framework.ResourceList) error {
 
 	// Notify users the gcloud context is stored in `gcloud-config.yaml`.
 	resourceList.Results = append(resourceList.Results, &framework.Result{
-		Message:  "store gcloud context",
+		Message:  fmt.Sprintf("store gcloud context in %v", ResultFile),
 		Severity: framework.Info,
 		File:     &framework.File{Path: ResultFile, Index: 0},
 	})
