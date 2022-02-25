@@ -37,6 +37,7 @@ FUNCTIONS := \
 	set-labels \
 	set-namespace \
 	set-project-id \
+	source-gcloud-config \
 	starlark \
 	upsert-resource
 
