@@ -44,7 +44,15 @@ func (rs *terraformResources) getHCL() (map[string]string, error) {
 
 	data := make(map[string]string)
 	for _, file := range files {
-		err := addFile(tmpl, file, groupedResources, data)
+		err := addFile(tmpl, file.name, groupedResources, data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// only add versions.tf if other files exist
+	if len(data) > 0 {
+		err = addFile(tmpl, "versions.tf", rs, data)
 		if err != nil {
 			return nil, err
 		}
@@ -53,13 +61,13 @@ func (rs *terraformResources) getHCL() (map[string]string, error) {
 	return data, nil
 }
 
-func addFile(tmpl *template.Template, file *TerraformFile, groupedResources map[string][]*terraformResource, data map[string]string) error {
+func addFile(tmpl *template.Template, name string, inputData interface{}, data map[string]string) error {
 	builder := strings.Builder{}
 	wr := &(builder)
 
-	err := tmpl.ExecuteTemplate(wr, file.name, groupedResources)
+	err := tmpl.ExecuteTemplate(wr, name, inputData)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	content := strings.TrimSpace(builder.String())
@@ -69,7 +77,7 @@ func addFile(tmpl *template.Template, file *TerraformFile, groupedResources map[
 	}
 
 	content = content + "\n"
-	data[file.name] = content
+	data[name] = content
 
 	return nil
 }

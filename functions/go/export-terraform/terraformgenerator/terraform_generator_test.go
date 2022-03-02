@@ -71,7 +71,8 @@ func TestTerraformGeneration(t *testing.T) {
 				// build our output list from input
 				tempRL, err := testutil.ResourceListFromDirectory(inDir, "")
 				require.NoError(err)
-				tempRL.UpsertObjectToItems(makeConfigMap(expectedTerraformMap), nil, false)
+				err = tempRL.UpsertObjectToItems(makeConfigMap(expectedTerraformMap), nil, false)
+				require.NoError(err)
 
 				// round-trip to disk to make sure all annotations are consistent
 				tmpDir, err := ioutil.TempDir("", "export-terraform-test-*")

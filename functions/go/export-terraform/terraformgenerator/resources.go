@@ -28,6 +28,10 @@ type terraformResources struct {
 	grouped   map[string][]*terraformResource
 }
 
+func (rs *terraformResources) GetVersion() string {
+	return "0.1.0"
+}
+
 func (rs *terraformResources) getResourceRef(kind string, name string, item *sdk.KubeObject) (*terraformResource, error) {
 	if rs.resources == nil {
 		rs.resources = map[string]*terraformResource{}
