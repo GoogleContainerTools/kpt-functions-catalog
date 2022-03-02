@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"testing"
 
 	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
@@ -136,18 +137,19 @@ func TestTerraformGeneration(t *testing.T) {
 }
 
 func getTerraformFromDir(sourceDir string) (map[string]string, error) {
-	files, err := ioutil.ReadDir(sourceDir)
+	files, err := filepath.Glob(path.Join(sourceDir, "*.tf"))
 	if err != nil {
 		return nil, err
 	}
 
 	data := make(map[string]string)
 	for _, file := range files {
-		contents, err := os.ReadFile(path.Join(sourceDir, file.Name()))
+		name := filepath.Base(file)
+		contents, err := os.ReadFile(path.Join(sourceDir, name))
 		if err != nil {
 			return nil, err
 		}
-		data[file.Name()] = string(contents)
+		data[name] = string(contents)
 	}
 
 	return data, nil

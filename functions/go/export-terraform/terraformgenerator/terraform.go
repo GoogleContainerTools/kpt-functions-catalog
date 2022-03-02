@@ -20,27 +20,20 @@ import (
 )
 
 type TerraformFile struct {
-	name     string
-	contents strings.Builder
+	name string
 }
 
 func (rs *terraformResources) getHCL() (map[string]string, error) {
 	files := []*TerraformFile{
 		{
-			name:     "folders.tf",
-			contents: strings.Builder{},
+			name: "folders.tf",
 		},
 		{
-			name:     "iam.tf",
-			contents: strings.Builder{},
+			name: "iam.tf",
 		},
 	}
 
-	tmpl, err := template.New("").Funcs(template.FuncMap{
-		// "displayName":  getDisplayName,
-		// "resourceName": getResourceName,
-		// "reference":    getTerraformId,
-	}).ParseFS(templates, "templates/*")
+	tmpl, err := template.New("").ParseFS(templates, "templates/*")
 	if err != nil {
 		return nil, err
 	}
@@ -51,20 +44,32 @@ func (rs *terraformResources) getHCL() (map[string]string, error) {
 
 	data := make(map[string]string)
 	for _, file := range files {
-		wr := &(file.contents)
-		err := tmpl.ExecuteTemplate(wr, file.name, groupedResources)
+		err := addFile(tmpl, file, groupedResources, data)
 		if err != nil {
 			return nil, err
 		}
-
-		content := strings.TrimSpace(file.contents.String())
-
-		if len(content) < 1 {
-			continue
-		}
-
-		data[file.name] = content + "\n"
 	}
 
 	return data, nil
+}
+
+func addFile(tmpl *template.Template, file *TerraformFile, groupedResources map[string][]*terraformResource, data map[string]string) error {
+	builder := strings.Builder{}
+	wr := &(builder)
+
+	err := tmpl.ExecuteTemplate(wr, file.name, groupedResources)
+	if err != nil {
+		return nil
+	}
+
+	content := strings.TrimSpace(builder.String())
+
+	if len(content) < 1 {
+		return nil
+	}
+
+	content = content + "\n"
+	data[file.name] = content
+
+	return nil
 }
