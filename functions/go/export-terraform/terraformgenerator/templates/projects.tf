@@ -4,9 +4,9 @@ module "{{ $project.GetResourceName }}" {
   version = "~> 12.0"
 
   name       = "{{ $project.GetDisplayName }}"{{ if ne $project.GetDisplayName $project.GetResourceName }}
-  project_id = "{{ $project.GetResourceName }}"{{end}}{{if eq $project.Parent.Kind "Folder"}}
-  folder_id = {{ $project.Parent.GetTerraformId false }}{{end}}{{if eq $project.Parent.Kind "Organization"}}
-  org_id = {{ $project.Parent.GetTerraformId false }}{{end}}
+  project_id = "{{ $project.GetResourceName }}"{{end}}
+  org_id     = {{ $project.GetOrganization.GetTerraformId false }}{{if eq $project.Parent.Kind "Folder"}}
+  folder_id  = {{ $project.Parent.GetTerraformId false }}{{end}}
 
   billing_account = "{{ $project.GetStringFromObject "spec" "billingAccountRef" "external" }}"{{if $project.GetBool "metadata" "annotations" "cnrm.cloud.google.com/auto-create-network"}}
   auto_create_network = true{{end}}

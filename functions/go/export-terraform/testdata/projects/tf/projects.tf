@@ -3,7 +3,8 @@ module "project-in-external" {
   version = "~> 12.0"
 
   name       = "project-in-external"
-  folder_id = "335620346181"
+  org_id     = var.org_id
+  folder_id  = "335620346181"
 
   billing_account = "AAAAAA-AAAAAA-AAAAAA"
 }
@@ -14,7 +15,8 @@ module "project-in-folder" {
 
   name       = "project-name"
   project_id = "project-in-folder"
-  folder_id = google_folder.test.name
+  org_id     = var.org_id
+  folder_id  = google_folder.test.name
 
   billing_account = "AAAAAA-AAAAAA-AAAAAA"
 }
@@ -24,7 +26,7 @@ module "project-in-org" {
   version = "~> 12.0"
 
   name       = "project-in-org"
-  org_id = var.org_id
+  org_id     = var.org_id
 
   billing_account = "AAAAAA-AAAAAA-AAAAAA"
   auto_create_network = true

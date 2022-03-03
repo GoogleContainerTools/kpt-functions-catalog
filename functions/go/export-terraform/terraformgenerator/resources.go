@@ -135,6 +135,20 @@ func (resource *terraformResource) GetStringFromObject(path ...string) string {
 	return ref
 }
 
+// Return if the resource itself should be created
+func (resource *terraformResource) GetOrganization() *terraformResource {
+	if resource.Parent.Kind == "Organization" {
+		return resource.Parent
+	}
+	orgs := resource.resources.getGrouped()["Organization"]
+	if len(orgs) < 1 {
+		sdk.Logf("Failed to fetch organization for %s/%s", resource.Kind, resource.Name)
+		return nil
+	}
+
+	return orgs[0]
+}
+
 func (resource *terraformResource) getParentRef(path ...string) (string, string, error) {
 	paths := [][]string{
 		{"Folder", "spec", "folderRef", "name"},
