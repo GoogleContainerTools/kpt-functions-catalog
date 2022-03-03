@@ -24,7 +24,7 @@ data:
   folders.tf: |+
     resource "google_folder" "finance" {
       display_name = "finance"
-      parent       = "organizations/123456789012"
+      parent       = "organizations/${var.org_id}"
     }
 
     resource "google_folder" "finance-dev" {
@@ -44,7 +44,7 @@ data:
 
     resource "google_folder" "retail" {
       display_name = "retail"
-      parent       = "organizations/123456789012"
+      parent       = "organizations/${var.org_id}"
     }
 
     resource "google_folder" "retail-dev" {
@@ -60,6 +60,11 @@ data:
     resource "google_folder" "retail-qa" {
       display_name = "retail.qa"
       parent       = google_folder.retail.name
+    }
+  variables.tf: |+
+    variable "org_id" {
+      description = "The organization id for the associated resources"
+      type        = string
     }
   versions.tf: |+
     terraform {

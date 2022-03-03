@@ -27,6 +27,7 @@ import (
 type terraformResources struct {
 	resources map[string]*terraformResource
 	grouped   map[string][]*terraformResource
+	Variables map[string]*variable
 }
 
 func (rs *terraformResources) GetVersion() string {
@@ -102,6 +103,7 @@ type terraformResource struct {
 	Children  []*terraformResource
 	isChild   bool
 	resources *terraformResources
+	variable  *variable
 }
 
 // Return if the resource itself should be created
@@ -198,12 +200,26 @@ func (ref *terraformResource) GetResourceName() string {
 	return ""
 }
 
-func (ref *terraformResource) GetTerraformId() string {
+func (ref *terraformResource) GetTerraformId(prefix ...bool) string {
 	if ref.ShouldCreate() {
 		return fmt.Sprintf("google_folder.%s.name", ref.GetResourceName())
 	}
-	if ref.Kind == "Organization" {
+	hasVariable := ref.variable != nil
+	usePrefix := len(prefix) > 0 && !prefix[0]
+	isOrg := ref.Kind == "Organization"
+
+	switch true {
+	case usePrefix && hasVariable:
+		return fmt.Sprintf("var.%s", ref.variable.Name)
+	case usePrefix && !hasVariable:
+		return fmt.Sprintf("\"%s\"", ref.Name)
+	case isOrg && hasVariable:
+		return fmt.Sprintf("\"organizations/${var.%s}\"", ref.variable.Name)
+	case isOrg && !hasVariable:
 		return fmt.Sprintf("\"organizations/%s\"", ref.Name)
+	case hasVariable:
+		return fmt.Sprintf("\"folders/${var.%s}\"", ref.variable.Name)
+	default:
+		return fmt.Sprintf("\"folders/%s\"", ref.Name)
 	}
-	return fmt.Sprintf("\"folders/%s\"", ref.Name)
 }

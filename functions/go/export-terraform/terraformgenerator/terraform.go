@@ -44,6 +44,10 @@ func (rs *terraformResources) getHCL() (map[string]string, error) {
 		if err != nil {
 			return nil, err
 		}
+		err = addFile(tmpl, "variables.tf", rs, data)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return data, nil

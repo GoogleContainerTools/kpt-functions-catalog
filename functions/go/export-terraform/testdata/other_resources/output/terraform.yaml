@@ -24,7 +24,12 @@ data:
   folders.tf: |+
     resource "google_folder" "test" {
       display_name = "Test Display"
-      parent       = "organizations/123456789012"
+      parent       = "organizations/${var.org_id}"
+    }
+  variables.tf: |+
+    variable "org_id" {
+      description = "The organization id for the associated resources"
+      type        = string
     }
   versions.tf: |+
     terraform {

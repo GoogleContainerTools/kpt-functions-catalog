@@ -19,4 +19,4 @@ metadata:
 spec:
   displayName: Test Display
   organizationRef:
-    external: '11111111111'
+    external: '123456789012'

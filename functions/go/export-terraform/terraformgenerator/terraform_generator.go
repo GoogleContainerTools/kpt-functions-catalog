@@ -51,6 +51,8 @@ func Processor(rl *sdk.ResourceList) error {
 		}
 	}
 
+	resources.makeVariables()
+
 	data, err := resources.getHCL()
 	if err != nil {
 		return err

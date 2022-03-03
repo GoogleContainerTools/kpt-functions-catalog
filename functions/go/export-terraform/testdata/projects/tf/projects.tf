@@ -3,7 +3,7 @@ module "project-in-external" {
   version = "~> 12.0"
 
   name       = "project-in-external"
-  folder_id = "folders/335620346181"
+  folder_id = "335620346181"
 
   billing_account = "AAAAAA-AAAAAA-AAAAAA"
 }
@@ -24,7 +24,7 @@ module "project-in-org" {
   version = "~> 12.0"
 
   name       = "project-in-org"
-  org_id = "organizations/123456789012"
+  org_id = var.org_id
 
   billing_account = "AAAAAA-AAAAAA-AAAAAA"
   auto_create_network = true
