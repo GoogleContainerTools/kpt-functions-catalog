@@ -142,6 +142,7 @@ func TestTerraformGeneration(t *testing.T) {
 
 func getTerraformFromDir(sourceDir string) (map[string]string, error) {
 	files, err := filepath.Glob(path.Join(sourceDir, "*.tf"))
+	files = append(files, "README.md")
 	if err != nil {
 		return nil, err
 	}

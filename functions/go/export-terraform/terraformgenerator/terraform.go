@@ -27,8 +27,6 @@ func (rs *terraformResources) getHCL() (map[string]string, error) {
 
 	groupedResources := rs.getGrouped()
 
-	// fmt.Printf("resources: %v\n", groupedResources)
-
 	data := make(map[string]string)
 	resourceFiles := []string{"folders.tf", "iam.tf", "projects.tf"}
 	for _, file := range resourceFiles {
@@ -38,15 +36,14 @@ func (rs *terraformResources) getHCL() (map[string]string, error) {
 		}
 	}
 
-	// only add versions.tf if other files exist
+	// only add other files if resource files exist
+	metaFiles := []string{"README.md", "versions.tf", "variables.tf"}
 	if len(data) > 0 {
-		err = addFile(tmpl, "versions.tf", rs, data)
-		if err != nil {
-			return nil, err
-		}
-		err = addFile(tmpl, "variables.tf", rs, data)
-		if err != nil {
-			return nil, err
+		for _, file := range metaFiles {
+			err := addFile(tmpl, file, rs, data)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
