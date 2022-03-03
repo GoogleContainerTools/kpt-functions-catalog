@@ -1,9 +1,9 @@
 diff --git a/terraform.yaml b/terraform.yaml
 new file mode 100644
-index 0000000..84a00c7
+index 0000000..c79a7cd
 --- /dev/null
 +++ b/terraform.yaml
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,74 @@
 +apiVersion: v1
 +kind: ConfigMap
 +metadata:
@@ -62,6 +62,7 @@ index 0000000..84a00c7
 +    variable "org_id" {
 +      description = "The organization id for the associated resources"
 +      type        = string
++      default     = "11111111111"
 +    }
 +  versions.tf: |
 +    terraform {
