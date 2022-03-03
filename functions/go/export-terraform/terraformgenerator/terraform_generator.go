@@ -29,7 +29,12 @@ var templates embed.FS
 
 func Processor(rl *sdk.ResourceList) error {
 	var resources terraformResources
-	supportedKinds := map[string]bool{"Folder": true, "Organization": true, "IAMPolicyMember": true}
+	supportedKinds := map[string]bool{
+		"Folder":          true,
+		"Organization":    true,
+		"IAMPolicyMember": true,
+		"Project":         true,
+	}
 
 	for _, item := range rl.Items {
 		if !strings.Contains(item.APIVersion(), "cnrm.cloud.google.com") {

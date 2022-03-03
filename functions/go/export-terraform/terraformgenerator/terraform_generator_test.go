@@ -51,6 +51,10 @@ var testCases = []TerraformTest{
 		Name: "iam",
 		Mode: "terraform",
 	},
+	{
+		Name: "projects",
+		Mode: "terraform",
+	},
 }
 
 func TestTerraformGeneration(t *testing.T) {
@@ -115,8 +119,7 @@ func TestTerraformGeneration(t *testing.T) {
 			// The workaround is that we read the resource files as a ResourceList and
 			// then compare this ResourceList with the expected ResourceList.
 			tmpDir, err := ioutil.TempDir("", "export-terraform-test-*")
-			fmt.Println(tmpDir)
-			//defer os.RemoveAll(tmpDir)
+			defer os.RemoveAll(tmpDir)
 			require.NoError(err)
 			err = testutil.ResourceListToDirectory(actualRL, tmpDir)
 			require.NoError(err)

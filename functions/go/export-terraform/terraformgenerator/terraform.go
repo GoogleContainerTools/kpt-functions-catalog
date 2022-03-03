@@ -19,20 +19,7 @@ import (
 	"text/template"
 )
 
-type TerraformFile struct {
-	name string
-}
-
 func (rs *terraformResources) getHCL() (map[string]string, error) {
-	files := []*TerraformFile{
-		{
-			name: "folders.tf",
-		},
-		{
-			name: "iam.tf",
-		},
-	}
-
 	tmpl, err := template.New("").ParseFS(templates, "templates/*")
 	if err != nil {
 		return nil, err
@@ -43,8 +30,9 @@ func (rs *terraformResources) getHCL() (map[string]string, error) {
 	// fmt.Printf("resources: %v\n", groupedResources)
 
 	data := make(map[string]string)
-	for _, file := range files {
-		err := addFile(tmpl, file.name, groupedResources, data)
+	resourceFiles := []string{"folders.tf", "iam.tf", "projects.tf"}
+	for _, file := range resourceFiles {
+		err := addFile(tmpl, file, groupedResources, data)
 		if err != nil {
 			return nil, err
 		}

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
@@ -108,6 +109,20 @@ func (resource *terraformResource) ShouldCreate() bool {
 	return resource.Item != nil
 }
 
+// Retrieve a boolean from the resource
+func (resource *terraformResource) GetBool(path ...string) bool {
+	value := resource.GetStringFromObject(path...)
+	if len(value) == 0 {
+		return false
+	}
+	boolValue, err := strconv.ParseBool(value)
+	if err != nil {
+		// todo: log the failure
+		return false
+	}
+	return boolValue
+}
+
 // Look up a referenced resource at a given path
 func (resource *terraformResource) GetStringFromObject(path ...string) string {
 	var ref string
@@ -121,6 +136,7 @@ func (resource *terraformResource) GetStringFromObject(path ...string) string {
 func (resource *terraformResource) getParentRef(path ...string) (string, string, error) {
 	paths := [][]string{
 		{"Folder", "spec", "folderRef", "name"},
+		{"Folder", "spec", "folderRef", "external"},
 		{"Organization", "spec", "organizationRef", "external"},
 		{"Project", "metadata", "annotations", "cnrm.cloud.google.com/my-project"},
 		{"detect", "spec", "resourceRef", "external"},
@@ -147,11 +163,15 @@ func (resource *terraformResource) getParentRef(path ...string) (string, string,
 func (ref *terraformResource) GetDisplayName() string {
 	var displayName string
 	found, err := ref.Item.Get(&displayName, "spec", "displayName")
-	if err != nil || !found {
-		// TODO: log failure to find
-		displayName = ref.Item.Name()
+	if err == nil && found {
+		return displayName
 	}
-	return displayName
+	found, err = ref.Item.Get(&displayName, "spec", "name")
+	if err == nil && found {
+		return displayName
+	}
+	// TODO: log failure to find
+	return ref.Item.Name()
 }
 
 var tfNameRegex = regexp.MustCompile(`[^a-zA-Z\d_-]`)
