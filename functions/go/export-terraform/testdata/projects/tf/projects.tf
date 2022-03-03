@@ -6,7 +6,7 @@ module "project-in-external" {
   org_id     = var.org_id
   folder_id  = "335620346181"
 
-  billing_account = "AAAAAA-AAAAAA-AAAAAA"
+  billing_account = var.billing_account
 }
 
 module "project-in-folder" {
@@ -18,7 +18,7 @@ module "project-in-folder" {
   org_id     = var.org_id
   folder_id  = google_folder.test.name
 
-  billing_account = "AAAAAA-AAAAAA-AAAAAA"
+  billing_account = var.billing_account
 }
 
 module "project-in-org" {
@@ -28,6 +28,6 @@ module "project-in-org" {
   name       = "project-in-org"
   org_id     = var.org_id
 
-  billing_account = "AAAAAA-AAAAAA-AAAAAA"
+  billing_account = var.billing_account
   auto_create_network = true
 }

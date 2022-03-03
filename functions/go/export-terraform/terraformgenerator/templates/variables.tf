@@ -1,5 +1,5 @@
 {{range $variable := .Variables}}
-variable "org_id" {
+variable "{{ $variable.Name }}" {
   description = "{{ $variable.Description }}"
   type        = string
   default     = "{{ $variable.Default }}"

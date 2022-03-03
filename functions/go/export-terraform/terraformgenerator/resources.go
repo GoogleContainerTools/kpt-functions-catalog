@@ -53,20 +53,9 @@ func (rs *terraformResources) getResourceRef(kind string, name string, item *sdk
 		resourceRef.Item = item
 
 		// attach parents
-		parentKind, parentName, err := resourceRef.getParentRef()
+		err := resourceRef.attachReferences()
 		if err != nil {
-			sdk.Logf("no parent reference found for %s, %v", item.Name(), err)
 			return nil, err
-		}
-
-		if parentKind != "" {
-			parentRef, err := rs.getResourceRef(parentKind, parentName, nil)
-			if err != nil {
-				return nil, err
-			}
-			parentRef.Children = append(parentRef.Children, resourceRef)
-			resourceRef.isChild = true
-			resourceRef.Parent = parentRef
 		}
 	}
 	return resourceRef, nil
@@ -96,14 +85,15 @@ func (rs *terraformResources) getGrouped() map[string][]*terraformResource {
 }
 
 type terraformResource struct {
-	Name      string
-	Kind      string
-	Item      *sdk.KubeObject
-	Parent    *terraformResource
-	Children  []*terraformResource
-	isChild   bool
-	resources *terraformResources
-	variable  *variable
+	Name       string
+	Kind       string
+	Item       *sdk.KubeObject
+	Parent     *terraformResource
+	Children   []*terraformResource
+	isChild    bool
+	resources  *terraformResources
+	variable   *variable
+	References map[string]*terraformResource
 }
 
 // Return if the resource itself should be created
@@ -147,6 +137,56 @@ func (resource *terraformResource) GetOrganization() *terraformResource {
 	}
 
 	return orgs[0]
+}
+
+// Attach parents and other references to a resource
+func (resource *terraformResource) attachReferences() error {
+	resource.References = make(map[string]*terraformResource)
+	paths := [][]string{
+		{"BillingAccount", "spec", "billingAccountRef", "external"},
+	}
+	for _, path := range paths {
+		kind := path[0]
+		ref := resource.getReferencedResource(kind, path[1:]...)
+		if ref != nil {
+			resource.References[kind] = ref
+		}
+	}
+
+	// attach parents
+	parentKind, parentName, err := resource.getParentRef()
+	if err != nil {
+		sdk.Logf("no parent reference found for %s, %v", resource.Item.Name(), err)
+		return err
+	}
+
+	if parentKind != "" {
+		parentRef, err := resource.resources.getResourceRef(parentKind, parentName, nil)
+		if err != nil {
+			return err
+		}
+		parentRef.Children = append(parentRef.Children, resource)
+		resource.isChild = true
+		resource.Parent = parentRef
+	}
+
+	return nil
+}
+
+// Retrieve a referenced resource from the object spec
+func (resource *terraformResource) getReferencedResource(kind string, path ...string) *terraformResource {
+	name := strings.TrimSpace(resource.GetStringFromObject(path...))
+	if len(name) == 0 {
+		return nil
+	}
+
+	ref, err := resource.resources.getResourceRef(kind, name, nil)
+	if err != nil {
+		sdk.Logf("Failed to retrieve resource reference for %s/%s from %s", kind, name, resource.Name)
+	}
+	ref.Children = append(ref.Children, resource)
+
+	return ref
 }
 
 func (resource *terraformResource) getParentRef(path ...string) (string, string, error) {
@@ -219,13 +259,13 @@ func (ref *terraformResource) GetTerraformId(prefix ...bool) string {
 		return fmt.Sprintf("google_folder.%s.name", ref.GetResourceName())
 	}
 	hasVariable := ref.variable != nil
-	usePrefix := len(prefix) > 0 && !prefix[0]
+	usePrefix := !(len(prefix) > 0 && !prefix[0])
 	isOrg := ref.Kind == "Organization"
 
 	switch true {
-	case usePrefix && hasVariable:
+	case !usePrefix && hasVariable:
 		return fmt.Sprintf("var.%s", ref.variable.Name)
-	case usePrefix && !hasVariable:
+	case !usePrefix && !hasVariable:
 		return fmt.Sprintf("\"%s\"", ref.Name)
 	case isOrg && hasVariable:
 		return fmt.Sprintf("\"organizations/${var.%s}\"", ref.variable.Name)

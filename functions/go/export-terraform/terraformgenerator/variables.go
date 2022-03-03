@@ -20,21 +20,41 @@ type variable struct {
 	Default     string
 }
 
+type resourceVariable struct {
+	*variable
+	kind       string
+	underlying *variable
+}
+
 // Find common values and make them into variables
 func (rs *terraformResources) makeVariables() {
 	rs.Variables = make(map[string]*variable)
 
 	resources := rs.getGrouped()
+	vars := []resourceVariable{
+		{
+			kind: "Organization",
+			underlying: &variable{
+				Name:        "org_id",
+				Description: "The organization id for the associated resources",
+			},
+		},
+		{
+			kind: "BillingAccount",
+			underlying: &variable{
+				Name:        "billing_account",
+				Description: "The ID of the billing account to associate projects with",
+			},
+		},
+	}
 
-	// If we have a single org, make it a variable
-	if len(resources["Organization"]) == 1 {
-		org := resources["Organization"][0]
-		orgVar := &variable{
-			Name:        "org_id",
-			Description: "The organization id for the associated resources",
-			Default:     org.Name,
+	for _, candidate := range vars {
+		if len(resources[candidate.kind]) != 1 {
+			continue
 		}
-		rs.Variables["org_id"] = orgVar
-		org.variable = orgVar
+		resource := resources[candidate.kind][0]
+		candidate.underlying.Default = resource.Name
+		resource.variable = candidate.underlying
+		rs.Variables[candidate.underlying.Name] = candidate.underlying
 	}
 }
