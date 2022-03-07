@@ -14,10 +14,32 @@
 
 package terraformgenerator
 
+import (
+	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
+)
+
+type iamMember struct {
+	Member string
+}
+
 type iamBinding struct {
-	Member   string
-	Role     string
-	resource *terraformResource
+	Members []*iamMember
+	Role    string
+}
+
+type iamPolicy struct {
+	bindings map[string]*iamBinding
+}
+
+func (policy *iamPolicy) addBinding(role string, member string) {
+	if policy.bindings == nil {
+		policy.bindings = make(map[string]*iamBinding)
+	}
+	_, found := policy.bindings[role]
+	if !found {
+		policy.bindings[role] = &iamBinding{Role: role}
+	}
+	policy.bindings[role].Members = append(policy.bindings[role].Members, &iamMember{Member: member})
 }
 
 func (resource *terraformResource) HasIAMBindings() bool {
@@ -26,20 +48,29 @@ func (resource *terraformResource) HasIAMBindings() bool {
 }
 
 // Retrieve IAM bindings for a given resource
-func (resource *terraformResource) GetIAMBindings() map[string][]*iamBinding {
-	bindings := make(map[string][]*iamBinding)
+func (resource *terraformResource) GetIAMBindings() map[string]*iamBinding {
+	policy := &iamPolicy{}
 
 	for _, child := range resource.Children {
 		switch child.Kind {
 		case "IAMPolicyMember":
-			binding := &iamBinding{
-				Member:   child.GetStringFromObject("spec", "member"),
-				Role:     child.GetStringFromObject("spec", "role"),
-				resource: child,
+			role := child.GetStringFromObject("spec", "role")
+			member := child.GetStringFromObject("spec", "member")
+			policy.addBinding(role, member)
+		case "IAMPartialPolicy":
+			var bindings []iamBinding
+			found, err := child.Item.Get(&bindings, "spec", "bindings")
+			if !found || err != nil {
+				sdk.Logf("Failure to find bindings in %s (found = %t): %s\n", resource.Name, found, err)
+				continue
 			}
-			bindings[binding.Role] = append(bindings[binding.Role], binding)
+			for _, binding := range bindings {
+				for _, member := range binding.Members {
+					policy.addBinding(binding.Role, member.Member)
+				}
+			}
 		}
 	}
 
-	return bindings
+	return policy.bindings
 }

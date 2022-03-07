@@ -30,10 +30,11 @@ var templates embed.FS
 func Processor(rl *sdk.ResourceList) error {
 	var resources terraformResources
 	supportedKinds := map[string]bool{
-		"Folder":          true,
-		"Organization":    true,
-		"IAMPolicyMember": true,
-		"Project":         true,
+		"Folder":           true,
+		"Organization":     true,
+		"IAMPolicyMember":  true,
+		"IAMPartialPolicy": true,
+		"Project":          true,
 	}
 
 	for _, item := range rl.Items {

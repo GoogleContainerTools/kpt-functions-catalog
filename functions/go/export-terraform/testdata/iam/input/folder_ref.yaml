@@ -34,3 +34,23 @@ spec:
     namespace: hierarchy
   role: roles/viewer
   member: group:gcp-developers@example.com
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPartialPolicy
+metadata:
+  name: folder-partial-policy
+  namespace: config-control
+spec:
+  resourceRef:
+    apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+    kind: Folder
+    name: test
+    namespace: hierarchy
+  bindings:
+  - role: roles/editor
+    members:
+    - member: group:gcp-developers@example.com
+  - role: roles/viewer
+    members:
+    - member: group:gcp-viewers@example.com
+    - member: group:gcp-devops@example.com

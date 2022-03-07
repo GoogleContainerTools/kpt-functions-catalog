@@ -1,14 +1,14 @@
-{{range $org := .Organization}}{{ if $org.HasIAMBindings }}
-module "{{ $org.GetResourceName }}-iam" {
+{{range $ref := .Organization}}{{ if $ref.HasIAMBindings }}
+module "{{ $ref.GetResourceName }}-iam" {
   source  = "terraform-google-modules/iam/google//modules/organizations_iam"
   version = "~> 7.4"
 
-  organizations = ["{{ $org.Name }}"]
+  organizations = ["{{ $ref.Name }}"]
 
   bindings = {
-    {{ range $role, $bindings := $org.GetIAMBindings }}
-    "{{ $role }}" = [{{ range $binding := $bindings }}
-      "{{ $binding.Member }}",{{ end }}
+    {{ range $role, $binding := $ref.GetIAMBindings }}
+    "{{ $role }}" = [{{ range $member := $binding.Members }}
+      "{{ $member.Member }}",{{ end }}
     ]
     {{ end }}
   }
@@ -22,9 +22,9 @@ module "{{ $ref.GetResourceName }}-iam" {
   folders = [{{ $ref.GetTerraformId }}]
 
   bindings = {
-    {{ range $role, $bindings := $ref.GetIAMBindings }}
-    "{{ $role }}" = [{{ range $binding := $bindings }}
-      "{{ $binding.Member }}",{{ end }}
+    {{ range $role, $binding := $ref.GetIAMBindings }}
+    "{{ $role }}" = [{{ range $member := $binding.Members }}
+      "{{ $member.Member }}",{{ end }}
     ]
     {{ end }}
   }

@@ -43,8 +43,14 @@ module "test-iam" {
 
   bindings = {
     
+    "roles/editor" = [
+      "group:gcp-developers@example.com",
+    ]
+    
     "roles/viewer" = [
       "group:gcp-developers@example.com",
+      "group:gcp-viewers@example.com",
+      "group:gcp-devops@example.com",
     ]
     
   }
