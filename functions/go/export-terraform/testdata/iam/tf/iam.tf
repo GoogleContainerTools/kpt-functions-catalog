@@ -35,6 +35,23 @@ module "folder-1-iam" {
 }
 
 
+module "authoritative-iam" {
+  source  = "terraform-google-modules/iam/google//modules/folders_iam"
+  version = "~> 7.4"
+
+  folders = [google_folder.authoritative.name]
+
+  bindings = {
+    
+    "roles/viewer" = [
+      "group:gcp-another@example.com",
+      "group:gcp-test@example.com",
+    ]
+    
+  }
+}
+
+
 module "test-iam" {
   source  = "terraform-google-modules/iam/google//modules/folders_iam"
   version = "~> 7.4"

@@ -16,6 +16,8 @@ The goal is to make the generated output as close to possible as what a human wo
 The following KCC resources are supported:
 - Folder
 - Project
+- IAMPartialPolicy
+- IAMPolicy
 - IAMPolicyMember
 
 The output Terraform will be saved to a `ConfigMap` in `terraform.yaml` at the root of the package.

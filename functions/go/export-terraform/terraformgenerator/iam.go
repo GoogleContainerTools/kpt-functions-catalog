@@ -57,7 +57,7 @@ func (resource *terraformResource) GetIAMBindings() map[string]*iamBinding {
 			role := child.GetStringFromObject("spec", "role")
 			member := child.GetStringFromObject("spec", "member")
 			policy.addBinding(role, member)
-		case "IAMPartialPolicy":
+		case "IAMPartialPolicy", "IAMPolicy":
 			var bindings []iamBinding
 			found, err := child.Item.Get(&bindings, "spec", "bindings")
 			if !found || err != nil {

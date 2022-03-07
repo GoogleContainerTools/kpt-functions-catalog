@@ -34,6 +34,7 @@ func Processor(rl *sdk.ResourceList) error {
 		"Organization":     true,
 		"IAMPolicyMember":  true,
 		"IAMPartialPolicy": true,
+		"IAMPolicy":        true,
 		"Project":          true,
 	}
 
