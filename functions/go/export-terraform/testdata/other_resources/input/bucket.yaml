@@ -16,7 +16,7 @@ kind: StorageBucket
 metadata:
   name: ignored-bucket
   annotations:
-    cnrm.cloud.google.com/my-project: test-project
+    cnrm.cloud.google.com/project-id: test-project
 spec:
   location: us-central1
   storageClass: standard

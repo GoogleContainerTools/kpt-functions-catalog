@@ -139,15 +139,20 @@ func (resource *terraformResource) GetOrganization() *terraformResource {
 	return orgs[0]
 }
 
+type referencePath struct {
+	kind string // If kind is unset, it will be auto-detected
+	path []string
+}
+
 // Attach parents and other references to a resource
 func (resource *terraformResource) attachReferences() error {
 	resource.References = make(map[string]*terraformResource)
-	paths := [][]string{
-		{"BillingAccount", "spec", "billingAccountRef", "external"},
+	paths := []referencePath{
+		{kind: "BillingAccount", path: []string{"spec", "billingAccountRef", "external"}},
 	}
 	for _, path := range paths {
-		kind := path[0]
-		ref := resource.getReferencedResource(kind, path[1:]...)
+		kind := path.kind
+		ref := resource.getReferencedResource(kind, path.path...)
 		if ref != nil {
 			resource.References[kind] = ref
 		}
@@ -190,24 +195,24 @@ func (resource *terraformResource) getReferencedResource(kind string, path ...st
 }
 
 func (resource *terraformResource) getParentRef(path ...string) (string, string, error) {
-	paths := [][]string{
-		{"Folder", "spec", "folderRef", "name"},
-		{"Folder", "spec", "folderRef", "external"},
-		{"Organization", "spec", "organizationRef", "external"},
-		{"Project", "metadata", "annotations", "cnrm.cloud.google.com/my-project"},
-		{"detect", "spec", "resourceRef", "external"},
-		{"detect", "spec", "resourceRef", "name"},
+	paths := []referencePath{
+		{kind: "Folder", path: []string{"spec", "folderRef", "name"}},
+		{kind: "Folder", path: []string{"spec", "folderRef", "external"}},
+		{kind: "Organization", path: []string{"spec", "organizationRef", "external"}},
+		{kind: "Project", path: []string{"metadata", "annotations", "cnrm.cloud.google.com/project-id", "name"}},
+		{path: []string{"spec", "resourceRef", "external"}},
+		{path: []string{"spec", "resourceRef", "name"}},
 	}
 
 	for _, path := range paths {
-		name := resource.GetStringFromObject(path[1:]...)
+		name := resource.GetStringFromObject(path.path...)
 		if name == "" {
 			continue
 		}
 
-		kind := path[0]
-		if kind == "detect" {
-			kind = resource.GetStringFromObject(append(path[1:len(path)-1], "kind")...)
+		kind := path.kind
+		if len(kind) <= 1 {
+			kind = resource.GetStringFromObject(append(path.path[0:len(path.path)-1], "kind")...)
 		}
 
 		return kind, strings.TrimSpace(name), nil
