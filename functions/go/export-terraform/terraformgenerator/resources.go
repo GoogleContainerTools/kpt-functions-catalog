@@ -212,7 +212,9 @@ func (resource *terraformResource) getParentRef(path ...string) (string, string,
 
 		kind := path.kind
 		if len(kind) <= 1 {
-			kind = resource.GetStringFromObject(append(path.path[0:len(path.path)-1], "kind")...)
+			// retrieve everything except the last element of the path, to find the Kind in a sibling node
+			refPath := path.path[0 : len(path.path)-1]
+			kind = resource.GetStringFromObject(append(refPath, "kind")...)
 		}
 
 		return kind, strings.TrimSpace(name), nil
