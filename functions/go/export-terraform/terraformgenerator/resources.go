@@ -262,7 +262,7 @@ func (ref *terraformResource) GetTerraformId(prefix ...bool) string {
 	usePrefix := !(len(prefix) > 0 && !prefix[0])
 	isOrg := ref.Kind == "Organization"
 
-	switch true {
+	switch {
 	case !usePrefix && hasVariable:
 		return fmt.Sprintf("var.%s", ref.variable.Name)
 	case !usePrefix && !hasVariable:
@@ -274,6 +274,6 @@ func (ref *terraformResource) GetTerraformId(prefix ...bool) string {
 	case hasVariable:
 		return fmt.Sprintf("\"folders/${var.%s}\"", ref.variable.Name)
 	default:
-		return fmt.Sprintf("\"folders/%s\"", ref.Name)
+		return fmt.Sprintf(`"folders/%s"`, ref.Name)
 	}
 }
