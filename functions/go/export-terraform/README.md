@@ -13,6 +13,11 @@ This function generates idiomatic Terraform configuration by parsing [Config Con
 Where appropriate, the generated Terraform references [Cloud Foundation Toolkit modules](https://g.co/dev/terraformfoundation).
 The goal is to make the generated output as close to possible as what a human would have written.
 
+The following KCC resources are supported:
+- Folder
+- Project
+- IAMPolicyMember
+
 The output Terraform will be saved to a `ConfigMap` in `terraform.yaml` at the root of the package.
 Each key in the `ConfigMap` corresponds to a different file which is part of the Terraform module.
 

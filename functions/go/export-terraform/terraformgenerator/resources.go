@@ -85,15 +85,15 @@ func (rs *terraformResources) getGrouped() map[string][]*terraformResource {
 }
 
 type terraformResource struct {
-	Name       string
-	Kind       string
-	Item       *sdk.KubeObject
-	Parent     *terraformResource
-	Children   []*terraformResource
-	isChild    bool
-	resources  *terraformResources
-	variable   *variable
-	References map[string]*terraformResource
+	Name       string                        // The name of the resource (from metadata.name)
+	Kind       string                        // The Kubernetes Kind of the resource
+	Item       *sdk.KubeObject               // The Kubernetes object for the resource, if it exists
+	Parent     *terraformResource            // The parent for the resource (ex. folder for project), if there is one
+	Children   []*terraformResource          // A list of any children underneath the resource
+	isChild    bool                          // Whether the resource has a valid hierarchical Parent or not
+	resources  *terraformResources           // A back-reference to the bundle of resources this resource is part of
+	variable   *variable                     // If this resource is defined by a variable, a reference to the associated variable
+	References map[string]*terraformResource // A map of resources this resource references, by the kind of reference
 }
 
 // Return if the resource itself should be created
