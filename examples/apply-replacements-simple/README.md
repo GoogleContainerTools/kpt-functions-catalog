@@ -10,7 +10,7 @@ with a simple example
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-replacements
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-replacements-simple
 ```
 
 We use a `Replacements` object to configure the `apply-replacements` function. 
@@ -43,7 +43,7 @@ field of the Job named "hello", creating it if it isn't already there.
 Invoke the function by running the following command:
 
 ```shell
-$ kpt fn render apply-replacements
+$ kpt fn render apply-replacements-simple
 ```
 
 ### Expected result
