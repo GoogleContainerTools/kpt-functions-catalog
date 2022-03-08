@@ -1,9 +1,9 @@
 diff --git a/terraform.yaml b/terraform.yaml
 new file mode 100644
-index 0000000..60fa1a3
+index 0000000..c79a7cd
 --- /dev/null
 +++ b/terraform.yaml
-@@ -0,0 +1,78 @@
+@@ -0,0 +1,74 @@
 +apiVersion: v1
 +kind: ConfigMap
 +metadata:
@@ -53,20 +53,16 @@ index 0000000..60fa1a3
 +    1. Building an [advanced foundation](https://github.com/terraform-google-modules/terraform-example-foundation) using the security blueprint
 +    2. Automatically deploying Terraform with [Cloud Build](https://cloud.google.com/architecture/managing-infrastructure-as-code)
 +  folders.tf: |
-+    resource "google_folder" "child-folder" {
-+      display_name = "child-folder"
-+      parent       = google_folder.parent-folder.name
-+    }
-+
-+    resource "google_folder" "parent-folder" {
-+      display_name = "parent folder"
++    resource "google_folder" "test" {
++      display_name = "Test Display"
 +      parent       = "organizations/${var.org_id}"
 +    }
++  iam.tf: "module \"organization-iam\" {\n  source  = \"terraform-google-modules/iam/google//modules/organizations_iam\"\n  version = \"~> 7.4\"\n\n  organizations = [\"11111111111\"]\n\n  bindings = {\n    \n    \"roles/editor\" = [\n      \"group:gcp-organization-admins@example.com\",\n      \"group:gcp-developers@example.com\",\n    ]\n    \n    \"roles/orgpolicy.policyAdmin\" = [\n      \"group:gcp-organization-admins@example.com\",\n    ]\n    \n  }\n}\n\n\nmodule \"folder-1-iam\" {\n  source  = \"terraform-google-modules/iam/google//modules/folders_iam\"\n  version = \"~> 7.4\"\n\n  folders = [\"folders/335620346181\"]\n\n  bindings = {\n    \n    \"roles/viewer\" = [\n      \"group:gcp-developers@example.com\",\n    ]\n    \n  }\n}\n\n\nmodule \"test-iam\" {\n  source  = \"terraform-google-modules/iam/google//modules/folders_iam\"\n  version = \"~> 7.4\"\n\n  folders = [google_folder.test.name]\n\n  bindings = {\n    \n    \"roles/viewer\" = [\n      \"group:gcp-developers@example.com\",\n    ]\n    \n  }\n}\n"
 +  variables.tf: |
 +    variable "org_id" {
 +      description = "The organization id for the associated resources"
 +      type        = string
-+      default     = "123456789012"
++      default     = "11111111111"
 +    }
 +  versions.tf: |
 +    terraform {

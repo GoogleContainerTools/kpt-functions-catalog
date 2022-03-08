@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-apiVersion: storage.cnrm.cloud.google.com/v1beta1
-kind: StorageBucket
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Folder
 metadata:
-  name: ignored-bucket
-  annotations:
-    cnrm.cloud.google.com/project-id: test-project
+  name: test
+  namespace: hierarchy
 spec:
-  location: us-central1
-  storageClass: standard
+  displayName: Test Display
+  organizationRef:
+    external: '123456789012'
