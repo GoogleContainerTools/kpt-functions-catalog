@@ -9,7 +9,7 @@ var FixLong = `
 This is an automated step to migrate kpt packages which are compatible with kpt v0.X.Y
 versions of kpt, and make them compatible with kpt 1.0
 
-Here are the automated changes performed by ` + "`" + `fix` + "`" + ` function on ` + "`" + `v1alpha1` + "`" + ` kpt package:
+Here are the automated changes performed by ` + "`" + `fix` + "`" + ` function on a ` + "`" + `v1alpha1` + "`" + ` kpt package:
 
 1. The ` + "`" + `packageMetaData` + "`" + ` section will be transformed to ` + "`" + `info` + "`" + ` section.
 2. ` + "`" + `upstream` + "`" + ` section(if present), in the ` + "`" + `v1alpha1` + "`" + ` Kptfile is converted to ` + "`" + `upstream` + "`" + `

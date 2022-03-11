@@ -121,6 +121,8 @@ Here's what you can do in the Starlark script:
   ` + "`" + `ctx.resource_list["items"]` + "`" + ` and the ` + "`" + `functionConfig` + "`" + ` from
   ` + "`" + `ctx.resource_list["functionConfig"]` + "`" + `.
 - Write resources to ` + "`" + `ctx.resource_list["items"]` + "`" + `.
+- Read the environment variables. e.g. ` + "`" + `ctx.environment["PATH"]` + "`" + `.
+- Read the OpenAPI schema. e.g. ` + "`" + `ctx.open_api["definitions"]["io.k8s.api.apps.v1.Deployment"]` + "`" + `
 - Return an error using [` + "`" + `fail` + "`" + `][fail].
 - Write error message to stderr using [` + "`" + `print` + "`" + `][print]
 
