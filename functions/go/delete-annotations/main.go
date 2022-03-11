@@ -95,13 +95,13 @@ func processResources(resourceList []*yaml.RNode, keys string) ([]framework.Resu
 		infoResultSlice := []framework.ResultItem{}
 		infoResultSlice = append(infoResultSlice, framework.ResultItem{
 			Severity: framework.Info,
-			Message:  fmt.Sprintf("The following annotations were deleted from the resources"),
+			Message:  "The following annotations were deleted from the resources",
 		})
 
 		resultItems = append(infoResultSlice, resultItems...)
 	} else if len(resultItems) == 0 {
 		resultItems = append(resultItems, framework.ResultItem{
-			Message:  fmt.Sprintf("None of the resources had the provided annotations to delete"),
+			Message:  "None of the resources had the provided annotations to delete",
 			Severity: framework.Warning,
 		})
 	}
