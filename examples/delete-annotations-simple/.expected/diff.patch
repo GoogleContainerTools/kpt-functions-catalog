@@ -1,0 +1,12 @@
+diff --git a/resources.yaml b/resources.yaml
+index b6c14a2..299aa44 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -5,7 +5,6 @@ metadata:
+   annotations:
+     description: "Restricts use of the cluster-admin role."
+     bundles.validator.forsetisecurity.org/cis-k8s-v1.5.1: 5.1.1
+-    annotation.to.delete: "some_value"
+ spec:
+   enforcementAction: deny
+   parameters:
