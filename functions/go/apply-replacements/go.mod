@@ -1,12 +1,13 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/apply-replacements
 
 go 1.17
 
 require (
-	github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk v0.0.0-20220111011035-c598c94c9a02
 	sigs.k8s.io/kustomize/api v0.10.1
-	sigs.k8s.io/kustomize/kyaml v0.13.1
+	sigs.k8s.io/kustomize/kyaml v0.13.3
 )
+
+require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220311045023-ca79f6109a4c
 
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
@@ -16,6 +17,7 @@ require (
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.3 // indirect
 	github.com/go-openapi/swag v0.19.5 // indirect
+	github.com/googleapis/gnostic v0.5.5 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect

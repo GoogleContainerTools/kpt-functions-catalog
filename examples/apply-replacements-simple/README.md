@@ -13,11 +13,11 @@ Get the example package by running the following commands:
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/apply-replacements-simple
 ```
 
-We use a `Replacements` object to configure the `apply-replacements` function. 
+We use a `ApplyReplacements` object to configure the `apply-replacements` function. 
 
 ```yaml
-apiVersion: kpt.dev/v1alpha1
-kind: Replacements
+apiVersion: fn.kpt.dev/v1alpha1
+kind: ApplyReplacements
 metadata:
   name: replacements-fn-config
 replacements:

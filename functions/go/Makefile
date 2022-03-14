@@ -19,7 +19,7 @@ GOBIN := $(shell go env GOPATH)/bin
 
 # Edit this list to contain all go functions
 FUNCTIONS := \
-    apply-replacements \
+	apply-replacements \
 	apply-setters \
 	create-setters \
 	enable-gcp-services \

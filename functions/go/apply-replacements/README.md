@@ -4,7 +4,7 @@
 
 <!--mdtogo:Short-->
 
-Invoke the [kustomize replacements] feature as a KRM function. 
+Use the [kustomize replacements] feature as a KRM function. 
 
 <!--mdtogo-->
 
@@ -12,96 +12,33 @@ Invoke the [kustomize replacements] feature as a KRM function.
 
 <!--mdtogo:Long-->
 
-We use a `Replacements` object to configure the `apply-replacements` function. 
+We use a `ApplyReplacements` object to configure the `apply-replacements` function. 
 
 ```yaml
-apiVersion: kpt.dev/v1alpha1
-kind: Replacements
+apiVersion: fn.kpt.dev/v1alpha1
+kind: ApplyReplacements
 metadata:
   name: replacements-fn-config
 replacements:
   # your replacements here
 ```
 
-The syntax for `replacements` is described in the [kustomize replacements] docs. 
-
-<!--mdtogo-->
-
-### Examples
-
-<!--mdtogo:Examples-->
-
-Suppose you have the following Job:
+The syntax for `replacements` is described in the [kustomize replacements] docs. For example,
+you can have a functionConfig such as:
 
 ```yaml
-# job.yaml
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: hello
-```
-
-and the following resources:
-
-```yaml
-# resources.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: my-pod
-spec:
-  containers:
-  - image: busybox
-    name: myapp-container
-  restartPolicy: OnFailure
-```
-
-You can specify the following functionConfig:
-
-```yaml
-# replacements.yaml
-apiVersion: kpt.dev/v1alpha1
-kind: Replacements
+apiVersion: fn.kpt.dev/v1alpha1
+kind: ApplyReplacements
 metadata:
   name: replacements-fn-config
 replacements:
-- source: 
-    kind: Pod
-    name: my-pod
-    fieldPath: spec
+- source:
+    kind: Deployment
+    fieldPath: metadata.name
   targets:
-  - select:
-      name: hello
-      kind: Job
-    fieldPaths: 
-    - spec.template.spec
-    options:
-      create: true
+  - select: 
+      name: my-resource
 ```
-
-Invoke the function:
-
-`kpt fn eval --fn-config=replacements.yaml --image=gcr.io/kpt-fn/apply-replacements:unstable`
-
-`job.yaml` will now have the following contents:
-
-```yaml
-# job.yaml
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: hello
-spec:
-  template:
-    spec:
-      restartPolicy: OnFailure
-      containers:
-      - image: busybox
-        name: myapp-container
-```
-
-demonstrating that the PodSpec has been copied from the Pod to the Job. 
-
 <!--mdtogo-->
 
 [kustomize replacements]: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/replacements/

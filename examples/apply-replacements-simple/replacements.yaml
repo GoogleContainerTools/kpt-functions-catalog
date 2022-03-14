@@ -1,5 +1,5 @@
-apiVersion: kpt.dev/v1alpha1
-kind: Replacements
+apiVersion: fn.kpt.dev/v1alpha1
+kind: ApplyReplacements
 metadata:
   name: replacements-fn-config
 replacements:
