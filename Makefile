@@ -44,6 +44,7 @@ check-licenses:
 
 verify-docs:
 	GO111MODULE=on go get github.com/monopole/mdrip
+	(cd scripts/patch_reader/ && go build -o patch_reader .)
 	scripts/verify-docs.py
 
 build: ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
