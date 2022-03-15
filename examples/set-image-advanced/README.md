@@ -14,7 +14,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-image:unstable
+    - image: gcr.io/kpt-fn/set-image:v0.1.0
       configPath: fn-config.yaml
 ```
 
@@ -47,7 +47,7 @@ field `additionalImageFields`.
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-image-advanced
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-image-advanced@set-image/v0.1.0
 $ kpt fn render set-image-advanced
 ```
 

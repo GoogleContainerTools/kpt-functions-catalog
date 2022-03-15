@@ -11,7 +11,7 @@ resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-image-digest
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-image-digest@set-image/v0.1.0
 ```
 
 We use the following `Kptfile` to configure the function.
@@ -23,7 +23,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-  - image: gcr.io/kpt-fn/set-image:unstable
+  - image: gcr.io/kpt-fn/set-image:v0.1.0
     configMap:
       name: nginx
       newName: bitnami/nginx
