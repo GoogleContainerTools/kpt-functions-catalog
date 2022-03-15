@@ -284,8 +284,12 @@ func (fr *functionRelease) replaceKptPackages(contents []byte) []byte {
 // https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.2/examples/set-namespace-simple
 func (fr *functionRelease) replaceGithubURLs(contents []byte) []byte {
 	exampleSubPath := fr.exampleSubPath()
+	sourceUrlSuffix := fmt.Sprintf(`/functions/%s/%s`, fr.Language, fr.FunctionName)
+	if fr.IsContrib {
+		sourceUrlSuffix = fmt.Sprintf(`/contrib/functions/%s/%s`, fr.Language, fr.FunctionName)
+	}
 	suffixes := []string{
-		fmt.Sprintf(`/functions/%s/%s`, fr.Language, fr.FunctionName),
+		sourceUrlSuffix,
 	}
 	for _, ex := range fr.Examples.exampleNames() {
 		suffixes = append(suffixes, fmt.Sprintf(`/%s/%s`, exampleSubPath, ex))
