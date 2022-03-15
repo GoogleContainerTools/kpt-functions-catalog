@@ -47,6 +47,9 @@ type PatchVersion struct {
 }
 
 func GetLatestPatch(functionName string, minorVersion string) (PatchVersion, error) {
+	if err := gitFetch(); err != nil {
+		return PatchVersion{}, err
+	}
 	tags, err := gitTag()
 	if err != nil {
 		return PatchVersion{}, err
@@ -72,6 +75,11 @@ func GetLatestPatch(functionName string, minorVersion string) (PatchVersion, err
 		LatestPatch: latestPatchVersion,
 		Lang:        lang,
 	}, nil
+}
+
+func gitFetch() error {
+	_, err := runCmd("git", "fetch", "--tags")
+	return err
 }
 
 func gitTag() (string, error) {
