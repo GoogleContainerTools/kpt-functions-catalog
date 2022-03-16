@@ -23,10 +23,10 @@ type Replacements struct {
 
 // Config initializes Replacements from a functionConfig fn.KubeObject
 func (r *Replacements) Config(functionConfig *fn.KubeObject) error {
-	if functionConfig.Kind() != fnConfigKind || functionConfig.APIVersion() != fnConfigApiVersion {
+	if functionConfig.GetKind() != fnConfigKind || functionConfig.GetAPIVersion() != fnConfigApiVersion {
 		return fmt.Errorf("received functionConfig of kind %s and apiVersion %s, " +
 			"only functionConfig of kind %s and apiVersion %s is supported",
-			functionConfig.Kind(), functionConfig.APIVersion(), fnConfigKind, fnConfigApiVersion)
+			functionConfig.GetKind(), functionConfig.GetAPIVersion(), fnConfigKind, fnConfigApiVersion)
 	}
 	r.Replacements = []types.Replacement{}
 	if err := functionConfig.As(r); err != nil {
@@ -43,7 +43,11 @@ func (r *Replacements) Process(rl *fn.ResourceList) error {
 	}
 	transformedItems, err := r.Transform(rl.Items)
 	if err != nil {
-		return err
+		rl.Results = append(rl.Results, &fn.Result{
+			Message: err.Error(),
+			Severity: fn.Error,
+		})
+		return nil
 	}
 	rl.Items = transformedItems
 	return nil
@@ -54,8 +58,12 @@ func (r *Replacements) Process(rl *fn.ResourceList) error {
 func (r *Replacements) Transform(items []*fn.KubeObject) ([]*fn.KubeObject, error) {
 	var transformedItems []*fn.KubeObject
 	var nodes []*yaml.RNode
+
 	for _, obj := range items {
-		objRN := obj.ToRNode()
+		objRN, err := yaml.Parse(obj.String())
+		if err != nil {
+			return nil, err
+		}
 		nodes = append(nodes, objRN)
 	}
 	transformedNodes, err := replacement.Filter{
@@ -65,7 +73,11 @@ func (r *Replacements) Transform(items []*fn.KubeObject) ([]*fn.KubeObject, erro
 		return nil, err
 	}
 	for _, n := range transformedNodes {
-		transformedItems = append(transformedItems, fn.NewFromRNode(n))
+		obj, err := fn.ParseKubeObject([]byte(n.MustString()))
+		if err != nil {
+			return nil, err
+		}
+		transformedItems = append(transformedItems, obj)
 	}
 	return transformedItems, nil
 }

@@ -7,7 +7,7 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.13.3
 )
 
-require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220311045023-ca79f6109a4c
+require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220315215931-2ef5e56080fb
 
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
