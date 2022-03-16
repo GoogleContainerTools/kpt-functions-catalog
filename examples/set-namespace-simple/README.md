@@ -1,10 +1,9 @@
-# set-namespace: Simple Example
+# set-namespace: Simple example
 
 ### Overview
 
-This example demonstrates how to declaratively run [`set-namespace`] function
-to adds or replaces the `.metadata.namespace` field on all resources except for
-those known to be cluster-scoped.
+This example demonstrates how to run [`set-namespace`] function
+to replace the  `namespace` resource type in a variety of KRM resources.
 
 ### Fetch the example package
 
@@ -37,11 +36,9 @@ key-value pair:
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn render set-namespace-simple
+$ kpt fn render set-namespace
 ```
 
 ### Expected result
 
-Check all resources have `metadata.namespace` set to `example-ns`:
-
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+Check all resources have `metadata.namespace` set to `example-ns`

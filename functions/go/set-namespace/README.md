@@ -4,18 +4,10 @@
 
 <!--mdtogo:Short-->
 
-The `set-namespace` function update or add namespace to all namespaced
-resources. Kubernetes supports multiple virtual clusters backed by the same
-physical cluster through namespaces.
-
-Namespaces are often used in the following scenarios:
-
-- Separate resources between environments (prod, staging and test).
-- Separate resources between different team or users to divide resource quota.
+The `set-namespace` function replace the `namespace` specific resource type in a variety
+of KRM resources.
 
 <!--mdtogo-->
-
-You can learn more about namespace [here][namespace].
 
 <!--mdtogo:Long-->
 
@@ -23,57 +15,36 @@ You can learn more about namespace [here][namespace].
 
 This function can be used with any KRM function orchestrators (e.g. kpt).
 
-For all namespaced resurces, the `set-namespace` function adds the namespace
-if `metadata.namespace` doesn't exist. Otherwise, it updates the existing value.
-It will skip the resources that are known to be cluster-scoped (e.g. `Node`
-, `CustomResourceDefinitions`, `ClusterRole`). Whether a resource is namespaced
-is determined by the OpenAPI schema. If the API path
-contains `namespaces/{namespace}` then the resource is considered namespaced.
-Otherwise, it's not. Currently, this function is using API version 1.20.4.
-
-In addition to updating the `metadata.namespace` field for applicable resources,
-by default the function will also update the [fields][commonnamespace] that
-target the namespace. There are a few cases that worth pointing out:
-
-- If there is a `Namespace` resource, its `metadata.name` field will be updated.
-- If there's a `RoleBinding` or `ClusterRoleBinding` resource, the function will
-  update the namespace in the `ServiceAccount` if one of the following are true:
-  1) the subject element `name` is `default`.
-  2) the subject element `name` matches the name of a `ServiceAccount` resource declared in the package.
+- If the resource is `Namespace`, `set-namespace` updates the `metadata.name` field.
+- If the resource is `RoleBinding` or `ClusterRoleBinding` resource, the function updates 
+  the namespace field in the `subjects` element whose name is `default`.
+- If the resource is `CustomResourceDefinition` (CRD), `set-namespace` updates the 
+  `spec/conversion/webhook/clientConfig/service/namespace` field.
+- If the resource is `APIService`, `set-namespace` updates the
+  `spec/service/namespace` field.
 - If there is a [`depends-on`] annotation for a namespaced resource, the namespace
   section of the annotation will be updated if the referenced resource is also
   declared in the package.
-
-In the following example, the `set-namespace` function will update:
-- `subjects[0].namespace` since `subjects[0].name` is `default`.
-- `subjects[1].namespace` since `subjects[1].name` matches a `ServiceAccount`
-  name declared in the package.
 
 ```yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: sa
-  namespace: ns
+  namespace: example
   annotations:
-    config.kubernetes.io/depends-on: /namespaces/ns/ServiceAccount/foo # <= this will NOT be updated (resource not declared)
+    config.kubernetes.io/depends-on: /namespaces/example/ServiceAccount/foo # <= this will NOT be updated (resource not declared)
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   ...
   annotations:
-    config.kubernetes.io/depends-on: /namespaces/ns/ServiceAccount/sa # <== this will be updated (resource declared)
+    config.kubernetes.io/depends-on: /namespaces/example/ServiceAccount/sa # <== this will be updated (resource declared)
 subjects:
   - kind: ServiceAccount
     name: default # <================== name default is used
-    namespace: ns # <================== this will be updated
-  - kind: ServiceAccount
-    name: sa # <======================= name matches above ServiceAccount
-    namespace: ns # <================== this will be updated
-  - kind: ServiceAccount
-    name: other-service-account # <==== name does not match any included resource
-    namespace: ns # <================== this will NOT be updated
+    namespace: example # <================== this will be updated
 roleRef:
   kind: Role
   name: confluent-operator
@@ -104,47 +75,8 @@ data:
   namespace: staging
 ```
 
-To use a `SetNamespace` custom resource as the `functionConfig`, the desired
-namespace must be specified in the `namespace` field. Sometimes you have
-resources (especially custom resources) that have namespace fields in fields
-other than the [defaults][commonnamespace], you can specify such label fields
-using `additionalNamespaceFields`. It will be used jointly with the
-[defaults][commonnamespace].
-
-`additionalNamespaceFields` has following fields:
-
-- `group`: Select the resources by API version group. Will select all groups if
-  omitted.
-- `version`: Select the resources by API version. Will select all versions if
-  omitted.
-- `kind`: Select the resources by resource kind. Will select all kinds if
-  omitted.
-- `path`: Specify the path to the field that the value needs to be updated. This
-  field is required.
-- `create`: If it's set to true, the field specified will be created if it
-  doesn't exist. Otherwise, the function will only update the existing field.
-
-To add namespace `staging` to all built-in resources and the
-path `spec/selector/namespace` in in `MyKind` resource, we use the
-following `functionConfig`:
-
-```yaml
-apiVersion: fn.kpt.dev/v1alpha1
-kind: SetNamespace
-metadata:
-name: my-config
-additionalNamespaceFields:
-  - path: spec/selector/namespace
-    kind: MyKind
-    version: v1
-    group: example.com
-    create: true
-```
-
 <!--mdtogo-->
 
 [namespace]: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
 
 [depends-on]: https://kpt.dev/reference/annotations/depends-on/
-
-[commonnamespace]: https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/namespace.go#L7
