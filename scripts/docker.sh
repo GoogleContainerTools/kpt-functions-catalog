@@ -51,10 +51,11 @@ function docker_build {
   [[ -f "${override_dockerfile}" ]] && dockerfile="${override_dockerfile}"
   [[ -f "${dockerfile}" ]] || err "Dockerfile does not exist: ${dockerfile}"
 
+  # Use + conditional parameter expansion to protect from unbound array variable
   docker build \
     -t "${GCR_REGISTRY}/${name}:${UNSTABLE_TAG}" \
     -f "${dockerfile}" \
-    "${build_args[@]}" \
+    "${build_args[@]+"${build_args[@]}"}" \
     "${function_dir}"
 }
 
