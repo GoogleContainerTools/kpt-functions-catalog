@@ -1,0 +1,17 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: ApplyReplacements
+metadata:
+  name: replacements-fn-config
+replacements:
+  - source:
+      kind: Pod
+      name: my-pod
+      fieldPath: spec
+    targets:
+      - select:
+          name: hello
+          kind: Job
+        fieldPaths:
+          - spec.template.spec
+        options:
+          create: true

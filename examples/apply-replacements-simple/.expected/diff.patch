@@ -1,0 +1,15 @@
+diff --git a/job.yaml b/job.yaml
+index 4584bb9..66f3ebe 100644
+--- a/job.yaml
++++ b/job.yaml
+@@ -2,3 +2,10 @@ apiVersion: batch/v1
+ kind: Job
+ metadata:
+   name: hello
++spec:
++  template:
++    spec:
++      containers:
++      - image: busybox
++        name: myapp-container
++      restartPolicy: OnFailure
