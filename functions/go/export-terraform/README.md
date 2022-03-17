@@ -40,6 +40,21 @@ data:
     }
 ```
 
+### Skipping Resources
+Any resource annotated with `cnrm.cloud.google.com/ignore-clusterless: "true"` will be excluded from the export.
+
+### Attribution
+The exported Terraform configuration will include a `provider_meta` block for attributing it back to this function.
+If you want to prevent attributing the configuration to this function, you should delete this block.
+
+```
+terraform {
+  provider_meta "google" {
+    module_name = "blueprints/terraform/exported-krm/v0.1.0"
+  }
+}
+```
+
 <!--mdtogo:Long-->
 
 ## Usage

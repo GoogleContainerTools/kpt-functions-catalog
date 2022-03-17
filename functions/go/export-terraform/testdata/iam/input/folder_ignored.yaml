@@ -14,12 +14,14 @@
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
 kind: IAMPolicyMember
 metadata:
-  name: external-viewer
+  name: ignored-resource
   namespace: config-control
+  annotations:
+    cnrm.cloud.google.com/ignore-clusterless: "true"
 spec:
   resourceRef:
     apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
     kind: Folder
     external: "335620346181"
   role: roles/viewer
-  member: group:gcp-developers@example.com
+  member: group:missing-group@example.com
