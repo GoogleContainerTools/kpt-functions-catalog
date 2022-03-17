@@ -21,6 +21,8 @@ type Replacements struct {
 	Replacements []types.Replacement `json:"replacements,omitempty" yaml:"replacements,omitempty"`
 }
 
+var _ fn.ResourceListProcessor = Replacements{}
+
 // Config initializes Replacements from a functionConfig fn.KubeObject
 func (r *Replacements) Config(functionConfig *fn.KubeObject) error {
 	if functionConfig.GetKind() != fnConfigKind || functionConfig.GetAPIVersion() != fnConfigApiVersion {
@@ -37,7 +39,7 @@ func (r *Replacements) Config(functionConfig *fn.KubeObject) error {
 }
 
 // Process configures the replacements and transformers them.
-func (r *Replacements) Process(rl *fn.ResourceList) error {
+func (r Replacements) Process(rl *fn.ResourceList) error {
 	if err := r.Config(rl.FunctionConfig); err != nil {
 		return err
 	}
