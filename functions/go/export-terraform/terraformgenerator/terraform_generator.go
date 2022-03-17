@@ -27,6 +27,11 @@ import (
 //go:embed templates
 var templates embed.FS
 
+const (
+	kccAPI         = "cnrm.cloud.google.com"
+	skipAnnotation = "cnrm.cloud.google.com/ignore-clusterless"
+)
+
 func Processor(rl *sdk.ResourceList) error {
 	var resources terraformResources
 	supportedKinds := map[string]bool{
@@ -39,7 +44,12 @@ func Processor(rl *sdk.ResourceList) error {
 	}
 
 	for _, item := range rl.Items {
-		if !strings.Contains(item.APIVersion(), "cnrm.cloud.google.com") {
+		if !strings.Contains(item.APIVersion(), kccAPI) {
+			continue
+		}
+
+		shouldSkip := item.Annotation(skipAnnotation)
+		if shouldSkip == "true" {
 			continue
 		}
 
