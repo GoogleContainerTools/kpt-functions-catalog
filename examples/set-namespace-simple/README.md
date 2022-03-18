@@ -1,4 +1,4 @@
-# set-namespace: Simple example
+# set-namespace: Simple Example
 
 ### Overview
 
@@ -36,9 +36,11 @@ key-value pair:
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn render set-namespace
+$ kpt fn render set-namespace-simple
 ```
 
 ### Expected result
 
 Check all resources have `metadata.namespace` set to `example-ns`
+
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/

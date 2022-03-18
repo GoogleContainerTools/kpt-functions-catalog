@@ -4,10 +4,14 @@
 
 <!--mdtogo:Short-->
 
-The `set-namespace` function replace the `namespace` specific resource type in a variety
+The `set-namespace` function replaces the `namespace` specific resource type in a variety
 of KRM resources.
 
 <!--mdtogo-->
+
+Namespaces are often used in the following scenarios:
+- Separate resources between environments (prod, staging and test).
+- Separate resources between different team or users to divide resource quota.
 
 <!--mdtogo:Long-->
 
