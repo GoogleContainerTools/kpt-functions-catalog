@@ -2,7 +2,6 @@ package replacements
 
 import (
 	"fmt"
-
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/kustomize/api/filters/replacement"
 	"sigs.k8s.io/kustomize/api/types"
@@ -24,7 +23,7 @@ type Replacements struct {
 // Config initializes Replacements from a functionConfig fn.KubeObject
 func (r *Replacements) Config(functionConfig *fn.KubeObject) error {
 	if functionConfig.GetKind() != fnConfigKind || functionConfig.GetAPIVersion() != fnConfigApiVersion {
-		return fmt.Errorf("received functionConfig of kind %s and apiVersion %s, " +
+		return fmt.Errorf("received functionConfig of kind %s and apiVersion %s, "+
 			"only functionConfig of kind %s and apiVersion %s is supported",
 			functionConfig.GetKind(), functionConfig.GetAPIVersion(), fnConfigKind, fnConfigApiVersion)
 	}
@@ -43,11 +42,7 @@ func (r *Replacements) Process(rl *fn.ResourceList) error {
 	}
 	transformedItems, err := r.Transform(rl.Items)
 	if err != nil {
-		rl.Results = append(rl.Results, &fn.Result{
-			Message: err.Error(),
-			Severity: fn.Error,
-		})
-		return nil
+		return err
 	}
 	rl.Items = transformedItems
 	return nil
@@ -67,7 +62,7 @@ func (r *Replacements) Transform(items []*fn.KubeObject) ([]*fn.KubeObject, erro
 		nodes = append(nodes, objRN)
 	}
 	transformedNodes, err := replacement.Filter{
-		Replacements:  r.Replacements,
+		Replacements: r.Replacements,
 	}.Filter(nodes)
 	if err != nil {
 		return nil, err
