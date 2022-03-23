@@ -1,8 +1,0 @@
-apiVersion: dev.example.com/v1
-kind: MyResource
-metadata:
-  name: the-service
-  namespace: the-namespace
-spec:
-  selector:
-    namespace: foo

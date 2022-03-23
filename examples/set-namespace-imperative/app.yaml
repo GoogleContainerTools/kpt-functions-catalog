@@ -21,4 +21,4 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: old-name
+  name: example
