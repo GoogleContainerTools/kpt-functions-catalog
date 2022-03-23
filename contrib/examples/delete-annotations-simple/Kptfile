@@ -4,6 +4,6 @@ metadata:
   name: delete-annotations-simple
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/delete-annotations:unstable
+    - image: gcr.io/kpt-fn-contrib/delete-annotations:unstable
       configMap:
         annotationKeys: annotation.to.delete

@@ -17,7 +17,7 @@ The function will execute as follows:
 
 To execute imperatively:
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn/delete-annotations:unstable -- annotationKeys=annotation.to.delete,another.annotation.to.delete
+$ kpt fn eval -i gcr.io/kpt-fn-contrib/delete-annotations:unstable -- annotationKeys=annotation.to.delete,another.annotation.to.delete
 ```
 
 To execute `delete-annotations` declaratively include the function in kpt package pipeline as follows:
@@ -25,7 +25,7 @@ To execute `delete-annotations` declaratively include the function in kpt packag
 ...
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/delete-annotations:unstable
+    - image: gcr.io/kpt-fn-contrib/delete-annotations:unstable
       configMap:
         annotationKeys: annotation.to.delete,another.annotation.to.delete
 ...

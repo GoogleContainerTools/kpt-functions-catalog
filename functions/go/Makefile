@@ -21,7 +21,6 @@ GOBIN := $(shell go env GOPATH)/bin
 FUNCTIONS := \
 	apply-setters \
 	create-setters \
-	delete-annotations \
 	enable-gcp-services \
 	ensure-name-substring \
 	export-terraform \

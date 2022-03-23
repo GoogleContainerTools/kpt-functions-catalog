@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/delete-annotations
+module github.com/GoogleContainerTools/kpt-functions-catalog/contrib/functions/go/delete-annotations
 
 go 1.17
 
