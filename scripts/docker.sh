@@ -52,7 +52,8 @@ function docker_build {
   [[ -f "${dockerfile}" ]] || err "Dockerfile does not exist: ${dockerfile}"
 
   # Use + conditional parameter expansion to protect from unbound array variable
-  docker build \
+  docker buildx build \
+    --platform=linux/amd64,linux/arm64 \
     -t "${GCR_REGISTRY}/${name}:${UNSTABLE_TAG}" \
     -f "${dockerfile}" \
     "${build_args[@]+"${build_args[@]}"}" \
