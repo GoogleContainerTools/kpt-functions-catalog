@@ -16,8 +16,4 @@
 
 set -euo pipefail
 
-GO_LICENSES_TMP_DIR=$(mktemp -d)
-cd "$GO_LICENSES_TMP_DIR"
-go mod init tmp
-go install github.com/google/go-licenses
-rm -rf "$GO_LICENSES_TMP_DIR"
+go install github.com/google/go-licenses@v1.0.0
