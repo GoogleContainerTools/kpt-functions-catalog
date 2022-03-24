@@ -43,7 +43,7 @@ check-licenses:
 	cd contrib/functions/ts && $(MAKE) check-licenses
 
 verify-docs:
-	go install github.com/monopole/mdrip@master
+	go install github.com/monopole/mdrip@v1.0.2
 	(cd scripts/patch_reader/ && go build -o patch_reader .)
 	scripts/verify-docs.py
 
