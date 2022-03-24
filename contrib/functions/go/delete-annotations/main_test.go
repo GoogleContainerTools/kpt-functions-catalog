@@ -3,9 +3,9 @@ package main
 import (
 	"testing"
 
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 var tests = []struct {
@@ -100,23 +100,22 @@ func TestPolicyResources(t *testing.T) {
 		test := tests[i]
 		t.Run(test.name, func(t *testing.T) {
 
-			var annotationKeys string
-			fcNode, err := yaml.Parse(test.config)
+			fcNode, err := fn.ParseKubeObject([]byte(test.config))
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
-			err = getAnnotationKeys(fcNode, &annotationKeys)
+			annotationKeys, err := getAnnotationKeys(fcNode)
 			if err != nil {
 				require.Equal(t, test.expectedResult[0], err.Error())
 				return
 			}
 
-			resource, err := yaml.Parse(test.input)
+			resource, err := fn.ParseKubeObject([]byte(test.input))
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
 
-			resources := append([]*yaml.RNode{}, resource)
+			resources := append([]*fn.KubeObject{}, resource)
 			items, err := processResources(resources, annotationKeys)
 			if err != nil {
 				t.Errorf("Error when calling processResources %s", err.Error())

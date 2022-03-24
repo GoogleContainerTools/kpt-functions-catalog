@@ -1,14 +1,11 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
 
-	"sigs.k8s.io/kustomize/kyaml/fn/framework"
-	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
-	"sigs.k8s.io/kustomize/kyaml/yaml"
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
 const (
@@ -18,91 +15,76 @@ const (
 
 //nolint
 func main() {
-	fp := DeleteAnnotationsProcessor{}
-	cmd := command.Build(&fp, command.StandaloneEnabled, false)
-	if err := cmd.Execute(); err != nil {
+	if err := fn.AsMain(fn.ResourceListProcessorFunc(deleteAnnotations)); err != nil {
 		os.Exit(1)
 	}
 }
-func (fp *DeleteAnnotationsProcessor) Process(resourceList *framework.ResourceList) error {
-	resourceList.Result = &framework.Result{
-		Name: "delete-annotations",
-	}
 
-	// get the annotation key from functionConfig
-	var annotationKeys string
-	err := getAnnotationKeys(resourceList.FunctionConfig, &annotationKeys)
+func deleteAnnotations(rl *fn.ResourceList) error {
+
+	var annotationKeys []string
+	annotationKeys, err := getAnnotationKeys(rl.FunctionConfig)
+
 	if err != nil {
-		resourceList.Result.Items = getErrorItem(err.Error())
+		rl.Results = append(rl.Results, getErrorItem(err.Error()))
 		return err
 	}
 
-	// process resources in the package and delete the annotation keys provided
-	items, err := processResources(resourceList.Items, annotationKeys)
+	items, err := processResources(rl.Items, annotationKeys)
 	if err != nil {
-		resourceList.Result.Items = getErrorItem(err.Error())
+		rl.Results = append(rl.Results, getErrorItem(err.Error()))
 		return err
 	}
-	resourceList.Result.Items = items
+
+	for _, resultItem := range items {
+		rl.Results = append(rl.Results, resultItem)
+	}
+
 	return nil
 }
 
-func processResources(resourceList []*yaml.RNode, keys string) ([]framework.ResultItem, error) {
-	var resultItems []framework.ResultItem
-	for _, node := range resourceList {
-		if node.IsNilOrEmpty() {
+func processResources(objects []*fn.KubeObject, annotationKeys []string) ([]*fn.Result, error) {
+	var resultItems []*fn.Result
+	for _, o := range objects {
+		if o.GetKind() == "" || o.GetName() == "" || o.GetAPIVersion() == "" {
 			continue
 		}
 
-		//confirm resources are valid
-		metadata, err := node.GetMeta()
-		if err != nil {
-			return nil, err
-		}
-
-		if metadata.Name == "" || metadata.Kind == "" {
-			continue
-		}
-
-		keysList := strings.Split(strings.TrimSpace(keys), annotationDelimeter)
-
-		for _, annotationKey := range keysList {
-			mutatedNode, err := node.Pipe(yaml.Lookup("metadata", "annotations"), yaml.FieldClearer{
-				Name: annotationKey})
-
+		for _, annotationKey := range annotationKeys {
+			removed, err := o.Remove("metadata", "annotations", annotationKey)
 			if err != nil {
 				return nil, err
 			}
 
-			if mutatedNode != nil {
-				itemFilePath := node.GetAnnotations()["internal.config.kubernetes.io/path"]
+			if removed {
+				itemFilePath := o.GetAnnotations()["internal.config.kubernetes.io/path"]
 				if itemFilePath == "" {
-					itemFilePath = node.GetAnnotations()["config.kubernetes.io/path"]
+					itemFilePath = o.GetAnnotations()["config.kubernetes.io/path"]
 				}
 
-				resultItems = append(resultItems, framework.ResultItem{
-					Message: fmt.Sprintf("Annonation: [%s] removed from resource: [%s]", annotationKey, node.GetName()),
-					File: framework.File{
+				resultItems = append(resultItems, &fn.Result{
+					Message: fmt.Sprintf("Annonation: [%s] removed from resource: [%s]", annotationKey, o.GetName()),
+					File: &fn.File{
 						Path: itemFilePath,
 					},
-					Severity: framework.Info,
+					Severity: fn.Info,
 				})
 			}
 		}
 	}
 
 	if len(resultItems) > 0 {
-		infoResultSlice := []framework.ResultItem{}
-		infoResultSlice = append(infoResultSlice, framework.ResultItem{
-			Severity: framework.Info,
+		infoResultSlice := []*fn.Result{}
+		infoResultSlice = append(infoResultSlice, &fn.Result{
+			Severity: fn.Info,
 			Message:  "The following annotations were deleted from the resources",
 		})
 
 		resultItems = append(infoResultSlice, resultItems...)
 	} else if len(resultItems) == 0 {
-		resultItems = append(resultItems, framework.ResultItem{
+		resultItems = append(resultItems, &fn.Result{
 			Message:  "None of the resources had the provided annotations to delete",
-			Severity: framework.Warning,
+			Severity: fn.Warning,
 		})
 	}
 
@@ -110,24 +92,21 @@ func processResources(resourceList []*yaml.RNode, keys string) ([]framework.Resu
 }
 
 // getAnnotationKeys gets the keys to delete from resources from the functionConfig
-func getAnnotationKeys(fc *yaml.RNode, keys *string) error {
-	if len(fc.GetDataMap()) < 1 {
-		return errors.New("expecting 1 or more annotation keys to delete as part of the ConfigMap")
+func getAnnotationKeys(fc *fn.KubeObject) ([]string, error) {
+	annotationKeysString := fc.GetStringOrDie("data", annotationKeysLiteral)
+
+	if annotationKeysString == "" {
+		return nil, fmt.Errorf("%s was not provided as part of the config or paramters to the function", annotationKeysLiteral)
 	}
 
-	*keys = fc.GetDataMap()[annotationKeysLiteral]
-
-	return nil
+	annotationKeys := strings.Split(strings.TrimSpace(annotationKeysString), annotationDelimeter)
+	return annotationKeys, nil
 }
 
 // getErrorItem returns the item for an error message
-func getErrorItem(errMsg string) []framework.ResultItem {
-	return []framework.ResultItem{
-		{
-			Message:  fmt.Sprintf("failed to process resources: %s", errMsg),
-			Severity: framework.Error,
-		},
+func getErrorItem(errMsg string) *fn.Result {
+	return &fn.Result{
+		Message:  fmt.Sprintf("failed to process resources: %s", errMsg),
+		Severity: fn.Error,
 	}
 }
-
-type DeleteAnnotationsProcessor struct{}
