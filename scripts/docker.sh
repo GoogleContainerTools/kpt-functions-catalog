@@ -51,13 +51,8 @@ function docker_build {
   [[ -f "${override_dockerfile}" ]] && dockerfile="${override_dockerfile}"
   [[ -f "${dockerfile}" ]] || err "Dockerfile does not exist: ${dockerfile}"
 
-  # cross platform building guide is here:
-  # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
-  docker buildx create --use
-
   # Use + conditional parameter expansion to protect from unbound array variable
-  docker buildx build \
-    --platform=linux/amd64,linux/arm64 \
+  docker build \
     -t "${GCR_REGISTRY}/${name}:${UNSTABLE_TAG}" \
     -f "${dockerfile}" \
     "${build_args[@]+"${build_args[@]}"}" \
