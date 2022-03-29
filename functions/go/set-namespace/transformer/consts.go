@@ -28,20 +28,7 @@ const (
 	nameIdx             = 4
 )
 
-type UpdateMode int
-
 var (
-	// Users provide the `namespaceSelector`, only update the namespace field matching the`namespaceSelector`.
-	CustomSelector UpdateMode = 1
-
-	// The `namespaceSelector` is not given but the input resource contains one and only one namespace object,
-	// only update the namespace field matching the namespace `metadata.name`.
-	NsObjectSelector UpdateMode = 2
-
-	// Neither `namespaceSelector` or namespace objects are given, require all namespace-scoped resources have unique
-	// namespace value and update this namespace to the new value.
-	Restrict UpdateMode = 3
-
 	// <group>/namespaces/<namespace>/<kind>/<name>
 	namespacedResourcePattern = regexp.MustCompile(`\A([-.\w]*)/namespaces/([-.\w]*)/([-.\w]*)/([-.\w]*)\z`)
 	dependsOnKeyPattern       = func(group, kind, name string) string {
