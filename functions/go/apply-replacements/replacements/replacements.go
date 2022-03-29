@@ -2,6 +2,7 @@ package replacements
 
 import (
 	"fmt"
+
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/kustomize/api/filters/replacement"
 	"sigs.k8s.io/kustomize/api/types"
@@ -11,7 +12,7 @@ import (
 const fnConfigKind = "ApplyReplacements"
 const fnConfigApiVersion = "fn.kpt.dev/v1alpha1"
 
-func ApplyReplacements(rl *fn.ResourceList) error {
+func ApplyReplacements(rl *fn.ResourceList) (bool, error) {
 	r := Replacements{}
 	return r.Process(rl)
 }
@@ -36,16 +37,18 @@ func (r *Replacements) Config(functionConfig *fn.KubeObject) error {
 }
 
 // Process configures the replacements and transformers them.
-func (r *Replacements) Process(rl *fn.ResourceList) error {
+func (r *Replacements) Process(rl *fn.ResourceList) (bool, error) {
 	if err := r.Config(rl.FunctionConfig); err != nil {
-		return err
+		rl.LogResult(err)
+		return false, nil
 	}
 	transformedItems, err := r.Transform(rl.Items)
 	if err != nil {
-		return err
+		rl.LogResult(err)
+		return false, nil
 	}
 	rl.Items = transformedItems
-	return nil
+	return true, nil
 }
 
 // Transform runs the replacement filter in order to apply the replacements - this
