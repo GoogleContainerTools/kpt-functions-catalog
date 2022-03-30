@@ -18,3 +18,4 @@ source: |
   load('time.star', 'time')
   load('xlsx.star', 'xlsx')
   load('zipfile.star', 'ZipFile')
+  load('krmfn.star', 'krmfn')
