@@ -49,7 +49,14 @@ func (p *NamespaceTransformer) Config(o *fn.KubeObject) error {
 	case o.IsGVK("v1", "ConfigMap"):
 		p.NewNamespace = o.GetStringOrDie("data", "namespace")
 		if p.NewNamespace == "" {
-			return fmt.Errorf("`data.namespace` should not be empty")
+			if o.GetName() == "kptfile.kpt.dev" {
+				p.NewNamespace = o.GetStringOrDie("data", "name")
+				if p.NewNamespace == "" {
+					return fmt.Errorf("`data.name` should not be empty")
+				}
+			} else {
+				return fmt.Errorf("`data.namespace` should not be empty")
+			}
 		}
 		p.namespaceSelector = o.GetStringOrDie("data", "namespaceSelector")
 	case o.IsGVK(fnConfigAPIVersion, fnConfigKind):
@@ -58,11 +65,6 @@ func (p *NamespaceTransformer) Config(o *fn.KubeObject) error {
 			return fmt.Errorf("`namespace` should not be empty")
 		}
 		p.namespaceSelector = o.GetStringOrDie("data", "namespaceSelector")
-	case o.IsGVK("v1", "ConfigMap") && o.GetName() == "kptfile.kpt.dev":
-		p.NewNamespace = o.GetStringOrDie("data", "name")
-		if p.NewNamespace == "" {
-			return fmt.Errorf("`data.name` should not be empty")
-		}
 	default:
 		return fmt.Errorf("unknown functionConfig Kind=%v ApiVersion=%v, expect `%v` or `ConfigMap`",
 			o.GetKind(), o.GetAPIVersion(), fnConfigKind)
@@ -158,7 +160,7 @@ func ReplaceNamespace(objects []*fn.KubeObject, oldNs, newNs string) {
 func GetDependsOnMap(objects []*fn.KubeObject) map[string]bool {
 	dependsOnMap := map[string]bool{}
 	VisitNamespaces(objects, func(ns *Namespace) {
-		key := ns.GetDependsOnAnno()
+		key := ns.GetDependsOnAnnotation()
 		dependsOnMap[key] = true
 	})
 	return dependsOnMap
@@ -167,16 +169,16 @@ func GetDependsOnMap(objects []*fn.KubeObject) map[string]bool {
 // UpdateAnnotation updates the `objects`'s "config.kubernetes.io/depends-on" annotation which contains namespace value.
 func UpdateAnnotation(objects []*fn.KubeObject, oldNs, newNs string, dependsOnMap map[string]bool) {
 	VisitNamespaces(objects, func(ns *Namespace) {
-		if ns.DependsOnAnno == "" || !namespacedResourcePattern.MatchString(ns.DependsOnAnno) {
+		if ns.DependsOnAnnotation == "" || !namespacedResourcePattern.MatchString(ns.DependsOnAnnotation) {
 			return
 		}
-		segments := strings.Split(ns.DependsOnAnno, "/")
+		segments := strings.Split(ns.DependsOnAnnotation, "/")
 		dependsOnkey := dependsOnKeyPattern(segments[groupIdx], segments[kindIdx], segments[nameIdx])
 		if ok := dependsOnMap[dependsOnkey]; ok {
 			if segments[namespaceIdx] == oldNs {
 				segments[namespaceIdx] = newNs
-				newAnno := strings.Join(segments, "/")
-				ns.SetDependsOnAnno(newAnno)
+				newAnnotation := strings.Join(segments, "/")
+				ns.SetDependsOnAnnotation(newAnnotation)
 			}
 		}
 	})
@@ -232,12 +234,12 @@ type NamespaceTransformer struct {
 
 func NewNamespace(obj *fn.KubeObject, path []string) *Namespace {
 	setter := func(newNs string) {
-		obj.Set(newNs, path...)
+		_ = obj.Set(newNs, path...)
 	}
-	annoSetter := func(newAnno string) {
-		obj.SetAnnotation(dependsOnAnnotation, newAnno)
+	annotationSetter := func(newAnnotation string) {
+		obj.SetAnnotation(dependsOnAnnotation, newAnnotation)
 	}
-	annoGetter := func() string {
+	annotationGetter := func() string {
 		group := obj.GetAPIVersion()
 		if i := strings.Index(obj.GetAPIVersion(), "/"); i > -1 {
 			group = group[:i]
@@ -245,33 +247,32 @@ func NewNamespace(obj *fn.KubeObject, path []string) *Namespace {
 		return dependsOnKeyPattern(group, obj.GetKind(), obj.GetName())
 	}
 	return &Namespace{
-		Name:          obj.GetStringOrDie(path...),
-		IsNamespace:   obj.IsGVK("v1", "Namespace"),
-		DependsOnAnno: obj.GetAnnotations()[dependsOnAnnotation],
-		setter:        setter,
-		annoGetter:    annoGetter,
-		annoSetter:    annoSetter,
+		Name:                obj.GetStringOrDie(path...),
+		IsNamespace:         obj.IsGVK("v1", "Namespace"),
+		DependsOnAnnotation: obj.GetAnnotations()[dependsOnAnnotation],
+		setter:              setter,
+		annotationGetter:    annotationGetter,
+		annotationSetter:    annotationSetter,
 	}
 }
 
 type Namespace struct {
-	Name          string
-	IsNamespace   bool
-	DependsOnAnno string
-	obj           *fn.KubeObject
-	setter        func(newNs string)
-	annoGetter    func() string
-	annoSetter    func(newDependsOnAnno string)
+	Name                string
+	IsNamespace         bool
+	DependsOnAnnotation string
+	setter              func(newNs string)
+	annotationGetter    func() string
+	annotationSetter    func(newDependsOnAnnotation string)
 }
 
 func (n *Namespace) Set(newNs string) {
 	n.setter(newNs)
 }
 
-func (n *Namespace) SetDependsOnAnno(newDependsOnAnno string) {
-	n.annoSetter(newDependsOnAnno)
+func (n *Namespace) SetDependsOnAnnotation(newDependsOn string) {
+	n.annotationSetter(newDependsOn)
 }
 
-func (n *Namespace) GetDependsOnAnno() string {
-	return n.annoGetter()
+func (n *Namespace) GetDependsOnAnnotation() string {
+	return n.annotationGetter()
 }
