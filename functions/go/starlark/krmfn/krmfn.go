@@ -26,8 +26,6 @@ func matchGVKN(thread *starlark.Thread, _ *starlark.Builtin, args starlark.Tuple
 	if err != nil {
 		return nil, err
 	}
-	if obj.GetAPIVersion() == apiVersion && obj.GetKind() == kind && obj.GetName() == name {
-		return starlark.Bool(true), nil
-	}
-	return starlark.Bool(false), nil
+	match := obj.GetAPIVersion() == apiVersion && obj.GetKind() == kind && obj.GetName() == name
+	return starlark.Bool(match), nil
 }
