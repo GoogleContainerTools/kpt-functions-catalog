@@ -19,3 +19,7 @@ source: |
   load('xlsx.star', 'xlsx')
   load('zipfile.star', 'ZipFile')
   load('krmfn.star', 'krmfn')
+
+  for r in ctx.resource_list["items"]:
+      if not krmfn.match_gvk(r, "kpt.dev/v1", "Kptfile") and krmfn.match_name(r, "my-nginx"):
+        r["metadata"]["namespace"] = "my-ns"
