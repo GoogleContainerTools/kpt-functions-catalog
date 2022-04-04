@@ -22,13 +22,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-func SetNamespace(rl *fn.ResourceList) error {
+func SetNamespace(rl *fn.ResourceList) (bool, error) {
 	tc := NamespaceTransformer{}
 	// Get "namespace" arguments from FunctionConfig
 	err := tc.Config(rl.FunctionConfig)
 	if err != nil {
 		rl.Results = append(rl.Results, fn.ErrorConfigObjectResult(err, rl.FunctionConfig))
-		return nil
+		return true, nil
 	}
 	// Update "namespace" to the proper resources.
 	tc.Transform(rl.Items)
@@ -40,7 +40,7 @@ func SetNamespace(rl *fn.ResourceList) error {
 		result = fn.GeneralResult("namespace updated", fn.Info)
 	}
 	rl.Results = append(rl.Results, result)
-	return nil
+	return true, nil
 }
 
 // Config gets the attributes from different FunctionConfig formats.
@@ -84,43 +84,42 @@ func (p *NamespaceTransformer) Transform(objects []*fn.KubeObject) {
 	}
 }
 
-// VisitNamespaces iterates the `objects` to execute the `callback` function on each corresponding namespace field.
-func VisitNamespaces(objects []*fn.KubeObject, callback func(ns *Namespace)) {
+// VisitNamespaces iterates the `objects` to execute the `visitor` function on each corresponding namespace field.
+func VisitNamespaces(objects []*fn.KubeObject, visitor func(namespace *Namespace)) {
 	for _, o := range objects {
 		switch {
 		// Skip local resource which `kpt live apply` skips.
 		case o.IsLocalConfig():
 			continue
 		case o.IsGVK("v1", "Namespace"):
-			ns := NewNamespace(o, []string{"metadata", "name"})
-			callback(ns)
+			namespace := o.GetStringOrDie("metadata", "name")
+			visitor(NewNamespace(o, &namespace))
+			o.SetOrDie(&namespace, "metadata", "name")
 		case o.IsGVK("apiextensions.k8s.io/v1", "CustomResourceDefinition"):
-			fields := []string{"spec", "conversion", "webhook", "clientConfig", "service", "namespace"}
-			callback(NewNamespace(o, fields))
+			namespace := o.GetStringOrDie("spec", "conversion", "webhook", "clientConfig", "service", "namespace")
+			visitor(NewNamespace(o, &namespace))
+			o.SetOrDie(&namespace, "spec", "conversion", "webhook", "clientConfig", "service", "namespace")
 		case o.IsGVK("apiregistration.k8s.io/v1", "APIService"):
-			fields := []string{"spec", "service", "namespace"}
-			callback(NewNamespace(o, fields))
-		/* TODO(yuwenma): waiting for the new features in kpt-functions-sdk to merge in.
+			namespace := o.GetStringOrDie("spec", "service", "namespace")
+			visitor(NewNamespace(o, &namespace))
+			o.SetOrDie(&namespace, "spec", "service", "namespace")
 		case o.GetKind() == "ClusterRoleBinding" || o.GetKind() == "RoleBinding":
-		subjects := o.GetSliceOrDie("subjects")
-		for _, s := range subjects {
-			if s.GetKind() == "ServiceAccount" {
-				ns := s.GetNamespace()
-				visitor(ns, false)
-				nsCollector <- func() {
-					nsPtr := &ns
-					p.updateNamespace(nsPtr)
-					s.SetNamespace(*nsPtr)
-					o.SetOrDie(&subjects, "subjects")
+			subjects := o.GetSlice("subjects")
+			for _, s := range subjects {
+				var ns string
+				found, _ := s.Get(&ns, "namespace")
+				if found {
+					visitor(NewNamespace(o, &ns))
+					_ = s.Set(&ns, "namespace")
 				}
 			}
-		}
-		*/
+			o.SetOrDie(&subjects, "subjects")
 		case o.HasNamespace():
 			// Only update the namespace scoped resource. To determine if a resource is namespace scoped,
 			// we assume its namespace should have been set.
-			fields := []string{"metadata", "namespace"}
-			callback(NewNamespace(o, fields))
+			namespace := o.GetStringOrDie("metadata", "namespace")
+			visitor(NewNamespace(o, &namespace))
+			o.SetOrDie(&namespace, "metadata", "namespace")
 		default:
 			// skip the cluster scoped resource. We determine if a resource is cluster scoped by
 			// checking if the metadata.namespace is configured.
@@ -133,13 +132,13 @@ func FindAllNamespaces(objects []*fn.KubeObject) ([]string, map[string]int) {
 	nsObjCounter := map[string]int{}
 	namespaces := sets.NewString()
 	VisitNamespaces(objects, func(ns *Namespace) {
-		if ns.Name == "" {
+		if *ns.Ptr == "" {
 			return
 		}
 		if ns.IsNamespace {
-			nsObjCounter[ns.Name] += 1
+			nsObjCounter[*ns.Ptr] += 1
 		}
-		namespaces.Insert(ns.Name)
+		namespaces.Insert(*ns.Ptr)
 	})
 	return namespaces.List(), nsObjCounter
 }
@@ -147,11 +146,11 @@ func FindAllNamespaces(objects []*fn.KubeObject) ([]string, map[string]int) {
 // ReplaceNamespace iterates the `objects` to replace the `OldNs` with `newNs` on namespace field.
 func ReplaceNamespace(objects []*fn.KubeObject, oldNs, newNs string) {
 	VisitNamespaces(objects, func(ns *Namespace) {
-		if ns.Name == "" {
+		if *ns.Ptr == "" {
 			return
 		}
-		if ns.Name == oldNs {
-			ns.Set(newNs)
+		if *ns.Ptr == oldNs {
+			*ns.Ptr = newNs
 		}
 	})
 }
@@ -232,10 +231,7 @@ type NamespaceTransformer struct {
 	Errors            []string
 }
 
-func NewNamespace(obj *fn.KubeObject, path []string) *Namespace {
-	setter := func(newNs string) {
-		_ = obj.Set(newNs, path...)
-	}
+func NewNamespace(obj *fn.KubeObject, namespacePtr *string) *Namespace {
 	annotationSetter := func(newAnnotation string) {
 		obj.SetAnnotation(dependsOnAnnotation, newAnnotation)
 	}
@@ -247,26 +243,20 @@ func NewNamespace(obj *fn.KubeObject, path []string) *Namespace {
 		return dependsOnKeyPattern(group, obj.GetKind(), obj.GetName())
 	}
 	return &Namespace{
-		Name:                obj.GetStringOrDie(path...),
+		Ptr:                 namespacePtr, //  obj.GetStringOrDie(path...),
 		IsNamespace:         obj.IsGVK("v1", "Namespace"),
 		DependsOnAnnotation: obj.GetAnnotations()[dependsOnAnnotation],
-		setter:              setter,
 		annotationGetter:    annotationGetter,
 		annotationSetter:    annotationSetter,
 	}
 }
 
 type Namespace struct {
-	Name                string
+	Ptr                 *string
 	IsNamespace         bool
 	DependsOnAnnotation string
-	setter              func(newNs string)
 	annotationGetter    func() string
 	annotationSetter    func(newDependsOnAnnotation string)
-}
-
-func (n *Namespace) Set(newNs string) {
-	n.setter(newNs)
 }
 
 func (n *Namespace) SetDependsOnAnnotation(newDependsOn string) {
