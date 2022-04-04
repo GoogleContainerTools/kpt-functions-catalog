@@ -1,17 +1,20 @@
-package main
+package starlark
 
 import (
 	"testing"
 
-	"sigs.k8s.io/kustomize/kyaml/yaml"
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestStarlarkFunctionConfig(t *testing.T) {
+func TestStarlarkConfig(t *testing.T) {
 	testcases := []struct {
+		name         string
 		config       string
 		expectErrMsg string
 	}{
 		{
+			name: "valid StarlarkRun",
 			config: `apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
@@ -25,14 +28,16 @@ source: |
 `,
 		},
 		{
+			name: "StarlarkRun missing Source",
 			config: `apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
   name: my-star-fn
 `,
-			expectErrMsg: "`source` in `StarlarkRun` must not be empty",
+			expectErrMsg: "`source` must not be empty",
 		},
 		{
+			name: "valid ConfigMap",
 			config: `apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -46,14 +51,16 @@ data:
 `,
 		},
 		{
+			name: "ConfigMap missing source",
 			config: `apiVersion: v1
 kind: ConfigMap
 metadata:
   name: my-star-fn
 `,
-			expectErrMsg: "`data.source` must not be empty in `ConfigMap`",
+			expectErrMsg: "`source` must not be empty",
 		},
 		{
+			name: "ConfigMap with parameter but missing source",
 			config: `apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -61,23 +68,22 @@ metadata:
 data:
   param1: foo
 `,
-			expectErrMsg: "`data.source` must not be empty in `ConfigMap`",
+			expectErrMsg: "`source` must not be empty",
 		},
 	}
 	for _, tc := range testcases {
-		var sfc StarlarkFnConfig
-		if err := yaml.Unmarshal([]byte(tc.config), &sfc); err != nil {
-			t.Errorf("unexpcted error: %v", err)
-			continue
-		}
-		err := sfc.Validate()
-		switch {
-		case err != nil && tc.expectErrMsg == "":
-			t.Errorf("unexpected error: %v", err)
-		case err == nil && tc.expectErrMsg != "":
-			t.Errorf("expect error: %v, but got nothing", tc.expectErrMsg)
-		case err != nil && err.Error() != tc.expectErrMsg:
-			t.Errorf("expect error: %v, but got: %v", tc.expectErrMsg, err)
-		}
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			sr := &StarlarkRun{}
+			ko, err := fn.ParseKubeObject([]byte(tc.config))
+			assert.NoError(t, err)
+			err = sr.Config(ko)
+			if tc.expectErrMsg == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tc.expectErrMsg)
+			}
+		})
 	}
 }
