@@ -1,19 +1,24 @@
 diff --git a/app.yaml b/app.yaml
-index d67a0d2..bf55161 100644
+index 1e641f7..bb4be90 100644
 --- a/app.yaml
 +++ b/app.yaml
-@@ -9,7 +9,7 @@ apiVersion: v1
- kind: Service
+@@ -2,6 +2,9 @@ apiVersion: v1
+ kind: ConfigMap
+ metadata:
+   name: the-map
++  labels:
++    color: orange
++    fruit: apple
+ data:
+   some-key: some-value
+ ---
+@@ -10,6 +13,9 @@ kind: MyResource
  metadata:
    name: the-service
--  namespace: example
-+  namespace: new-ns
+   namespace: the-namespace
++  labels:
++    color: orange
++    fruit: apple
  spec:
-   ports:
-     - name: etcd-server-ssl
-@@ -34,4 +34,4 @@ spec:
- apiVersion: v1
- kind: Namespace
- metadata:
--  name: example
-+  name: new-ns
+   selector:
+     labels:
