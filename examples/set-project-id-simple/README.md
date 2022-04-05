@@ -24,7 +24,7 @@ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/ex
 Invoke the function with the following command:
 
 ```shell
-kpt fn eval set-project-id-simple --include-meta-resources --image gcr.io/kpt-fn/set-project-id:unstable -- 'project-id=foo'
+kpt fn eval set-project-id-simple --image gcr.io/kpt-fn/set-project-id:unstable -- 'project-id=foo'
 ```
 
 ### Expected result
