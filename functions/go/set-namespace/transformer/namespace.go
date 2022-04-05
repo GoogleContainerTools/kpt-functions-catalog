@@ -103,7 +103,7 @@ func VisitNamespaces(objects []*fn.KubeObject, visitor func(namespace *Namespace
 			namespace := o.GetStringOrDie("spec", "service", "namespace")
 			visitor(NewNamespace(o, &namespace))
 			o.SetOrDie(&namespace, "spec", "service", "namespace")
-		case o.GetKind() == "ClusterRoleBinding" || o.GetKind() == "RoleBinding":
+		case o.GetKind() == "ClusterRoleBinding":
 			subjects := o.GetSlice("subjects")
 			for _, s := range subjects {
 				var ns string
