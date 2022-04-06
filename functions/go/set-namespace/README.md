@@ -36,21 +36,21 @@ This function replaces the KRM resources existing namespace to a new value.
 
 This function supports the default `ConfigMap` as function config and a custom `SetNamespace`. See below examples
 
-ConfigMap as functionConfig
+`ConfigMap` as functionConfig
 ```yaml
 apiVersion: v1
 kind: ConfigMap
 data:
   namespace: newNamespace # required
-  namespaceSelector: example # update namespace whose value is "example" to "newNamespace"
+  namespaceMatcher: example # update namespace whose value is "example" to "newNamespace"
 ```
 
-SetNamespace as functionConfig
+`SetNamespace` as functionConfig
 ```yaml
 apiVersion: fn.kpt.dev/v1alpha1
 kind: SetNamespace
 namespace: newNamespace # required
-namespaceSelector: example # update namespace whose value is "example" to "newNamespace"
+namespaceMatcher: example # update namespace whose value is "example" to "newNamespace"
 ```
 
 
@@ -61,7 +61,7 @@ This function supports three modes to flexibly choose and update the target name
 ##### Restrict Mode
 All target KRM resources namespace has to have the same value. All namespace will be updated to the new value. 
 
-ConfigMap as functionConfig
+`ConfigMap` as functionConfig
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -71,9 +71,9 @@ data:
 
 ##### DefaultNamespace Mode
 
-The input `resourcelist.items` contains one and only one namespace object. The function matches the namespace `metadata.name`
-with all other KRM resources, and only update the namespace if it matches the namespace object. 
-If more than one namespace objects are found, raise errors;
+The input `resourcelist.items` contains one and only one `Namespace` object. The function matches the namespace `metadata.name`
+with all other KRM resources, and only update the namespace if it matches the `Namespace` object. 
+If more than one `Namespace` objects are found, raise errors;
 
 ```yaml
 kind: ResourceList
@@ -99,31 +99,31 @@ items:
     namespace: irrelevant # skip since namespace does not match "example".
 ```
 
-##### Selector Mode
+##### Matcher Mode
 
 Only updates the namespace which matches a given value. The "oldNamespace" refers to the argument in FunctionConfig
 
-ConfigMap as functionConfig
+`ConfigMap` as functionConfig
 ```yaml
 apiVersion: v1
 kind: ConfigMap
 data:
   namespace: newNamespace
-  namespaceSelector: example # update namespace whose value is "example" to "newNamespace"
+  namespaceMatcher: example # update namespace whose value is "example" to "newNamespace"
 ```
 
-SetNamespace as functionConfig
+`SetNamespace` as functionConfig
 ```yaml
 apiVersion: fn.kpt.dev/v1alpha1
 kind: SetNamespace
 namespace: newNamespace
-namespaceSelector: example # update namespace whose value is "example" to "newNamespace"
+namespaceMatcher: example # update namespace whose value is "example" to "newNamespace"
 ```
 
 ### DependsOn annotation
 
 DependsOn annotation is a [kpt feature](https://kpt.dev/reference/annotations/depends-on/). This function updates the 
-namespace segment in a depends-on annotation if matches oldNs
+namespace segment in a depends-on annotation if the namespace matches the `Namespace` object or `namespaceMatcher` field.
 
 <!--mdtogo-->
 

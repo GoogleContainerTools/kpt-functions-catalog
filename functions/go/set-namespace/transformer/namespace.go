@@ -58,13 +58,13 @@ func (p *NamespaceTransformer) Config(o *fn.KubeObject) error {
 				return fmt.Errorf("`data.namespace` should not be empty")
 			}
 		}
-		p.namespaceSelector = o.GetStringOrDie("data", "namespaceSelector")
+		p.NamespaceMatcher = o.GetStringOrDie("data", "namespaceMatcher")
 	case o.IsGVK(fnConfigAPIVersion, fnConfigKind):
 		p.NewNamespace = o.GetStringOrDie("namespace")
 		if p.NewNamespace == "" {
 			return fmt.Errorf("`namespace` should not be empty")
 		}
-		p.namespaceSelector = o.GetStringOrDie("data", "namespaceSelector")
+		p.NamespaceMatcher = o.GetStringOrDie("data", "namespaceMatcher")
 	default:
 		return fmt.Errorf("unknown functionConfig Kind=%v ApiVersion=%v, expect `%v` or `ConfigMap`",
 			o.GetKind(), o.GetAPIVersion(), fnConfigKind)
@@ -186,17 +186,17 @@ func UpdateAnnotation(objects []*fn.KubeObject, oldNs, newNs string, dependsOnMa
 // GetOldNamespace finds the existing namespace and make sure the input resourceList.items satisfy the requirements.
 // - no more than one Namespace Object can exist in the input resource.items
 // - If Namespace object exists, its name is the `oldNs`
-// - If `namespaceSelector` is given, its value is the `oldNs`
-// - If neither Namespace object nor `namespaceSelector` found, all resources should have the same namespace value and
+// - If `namespaceMatcher` is given, its value is the `oldNs`
+// - If neither Namespace object nor `namespaceMatcher` found, all resources should have the same namespace value and
 // this value is teh `oldNs`
 func (p *NamespaceTransformer) GetOldNamespace(fromResources []string, nsCount map[string]int) (string, bool) {
-	if p.namespaceSelector != "" {
+	if p.NamespaceMatcher != "" {
 		if len(nsCount) == 0 {
-			return p.namespaceSelector, true
+			return p.NamespaceMatcher, true
 		}
 		p.Errors = append(p.Errors,
 			"found Namespace objects from the input resources, "+
-				"you cannot use `namespaceSelector` in FunctionConfig together with Namespace objects")
+				"you cannot use `namespaceMatcher` in FunctionConfig together with Namespace objects")
 		return "", false
 	}
 	if len(nsCount) > 1 {
@@ -206,7 +206,7 @@ func (p *NamespaceTransformer) GetOldNamespace(fromResources []string, nsCount m
 		return "", false
 	}
 	if len(nsCount) == 1 {
-		// Use the namespace object as the matching namespace if `namespaceSelector` is not given.
+		// Use the namespace object as the matching namespace if `namespaceMatcher` is not given.
 		oldNs := reflect.ValueOf(nsCount).MapKeys()[0].String()
 		if nsCount[oldNs] > 1 {
 			msg := fmt.Sprintf("found more than one Namespace objects of the same name %v", oldNs)
@@ -225,10 +225,10 @@ func (p *NamespaceTransformer) GetOldNamespace(fromResources []string, nsCount m
 }
 
 type NamespaceTransformer struct {
-	NewNamespace      string
-	namespaceSelector string
-	DependsOnMap      map[string]bool
-	Errors            []string
+	NewNamespace     string
+	NamespaceMatcher string
+	DependsOnMap     map[string]bool
+	Errors           []string
 }
 
 func NewNamespace(obj *fn.KubeObject, namespacePtr *string) *Namespace {
