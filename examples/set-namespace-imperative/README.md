@@ -2,9 +2,9 @@
 
 ### Overview
 
-This examples shows how to set namespace in the `.metadata.namespace` field on
-all resources by running [`set-namespace`] function imperatively. Resources that
-are known to be cluster-scoped will be skipped.
+This examples shows how to replace KRM resources' namespace fields by matching
+the namespace with the namespace object's `metadata.name`.  
+The example uses `kpt fn eval` to run the function imperatively.
 
 ### Fetch the example package
 
@@ -27,6 +27,7 @@ The desired namespace is provided after `--` and it will be converted to
 
 ### Expected result
 
-Check all resources have `metadata.namespace` set to `example-ns`:
+Only the namespace fields which match the `namespace` "example" object has the value updated to
+`new-ns`:
 
 [`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
