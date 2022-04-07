@@ -12,7 +12,7 @@ line arguments.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark-configmap-as-functionconfig
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark-configmap-as-functionconfig@starlark/v0.4.0
 ```
 
 We are going to use the following starlark script:
@@ -33,11 +33,11 @@ setReplicas(ctx.resource_list["items"], replicas)
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/starlark:unstable -- source="$(cat set-replicas.star)" replicas=5
+$ kpt fn eval --image gcr.io/kpt-fn/starlark:v0.4.0 -- source="$(cat set-replicas.star)" replicas=5
 ```
 
 ### Expected result
 
 Check the `spec.replicas` field has been set to `5` in the `Deployment`.
 
-[`starlark`]: https://catalog.kpt.dev/starlark/v0.1/
+[`starlark`]: https://catalog.kpt.dev/starlark/v0.4/
