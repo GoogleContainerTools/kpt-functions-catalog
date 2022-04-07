@@ -4,5 +4,5 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/ensure-name-substring:unstable
+    - image: gcr.io/kpt-fn/ensure-name-substring:v0.2.0
       configPath: fn-config.yaml
