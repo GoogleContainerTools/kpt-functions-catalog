@@ -10,7 +10,7 @@ to replace the  `namespace` resource type in a variety of KRM resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-simple
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-simple@set-namespace/v0.3.0
 ```
 
 We use the following `Kptfile` to configure the function.
@@ -22,7 +22,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-namespace:unstable
+    - image: gcr.io/kpt-fn/set-namespace:v0.3.0
       configMap:
         namespace: example-ns
 ```
@@ -43,4 +43,4 @@ $ kpt fn render set-namespace-simple
 
 Check all resources have `metadata.namespace` set to `example-ns`
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3/

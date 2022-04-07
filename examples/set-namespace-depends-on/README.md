@@ -16,7 +16,7 @@ portion of the annotation.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-depends-on
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-depends-on@set-namespace/v0.3.0
 ```
 
 We use the following `Kptfile` to configure the function.
@@ -28,7 +28,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-namespace:unstable
+    - image: gcr.io/kpt-fn/set-namespace:v0.3.0
       configMap:
         namespace: example-ns
 ```
@@ -56,5 +56,5 @@ the package.
 annotation updated, since it references a namespaced resource which was not
 included in the package.
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3/
 [`depends-on`]: https://kpt.dev/reference/annotations/depends-on/
