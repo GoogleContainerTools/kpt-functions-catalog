@@ -10,7 +10,7 @@ function to prepend prefix in the resource names.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring-prefix
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/ensure-name-substring-prefix@ensure-name-substring/v0.2.0
 ```
 
 We use the following `Kptfile` to run the function.
@@ -22,7 +22,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/ensure-name-substring:unstable
+    - image: gcr.io/kpt-fn/ensure-name-substring:v0.2.0
       configMap:
         prepend: prod-
 ```
@@ -44,4 +44,4 @@ Check all resources have `prod-` in their names:
 We have a `Service` object whose name is `with-prod-service` which already
 contains substring `prod-`. This resource will be skipped.
 
-[ensure-name-substring]: https://catalog.kpt.dev/ensure-name-substring/v0.1/
+[ensure-name-substring]: https://catalog.kpt.dev/ensure-name-substring/v0.2/
