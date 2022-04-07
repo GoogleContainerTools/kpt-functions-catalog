@@ -4,5 +4,5 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/apply-replacements:unstable
+    - image: gcr.io/kpt-fn/apply-replacements:v0.1.0
       configPath: replacements.yaml
