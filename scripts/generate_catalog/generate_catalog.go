@@ -298,9 +298,10 @@ func copyExamples(b string, exampleSources []string, versionDest, minorVersion s
 	}
 
 	for _, exampleSource := range exampleSources {
-		splitedPaths := strings.SplitN(exampleSource, minorVersion+string(filepath.Separator), 2)
+		// We will split something like "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.2/examples/set-namespace-simple" by something like "v0.3"
+		splitedPaths := strings.SplitN(exampleSource, minorVersion, 2)
 		if len(splitedPaths) != 2 {
-			return fmt.Errorf("expect 2 substring after spliting %q by %q", exampleSource, minorVersion+string(filepath.Separator))
+			return fmt.Errorf("expect 2 substring after spliting %q by %q", exampleSource, minorVersion)
 		}
 		relativePath := splitedPaths[1]
 		// Fetch example into temporary directory.
