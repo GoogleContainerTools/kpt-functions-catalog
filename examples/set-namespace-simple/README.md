@@ -22,7 +22,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-namespace:v0.3.0
+    - image: gcr.io/kpt-fn/set-namespace:v0.3.2
       configMap:
         namespace: example-ns
 ```
