@@ -103,7 +103,7 @@ func VisitNamespaces(objects []*fn.KubeObject, visitor func(namespace *Namespace
 			namespace := o.GetStringOrDie("spec", "service", "namespace")
 			visitor(NewNamespace(o, &namespace))
 			o.SetOrDie(&namespace, "spec", "service", "namespace")
-		case o.GetKind() == "ClusterRoleBinding":
+		case o.GetKind() == "ClusterRoleBinding" || o.GetKind() == "RoleBinding":
 			subjects := o.GetSlice("subjects")
 			for _, s := range subjects {
 				var ns string
@@ -114,15 +114,16 @@ func VisitNamespaces(objects []*fn.KubeObject, visitor func(namespace *Namespace
 				}
 			}
 			o.SetOrDie(&subjects, "subjects")
-		case o.HasNamespace():
-			// Only update the namespace scoped resource. To determine if a resource is namespace scoped,
-			// we assume its namespace should have been set.
-			namespace := o.GetStringOrDie("metadata", "namespace")
-			visitor(NewNamespace(o, &namespace))
-			o.SetOrDie(&namespace, "metadata", "namespace")
 		default:
 			// skip the cluster scoped resource. We determine if a resource is cluster scoped by
 			// checking if the metadata.namespace is configured.
+		}
+		if o.HasNamespace() {
+			// We made the hypothesis that a namespace scoped resource should have its metadata.namespace field setup.
+			// All above special types are cluster scoped, except RoleBinding
+			namespace := o.GetStringOrDie("metadata", "namespace")
+			visitor(NewNamespace(o, &namespace))
+			o.SetOrDie(&namespace, "metadata", "namespace")
 		}
 	}
 }
