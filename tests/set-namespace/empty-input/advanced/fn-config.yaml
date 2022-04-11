@@ -1,4 +1,0 @@
-apiVersion: fn.kpt.dev/v1alpha1
-kind: SetNamespace
-metadata:
-  name: my-config

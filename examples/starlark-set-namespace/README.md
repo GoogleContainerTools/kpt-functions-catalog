@@ -36,11 +36,12 @@ metadata:
   name: set-namespace-to-prod
   annotations:
 source: |
-  # set the namespace on all resources
+  # set the namespace on all resources except StarlarkRun and Kptfile kind.
   def setnamespace(resources, namespace):
     for resource in resources:
       # mutate the resource
-      resource["metadata"]["namespace"] = namespace
+      if resource["kind"] not in ["StarlarkRun", "Kptfile"]:
+        resource["metadata"]["namespace"] = namespace
   setnamespace(ctx.resource_list["items"], "prod")
 ```
 

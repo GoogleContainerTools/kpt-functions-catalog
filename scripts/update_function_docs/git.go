@@ -51,10 +51,6 @@ func gitCheckout(branch string) error {
 	return err
 }
 
-func gitTag() (string, error) {
-	return runCmd("git", "tag")
-}
-
 func gitAdd() error {
 	_, err := runCmd("git", "add", "-u")
 	return err

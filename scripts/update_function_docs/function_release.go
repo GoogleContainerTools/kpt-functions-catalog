@@ -21,15 +21,13 @@ import (
 	"regexp"
 	"strings"
 
-	"golang.org/x/mod/semver"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/scripts/patch_reader/pkg/latestpatch"
 	"gopkg.in/yaml.v2"
 )
 
 var (
 	// pattern of release branches, e.g. apply-setters/v1.0
 	releaseBranchPattern = regexp.MustCompile(`[-\w]*/(v\d*\.\d*)`)
-	// pattern of release tags, e.g. functions/go/apply-setters/v1.0.1
-	releaseTagPattern = regexp.MustCompile(`.*(go|ts)/[-\w]*/(v\d*\.\d*\.\d*)`)
 	// pattern for version tags, e.g. unstable, v0.1.1, v0.1
 	versionGroup = `unstable|v\d*\.\d*\.\d*|v\d*\.\d*`
 )
@@ -98,29 +96,12 @@ func (fr *functionRelease) readLatestPatchVersion() error {
 	if fr.FunctionName == "" || fr.MinorVersion == "" {
 		return fmt.Errorf("missing function name and/or minor version")
 	}
-	tags, err := gitTag()
+	patch, err := latestpatch.GetLatestPatch(fr.FunctionName, fr.MinorVersion)
 	if err != nil {
 		return err
 	}
-	funcPattern := fmt.Sprintf("%s/%s", fr.FunctionName, fr.MinorVersion)
-	var lang, latestPatchVersion string
-	for _, tag := range strings.Split(tags, "\n") {
-		if !strings.Contains(tag, funcPattern) || !releaseTagPattern.MatchString(tag) {
-			continue
-		}
-		segments := strings.Split(tag, "/")
-		patchVersion := segments[len(segments)-1]
-		if latestPatchVersion == "" ||
-			semver.Compare(patchVersion, latestPatchVersion) == 1 {
-			latestPatchVersion = patchVersion
-			lang = segments[len(segments)-3]
-		}
-	}
-	if latestPatchVersion == "" || lang == "" {
-		return fmt.Errorf("could not find matching tag for release branch")
-	}
-	fr.Language = lang
-	fr.LatestPatchVersion = latestPatchVersion
+	fr.Language = patch.Lang
+	fr.LatestPatchVersion = patch.LatestPatch
 	return nil
 }
 
@@ -303,8 +284,12 @@ func (fr *functionRelease) replaceKptPackages(contents []byte) []byte {
 // https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.2/examples/set-namespace-simple
 func (fr *functionRelease) replaceGithubURLs(contents []byte) []byte {
 	exampleSubPath := fr.exampleSubPath()
+	sourceUrlSuffix := fmt.Sprintf(`/functions/%s/%s`, fr.Language, fr.FunctionName)
+	if fr.IsContrib {
+		sourceUrlSuffix = fmt.Sprintf(`/contrib/functions/%s/%s`, fr.Language, fr.FunctionName)
+	}
 	suffixes := []string{
-		fmt.Sprintf(`/functions/%s/%s`, fr.Language, fr.FunctionName),
+		sourceUrlSuffix,
 	}
 	for _, ex := range fr.Examples.exampleNames() {
 		suffixes = append(suffixes, fmt.Sprintf(`/%s/%s`, exampleSubPath, ex))
