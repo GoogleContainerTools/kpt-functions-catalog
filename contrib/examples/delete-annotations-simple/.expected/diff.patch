@@ -10,3 +10,4 @@ index f8ec01d..bcc8f78 100644
 -    annotation-to-delete: "some_value"
  data:
    some-key: some-value
+ ---
