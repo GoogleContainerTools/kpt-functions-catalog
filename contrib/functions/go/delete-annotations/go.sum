@@ -39,8 +39,8 @@ cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220322205615-b3b2aa33ba46 h1:1MUhi+aih7/tGMkU5vmieVSu+U4qEVAJwq4JMX6/Xg0=
-github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220322205615-b3b2aa33ba46/go.mod h1:hENpuHQH/bIfHUCuG4hvzb5i4doJ1KTId5EdWBg6AvU=
+github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220405020624-e5817d5d2014 h1:NAhq6yh7qg7FE6ijZH3yTXDPHwyvg/5n7gg19w9fhFo=
+github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220405020624-e5817d5d2014/go.mod h1:hENpuHQH/bIfHUCuG4hvzb5i4doJ1KTId5EdWBg6AvU=
 github.com/NYTimes/gziphandler v0.0.0-20170623195520-56545f4a5d46/go.mod h1:3wb06e3pkSAbeQ52E9H9iFoQsEEwGN64994WTCIhntQ=
 github.com/PuerkitoBio/purell v1.1.1 h1:WEQqlqaGbrPkxLJWfBwQmfEAE1Z7ONdDLqrN38tNFfI=
 github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=

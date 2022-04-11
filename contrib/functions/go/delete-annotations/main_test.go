@@ -37,7 +37,7 @@ metadata:
   annotationKeys: policy.library/doc-gen
 `,
 		expectedResult: []string{
-			"The following annotations were deleted from the resources",
+			"The provided annotations were deleted from 1 resource(s)",
 			"Annonation: [policy.library/doc-gen] removed from resource: [no-secrets-as-env-vars]",
 		},
 	},
@@ -52,7 +52,7 @@ metadata:
     description: "Prohibits secrets as environment variables in container definitions; instead, use mounted secret files in data volumes."
     bundles.validator.forsetisecurity.org/cis-k8s-v1.5.1: 5.4.1
     policy.library/doc-gen: "do_not_document"
-    another.annotation.to.delete: "some_value"
+    another-annotation-to-delete: "some_value"
   spec:
     enforcementAction: dryrun 
     match:
@@ -61,12 +61,12 @@ metadata:
       - gke-connect
 `,
 		config: `data:
-  annotationKeys: policy.library/doc-gen,another.annotation.to.delete
+  annotationKeys: policy.library/doc-gen,another-annotation-to-delete
 `,
 		expectedResult: []string{
-			"The following annotations were deleted from the resources",
+			"The provided annotations were deleted from 1 resource(s)",
 			"Annonation: [policy.library/doc-gen] removed from resource: [no-secrets-as-env-vars]",
-			"Annonation: [another.annotation.to.delete] removed from resource: [no-secrets-as-env-vars]",
+			"Annonation: [another-annotation-to-delete] removed from resource: [no-secrets-as-env-vars]",
 		},
 	},
 	{
@@ -87,7 +87,7 @@ metadata:
       - gke-connect
 `,
 		config: `data:
-  annotationKeys: policy.library/doc-gen,another.annotation.to.delete
+  annotationKeys: policy.library/doc-gen,another-annotation-to-delete
 `,
 		expectedResult: []string{
 			"None of the resources had the provided annotations to delete",

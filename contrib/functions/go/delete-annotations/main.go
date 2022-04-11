@@ -20,31 +20,33 @@ func main() {
 	}
 }
 
-func deleteAnnotations(rl *fn.ResourceList) error {
+func deleteAnnotations(rl *fn.ResourceList) (bool, error) {
 
 	var annotationKeys []string
 	annotationKeys, err := getAnnotationKeys(rl.FunctionConfig)
 
 	if err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
-		return err
+		return false, err
 	}
 
 	items, err := processResources(rl.Items, annotationKeys)
 	if err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
-		return err
+		return false, err
 	}
 
 	for _, resultItem := range items {
 		rl.Results = append(rl.Results, resultItem)
 	}
 
-	return nil
+	return true, nil
 }
 
 func processResources(objects []*fn.KubeObject, annotationKeys []string) ([]*fn.Result, error) {
 	var resultItems []*fn.Result
+	var currObjName string
+	var prunedObjCtr int
 	for _, o := range objects {
 		if o.GetKind() == "" || o.GetName() == "" || o.GetAPIVersion() == "" {
 			continue
@@ -57,6 +59,11 @@ func processResources(objects []*fn.KubeObject, annotationKeys []string) ([]*fn.
 			}
 
 			if removed {
+				if o.GetName() != currObjName {
+					prunedObjCtr++
+					currObjName = o.GetName()
+				}
+
 				itemFilePath := o.GetAnnotations()["internal.config.kubernetes.io/path"]
 
 				resultItems = append(resultItems, &fn.Result{
@@ -74,7 +81,7 @@ func processResources(objects []*fn.KubeObject, annotationKeys []string) ([]*fn.
 		infoResultSlice := []*fn.Result{}
 		infoResultSlice = append(infoResultSlice, &fn.Result{
 			Severity: fn.Info,
-			Message:  "The following annotations were deleted from the resources",
+			Message:  fmt.Sprintf("The provided annotations were deleted from %d resource(s)", prunedObjCtr),
 		})
 
 		resultItems = append(infoResultSlice, resultItems...)

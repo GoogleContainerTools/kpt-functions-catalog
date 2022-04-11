@@ -6,4 +6,4 @@ pipeline:
   mutators:
     - image: gcr.io/kpt-fn-contrib/delete-annotations:unstable
       configMap:
-        annotationKeys: annotation.to.delete
+        annotationKeys: annotation-to-delete
