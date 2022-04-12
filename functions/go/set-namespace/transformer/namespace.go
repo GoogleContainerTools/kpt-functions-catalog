@@ -222,6 +222,12 @@ func (p *NamespaceTransformer) GetOldNamespace(fromResources []string, nsCount m
 		p.Errors = append(p.Errors, msg)
 		return "", false
 	}
+	if len(fromResources) == 0 {
+		msg := "could not find any namespace fields to update. This function requires at least one of Namespace objects or " +
+			"namespace-scoped resources to have their namespace field set."
+		p.Errors = append(p.Errors, msg)
+		return "", false
+	}
 	return fromResources[0], true
 }
 
