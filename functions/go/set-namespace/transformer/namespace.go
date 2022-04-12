@@ -31,16 +31,32 @@ func SetNamespace(rl *fn.ResourceList) (bool, error) {
 		return true, nil
 	}
 	// Update "namespace" to the proper resources.
-	tc.Transform(rl.Items)
+	count := tc.Transform(rl.Items)
 	var result *fn.Result
 	if len(tc.Errors) != 0 {
 		errMsg := strings.Join(tc.Errors, "\n")
 		result = fn.GeneralResult(errMsg, fn.Error)
 	} else {
-		result = fn.GeneralResult("namespace updated", fn.Info)
+		result = fn.GeneralResult(tc.LogResult(count), fn.Info)
 	}
+
 	rl.Results = append(rl.Results, result)
+	rl.Results = append(rl.Results, &fn.Result{
+		Message: fmt.Sprintf("set image from %s to %s", tc.NamespaceMatcher, tc.NewNamespace),
+		Field: &fn.Field{
+			Path:          "",
+			CurrentValue:  tc.NamespaceMatcher,
+			ProposedValue: tc.NewNamespace,
+		},
+		File:     &fn.File{Path: "test", Index: 0},
+		Severity: fn.Info,
+	})
 	return true, nil
+}
+
+func (p *NamespaceTransformer) LogResult(count int) string {
+	return fmt.Sprintf("namespace %q updated to %q, %d values changed", p.NamespaceMatcher, p.NewNamespace,
+		count)
 }
 
 // Config gets the attributes from different FunctionConfig formats.
@@ -74,14 +90,16 @@ func (p *NamespaceTransformer) Config(o *fn.KubeObject) error {
 
 // Transform replace the existing Namespace object, namespace-scoped resources' `metadata.name` and
 // other namespace reference fields to the new value.
-func (p *NamespaceTransformer) Transform(objects []*fn.KubeObject) {
+func (p *NamespaceTransformer) Transform(objects []*fn.KubeObject) int {
+	count := new(int)
 	namespaces, nsObjCounter := FindAllNamespaces(objects)
 	if oldNs, ok := p.GetOldNamespace(namespaces, nsObjCounter); ok {
-		ReplaceNamespace(objects, oldNs, p.NewNamespace)
+		ReplaceNamespace(objects, oldNs, p.NewNamespace, count)
 		// Update the resources annotation "config.kubernetes.io/depends-on" which may contain old namespace value.
 		dependsOnMap := GetDependsOnMap(objects)
 		UpdateAnnotation(objects, oldNs, p.NewNamespace, dependsOnMap)
 	}
+	return *count
 }
 
 // VisitNamespaces iterates the `objects` to execute the `visitor` function on each corresponding namespace field.
@@ -145,13 +163,17 @@ func FindAllNamespaces(objects []*fn.KubeObject) ([]string, map[string]int) {
 }
 
 // ReplaceNamespace iterates the `objects` to replace the `OldNs` with `newNs` on namespace field.
-func ReplaceNamespace(objects []*fn.KubeObject, oldNs, newNs string) {
+func ReplaceNamespace(objects []*fn.KubeObject, oldNs, newNs string, count *int) {
+	if oldNs == newNs {
+		return
+	}
 	VisitNamespaces(objects, func(ns *Namespace) {
 		if *ns.Ptr == "" {
 			return
 		}
 		if *ns.Ptr == oldNs {
 			*ns.Ptr = newNs
+			*count += 1
 		}
 	})
 }
@@ -210,15 +232,16 @@ func (p *NamespaceTransformer) GetOldNamespace(fromResources []string, nsCount m
 		// Use the namespace object as the matching namespace if `namespaceMatcher` is not given.
 		oldNs := reflect.ValueOf(nsCount).MapKeys()[0].String()
 		if nsCount[oldNs] > 1 {
-			msg := fmt.Sprintf("found more than one Namespace objects of the same name %v", oldNs)
+			msg := fmt.Sprintf("found more than one Namespace objects of the same name %q", oldNs)
 			p.Errors = append(p.Errors, msg)
 			return "", false
 		}
+		p.NamespaceMatcher = oldNs
 		return oldNs, true
 	}
 	if len(fromResources) > 1 {
 		msg := fmt.Sprintf("all input namespace-scoped resources should be under the same namespace "+
-			"but found different namespaces: %v ", strings.Join(fromResources, ","))
+			"but found different namespaces: %q ", strings.Join(fromResources, ","))
 		p.Errors = append(p.Errors, msg)
 		return "", false
 	}
@@ -228,6 +251,7 @@ func (p *NamespaceTransformer) GetOldNamespace(fromResources []string, nsCount m
 		p.Errors = append(p.Errors, msg)
 		return "", false
 	}
+	p.NamespaceMatcher = fromResources[0]
 	return fromResources[0], true
 }
 
