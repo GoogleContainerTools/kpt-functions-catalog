@@ -1,0 +1,6 @@
+apiVersion: fn.kpt.dev/v1alpha1
+kind: StarlarkRun
+metadata:
+  name: read-openapi-print
+source: |
+  print(ctx.open_api["definitions"]["io.k8s.api.apps.v1.Deployment"]["x-kubernetes-group-version-kind"][0]["kind"])
