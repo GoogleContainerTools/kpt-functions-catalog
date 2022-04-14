@@ -295,7 +295,7 @@ func (fr *functionRelease) replaceGithubURLs(contents []byte) []byte {
 		suffixes = append(suffixes, fmt.Sprintf(`/%s/%s`, exampleSubPath, ex))
 	}
 	suffixGroup := strings.Join(suffixes, "|")
-	refGroup := fmt.Sprintf(`master|%s/v\d*\.\d*`, fr.FunctionName)
+	refGroup := fmt.Sprintf(`master|%[1]s/v\d*\.\d*\.\d*|%[1]s/v\d*\.\d*`, fr.FunctionName)
 	githubURLPattern := regexp.MustCompile(
 		fmt.Sprintf(`(https://github\.com/GoogleContainerTools/kpt-functions-catalog/tree/)(%s)(%s)`,
 			refGroup, suffixGroup))
