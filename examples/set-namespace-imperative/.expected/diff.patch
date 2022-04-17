@@ -1,19 +1,19 @@
 diff --git a/app.yaml b/app.yaml
-index 1f8aeee..33e42da 100644
+index d67a0d2..bf55161 100644
 --- a/app.yaml
 +++ b/app.yaml
 @@ -9,7 +9,7 @@ apiVersion: v1
  kind: Service
  metadata:
    name: the-service
--  namespace: the-namespace
-+  namespace: example-ns
+-  namespace: example
++  namespace: new-ns
  spec:
    ports:
      - name: etcd-server-ssl
-@@ -21,4 +21,4 @@ spec:
+@@ -34,4 +34,4 @@ spec:
  apiVersion: v1
  kind: Namespace
  metadata:
 -  name: example
-+  name: example-ns
++  name: new-ns

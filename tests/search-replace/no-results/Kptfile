@@ -7,3 +7,4 @@ pipeline:
     - image: gcr.io/kpt-fn/search-replace:unstable
       configMap:
         by-value: non-existent-value
+        by-file-path: 'resources.yaml'

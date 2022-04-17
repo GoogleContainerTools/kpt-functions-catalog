@@ -1,0 +1,11 @@
+diff --git a/app.yaml b/app.yaml
+index 95ea181..cbd25e7 100644
+--- a/app.yaml
++++ b/app.yaml
+@@ -2,5 +2,6 @@ apiVersion: apps/v1
+ kind: ConfigMap
+ metadata:
+   name: my-nginx
++  namespace: my-ns
+ data:
+   foo: bar

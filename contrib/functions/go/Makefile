@@ -20,7 +20,7 @@ GOBIN := $(shell go env GOPATH)/bin
 # Edit this list to contain all go functions
 FUNCTIONS := \
 	annotate-apply-time-mutations \
-	generate-kpt-pkg-docs
+	delete-annotations
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
