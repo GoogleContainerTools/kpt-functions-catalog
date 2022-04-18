@@ -2,11 +2,11 @@ image: gcr.io/kpt-fn/set-namespace
 description: Update namespace.
 tags:
   - mutator
-sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.3/functions/go/set-namespace
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.4/functions/go/set-namespace
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.3/examples/set-namespace-simple
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.3/examples/set-namespace-imperative
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.3/examples/set-namespace-depends-on
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.4/examples/set-namespace-simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.4/examples/set-namespace-imperative
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.4/examples/set-namespace-depends-on
 emails:
   - kpt-team@google.com
 license: Apache-2.0
