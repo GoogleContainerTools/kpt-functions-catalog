@@ -41,16 +41,6 @@ func SetNamespace(rl *fn.ResourceList) (bool, error) {
 	}
 
 	rl.Results = append(rl.Results, result)
-	rl.Results = append(rl.Results, &fn.Result{
-		Message: fmt.Sprintf("set image from %s to %s", tc.NamespaceMatcher, tc.NewNamespace),
-		Field: &fn.Field{
-			Path:          "",
-			CurrentValue:  tc.NamespaceMatcher,
-			ProposedValue: tc.NewNamespace,
-		},
-		File:     &fn.File{Path: "test", Index: 0},
-		Severity: fn.Info,
-	})
 	return true, nil
 }
 

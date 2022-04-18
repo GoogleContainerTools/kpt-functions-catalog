@@ -9,10 +9,3 @@ items:
     results:
       - message: could not find any namespace fields to update. This function requires at least one of Namespace objects or namespace-scoped resources to have their namespace field set.
         severity: error
-      - message: set image from  to example-ns
-        severity: info
-        field:
-          currentValue: ""
-          proposedValue: example-ns
-        file:
-          path: test
