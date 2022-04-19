@@ -183,7 +183,6 @@ pip install pyyaml
 To install `mdrip`, run the following commands:
 
 ```shell
-$ go install github.com/russross/blackfriday/v2@v2.0.1
 $ go install github.com/monopole/mdrip@v1.0.2
 ```
 

@@ -1,6 +1,7 @@
 package starlark
 
 import (
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/starlark/krmfn"
 	"github.com/qri-io/starlib/bsoup"
 	"github.com/qri-io/starlib/encoding/base64"
 	"github.com/qri-io/starlib/encoding/csv"
@@ -18,7 +19,8 @@ import (
 	"go.starlark.net/starlark"
 )
 
-// load loads starlark libraries from https://github.com/qri-io/starlib#packages.
+// load loads starlark libraries from https://github.com/qri-io/starlib#packages and from
+// our own custom libraries.
 func load(_ *starlark.Thread, module string) (starlark.StringDict, error) {
 	switch module {
 	case bsoup.ModuleName:
@@ -49,6 +51,8 @@ func load(_ *starlark.Thread, module string) (starlark.StringDict, error) {
 		return xlsx.LoadModule()
 	case zipfile.ModuleName:
 		return zipfile.LoadModule()
+	case krmfn.ModuleName:
+		return starlark.StringDict{"krmfn": krmfn.Module}, nil
 	}
 	return nil, nil
 }

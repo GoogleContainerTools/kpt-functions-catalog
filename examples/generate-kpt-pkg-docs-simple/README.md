@@ -13,7 +13,7 @@ Running `generate-kpt-pkg-docs` function on the example package will:
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/contrib/examples/generate-kpt-pkg-docs-simple
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/generate-kpt-pkg-docs-simple
 ```
 
 ### Function invocation
@@ -21,7 +21,7 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function with the following command:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn-contrib/blueprint-docs:unstable --include-meta-resources \
+$ kpt fn eval -i generate-kpt-pkg-docs:unstable --include-meta-resources \
 --mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- readme-path=/tmp/GENERATED.md
 ```
 

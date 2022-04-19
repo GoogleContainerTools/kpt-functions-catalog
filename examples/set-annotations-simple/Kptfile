@@ -8,3 +8,6 @@ pipeline:
       configMap:
         color: orange
         fruit: apple
+      selectors:
+        - kind: ConfigMap
+        - kind: Namespace

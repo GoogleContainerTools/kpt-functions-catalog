@@ -6,3 +6,6 @@ pipeline:
   mutators:
     - image: gcr.io/kpt-fn/set-annotations:unstable
       configPath: fn-config.yaml
+      selectors:
+        - kind: ConfigMap
+        - kind: MyResource

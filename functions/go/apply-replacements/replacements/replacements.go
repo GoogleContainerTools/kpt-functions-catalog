@@ -12,7 +12,7 @@ import (
 const fnConfigKind = "ApplyReplacements"
 const fnConfigApiVersion = "fn.kpt.dev/v1alpha1"
 
-func ApplyReplacements(rl *fn.ResourceList) error {
+func ApplyReplacements(rl *fn.ResourceList) (bool, error) {
 	r := Replacements{}
 	return r.Process(rl)
 }
@@ -24,7 +24,7 @@ type Replacements struct {
 // Config initializes Replacements from a functionConfig fn.KubeObject
 func (r *Replacements) Config(functionConfig *fn.KubeObject) error {
 	if functionConfig.GetKind() != fnConfigKind || functionConfig.GetAPIVersion() != fnConfigApiVersion {
-		return fmt.Errorf("received functionConfig of kind %s and apiVersion %s, " +
+		return fmt.Errorf("received functionConfig of kind %s and apiVersion %s, "+
 			"only functionConfig of kind %s and apiVersion %s is supported",
 			functionConfig.GetKind(), functionConfig.GetAPIVersion(), fnConfigKind, fnConfigApiVersion)
 	}
@@ -37,20 +37,18 @@ func (r *Replacements) Config(functionConfig *fn.KubeObject) error {
 }
 
 // Process configures the replacements and transformers them.
-func (r *Replacements) Process(rl *fn.ResourceList) error {
+func (r *Replacements) Process(rl *fn.ResourceList) (bool, error) {
 	if err := r.Config(rl.FunctionConfig); err != nil {
-		return err
+		rl.LogResult(err)
+		return false, nil
 	}
 	transformedItems, err := r.Transform(rl.Items)
 	if err != nil {
-		rl.Results = append(rl.Results, &fn.Result{
-			Message: err.Error(),
-			Severity: fn.Error,
-		})
-		return nil
+		rl.LogResult(err)
+		return false, nil
 	}
 	rl.Items = transformedItems
-	return nil
+	return true, nil
 }
 
 // Transform runs the replacement filter in order to apply the replacements - this
@@ -67,7 +65,7 @@ func (r *Replacements) Transform(items []*fn.KubeObject) ([]*fn.KubeObject, erro
 		nodes = append(nodes, objRN)
 	}
 	transformedNodes, err := replacement.Filter{
-		Replacements:  r.Replacements,
+		Replacements: r.Replacements,
 	}.Filter(nodes)
 	if err != nil {
 		return nil, err
