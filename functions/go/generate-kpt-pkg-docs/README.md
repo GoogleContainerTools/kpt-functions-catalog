@@ -17,7 +17,7 @@ It works by analyzing the kpt package to generate markdown documentation and wri
 The `generate-kpt-pkg-docs` function is expected to be executed imperatively like:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-kpt-pkg-docs:unstable --include-meta-resources \
+$ kpt fn eval -i generate-kpt-pkg-docs:unstable --include-meta-resources \
 --mount type=bind,src="$(pwd)",dst="/tmp",rw=true
 ```
 
@@ -112,7 +112,7 @@ and a sample readme with HTML markers.
 Invoke the function:
 
 ```shell
-$ kpt fn eval -i gcr.io/kpt-fn-contrib/generate-kpt-pkg-docs:unstable --include-meta-resources \
+$ kpt fn eval -i generate-kpt-pkg-docs:unstable --include-meta-resources \
 --mount type=bind,src="$(pwd)",dst="/tmp",rw=true -- readme-path=/tmp/README.md
 ```
 
