@@ -12,8 +12,8 @@ Get the example package by running the following commands:
 $ kpt pkg get --for-deployment https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-kpt-package-context
 ```
 
-Since we use flag --for-deployment, kpt generates a local file `package-context.yaml` as below
-```
+Since we use flag `--for-deployment`, kpt generates a local file `package-context.yaml` as below
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -23,8 +23,8 @@ metadata:
 data:
   name: set-namespace-kpt-package-context
 ```
-We can use this file as function config.
 
+We can use this `package-context.yaml` as function config. See the `Kptfile` below:
 ```yaml
 apiVersion: kpt.dev/v1
 kind: Kptfile
@@ -46,6 +46,6 @@ $ kpt fn render set-namespace-kpt-package-context
 
 ### Expected result
 
-Verify that all namespace is updated from "old" to "example".
+Verify that all namespaces in `resources.yaml` are updated from `old` to `example`.
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3/

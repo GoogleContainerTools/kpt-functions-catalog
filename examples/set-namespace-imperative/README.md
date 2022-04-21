@@ -30,4 +30,4 @@ The desired namespace is provided after `--` and it will be converted to
 Only the namespace fields which match the `namespace` "example" object has the value updated to
 `new-ns`:
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3/

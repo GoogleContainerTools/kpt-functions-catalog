@@ -2,7 +2,7 @@
 
 ### Overview
 
-This example demonstrates how to run [`set-namespace`] function in Matcher Mode.
+This example demonstrates how to run [`set-namespace`] function [in Matcher Mode].
 
 ### Fetch the example package
 
@@ -49,6 +49,8 @@ Package "set-namespace-matcher-mode":
 
 Successfully executed 1 function(s) in 1 package(s).
 ```
-Check the resources.yaml, only `example1` is changed to `new-example`.
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+Check the `resources.yaml`, only `example1` is changed to `new-example`.
+
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3
+[in Matcher Mode]: https://catalog.kpt.dev/set-namespace/v0.3/?id=matcher-mode

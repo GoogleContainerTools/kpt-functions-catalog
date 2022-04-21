@@ -19,7 +19,7 @@ Get the example package by running the following commands:
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-depends-on
 ```
 
-We use the following `Kptfile` to configure the function.
+We use the following `set-namespace-depends-on/Kptfile` to configure the function.
 
 ```yaml
 apiVersion: kpt.dev/v1
@@ -56,5 +56,5 @@ the package.
 annotation updated, since it references a namespaced resource which was not
 included in the package.
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3/
 [`depends-on`]: https://kpt.dev/reference/annotations/depends-on/

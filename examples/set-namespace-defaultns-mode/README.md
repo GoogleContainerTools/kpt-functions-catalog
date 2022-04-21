@@ -2,7 +2,7 @@
 
 ### Overview
 
-This example demonstrates how to run [`set-namespace`] function in defaultns mode. Only the namespace field
+This example demonstrates how to run [`set-namespace`] function [in defaultns mode]. Only the namespace field
 which matches the Namespace object's `metadata.name` will be updated.
 
 ### Fetch the example package
@@ -12,7 +12,7 @@ Get the example package by running the following commands:
 ```shell
 $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-defaultns-mode
 ```
-Below is the Kptfile which sets the new namespace to `example-ns`
+Below is the `set-namespace-defaultns-mode/Kptfile` which sets the new namespace to `example-ns`
 ```yaml
 apiVersion: kpt.dev/v1
 kind: Kptfile
@@ -26,9 +26,9 @@ pipeline:
         namespace: example-ns
 ```
 
-Take a look at the set-namespace-defaultns-mode/resources.yaml. 
-Two namespace values exist, one is "example" and the other is "irrelevant". The Namespace object is `metadata.name`
-is "example".
+Take a look at the `set-namespace-defaultns-mode/resources.yaml`. 
+Two namespace values exist, one is `example` and the other is `irrelevant`. The Namespace object is `metadata.name`
+is `example`.
 
 ### Function invocation
 
@@ -50,6 +50,8 @@ Package "set-namespace-defaultns-mode":
 
 Successfully executed 1 function(s) in 1 package(s).
 ```
-Check the resources, all the "example" namespaces are changed, "irrelevant" namespace are not. 
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+Check the `resources.yaml`, all the `example` namespaces are changed to `example-ns`, `irrelevant` namespace are unchanged.
+
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3
+[in defaultns mode]: https://catalog.kpt.dev/set-namespace/v0.3/?id=defaultnamespace-mode

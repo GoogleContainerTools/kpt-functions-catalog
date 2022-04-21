@@ -2,7 +2,7 @@
 
 ### Overview
 
-This example demonstrates how to run [`set-namespace`] function in Restrict Mode.
+This example demonstrates how to run [`set-namespace`] function [in Restrict Mode].
 
 ### Fetch the example package
 
@@ -27,7 +27,7 @@ pipeline:
         namespace: example-ns
 ```
 
-Take a look at the set-namespace-restrict-mode/resources.yaml, all namespace fields are `example`
+Take a look at the `set-namespace-restrict-mode/resources.yaml`, all namespace fields are `example`
 
 ### Function invocation
 
@@ -49,6 +49,7 @@ Package "set-namespace-restrict-mode":
 
 Successfully executed 1 function(s) in 1 package(s).
 ```
-Check all resources have `metadata.namespace` set to `example-ns`
+Check the resources in `resources.yaml`, their namespace fields are updated from `example` to `example-ns`
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3
+[in Restrict Mode]: https://catalog.kpt.dev/set-namespace/v0.3/?id=restrict-mode
