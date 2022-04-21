@@ -11,7 +11,7 @@ to validate a `ConfigMap`.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark-validation@starlark/v0.4.0
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark-validation@starlark/v0.4.1
 ```
 
 We are going to use the following `Kptfile` and `fn-config.yaml` to configure
@@ -24,7 +24,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/starlark:v0.4.0
+    - image: gcr.io/kpt-fn/starlark:v0.4.1
       configPath: fn-config.yaml
 ```
 
@@ -67,7 +67,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/starlark:v0.4.0
+  - image: gcr.io/kpt-fn/starlark:v0.4.1
     stderr: 'fail: it is prohibited to have private key in a configmap'
     exitCode: 1
     results:
