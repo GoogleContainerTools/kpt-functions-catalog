@@ -11,7 +11,7 @@ to inject sidecar container to `Deployment`.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark-inject-sidecar@starlark/v0.4.1
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark-inject-sidecar@starlark/v0.4.2
 ```
 
 We are going to use the following `Kptfile` and `fn-config.yaml` to configure
@@ -24,7 +24,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/starlark:v0.4.1
+    - image: gcr.io/kpt-fn/starlark:v0.4.2
       configPath: fn-config.yaml
 ```
 
