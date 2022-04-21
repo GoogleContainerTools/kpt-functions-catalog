@@ -1,0 +1,28 @@
+diff --git a/resources.yaml b/resources.yaml
+index 8d3c81a..2b4d056 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,7 +2,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: the-service
+-  namespace: example1
++  namespace: new-example
+ ---
+ apiVersion: apiextensions.k8s.io/v1
+ kind: CustomResourceDefinition
+@@ -15,7 +15,7 @@ spec:
+       clientConfig:
+         service:
+           name: crd-svc
+-          namespace: example1
++          namespace: new-example
+ ---
+ apiVersion: apiregistration.k8s.io/v1
+ kind: APIService
+@@ -33,4 +33,4 @@ metadata:
+ subjects:
+   - kind: ServiceAccount
+     name: default
+-    namespace: example1
++    namespace: new-example
