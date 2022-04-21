@@ -1,0 +1,11 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 0
+items:
+  - image: gcr.io/kpt-fn/set-namespace:unstable
+    exitCode: 0
+    results:
+      - message: cannot accept more than one Namespace objects from the input resources, found map[example1:1 example2:1]
+        severity: error
