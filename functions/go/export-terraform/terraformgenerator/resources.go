@@ -149,6 +149,9 @@ func (resource *terraformResource) attachReferences() error {
 	resource.References = make(map[string]*terraformResource)
 	paths := []referencePath{
 		{kind: "BillingAccount", path: []string{"spec", "billingAccountRef", "external"}},
+		{kind: "BigQueryDataset", path: []string{"spec", "destination", "bigQueryDatasetRef", "name"}},
+		{kind: "PubSubTopic", path: []string{"spec", "destination", "pubSubTopicRef", "name"}},
+		{kind: "StorageBucket", path: []string{"spec", "destination", "storageBucketRef", "name"}},
 	}
 	for _, path := range paths {
 		kind := path.kind
@@ -199,7 +202,7 @@ func (resource *terraformResource) getParentRef(path ...string) (string, string,
 		{kind: "Folder", path: []string{"spec", "folderRef", "name"}},
 		{kind: "Folder", path: []string{"spec", "folderRef", "external"}},
 		{kind: "Organization", path: []string{"spec", "organizationRef", "external"}},
-		{kind: "Project", path: []string{"metadata", "annotations", "cnrm.cloud.google.com/project-id", "name"}},
+		{kind: "Project", path: []string{"metadata", "annotations", "cnrm.cloud.google.com/project-id"}},
 		{path: []string{"spec", "resourceRef", "external"}},
 		{path: []string{"spec", "resourceRef", "name"}},
 	}
