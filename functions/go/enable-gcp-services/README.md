@@ -45,8 +45,8 @@ kind: ProjectServiceSet
 metadata:
   name: my-project-services
   annotations:
-    cnrm.cloud.google.com/deletion-policy: false
-    config.kubernetes.io/local-config: true
+    cnrm.cloud.google.com/deletion-policy: "false"
+    config.kubernetes.io/local-config: "true"
 spec:
   services: # list of services to generate
     - compute.googleapis.com
@@ -73,7 +73,7 @@ kind: ProjectServiceSet
 metadata:
   name: proj1-service
   annotations:
-    config.kubernetes.io/local-config: true
+    config.kubernetes.io/local-config: "true"
 spec:
   services:
     - compute.googleapis.com
