@@ -1,4 +1,4 @@
-# export-terraform-resources
+# export-terraform
 
 ## Overview
 
