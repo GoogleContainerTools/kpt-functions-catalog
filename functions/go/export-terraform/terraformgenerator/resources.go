@@ -115,10 +115,18 @@ func (resource *terraformResource) GetBool(path ...string) bool {
 	return boolValue
 }
 
+// Retrieve an int from the resource
+func (resource *terraformResource) GetInt(path ...string) int {
+	num, found, err := resource.Item.GetInt(path...)
+	if err != nil || !found {
+		return 0
+	}
+	return num
+}
+
 // Look up a referenced resource at a given path
 func (resource *terraformResource) GetStringFromObject(path ...string) string {
-	var ref string
-	found, err := resource.Item.Get(&ref, path...)
+	ref, found, err := resource.Item.GetString(path...)
 	if err != nil || !found {
 		return ""
 	}

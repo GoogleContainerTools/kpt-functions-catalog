@@ -16,9 +16,9 @@ module "{{ .GetResourceName }}-destination" {
 
   project_id               = module.{{ .Parent.GetResourceName }}.project_id
   dataset_name             = "{{ .GetResourceName }}"
-  log_sink_writer_identity = module.logsink-{{ $logsink.GetResourceName }}.writer_identity
-  expiration_days          = "365"
-  location                 = "US"
+  log_sink_writer_identity = module.logsink-{{ $logsink.GetResourceName }}.writer_identity{{ with .GetInt "spec" "defaultTableExpirationMs" }}
+  expiration_days          = "{{ . | msToDays }}"{{end}}{{ with .GetStringFromObject "spec" "location" }}
+  location                 = "{{.}}"{{end}}
 }
 {{end}}{{with $logsink.References.PubSubTopic }}
 module "{{ .GetResourceName }}-destination" {
@@ -37,9 +37,12 @@ module "{{ .GetResourceName }}-destination" {
   project_id                  = module.{{ .Parent.GetResourceName }}.project_id
   storage_bucket_name         = "{{ .GetResourceName }}"
   log_sink_writer_identity    = module.logsink-{{ $logsink.GetResourceName }}.writer_identity
-  uniform_bucket_level_access = true
-  location                    = "US"
-  storage_class               = "MULTI_REGIONAL"
-  retention_policy            = { retention_period_days = 365, is_locked = false }
+  uniform_bucket_level_access = {{ .GetBool "spec" "uniformBucketLevelAccess" }}{{ with .GetStringFromObject "spec" "location" }}
+  location                    = "{{.}}"{{end}}{{ with .GetStringFromObject "spec" "storageClass" }}
+  storage_class               = "{{.}}"{{end}}{{ if .GetInt "spec" "retentionPolicy" "retentionPeriod"}}
+  retention_policy = {
+    retention_period_days = {{ .GetInt "spec" "retentionPolicy" "retentionPeriod" | sToDays }},
+    is_locked             = {{ .GetBool "spec" "retentionPolicy" "isLocked" }}
+  }{{end}}
 }
 {{end}}{{end}}

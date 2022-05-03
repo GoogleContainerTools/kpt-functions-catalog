@@ -39,7 +39,7 @@ metadata:
     cnrm.cloud.google.com/project-id: prj-logging # kpt-set: ${project-id}
     cnrm.cloud.google.com/blueprint: cnrm/landing-zone:log-export/v0.4.0
 spec:
-  defaultTableExpirationMs: 3600000 # kpt-set: ${default-table-expiration-ms}
+  defaultTableExpirationMs: 31536000000 # kpt-set: ${default-table-expiration-ms}
   description: "BigQuery audit logs for folder" # kpt-set: ${dataset-description}
   friendlyName: audit-logs # kpt-set: ${dataset-name}
   location: US # kpt-set: ${dataset-location}

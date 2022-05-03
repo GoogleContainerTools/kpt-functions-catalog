@@ -58,8 +58,11 @@ module "my-storage-bucket-destination" {
   project_id                  = module.prj-logging.project_id
   storage_bucket_name         = "my-storage-bucket"
   log_sink_writer_identity    = module.logsink-123456789012-storagesink.writer_identity
-  uniform_bucket_level_access = true
+  uniform_bucket_level_access = false
   location                    = "US"
   storage_class               = "MULTI_REGIONAL"
-  retention_policy            = { retention_period_days = 365, is_locked = false }
+  retention_policy = {
+    retention_period_days = 365,
+    is_locked             = false
+  }
 }

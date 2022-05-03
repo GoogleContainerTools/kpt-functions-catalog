@@ -15,12 +15,20 @@
 package terraformgenerator
 
 import (
+	"fmt"
+	"math"
 	"strings"
 	"text/template"
+	"time"
 )
 
 func (rs *terraformResources) getHCL() (map[string]string, error) {
-	tmpl, err := template.New("").ParseFS(templates, "templates/*")
+	tmplUtilFns := template.FuncMap{
+		"msToDays": msToDays,
+		"sToDays":  func(t int) (float64, error) { return msToDays(t * 1000) },
+	}
+
+	tmpl, err := template.New("").Funcs(tmplUtilFns).ParseFS(templates, "templates/*")
 	if err != nil {
 		return nil, err
 	}
@@ -69,4 +77,13 @@ func addFile(tmpl *template.Template, name string, inputData interface{}, data m
 	data[name] = content
 
 	return nil
+}
+
+// msToDays converts milliseconds to days rounded to two decimal places
+func msToDays(t int) (float64, error) {
+	d, err := time.ParseDuration(fmt.Sprintf("%dms", t))
+	if err != nil {
+		return 0, err
+	}
+	return math.Round((d.Hours()/24)*100) / 100, nil
 }
