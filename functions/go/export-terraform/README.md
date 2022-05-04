@@ -1,4 +1,4 @@
-# export-terraform-resources
+# export-terraform
 
 ## Overview
 
@@ -19,6 +19,10 @@ The following KCC resources are supported:
 - IAMPartialPolicy
 - IAMPolicy
 - IAMPolicyMember
+- LoggingLogSink
+- BigQueryDataset
+- PubSubTopic
+- StorageBucket
 
 The output Terraform will be saved to a `ConfigMap` in `terraform.yaml` at the root of the package.
 Each key in the `ConfigMap` corresponds to a different file which is part of the Terraform module.
