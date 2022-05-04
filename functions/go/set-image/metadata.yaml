@@ -2,12 +2,12 @@ image: gcr.io/kpt-fn/set-image
 description: Set all images of a given name to a given name:tag or name@digest.
 tags:
   - mutator
-sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1/functions/go/set-image
+sourceURL: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1.1/functions/go/set-image
 examplePackageURLs:
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1/examples/set-image-simple
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1/examples/set-image-digest
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1/examples/set-image-advanced
-  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1/examples/set-image-imperative
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1.1/examples/set-image-simple
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1.1/examples/set-image-digest
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1.1/examples/set-image-advanced
+  - https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-image/v0.1.1/examples/set-image-imperative
 emails:
   - kpt-team@google.com
 license: Apache-2.0
