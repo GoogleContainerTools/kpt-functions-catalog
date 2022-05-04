@@ -14,7 +14,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-image:v0.1.0
+    - image: gcr.io/kpt-fn/set-image:v0.1.1
       configPath: fn-config.yaml
 ```
 
@@ -47,7 +47,7 @@ field `additionalImageFields`.
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-image-advanced@set-image/v0.1.0
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-image-advanced@set-image/v0.1.1
 $ kpt fn render set-image-advanced
 ```
 
@@ -58,4 +58,4 @@ standard `.spec.containers[].image` field of the resource of kind `Pod`. And the
 image `nginx` has been set to `bitnami/nginx:1.21.4` in the custom
 `.spec.manifest.images[].image` location of the resource of kind `MyKind`
 
-[`set-image`]: https://catalog.kpt.dev/set-image/v0.1/
+[`set-image`]: https://catalog.kpt.dev/set-image/v0.1.1/
