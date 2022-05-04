@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/kustomize/api/filters/imagetag"
 	"sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts"
 	"sigs.k8s.io/kustomize/api/types"
@@ -30,11 +30,6 @@ func getDefaultImageFields() (types.FsSlice, error) {
 	var tc defaultConfig
 	err := yaml.Unmarshal([]byte(defaultConfigString), &tc)
 	return tc.FieldSpecs, err
-}
-
-// validGVK returns whether the given sdk.KubeObject is of the given apiVersion/kind
-func validGVK(ko *sdk.KubeObject, apiVersion, kind string) bool {
-	return ko.APIVersion() == apiVersion && ko.Kind() == kind
 }
 
 type SetImage struct {
@@ -69,28 +64,28 @@ type setImageResult struct {
 // setImageResults tracks the number of images updated matching the key
 type setImageResults map[setImageResultKey][]setImageResult
 
-// SdkResults returns sdk.Results representing which images were updated
-func (si *SetImage) SdkResults() sdk.Results {
-	var results sdk.Results
+// SdkResults returns fn.Results representing which images were updated
+func (si *SetImage) SdkResults() fn.Results {
+	results := fn.Results{}
 	if len(si.setImageResults) == 0 {
-		results = append(results, &sdk.Result{
+		results = append(results, &fn.Result{
 			Message:  "no images changed",
-			Severity: sdk.Info,
+			Severity: fn.Info,
 		})
 		return results
 	}
 	for k, v := range si.setImageResults {
 		resourceRef := k.ResourceRef
 		for _, sir := range v {
-			results = append(results, &sdk.Result{
+			results = append(results, &fn.Result{
 				Message: fmt.Sprintf("set image from %s to %s", sir.CurrentValue, sir.UpdatedValue),
-				Field: &sdk.Field{
+				Field: &fn.Field{
 					Path:          k.FieldPath,
 					CurrentValue:  sir.CurrentValue,
 					ProposedValue: sir.UpdatedValue,
 				},
-				File:        &sdk.File{Path: k.FilePath, Index: k.FileIndex},
-				Severity:    sdk.Info,
+				File:        &fn.File{Path: k.FilePath, Index: k.FileIndex},
+				Severity:    fn.Info,
 				ResourceRef: &resourceRef,
 			})
 		}
@@ -113,63 +108,73 @@ func (si *SetImage) validateInput() error {
 	return nil
 }
 
-// Config initializes SetImage from a functionConfig sdk.KubeObject
-func (si *SetImage) Config(functionConfig *sdk.KubeObject) error {
+// Config initializes SetImage from a functionConfig fn.KubeObject
+func (si *SetImage) Config(functionConfig *fn.KubeObject) (error, bool) {
 	si.Image = types.Image{}
 	si.AdditionalImageFields = nil
 	switch {
-	case validGVK(functionConfig, "v1", "ConfigMap"):
-		if found, err := functionConfig.Get(&si.Image, "data"); err != nil {
-			return fmt.Errorf("unable to convert functionConfig to v1 ConfigMap:\n%w", err)
-		} else if !found {
-			return fmt.Errorf("unable to get field data from functionConfig")
-		}
-	case validGVK(functionConfig, fnConfigAPIVersion, fnConfigKind):
-		if err := functionConfig.As(si); err != nil {
-			return fmt.Errorf("unable to convert functionConfig to %s %s:\n%w",
-				fnConfigAPIVersion, fnConfigKind, err)
-		}
+	case functionConfig.IsGVK( "v1", "ConfigMap"):
+		functionConfig.GetOrDie(&si.Image, "data")
+	case functionConfig.IsGVK(fnConfigAPIVersion, fnConfigKind):
+		functionConfig.AsOrDie(si)
 	default:
-		return fmt.Errorf("`functionConfig` must be a `ConfigMap` or `%s`", fnConfigKind)
+		return fmt.Errorf("`functionConfig` must be a `ConfigMap` or `%s`", fnConfigKind), false
 	}
 	if err := si.validateInput(); err != nil {
-		return err
+		return err, false
 	}
 	defaultImageFields, err := getDefaultImageFields()
 	if err != nil {
-		return err
+		return err, false
 	}
 	si.AdditionalImageFields = append(si.AdditionalImageFields, defaultImageFields...)
-	return nil
+	return nil, true
 }
 
-// Transform set image out of place and returns a new []*sdk.KubeObject
-func (si *SetImage) Transform(items []*sdk.KubeObject) ([]*sdk.KubeObject, error) {
-	var transformedItems []*sdk.KubeObject
+// Transform set image out of place.
+func (si *SetImage) Transform(rl *fn.ResourceList) error {
+	var transformedItems []*fn.KubeObject
 	si.setImageResults = make(setImageResults)
-	for _, obj := range items {
-		objRN := obj.ToRNode()
+	for _, obj := range rl.Items {
+		objRN, err := yaml.Parse(obj.String())
+		if err != nil {
+			return err
+		}
 		filter := imagetag.Filter{
 			ImageTag: si.Image,
 			FsSlice:  si.AdditionalImageFields,
 		}
-		filter.WithMutationTracker(si.mutationTracker(obj))
-		err := filtersutil.ApplyToJSON(filter, objRN)
+		filter.WithMutationTracker(si.mutationTracker(objRN, obj))
+		err = filtersutil.ApplyToJSON(filter, objRN)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		transformedItems = append(transformedItems, sdk.NewFromRNode(objRN))
+		obj, err = fn.ParseKubeObject([]byte(objRN.MustString()))
+		if err != nil {
+			return err
+		}
+		transformedItems = append(transformedItems, obj)
 	}
-	return transformedItems, nil
+	rl.Items = transformedItems
+	return nil
 }
 
-func (si *SetImage) mutationTracker(ko *sdk.KubeObject) func(key, value, tag string, node *yaml.RNode) {
-	filePath, fileIndexStr, _ := kioutil.GetFileAnnotations(ko.ToRNode())
+func (si *SetImage) mutationTracker(objRN *yaml.RNode, ko *fn.KubeObject) func(key, value, tag string, node *yaml.RNode) {
+	filePath, fileIndexStr, _ := kioutil.GetFileAnnotations(objRN)
 	fileIndex, _ := strconv.Atoi(fileIndexStr)
 	return func(key, value, tag string, node *yaml.RNode) {
 		currentValue := node.YNode().Value
 		rk := setImageResultKey{
-			ResourceRef: *ko.ResourceIdentifier(),
+			ResourceRef: yaml.ResourceIdentifier{
+				TypeMeta: yaml.TypeMeta{
+					APIVersion: ko.GetAPIVersion(),
+					Kind:       ko.GetKind(),
+				},
+				NameMeta: yaml.NameMeta{
+					Name:      ko.GetName(),
+					Namespace: ko.GetNamespace(),
+				},
+			},
 			FilePath:    filePath,
 			FileIndex:   fileIndex,
 			FieldPath:   strings.Join(node.FieldPath(), "."),
