@@ -15,7 +15,6 @@ package transformer
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
@@ -50,8 +49,11 @@ func (p *NamespaceTransformer) LogResults(rl *fn.ResourceList, count int, oldNam
 		return fn.GeneralResult(msg, fn.Info)
 	}
 
-	msg := fmt.Sprintf("namespace %q updated to %q, %d value(s) changed", reflect.ValueOf(oldNamespaces).MapKeys(),
-		p.NewNamespace, count)
+	oldNss := []string{}
+	for oldNs := range oldNamespaces {
+		oldNss = append(oldNss, `"`+oldNs+`"`)
+	}
+	msg := fmt.Sprintf("namespace %v updated to %q, %d value(s) changed", strings.Join(oldNss, ","), p.NewNamespace, count)
 	return fn.GeneralResult(msg, fn.Info)
 }
 
