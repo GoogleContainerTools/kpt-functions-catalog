@@ -55,6 +55,10 @@ var testCases = []TerraformTest{
 		Name: "projects",
 		Mode: "terraform",
 	},
+	{
+		Name: "log",
+		Mode: "terraform",
+	},
 }
 
 func TestTerraformGeneration(t *testing.T) {

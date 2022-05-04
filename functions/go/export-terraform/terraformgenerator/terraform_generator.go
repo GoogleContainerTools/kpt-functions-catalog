@@ -41,6 +41,10 @@ func Processor(rl *sdk.ResourceList) error {
 		"IAMPartialPolicy": true,
 		"IAMPolicy":        true,
 		"Project":          true,
+		"LoggingLogSink":   true,
+		"BigQueryDataset":  true,
+		"PubSubTopic":      true,
+		"StorageBucket":    true,
 	}
 
 	for _, item := range rl.Items {
