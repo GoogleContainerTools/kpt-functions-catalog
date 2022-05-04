@@ -5,5 +5,4 @@ metadata:
 pipeline:
   mutators:
     - image: gcr.io/kpt-fn/set-namespace:unstable
-      configMap:
-        namespace: example-ns
+      configPath: package-context.yaml

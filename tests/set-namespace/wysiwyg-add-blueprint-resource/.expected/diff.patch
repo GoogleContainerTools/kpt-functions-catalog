@@ -1,0 +1,13 @@
+diff --git a/resources.yaml b/resources.yaml
+index 5faabf7..a5e745f 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -3,7 +3,7 @@ apiVersion: v1
+ kind: ResourceQuota
+ metadata:
+   name: istions
+-  namespace: example # Using "example" as default convention, should be updated to "istio-backend1"
++  namespace: istio-backend1 # Using "example" as default convention, should be updated to "istio-backend1"
+ spec:
+   hard:
+     limits.cpu: '10'

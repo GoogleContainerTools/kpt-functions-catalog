@@ -1,4 +1,0 @@
-testType: eval
-image: gcr.io/kpt-fn/set-namespace:unstable
-args:
-  namespace: new-ns
