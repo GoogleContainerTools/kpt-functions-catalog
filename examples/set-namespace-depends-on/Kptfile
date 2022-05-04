@@ -4,6 +4,6 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-namespace:unstable
+    - image: gcr.io/kpt-fn/set-namespace:v0.4.0
       configMap:
         namespace: example-ns
