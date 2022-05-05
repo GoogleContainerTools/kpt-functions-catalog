@@ -25,8 +25,8 @@ func SetNamespace(rl *fn.ResourceList) (bool, error) {
 	// Get "namespace" arguments from FunctionConfig
 	err := tc.Config(rl.FunctionConfig)
 	if err != nil {
-		rl.Results = append(rl.Results, fn.ErrorConfigObjectResult(err, rl.FunctionConfig))
-		return true, nil
+		rl.Results = append(rl.Results, fn.ErrorResult(err))
+		return false, nil
 	}
 	// Update "namespace" to the proper resources.
 	oldNamespaces := map[string]struct{}{}
@@ -60,6 +60,8 @@ func (p *NamespaceTransformer) LogResults(rl *fn.ResourceList, count int, oldNam
 // Config gets the attributes from different FunctionConfig formats.
 func (p *NamespaceTransformer) Config(o *fn.KubeObject) error {
 	switch {
+	case o.IsEmpty():
+		return fmt.Errorf("FunctionConfig is missing. Expect `ConfigMap` or `SetNamespace`")
 	case o.IsGVK("v1", "ConfigMap"):
 		p.NewNamespace = o.NestedStringOrDie("data", "namespace")
 		if p.NewNamespace == "" {

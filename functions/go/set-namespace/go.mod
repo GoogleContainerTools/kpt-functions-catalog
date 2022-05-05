@@ -2,7 +2,7 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-na
 
 go 1.17
 
-require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220503232936-7ad5b77727ee
+require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220506190241-f85503febd54
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
