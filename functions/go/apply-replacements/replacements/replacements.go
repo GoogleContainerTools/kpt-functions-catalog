@@ -23,6 +23,9 @@ type Replacements struct {
 
 // Config initializes Replacements from a functionConfig fn.KubeObject
 func (r *Replacements) Config(functionConfig *fn.KubeObject) error {
+	if functionConfig.IsEmpty() {
+		return fmt.Errorf("FunctionConfig is missing. Expect `ApplyReplacements`")
+	}
 	if functionConfig.GetKind() != fnConfigKind || functionConfig.GetAPIVersion() != fnConfigApiVersion {
 		return fmt.Errorf("received functionConfig of kind %s and apiVersion %s, "+
 			"only functionConfig of kind %s and apiVersion %s is supported",
