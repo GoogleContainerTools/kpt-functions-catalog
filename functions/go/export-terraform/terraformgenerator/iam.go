@@ -31,6 +31,11 @@ type iamPolicy struct {
 	bindings map[string]*iamBinding
 }
 
+type iamAuditLogConfig struct {
+	ExemptedMembers []string `yaml:"exemptedMembers,omitempty"`
+	LogType         string   `yaml:"logType"`
+}
+
 func (policy *iamPolicy) addBinding(role string, member string) {
 	if policy.bindings == nil {
 		policy.bindings = make(map[string]*iamBinding)
@@ -73,4 +78,13 @@ func (resource *terraformResource) GetIAMBindings() map[string]*iamBinding {
 	}
 
 	return policy.bindings
+}
+
+func (resource *terraformResource) GetIAMAuditLogConfigs() []iamAuditLogConfig {
+	var auditLogConfigs []iamAuditLogConfig
+	found, err := resource.Item.Get(&auditLogConfigs, "spec", "auditLogConfigs")
+	if !found || err != nil {
+		sdk.Logf("unable to find auditLogConfigs in %s (found = %t): %s\n", resource.Name, found, err)
+	}
+	return auditLogConfigs
 }

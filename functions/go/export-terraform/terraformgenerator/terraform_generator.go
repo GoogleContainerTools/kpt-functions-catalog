@@ -45,6 +45,7 @@ func Processor(rl *sdk.ResourceList) error {
 		"BigQueryDataset":  true,
 		"PubSubTopic":      true,
 		"StorageBucket":    true,
+		"IAMAuditConfig":   true,
 	}
 
 	for _, item := range rl.Items {
