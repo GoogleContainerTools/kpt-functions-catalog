@@ -9,7 +9,7 @@ This example demonstrates how to run [`set-namespace`] function with kpt variant
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get --for-deployment https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-kpt-package-context@set-namespace/v0.4.0
+$ kpt pkg get --for-deployment https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-namespace-kpt-package-context@set-namespace/v0.4.1
 ```
 
 Since we use flag `--for-deployment`, kpt generates a local file `package-context.yaml` as below
@@ -32,7 +32,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-namespace:v0.4.0
+    - image: gcr.io/kpt-fn/set-namespace:v0.4.1
       configPath: package-context.yaml
 ```
 
