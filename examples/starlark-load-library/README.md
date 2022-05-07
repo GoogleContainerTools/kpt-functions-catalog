@@ -10,7 +10,7 @@ In this example, we are going to demonstrate how to load a library in the
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark-load-library@starlark/v0.4.2
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/starlark-load-library@starlark/v0.4.3
 ```
 
 We are going to use the following `Kptfile` and `fn-config.yaml` to configure
@@ -23,7 +23,7 @@ metadata:
   name: example
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/starlark:v0.4.2
+    - image: gcr.io/kpt-fn/starlark:v0.4.3
       configPath: fn-config.yaml
 ```
 
