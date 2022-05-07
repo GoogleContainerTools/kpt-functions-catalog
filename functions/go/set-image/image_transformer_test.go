@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"github.com/stretchr/testify/assert"
 )
 
 // helper function to convert ResourceList items to yaml
-func itemsToYaml(items []*sdk.KubeObject) string {
+func itemsToYaml(items []*fn.KubeObject) string {
 	var itemYamls []string
 	for _, item := range items {
 		itemYamls = append(itemYamls, item.String())
@@ -19,19 +19,30 @@ func itemsToYaml(items []*sdk.KubeObject) string {
 	return result
 }
 
-func runImageTransformerResults(input, config string) (*sdk.ResourceList, error) {
-	rl, err := sdk.ParseResourceList([]byte(input))
+func runImageTransformerResults(input, config string) (*fn.ResourceList, error) {
+	rl, err := fn.ParseResourceList([]byte(input))
 	if err != nil {
 		return nil, err
 	}
-	functionConfig, err := sdk.ParseKubeObject([]byte(config))
+	functionConfig, err := fn.ParseKubeObject([]byte(config))
 	if err != nil {
 		return nil, err
 	}
 	rl.FunctionConfig = functionConfig
-
-	if err = setImageTags(rl); err != nil {
+	in, _ := rl.ToYAML()
+	out, err := fn.Run(fn.ResourceListProcessorFunc(setImageTags), in)
+	if err != nil {
 		return nil, err
+	}
+	rl, _ = fn.ParseResourceList(out)
+
+	ko, _ := fn.ParseKubeObject(out)
+	results := ko.GetSlice("results")
+	for _, result := range results{
+		if result.GetString("severity") == "error" {
+			return rl, fn.GeneralResult(result.GetString("message"), fn.Error)
+		}
+		rl.Results = append(rl.Results, fn.GeneralResult(result.GetString("message"), fn.Info))
 	}
 	return rl, nil
 }
@@ -254,7 +265,7 @@ kind: ConfigMap
 metadata:
   name: my-func-config
 `,
-			ExpectedError: `unable to get field data from functionConfig`,
+			ExpectedError: `missing image name`,
 		},
 		{
 			TestName: "set-image should return an error when an invalid ConfigMap is used as the functionConfig",
@@ -265,9 +276,7 @@ data:
   name:
     unexpected: object
 `,
-			ExpectedError: `unable to convert functionConfig to v1 ConfigMap:
-unable to get fields [data] as *types.Image with error: yaml: unmarshal errors:
-  line 6: cannot unmarshal !!map into string`,
+			ExpectedError: "SubObject has unmatched field type: `data",
 		},
 		{
 			TestName: "set-image should return an error when an invalid SetImage is used as the functionConfig",
@@ -278,8 +287,7 @@ image:
   name:
     unexpected: object
 `,
-			ExpectedError: `unable to convert functionConfig to fn.kpt.dev/v1alpha1 SetImage:
-unable to convert object to *main.SetImage with error: json: cannot unmarshal object into Go struct field Image.image.name of type string`,
+			ExpectedError: "Resource(apiVersion=fn.kpt.dev/v1alpha1, kind=SetImage, Name=) has unmatched field type: `",
 		},
 	}
 
@@ -344,9 +352,9 @@ items:
       name: test-container2
 `,
 			ExpectedResults: `
-[info] v1/Pod/the-namespace/the-pod spec.containers.image: set image from foo:1.2.3 to bar:4.5.6
-[info] v1/Pod/the-namespace/the-pod2 spec.containers.image: set image from foo:1.2.3 to bar:4.5.6
-[info] v1/Pod/the-namespace/the-pod2 spec.containers.image: set image from foo:latest to bar:4.5.6
+[info]: set image from foo:1.2.3 to bar:4.5.6
+[info]: set image from foo:1.2.3 to bar:4.5.6
+[info]: set image from foo:latest to bar:4.5.6
 `,
 		},
 	}

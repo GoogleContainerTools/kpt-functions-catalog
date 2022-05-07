@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/qri-io/starlib/util"
 	"go.starlark.net/starlark"
@@ -25,13 +26,9 @@ func (c *Context) predeclared() (starlark.StringDict, error) {
 	if err != nil {
 		return nil, err
 	}
-	oa, err := oa()
-	if err != nil {
-		return nil, err
-	}
 	dict := starlark.StringDict{
 		"resource_list": c.resourceList,
-		"open_api":      oa,
+		"open_api":      &LazyInitializationOpenapi{},
 		"environment":   e,
 	}
 
@@ -58,6 +55,55 @@ func env() (starlark.Value, error) {
 		return nil, errors.Wrap(err)
 	}
 	return value, nil
+}
+
+type LazyInitializationOpenapi struct {
+	once sync.Once
+	val  starlark.Value
+}
+
+var _ starlark.Mapping = &LazyInitializationOpenapi{}
+
+func (v *LazyInitializationOpenapi) init() {
+	o, err := oa()
+	if err != nil {
+		panic(err)
+	}
+	v.val = o
+}
+
+func (v *LazyInitializationOpenapi) String() string {
+	v.once.Do(v.init)
+	return v.val.String()
+}
+
+func (v *LazyInitializationOpenapi) Type() string {
+	v.once.Do(v.init)
+	return v.val.Type()
+}
+
+func (v *LazyInitializationOpenapi) Freeze() {
+	v.once.Do(v.init)
+	v.val.Freeze()
+}
+
+func (v *LazyInitializationOpenapi) Truth() starlark.Bool {
+	v.once.Do(v.init)
+	return v.val.Truth()
+}
+
+func (v *LazyInitializationOpenapi) Hash() (uint32, error) {
+	v.once.Do(v.init)
+	return v.val.Hash()
+}
+
+func (v *LazyInitializationOpenapi) Get(val starlark.Value) (starlark.Value, bool, error) {
+	v.once.Do(v.init)
+	m, ok := v.val.(starlark.Mapping)
+	if ok {
+		return m.Get(val)
+	}
+	return nil, false, nil
 }
 
 func interfaceToValue(i interface{}) (starlark.Value, error) {
