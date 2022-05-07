@@ -43,4 +43,4 @@ $ kpt fn render set-namespace-simple
 
 Check all resources have `metadata.namespace` set to `example-ns`
 
-[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.1/
+[`set-namespace`]: https://catalog.kpt.dev/set-namespace/v0.3/

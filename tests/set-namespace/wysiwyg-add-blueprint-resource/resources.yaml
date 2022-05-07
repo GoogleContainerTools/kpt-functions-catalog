@@ -1,0 +1,56 @@
+# Newly added resource-quota.yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: istions
+  namespace: example # Using "example" as default convention, should be updated to "istio-backend1"
+spec:
+  hard:
+    limits.cpu: '10'
+    limits.memory: 10G
+---
+# istio-backend1/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-backend1
+  labels:
+    privilege: standard
+    istio-injection: enabled
+---
+# istio-backend1/role-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: app-admin
+  namespace: istio-backend1
+roleRef:
+  kind: ClusterRole
+  name: app-admin
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: Group
+    name: istio-backend1.admin@bigco.com
+    apiGroup: rbac.authorization.k8s.io
+---
+# istio-backend1/apply-replacements.yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: ApplyReplacements
+metadata:
+  name: update-rolebinding
+  annotations:
+    config.kubernetes.io/local-config: 'true'
+replacements:
+  - source:
+      kind: ConfigMap
+      name: kptfile.kpt.dev
+      fieldPath: data.name
+    targets:
+      - select:
+          name: app-admin
+          kind: RoleBinding
+        fieldPaths:
+          - subjects.[kind=Group].name
+        options:
+          delimiter: '.'
+          index: 0

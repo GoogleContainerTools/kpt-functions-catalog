@@ -3,25 +3,29 @@ package main
 import (
 	"os"
 
-	sdk "github.com/GoogleContainerTools/kpt-functions-catalog/thirdparty/kyaml/fnsdk"
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
 func main() {
-	if err := sdk.AsMain(sdk.ResourceListProcessorFunc(setImageTags)); err != nil {
+	if err := fn.AsMain(fn.ResourceListProcessorFunc(setImageTags)); err != nil {
 		os.Exit(1)
 	}
 }
 
-func setImageTags(rl *sdk.ResourceList) error {
+func setImageTags(rl *fn.ResourceList) (bool, error) {
 	si := SetImage{}
-	if err := si.Config(rl.FunctionConfig); err != nil {
-		return err
+	err, ok := si.Config(rl.FunctionConfig)
+	if !ok {
+		return false, err
 	}
-	transformedItems, err := si.Transform(rl.Items)
 	if err != nil {
-		return err
+		rl.Results = append(rl.Results, fn.ErrorConfigObjectResult(err, rl.FunctionConfig))
+		return true, nil
 	}
-	rl.Items = transformedItems
-	rl.Results = si.SdkResults()
-	return nil
+	err = si.Transform(rl)
+	if err != nil {
+		return false, err
+	}
+	rl.Results = append(rl.Results, si.SdkResults()...)
+	return true, nil
 }
