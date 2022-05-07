@@ -4,5 +4,5 @@ metadata:
   name: example
 pipeline:
   validators:
-    - image: gcr.io/kpt-fn/starlark:v0.4.2
+    - image: gcr.io/kpt-fn/starlark:v0.4.3
       configPath: fn-config.yaml
