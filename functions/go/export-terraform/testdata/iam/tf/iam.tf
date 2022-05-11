@@ -72,3 +72,13 @@ module "test-iam" {
     
   }
 }
+
+
+resource "google_organization_iam_audit_config" "org_config" {
+  org_id  = var.org_id
+  service = "allServices"
+
+  audit_log_config {
+      log_type = "ADMIN_READ"
+  }
+}
