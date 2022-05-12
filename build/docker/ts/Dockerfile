@@ -1,4 +1,4 @@
-FROM node:lts-alpine as builder
+FROM node:14.19-alpine3.15 as builder
 
 RUN mkdir -p /home/node/app && \
     chown -R node:node /home/node/app
@@ -20,7 +20,7 @@ RUN npm run build && \
 
 #############################################
 
-FROM node:lts-alpine
+FROM node:14.19-alpine3.15
 
 ARG FILENAME
 ENV FILENAME=${FILENAME}
