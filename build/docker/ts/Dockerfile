@@ -1,4 +1,8 @@
-FROM node:14.19-alpine3.15 as builder
+ARG BUILDER_IMAGE
+ARG BASE_IMAGE
+
+
+FROM $BUILDER_IMAGE as builder
 
 RUN mkdir -p /home/node/app && \
     chown -R node:node /home/node/app
@@ -20,7 +24,7 @@ RUN npm run build && \
 
 #############################################
 
-FROM node:14.19-alpine3.15
+FROM $BASE_IMAGE
 
 ARG FILENAME
 ENV FILENAME=${FILENAME}
