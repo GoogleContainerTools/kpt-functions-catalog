@@ -103,6 +103,14 @@ func (resource *terraformResource) ShouldCreate() bool {
 
 // Retrieve a boolean from the resource
 func (resource *terraformResource) GetBool(path ...string) bool {
+	// check if value of type bool
+	var boolVal bool
+	// ignore error as we will also try get this value as a string
+	found, _ := resource.Item.Get(&boolVal, path...)
+	if found {
+		return boolVal
+	}
+	// check if bool represented as string
 	value := resource.GetStringFromObject(path...)
 	if len(value) == 0 {
 		return false
@@ -124,6 +132,16 @@ func (resource *terraformResource) GetInt(path ...string) int {
 	return num
 }
 
+// Retrieve a float from the resource
+func (resource *terraformResource) GetFloat(path ...string) float64 {
+	var floatVal float64
+	found, err := resource.Item.Get(&floatVal, path...)
+	if err != nil || !found {
+		return 0
+	}
+	return floatVal
+}
+
 // Look up a referenced resource at a given path
 func (resource *terraformResource) GetStringFromObject(path ...string) string {
 	ref, found, err := resource.Item.GetString(path...)
@@ -131,6 +149,15 @@ func (resource *terraformResource) GetStringFromObject(path ...string) string {
 		return ""
 	}
 	return ref
+}
+
+func (resource *terraformResource) GetStringsFromObject(path ...string) []string {
+	var strVals []string
+	found, err := resource.Item.Get(&strVals, path...)
+	if err != nil || !found {
+		return nil
+	}
+	return strVals
 }
 
 // Return if the resource itself should be created
@@ -148,8 +175,23 @@ func (resource *terraformResource) GetOrganization() *terraformResource {
 }
 
 type referencePath struct {
-	kind string // If kind is unset, it will be auto-detected
-	path []string
+	kind            string // If kind is unset, it will be auto-detected
+	path            []string
+	customRetriever func(*sdk.KubeObject) string // custom func to retrieve ref from KubeObject
+}
+
+// singleCACustomRetriever creates a customRetriever for a compute address ref
+func singleCACustomRetriever(path []string) func(*sdk.KubeObject) string {
+	return func(r *sdk.KubeObject) string {
+		f := make([]struct {
+			Name string `yaml:"name"`
+		}, 0)
+		found, err := r.Get(&f, path...)
+		if found && err == nil && len(f) > 0 {
+			return f[0].Name
+		}
+		return ""
+	}
 }
 
 // Attach parents and other references to a resource
@@ -160,10 +202,14 @@ func (resource *terraformResource) attachReferences() error {
 		{kind: "BigQueryDataset", path: []string{"spec", "destination", "bigQueryDatasetRef", "name"}},
 		{kind: "PubSubTopic", path: []string{"spec", "destination", "pubSubTopicRef", "name"}},
 		{kind: "StorageBucket", path: []string{"spec", "destination", "storageBucketRef", "name"}},
+		{kind: "ComputeNetwork", path: []string{"spec", "networkRef", "name"}},
+		{kind: "ComputeRouter", path: []string{"spec", "routerRef", "name"}},
+		{kind: "ComputeAddress", customRetriever: singleCACustomRetriever([]string{"spec", "natIps"})},
+		{kind: "ComputeAddress", customRetriever: singleCACustomRetriever([]string{"spec", "reservedPeeringRanges"})},
 	}
 	for _, path := range paths {
 		kind := path.kind
-		ref := resource.getReferencedResource(kind, path.path...)
+		ref := resource.getReferencedResource(kind, path.customRetriever, path.path...)
 		if ref != nil {
 			resource.References[kind] = ref
 		}
@@ -190,8 +236,15 @@ func (resource *terraformResource) attachReferences() error {
 }
 
 // Retrieve a referenced resource from the object spec
-func (resource *terraformResource) getReferencedResource(kind string, path ...string) *terraformResource {
-	name := strings.TrimSpace(resource.GetStringFromObject(path...))
+func (resource *terraformResource) getReferencedResource(kind string, customRetriever func(*sdk.KubeObject) string, path ...string) *terraformResource {
+	name := ""
+	if customRetriever != nil {
+		// if a customRetriever func is defined, use that to extract ref name
+		name = customRetriever(resource.Item)
+	} else {
+		// fall back to path based retrieval
+		name = strings.TrimSpace(resource.GetStringFromObject(path...))
+	}
 	if len(name) == 0 {
 		return nil
 	}
@@ -294,4 +347,15 @@ func (ref *terraformResource) GetTerraformId(prefix ...bool) string {
 	default:
 		return fmt.Sprintf(`"folders/%s"`, ref.Name)
 	}
+}
+
+// GetChildrenByKind returns children of a resource filtered by kind
+func (resource *terraformResource) GetChildrenByKind(kind string) []*terraformResource {
+	filteredChildren := make([]*terraformResource, 0)
+	for _, child := range resource.Children {
+		if child.Kind == kind {
+			filteredChildren = append(filteredChildren, child)
+		}
+	}
+	return filteredChildren
 }
