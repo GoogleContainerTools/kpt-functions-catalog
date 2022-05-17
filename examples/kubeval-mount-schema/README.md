@@ -13,7 +13,7 @@ with [`kubeval`] function to validate KRM resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval-mount-schema@kubeval/v0.2.0
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/kubeval-mount-schema@kubeval/v0.2.1
 ```
 
 We have a `ReplicationController` in `replicationcontroller.yaml` that has a
@@ -39,7 +39,7 @@ $ openapi2jsonschema --stand-alone --expanded --kubernetes -o jsonschema path/to
 We can invoke function with the following command:
 
 ```shell
-$ kpt fn eval kubeval-mount-schema -i gcr.io/kpt-fn/kubeval:v0.2.0 --results-dir /tmp \
+$ kpt fn eval kubeval-mount-schema -i gcr.io/kpt-fn/kubeval:v0.2.1 --results-dir /tmp \
   --mount type=bind,src="$(pwd)/kubeval-mount-schema/jsonschema",dst=/schema-dir/master-standalone \
   -- schema_location=file:///schema-dir
 ```
@@ -61,7 +61,7 @@ metadata:
   name: fnresults
 exitCode: 1
 items:
-  - image: gcr.io/kpt-fn/kubeval:v0.2.0
+  - image: gcr.io/kpt-fn/kubeval:v0.2.1
     exitCode: 1
     results:
       - message: 'Invalid type. Expected: [integer,null], given: string'
