@@ -1,7 +1,11 @@
 # OpenAPI
 
 `k8s.json` should be the OpenAPI schema downloaded from a GKE cluster with
-Config Connector resources installed.
+Config Connector resources installed. To download an OpenAPI schema file:
+
+```shell
+curl -k -H "Authorization: Bearer $(gcloud auth print-access-token)"  https://${your-apiserver-address}/openapi/v2 | jq > k8s.json
+```
 
 # Merge kptfile openapi schema
 
