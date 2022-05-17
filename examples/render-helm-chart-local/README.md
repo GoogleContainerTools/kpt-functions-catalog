@@ -27,14 +27,25 @@ $ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable \
 releaseName=test
 ```
 
-You can optionally provide your own values files using `--valuesFile`.
+You can optionally provide your own values files using `valuesFile`.
 
 ```shell
 $ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable \
 --mount type=bind,src=$(pwd),dst=/tmp/charts -- \
 name=helloworld-chart \
 releaseName=test \
-valuesFile=tmp/charts/helloworld-values/values.yaml
+valuesFile=/tmp/charts/helloworld-values/values.yaml
+```
+
+You can optionally skip tests in the templated output with `skipTests`.
+
+```shell
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:unstable \
+--mount type=bind,src=$(pwd),dst=/tmp/charts -- \
+name=helloworld-chart \
+releaseName=test \
+valuesFile=/tmp/charts/helloworld-values/values.yaml \
+skipTests=true
 ```
 
 ### Expected result
@@ -52,3 +63,6 @@ $ kpt pkg tree
 You should be able to find `replicas: 5` in
 file `deployment_test-helloworld-chart.yaml`, which demonstrates that
 the correct values file provided by --valuesFile was used.
+
+If you provided the `skipTests` option, `pod_test-helloworld-chart-test-connection.yaml`
+will not appear in your files. 

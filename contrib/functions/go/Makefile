@@ -19,7 +19,8 @@ GOBIN := $(shell go env GOPATH)/bin
 
 # Edit this list to contain all go functions
 FUNCTIONS := \
-	annotate-apply-time-mutations
+	annotate-apply-time-mutations \
+	delete-annotations
 
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
@@ -92,7 +93,7 @@ GO_LICENSES=$(shell which go-licenses)
 endif
 
 install-mdtogo:
-	GO111MODULE=on go get -v github.com/GoogleContainerTools/kpt/mdtogo@main
+	go install github.com/GoogleContainerTools/kpt/mdtogo@main
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
@@ -107,7 +108,7 @@ func-fmt:
 
 func-lint:
 	(which $(GOPATH)/bin/golangci-lint || \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.41.1)
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.45.0/install.sh | sh -s -- -b $(GOPATH)/bin v1.41.1)
 	cd $(CURRENT_FUNCTION) && time $(GOPATH)/bin/golangci-lint run --timeout=10m ./...
 
 func-test:

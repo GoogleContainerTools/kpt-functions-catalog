@@ -25,7 +25,7 @@ RUN apk add --no-cache make
 RUN apk add --no-cache curl
 
 # Install golang
-COPY --from=golang:1.16-alpine /usr/local/go/ /usr/local/go/
+COPY --from=golang:1.17-alpine /usr/local/go/ /usr/local/go/
 ENV PATH="/usr/local/go/bin:${PATH}"
 
 # Install node and npm

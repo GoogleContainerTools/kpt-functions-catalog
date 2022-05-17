@@ -1,0 +1,51 @@
+diff --git a/package-context.yaml b/package-context.yaml
+new file mode 100644
+index 0000000..6c33d9e
+--- /dev/null
++++ b/package-context.yaml
+@@ -0,0 +1,8 @@
++apiVersion: v1
++kind: ConfigMap
++metadata:
++  name: kptfile.kpt.dev
++  annotations:
++    config.kubernetes.io/local-config: "true"
++data:
++  name: example
+diff --git a/resources.yaml b/resources.yaml
+index 7e3aff2..83f166f 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,7 +2,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: the-service
+-  namespace: old
++  namespace: example
+ ---
+ apiVersion: apiextensions.k8s.io/v1
+ kind: CustomResourceDefinition
+@@ -15,7 +15,7 @@ spec:
+       clientConfig:
+         service:
+           name: crd-svc
+-          namespace: old
++          namespace: example
+ ---
+ apiVersion: apiregistration.k8s.io/v1
+ kind: APIService
+@@ -24,7 +24,7 @@ metadata:
+ spec:
+   service:
+     name: api-svc
+-    namespace: old
++    namespace: example
+ ---
+ apiVersion: rbac.authorization.k8s.io/v1
+ kind: ClusterRoleBinding
+@@ -33,4 +33,4 @@ metadata:
+ subjects:
+   - kind: ServiceAccount
+     name: default
+-    namespace: old
++    namespace: example

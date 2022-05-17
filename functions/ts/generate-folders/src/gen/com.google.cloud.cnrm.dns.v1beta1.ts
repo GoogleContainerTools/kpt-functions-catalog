@@ -23,14 +23,18 @@ export class DNSManagedZoneList {
 }
 
 export function isDNSManagedZoneList(o: any): o is DNSManagedZoneList {
-  return o && o.apiVersion === DNSManagedZoneList.apiVersion && o.kind === DNSManagedZoneList.kind;
+  return (
+    o &&
+    o.apiVersion === DNSManagedZoneList.apiVersion &&
+    o.kind === DNSManagedZoneList.kind
+  );
 }
 
 export namespace DNSManagedZoneList {
-  export const apiVersion = "dns.cnrm.cloud.google.com/v1beta1";
-  export const group = "dns.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "DNSManagedZoneList";
+  export const apiVersion = 'dns.cnrm.cloud.google.com/v1beta1';
+  export const group = 'dns.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'DNSManagedZoneList';
 
   // DNSManagedZoneList is a list of DNSManagedZone
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace DNSManagedZoneList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,18 @@ export class DNSPolicyList {
 }
 
 export function isDNSPolicyList(o: any): o is DNSPolicyList {
-  return o && o.apiVersion === DNSPolicyList.apiVersion && o.kind === DNSPolicyList.kind;
+  return (
+    o &&
+    o.apiVersion === DNSPolicyList.apiVersion &&
+    o.kind === DNSPolicyList.kind
+  );
 }
 
 export namespace DNSPolicyList {
-  export const apiVersion = "dns.cnrm.cloud.google.com/v1beta1";
-  export const group = "dns.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "DNSPolicyList";
+  export const apiVersion = 'dns.cnrm.cloud.google.com/v1beta1';
+  export const group = 'dns.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'DNSPolicyList';
 
   // DNSPolicyList is a list of DNSPolicy
   export interface Interface {
@@ -112,7 +120,7 @@ export namespace DNSPolicyList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -143,14 +151,18 @@ export class DNSRecordSetList {
 }
 
 export function isDNSRecordSetList(o: any): o is DNSRecordSetList {
-  return o && o.apiVersion === DNSRecordSetList.apiVersion && o.kind === DNSRecordSetList.kind;
+  return (
+    o &&
+    o.apiVersion === DNSRecordSetList.apiVersion &&
+    o.kind === DNSRecordSetList.kind
+  );
 }
 
 export namespace DNSRecordSetList {
-  export const apiVersion = "dns.cnrm.cloud.google.com/v1beta1";
-  export const group = "dns.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "DNSRecordSetList";
+  export const apiVersion = 'dns.cnrm.cloud.google.com/v1beta1';
+  export const group = 'dns.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'DNSRecordSetList';
 
   // DNSRecordSetList is a list of DNSRecordSet
   export interface Interface {
@@ -172,7 +184,7 @@ export namespace DNSRecordSetList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

@@ -45,19 +45,25 @@ export class HorizontalPodAutoscaler implements KubernetesObject {
   }
 }
 
-export function isHorizontalPodAutoscaler(o: any): o is HorizontalPodAutoscaler {
-  return o && o.apiVersion === HorizontalPodAutoscaler.apiVersion && o.kind === HorizontalPodAutoscaler.kind;
+export function isHorizontalPodAutoscaler(
+  o: any
+): o is HorizontalPodAutoscaler {
+  return (
+    o &&
+    o.apiVersion === HorizontalPodAutoscaler.apiVersion &&
+    o.kind === HorizontalPodAutoscaler.kind
+  );
 }
 
 export namespace HorizontalPodAutoscaler {
-  export const apiVersion = "autoscaling/v1";
-  export const group = "autoscaling";
-  export const version = "v1";
-  export const kind = "HorizontalPodAutoscaler";
+  export const apiVersion = 'autoscaling/v1';
+  export const group = 'autoscaling';
+  export const version = 'v1';
+  export const kind = 'HorizontalPodAutoscaler';
 
   // named constructs a HorizontalPodAutoscaler with metadata.name set to name.
   export function named(name: string): HorizontalPodAutoscaler {
-    return new HorizontalPodAutoscaler({metadata: {name}});
+    return new HorizontalPodAutoscaler({ metadata: { name } });
   }
   // configuration of a horizontal pod autoscaler.
   export interface Interface {
@@ -94,15 +100,21 @@ export class HorizontalPodAutoscalerList {
   }
 }
 
-export function isHorizontalPodAutoscalerList(o: any): o is HorizontalPodAutoscalerList {
-  return o && o.apiVersion === HorizontalPodAutoscalerList.apiVersion && o.kind === HorizontalPodAutoscalerList.kind;
+export function isHorizontalPodAutoscalerList(
+  o: any
+): o is HorizontalPodAutoscalerList {
+  return (
+    o &&
+    o.apiVersion === HorizontalPodAutoscalerList.apiVersion &&
+    o.kind === HorizontalPodAutoscalerList.kind
+  );
 }
 
 export namespace HorizontalPodAutoscalerList {
-  export const apiVersion = "autoscaling/v1";
-  export const group = "autoscaling";
-  export const version = "v1";
-  export const kind = "HorizontalPodAutoscalerList";
+  export const apiVersion = 'autoscaling/v1';
+  export const group = 'autoscaling';
+  export const version = 'v1';
+  export const kind = 'HorizontalPodAutoscalerList';
 
   // list of horizontal pod autoscaler objects.
   export interface Interface {
@@ -193,14 +205,14 @@ export function isScale(o: any): o is Scale {
 }
 
 export namespace Scale {
-  export const apiVersion = "autoscaling/v1";
-  export const group = "autoscaling";
-  export const version = "v1";
-  export const kind = "Scale";
+  export const apiVersion = 'autoscaling/v1';
+  export const group = 'autoscaling';
+  export const version = 'v1';
+  export const kind = 'Scale';
 
   // named constructs a Scale with metadata.name set to name.
   export function named(name: string): Scale {
-    return new Scale({metadata: {name}});
+    return new Scale({ metadata: { name } });
   }
   // Scale represents a scaling request for a resource.
   export interface Interface {

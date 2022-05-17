@@ -3,7 +3,8 @@ kind: StarlarkRun
 metadata:
   name: set-namespace-to-prod
 source: |
-  # set the namespace on all resources
+  # set the namespace on all resources except Kptfile and StarlarkRun kind.
   for resource in ctx.resource_list["items"]:
     # mutate the resource
-    resource["metadata"]["namespace"] = "prod"
+    if resource.get("kind") not in ["StarlarkRun", "Kptfile"]:
+      resource["metadata"]["namespace"] = "prod"

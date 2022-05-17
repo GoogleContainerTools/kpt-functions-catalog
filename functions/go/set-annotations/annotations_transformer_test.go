@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -16,6 +17,7 @@ func runAnnotationTransformerE(config, input string) (string, error) {
 	}
 
 	var plugin *plugin = &KustomizePlugin
+	plugin.Results = nil
 	err = plugin.Config(nil, []byte(config))
 	if err != nil {
 		return "", err
@@ -188,6 +190,71 @@ spec:
 		fmt.Println("===")
 		fmt.Println("Expected:")
 		fmt.Println(expected)
+		t.Fatalf("Actual doesn't equal to expected")
+	}
+}
+
+func TestAnnotationsTransformerResults(t *testing.T) {
+	config := `
+annotations:
+  app: myApp
+`
+	input := `
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    internal.config.kubernetes.io/path: foo.yaml
+    internal.config.kubernetes.io/index: 0
+  name: myService
+spec:
+  ports:
+  - port: 7002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    internal.config.kubernetes.io/path: bar.yaml
+    internal.config.kubernetes.io/index: 1
+  name: mungebot
+  labels:
+    app: mungebot
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mungebot
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+`
+	expectedResults := AnnotationResults{
+		{
+			FilePath:  "foo.yaml",
+			FileIndex: "0",
+			FieldPath: "metadata.annotations",
+		}: {"app": "myApp"},
+		{
+			FilePath:  "bar.yaml",
+			FileIndex: "1",
+			FieldPath: "metadata.annotations",
+		}: {"app": "myApp"},
+		{
+			FilePath:  "bar.yaml",
+			FileIndex: "1",
+			FieldPath: "spec.template.metadata.annotations",
+		}: {"app": "myApp"},
+	}
+	runAnnotationTransformer(t, config, input)
+	if !reflect.DeepEqual(KustomizePlugin.Results, expectedResults) {
+		fmt.Println("Actual:")
+		fmt.Println(KustomizePlugin.Results)
+		fmt.Println("===")
+		fmt.Println("Expected:")
+		fmt.Println(expectedResults)
 		t.Fatalf("Actual doesn't equal to expected")
 	}
 }

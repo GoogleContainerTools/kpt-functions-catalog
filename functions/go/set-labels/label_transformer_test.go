@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func runLabelTransformerE(config, input string) (string, error) {
@@ -13,6 +15,7 @@ func runLabelTransformerE(config, input string) (string, error) {
 	}
 
 	var plugin *plugin = &KustomizePlugin
+	plugin.Results = nil
 	err = plugin.Config(nil, []byte(config))
 	if err != nil {
 		return "", err
@@ -192,4 +195,49 @@ metadata:
 		fmt.Println(expected)
 		t.Fatalf("Actual doesn't equal to expected")
 	}
+}
+
+func TestAnnotationsTransformerResults(t *testing.T) {
+	config := `
+labels:
+  foo: bar
+  baz: bat
+fieldSpecs:
+- kind: ConfigMap
+  path: metadata/labels
+  create: true
+`
+	input := `
+apiVersion: apps/v1
+kind: ConfigMap
+metadata:
+  annotations:
+    internal.config.kubernetes.io/path: foo.yaml
+    internal.config.kubernetes.io/index: 0
+  name: vilgefortz
+data: {}
+---
+apiVersion: apps/v1
+kind: ConfigMap
+metadata:
+  annotations:
+    internal.config.kubernetes.io/path: bar.yaml
+    internal.config.kubernetes.io/index: 1
+  name: triss
+data: {}
+`
+	expectedResults := LabelResults{
+		{
+			FilePath:  "foo.yaml",
+			FileIndex: "0",
+			FieldPath: "metadata.labels",
+		}: {"foo": "bar", "baz": "bat"},
+		{
+			FilePath:  "bar.yaml",
+			FileIndex: "1",
+			FieldPath: "metadata.labels",
+		}: {"foo": "bar", "baz": "bat"},
+	}
+	runLabelTransformer(t, config, input)
+	assert.Equal(t, expectedResults, KustomizePlugin.Results)
 }

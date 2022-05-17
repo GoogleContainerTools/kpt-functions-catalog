@@ -10,16 +10,19 @@ generators:
             network: true
             image: gcr.io/kpt-fn/render-helm-chart:unstable
     helmCharts:
-    - name: ocp-pipeline
-      namespace: mynamespace
-      version: 0.1.16
-      repo: https://bcgov.github.io/helm-charts
-      releaseName: moria
-      valuesInline:
-        releaseNamespace: ""
-        rbac:
-          create: true
-          rules:
-            - apiGroups: [""]
-              verbs: ["*"]
-              resources: ["*"]
+    - chartArgs:
+        name: ocp-pipeline
+        version: 0.1.16
+        repo: https://bcgov.github.io/helm-charts
+      templateOptions:
+        releaseName: moria
+        namespace: mynamespace
+        values:
+          valuesInline:
+            releaseNamespace: ""
+            rbac:
+              create: true
+              rules:
+                - apiGroups: [""]
+                  verbs: ["*"]
+                  resources: ["*"]

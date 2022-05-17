@@ -27,18 +27,20 @@ export class APIService implements KubernetesObject {
 }
 
 export function isAPIService(o: any): o is APIService {
-  return o && o.apiVersion === APIService.apiVersion && o.kind === APIService.kind;
+  return (
+    o && o.apiVersion === APIService.apiVersion && o.kind === APIService.kind
+  );
 }
 
 export namespace APIService {
-  export const apiVersion = "apiregistration.k8s.io/v1";
-  export const group = "apiregistration.k8s.io";
-  export const version = "v1";
-  export const kind = "APIService";
+  export const apiVersion = 'apiregistration.k8s.io/v1';
+  export const group = 'apiregistration.k8s.io';
+  export const version = 'v1';
+  export const kind = 'APIService';
 
   // named constructs a APIService with metadata.name set to name.
   export function named(name: string): APIService {
-    return new APIService({metadata: {name}});
+    return new APIService({ metadata: { name } });
   }
   // APIService represents a server for a particular GroupVersion. Name must be "version.group".
   export interface Interface {
@@ -99,14 +101,18 @@ export class APIServiceList {
 }
 
 export function isAPIServiceList(o: any): o is APIServiceList {
-  return o && o.apiVersion === APIServiceList.apiVersion && o.kind === APIServiceList.kind;
+  return (
+    o &&
+    o.apiVersion === APIServiceList.apiVersion &&
+    o.kind === APIServiceList.kind
+  );
 }
 
 export namespace APIServiceList {
-  export const apiVersion = "apiregistration.k8s.io/v1";
-  export const group = "apiregistration.k8s.io";
-  export const version = "v1";
-  export const kind = "APIServiceList";
+  export const apiVersion = 'apiregistration.k8s.io/v1';
+  export const group = 'apiregistration.k8s.io';
+  export const version = 'v1';
+  export const kind = 'APIServiceList';
 
   // APIServiceList is a list of APIService objects.
   export interface Interface {

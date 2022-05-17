@@ -25,7 +25,7 @@
 # something here...
 # ```
 
-
+import json
 import os
 import yaml
 import subprocess
@@ -153,6 +153,21 @@ def eval_or_exec_script(example_path):
     return False
 
 
+def latest_patch(fn_name, minor_version):
+    scripts_dir = os.path.dirname(os.path.abspath(__file__))
+    patch_reader = os.path.join(scripts_dir, 'patch_reader', 'patch_reader')
+    process = subprocess.Popen([patch_reader,
+                                '--function', fn_name,
+                                '--minor', minor_version],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        raise Exception(f'patch_reader error: {stderr.decode("utf-8")}')
+    patch_version = json.loads(stdout)
+    return patch_version['latest_patch']
+
+
 def validate_example_kptfile(fn_name, dir_name, example_name, branch, contrib):
     example_path = os.path.join(dir_name, example_name)
     kptfile_path = os.path.join(example_path, 'Kptfile')
@@ -170,7 +185,8 @@ def validate_example_kptfile(fn_name, dir_name, example_name, branch, contrib):
         splits = branch.split('/')
         if len(splits) != 2:
             raise Exception(f'the release branch {branch} must has format <fn-name>/vX.Y')
-        tag = splits[1]
+        minor_version = splits[1]
+        tag = latest_patch(fn_name, minor_version)
 
     kptfile = yaml.load(open(kptfile_path), Loader=yaml.Loader)
     if kptfile['apiVersion'] != 'kpt.dev/v1alpha2' and kptfile['apiVersion'] != 'kpt.dev/v1':

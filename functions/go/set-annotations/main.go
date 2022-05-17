@@ -3,8 +3,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-annotations/generated"
 	"sigs.k8s.io/kustomize/api/hasher"
@@ -29,19 +31,17 @@ const (
 type SetAnnotationsProcessor struct{}
 
 func (sap *SetAnnotationsProcessor) Process(resourceList *framework.ResourceList) error {
-	err := run(resourceList)
+	results, err := run(resourceList)
 	if err != nil {
-		resourceList.Result = &framework.Result{
-			Name: "set-annotations",
-			Items: []framework.ResultItem{
-				{
-					Message:  err.Error(),
-					Severity: framework.Error,
-				},
+		resourceList.Results = framework.Results{
+			&framework.Result{
+				Message:  err.Error(),
+				Severity: framework.Error,
 			},
 		}
-		return resourceList.Result
+		return resourceList.Results
 	}
+	resourceList.Results = results
 	return nil
 }
 
@@ -110,6 +110,32 @@ func (f *setAnnotationFunction) validGVK(rn *kyaml.RNode, apiVersion, kind strin
 	return true
 }
 
+// resultsToItems converts the set annotation results to
+// equivalent framework.Results
+func (f *setAnnotationFunction) resultsToItems() (framework.Results, error) {
+	var results framework.Results
+	if len(f.plugin.Results) == 0 {
+		results = append(results, &framework.Result{
+			Message: "no annotations applied",
+		})
+		return results, nil
+	}
+	for resKey, annoVals := range f.plugin.Results {
+		fileIndex, _ := strconv.Atoi(resKey.FileIndex)
+		annotationJson, err := json.Marshal(annoVals)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, &framework.Result{
+			Message: fmt.Sprintf("set annotations: %s", annotationJson),
+			Field:   &framework.Field{Path: resKey.FieldPath},
+			File:    &framework.File{Path: resKey.FilePath, Index: fileIndex},
+		})
+	}
+	results.Sort()
+	return results, nil
+}
+
 func getDefaultConfig() (transformerConfig, error) {
 	defaultConfigString := builtinpluginconsts.GetDefaultFieldSpecsAsMap()["commonannotations"]
 	var tc transformerConfig
@@ -135,16 +161,16 @@ func main() {
 	}
 }
 
-func run(resourceList *framework.ResourceList) error {
+func run(resourceList *framework.ResourceList) (framework.Results, error) {
 	var fn setAnnotationFunction
 	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		return fmt.Errorf("failed to configure function: %w", err)
+		return nil, fmt.Errorf("failed to configure function: %w", err)
 	}
 
 	resourceList.Items, err = fn.Run(resourceList.Items)
 	if err != nil {
-		return fmt.Errorf("failed to run function: %w", err)
+		return nil, fmt.Errorf("failed to run function: %w", err)
 	}
-	return nil
+	return fn.resultsToItems()
 }

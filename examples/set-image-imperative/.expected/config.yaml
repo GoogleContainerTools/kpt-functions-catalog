@@ -1,0 +1,6 @@
+testType: eval
+image: gcr.io/kpt-fn/set-image:unstable
+args:
+  name: nginx
+  newName: bitnami/nginx
+  newTag: 1.21.4

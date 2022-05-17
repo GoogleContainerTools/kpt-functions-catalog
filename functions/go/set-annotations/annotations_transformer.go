@@ -6,10 +6,13 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"sigs.k8s.io/kustomize/api/filters/annotations"
 	"sigs.k8s.io/kustomize/api/resmap"
 	"sigs.k8s.io/kustomize/api/types"
+	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
+	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
 )
 
@@ -21,7 +24,25 @@ type plugin struct {
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 	// AdditionalAnnotationFields is used to specify additional fields to add annotations.
 	AdditionalAnnotationFields []types.FieldSpec `json:"additionalAnnotationFields,omitempty" yaml:"additionalAnnotationFields,omitempty"`
+	// Results are the results of applying annotations
+	Results AnnotationResults
 }
+
+// AnnotationResults maps annotation paths to key/value pairs
+type AnnotationResults map[AnnotationResultKey]AnnotationValues
+
+// AnnotationResultKey is a unique representation for an annotations field path
+type AnnotationResultKey struct {
+	// FilePath is the file path of the resource
+	FilePath string
+	// FileIndex is the file index of the resource
+	FileIndex string
+	// FieldPath is field path of the annotations
+	FieldPath string
+}
+
+// AnnotationValues represents annotation key/value pairs
+type AnnotationValues map[string]string
 
 //noinspection GoUnusedGlobalVariable
 var KustomizePlugin plugin
@@ -47,10 +68,30 @@ func (p *plugin) Transform(m resmap.ResMap) error {
 	if len(p.Annotations) == 0 {
 		return nil
 	}
+	if p.Results == nil {
+		p.Results = make(AnnotationResults)
+	}
 	for _, r := range m.Resources() {
-		err := r.ApplyFilter(annotations.Filter{
-			Annotations: p.Annotations,
+		filePath, fileIndex, err := kioutil.GetFileAnnotations(&r.RNode)
+		if err != nil {
+			return err
+		}
+		err = r.ApplyFilter(annotations.Filter{
 			FsSlice:     p.AdditionalAnnotationFields,
+			Annotations: p.Annotations,
+			SetEntryCallback: func(key, value, tag string, node *kyaml.RNode) {
+				resultKey := AnnotationResultKey{
+					FieldPath: strings.Join(node.FieldPath(), "."),
+					FilePath:  filePath,
+					FileIndex: fileIndex,
+				}
+				result, ok := p.Results[resultKey]
+				if ok {
+					result[key] = value
+				} else {
+					p.Results[resultKey] = AnnotationValues{key: value}
+				}
+			},
 		})
 		if err != nil {
 			return err

@@ -15,108 +15,29 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"sort"
 	"strconv"
 
-	opaapis "github.com/open-policy-agent/frameworks/constraint/pkg/apis"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/apis/templates/v1beta1"
-	opaclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
 	opatypes "github.com/open-policy-agent/frameworks/constraint/pkg/types"
-	"github.com/open-policy-agent/gatekeeper/pkg/target"
+	// The gatekeeper/pkg/gator/test package is the underlying libraries for
+	// the `gator test` subcommand, not a library for testing golang code.
+	gatortest "github.com/open-policy-agent/gatekeeper/pkg/gator/test"
 	opautil "github.com/open-policy-agent/gatekeeper/pkg/util"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-var scheme = runtime.NewScheme()
-
-func init() {
-	err := opaapis.AddToScheme(scheme)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func createClient() (*opaclient.Client, error) {
-	driver := local.New(local.Tracing(false))
-	backend, err := opaclient.NewBackend(opaclient.Driver(driver))
-	if err != nil {
-		return nil, err
-	}
-	return backend.NewClient(opaclient.Targets(&target.K8sValidationTarget{}))
-}
-
-func gatherTemplates(objects []runtime.Object) ([]*templates.ConstraintTemplate, error) {
-	var templs []*templates.ConstraintTemplate
-	for _, obj := range objects {
-		ct, isConstraintTemplate := obj.(*v1beta1.ConstraintTemplate)
-		if !isConstraintTemplate {
-			continue
-		}
-		templ := &templates.ConstraintTemplate{}
-		if err := scheme.Convert(ct, templ, nil); err != nil {
-			return nil, err
-		}
-		templs = append(templs, templ)
-	}
-	return templs, nil
-}
-
-func gatherConstraints(objects []runtime.Object) ([]*unstructured.Unstructured, error) {
-	var cstrs []*unstructured.Unstructured
-	for _, obj := range objects {
-		gvk := obj.GetObjectKind().GroupVersionKind()
-		if gvk.Group == "constraints.gatekeeper.sh" {
-			cstrs = append(cstrs, obj.(*unstructured.Unstructured))
-		}
-	}
-	return cstrs, nil
-}
-
 // Validate makes sure the configs passed to it comply with any Constraints and
 // Constraint Templates present in the list of configs
-func Validate(objects []runtime.Object) (*framework.Result, error) {
-	client, err := createClient()
+func Validate(objects []*unstructured.Unstructured) (*framework.Result, error) {
+	resps, err := gatortest.Test(objects)
 	if err != nil {
 		return nil, err
-	}
-	tmpls, err := gatherTemplates(objects)
-	if err != nil {
-		return nil, err
-	}
-	ctx := context.Background()
-	for _, t := range tmpls {
-		if _, err = client.AddTemplate(ctx, t); err != nil {
-			return nil, err
-		}
-	}
-	cstrs, err := gatherConstraints(objects)
-	if err != nil {
-		return nil, err
-	}
-	for _, c := range cstrs {
-		if _, err = client.AddConstraint(ctx, c); err != nil {
-			return nil, err
-		}
 	}
 
-	for _, obj := range objects {
-		if _, err = client.AddData(ctx, obj); err != nil {
-			return nil, err
-		}
-	}
-
-	resps, err := client.Audit(ctx)
-	if err != nil {
-		return nil, err
-	}
 	results := resps.Results()
 	if len(results) > 0 {
 		return parseResults(results)
@@ -150,9 +71,7 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 		switch r.EnforcementAction {
 		case string(opautil.Dryrun):
 			item.Severity = framework.Info
-		// TODO(mengqiy): Warn start to be available in gatekeeper v3.4.0-rc1, we should upgrade to it when v3.4.0 is released.
-		// https://github.com/open-policy-agent/gatekeeper/blob/f1eda8f381aaaf7fc12db1782d41498b57431a5d/pkg/util/enforcement_action.go#L14
-		case "warn":
+		case string(opautil.Warn):
 			item.Severity = framework.Warning
 		default:
 			item.Severity = framework.Error

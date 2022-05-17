@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine3.13
+FROM golang:1.17-alpine3.15
 ENV CGO_ENABLED=0
 WORKDIR /go/src/
 
@@ -16,7 +16,7 @@ RUN curl -fsSL -o /helm-${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/h
 
 #############################################
 
-FROM alpine:3.13
+FROM alpine:3.15
 COPY --from=0 /usr/local/bin/function /usr/local/bin/function
 COPY --from=0 /usr/local/bin/helm /usr/local/bin/helm
 

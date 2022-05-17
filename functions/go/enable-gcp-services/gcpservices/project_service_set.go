@@ -22,19 +22,25 @@ const (
 )
 
 // ignoreAnnotations is used to ignore any annotation that should not be added to generated Service CRs
-var ignoreAnnotations = map[string]bool{kioutil.PathAnnotation: true, filters.LocalConfigAnnotation: true}
+var ignoreAnnotations = map[string]bool{
+	kioutil.PathAnnotation:        true,
+	kioutil.LegacyPathAnnotation:  true, // nolint:staticcheck
+	kioutil.IndexAnnotation:       true,
+	kioutil.LegacyIndexAnnotation: true, // nolint:staticcheck
+	filters.LocalConfigAnnotation: true,
+}
 
 // ProjectServiceSetRunner discovers ProjectServiceSet CRs to generate Service CRs
 type ProjectServiceSetRunner struct {
-	results []framework.ResultItem
+	results []*framework.Result
 }
 
 // ProjectServiceSet is the functionConfig for generating services
 type ProjectServiceSet struct {
 	yaml.ResourceMeta `json:",inline" yaml:",inline"`
 	Spec              projectServiceSetSpec `json:"spec" yaml:"spec"`
-	prunedServices    map[string]framework.ResultItem
-	generatedServices map[string]framework.ResultItem
+	prunedServices    map[string]*framework.Result
+	generatedServices map[string]*framework.Result
 }
 
 type projectServiceSetSpec struct {
@@ -113,8 +119,8 @@ func getProjectServiceSets(nodes []*yaml.RNode) ([]ProjectServiceSet, error) {
 			if err != nil {
 				return nil, err
 			}
-			psl.generatedServices = make(map[string]framework.ResultItem)
-			psl.prunedServices = make(map[string]framework.ResultItem)
+			psl.generatedServices = make(map[string]*framework.Result)
+			psl.prunedServices = make(map[string]*framework.Result)
 			psls = append(psls, psl)
 		}
 	}
@@ -201,9 +207,10 @@ func (ps *ProjectServiceSet) addResult(action actionType, r *yaml.RNode) error {
 	}
 
 	resID := resid.NewResIdWithNamespace(resid.GvkFromNode(r), meta.Name, meta.Namespace).String()
-	result := framework.ResultItem{
-		ResourceRef: meta.GetIdentifier(),
-		File:        framework.File{Path: fp},
+	rr := meta.GetIdentifier()
+	result := &framework.Result{
+		ResourceRef: &rr,
+		File:        &framework.File{Path: fp},
 		Message:     action.String(),
 		Severity:    framework.Info,
 	}
@@ -217,8 +224,8 @@ func (ps *ProjectServiceSet) addResult(action actionType, r *yaml.RNode) error {
 }
 
 // getResults returns operations performed by ProjectServiceSet
-func (ps *ProjectServiceSet) getResults() []framework.ResultItem {
-	collapsedResults := make([]framework.ResultItem, 0)
+func (ps *ProjectServiceSet) getResults() []*framework.Result {
+	collapsedResults := make([]*framework.Result, 0)
 	for resid, result := range ps.prunedServices {
 		g, recreated := ps.generatedServices[resid]
 		// check if a resource was pruned and recreated
@@ -237,7 +244,7 @@ func (ps *ProjectServiceSet) getResults() []framework.ResultItem {
 }
 
 // GetResults returns operations performed by ProjectServiceSetRunner
-func (r *ProjectServiceSetRunner) GetResults() []framework.ResultItem {
+func (r *ProjectServiceSetRunner) GetResults() []*framework.Result {
 	return r.results
 }
 

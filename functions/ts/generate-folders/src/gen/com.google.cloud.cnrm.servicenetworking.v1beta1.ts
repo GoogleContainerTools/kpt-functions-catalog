@@ -22,15 +22,21 @@ export class ServiceNetworkingConnectionList {
   }
 }
 
-export function isServiceNetworkingConnectionList(o: any): o is ServiceNetworkingConnectionList {
-  return o && o.apiVersion === ServiceNetworkingConnectionList.apiVersion && o.kind === ServiceNetworkingConnectionList.kind;
+export function isServiceNetworkingConnectionList(
+  o: any
+): o is ServiceNetworkingConnectionList {
+  return (
+    o &&
+    o.apiVersion === ServiceNetworkingConnectionList.apiVersion &&
+    o.kind === ServiceNetworkingConnectionList.kind
+  );
 }
 
 export namespace ServiceNetworkingConnectionList {
-  export const apiVersion = "servicenetworking.cnrm.cloud.google.com/v1beta1";
-  export const group = "servicenetworking.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ServiceNetworkingConnectionList";
+  export const apiVersion = 'servicenetworking.cnrm.cloud.google.com/v1beta1';
+  export const group = 'servicenetworking.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ServiceNetworkingConnectionList';
 
   // ServiceNetworkingConnectionList is a list of ServiceNetworkingConnection
   export interface Interface {
@@ -52,7 +58,7 @@ export namespace ServiceNetworkingConnectionList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

@@ -26,15 +26,21 @@ export class LocalSubjectAccessReview implements KubernetesObject {
   }
 }
 
-export function isLocalSubjectAccessReview(o: any): o is LocalSubjectAccessReview {
-  return o && o.apiVersion === LocalSubjectAccessReview.apiVersion && o.kind === LocalSubjectAccessReview.kind;
+export function isLocalSubjectAccessReview(
+  o: any
+): o is LocalSubjectAccessReview {
+  return (
+    o &&
+    o.apiVersion === LocalSubjectAccessReview.apiVersion &&
+    o.kind === LocalSubjectAccessReview.kind
+  );
 }
 
 export namespace LocalSubjectAccessReview {
-  export const apiVersion = "authorization.k8s.io/v1";
-  export const group = "authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "LocalSubjectAccessReview";
+  export const apiVersion = 'authorization.k8s.io/v1';
+  export const group = 'authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'LocalSubjectAccessReview';
 
   // LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
   export interface Interface {
@@ -143,15 +149,21 @@ export class SelfSubjectAccessReview implements KubernetesObject {
   }
 }
 
-export function isSelfSubjectAccessReview(o: any): o is SelfSubjectAccessReview {
-  return o && o.apiVersion === SelfSubjectAccessReview.apiVersion && o.kind === SelfSubjectAccessReview.kind;
+export function isSelfSubjectAccessReview(
+  o: any
+): o is SelfSubjectAccessReview {
+  return (
+    o &&
+    o.apiVersion === SelfSubjectAccessReview.apiVersion &&
+    o.kind === SelfSubjectAccessReview.kind
+  );
 }
 
 export namespace SelfSubjectAccessReview {
-  export const apiVersion = "authorization.k8s.io/v1";
-  export const group = "authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "SelfSubjectAccessReview";
+  export const apiVersion = 'authorization.k8s.io/v1';
+  export const group = 'authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'SelfSubjectAccessReview';
 
   // SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
   export interface Interface {
@@ -200,14 +212,18 @@ export class SelfSubjectRulesReview implements KubernetesObject {
 }
 
 export function isSelfSubjectRulesReview(o: any): o is SelfSubjectRulesReview {
-  return o && o.apiVersion === SelfSubjectRulesReview.apiVersion && o.kind === SelfSubjectRulesReview.kind;
+  return (
+    o &&
+    o.apiVersion === SelfSubjectRulesReview.apiVersion &&
+    o.kind === SelfSubjectRulesReview.kind
+  );
 }
 
 export namespace SelfSubjectRulesReview {
-  export const apiVersion = "authorization.k8s.io/v1";
-  export const group = "authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "SelfSubjectRulesReview";
+  export const apiVersion = 'authorization.k8s.io/v1';
+  export const group = 'authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'SelfSubjectRulesReview';
 
   // SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
   export interface Interface {
@@ -252,14 +268,18 @@ export class SubjectAccessReview implements KubernetesObject {
 }
 
 export function isSubjectAccessReview(o: any): o is SubjectAccessReview {
-  return o && o.apiVersion === SubjectAccessReview.apiVersion && o.kind === SubjectAccessReview.kind;
+  return (
+    o &&
+    o.apiVersion === SubjectAccessReview.apiVersion &&
+    o.kind === SubjectAccessReview.kind
+  );
 }
 
 export namespace SubjectAccessReview {
-  export const apiVersion = "authorization.k8s.io/v1";
-  export const group = "authorization.k8s.io";
-  export const version = "v1";
-  export const kind = "SubjectAccessReview";
+  export const apiVersion = 'authorization.k8s.io/v1';
+  export const group = 'authorization.k8s.io';
+  export const version = 'v1';
+  export const kind = 'SubjectAccessReview';
 
   // SubjectAccessReview checks whether or not a user or group can perform an action.
   export interface Interface {
@@ -276,7 +296,7 @@ export namespace SubjectAccessReview {
 // SubjectAccessReviewSpec is a description of the access request.  Exactly one of ResourceAuthorizationAttributes and NonResourceAuthorizationAttributes must be set
 export class SubjectAccessReviewSpec {
   // Extra corresponds to the user.Info.GetExtra() method from the authenticator.  Since that is input to the authorizer it needs a reflection here.
-  public extra?: {[key: string]: string[]};
+  public extra?: { [key: string]: string[] };
 
   // Groups is the groups you're testing for.
   public groups?: string[];

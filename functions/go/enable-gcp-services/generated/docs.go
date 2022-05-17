@@ -11,7 +11,7 @@ var EnableGcpServicesLong = `
 
 ` + "`" + `enable-gcp-services` + "`" + ` function can be used both declaratively and imperatively.
 
-  kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable
+  $ kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable
 
 The ` + "`" + `enable-gcp-services` + "`" + ` function does the following:
 
@@ -67,7 +67,7 @@ Let's start with a ` + "`" + `ProjectServiceSet` + "`" + ` CR for enabling two s
 
 Invoke the function:
 
-  kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable
+  $ kpt fn eval --image gcr.io/kpt-fn/enable-gcp-services:unstable
 
 Generated resources looks like the following:
 

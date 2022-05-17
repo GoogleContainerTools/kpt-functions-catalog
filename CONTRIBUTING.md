@@ -56,7 +56,13 @@ Contributions are required to follow these style guides:
 │     │     └── ts: Home for all typescript-based contrib function source code
 │     └── examples: Home for all contrib function examples.
 ├── scripts
-└── tests: Home for e2e tests
+├── tests: Home for e2e tests
+└── build
+      └── docker
+          ├── go: Home for default golang Dockerfile
+          │    └── Dockerfile
+          └── ts: Home for default typescript Dockerfile
+               └── Dockerfile
 ```
 
 For each function, its files spread in the follow places:
@@ -70,12 +76,17 @@ For each function, its files spread in the follow places:
         - golang-based functions should follow [this template][golang-template].
         - typescript-based functions should follow [this template][ts-template].
     - A metadata.yaml file that follows the function metadata schema.
-    - A Dockerfile to build the docker container.
+    - (Optional) A Dockerfile to build the docker container. If a Dockerfile is
+      not defined, the [default Dockerfile for the language][docker-common] will
+      be used.
 - `examples/` directory: It contains examples for functions, and these examples
   are also being tested as e2e tests. Each function should have at least one
   example here. There must be a README.md file in each example directory, and it
   should follow the [template][example-template].
 - The `tests/` directory contains additional e2e tests.
+- `master` branch should should contain examples with the `unstable` tag for
+  your function images.  When you release the function version that tag should 
+  have the samples and tests that match the function version.
 
 For golang-based functions, you need to generate some doc related variables from
 the `README.md` by running
@@ -95,6 +106,19 @@ To run all unit tests
 $ make unit-test
 ```
 
+#### Building a function image
+
+To build all function images
+```shell
+$ make build
+```
+
+To build a single function image (e.g. `apply-setters`)
+```shell
+$ cd functions/go
+$ make apply-setters-BUILD
+```
+
 #### E2E Tests
 
 The e2e tests are the recommended way to test functions in the catalog. They are
@@ -105,11 +129,16 @@ structure [here][e2e test harness doc].
 You can choose to put the e2e test in either the `examples/` directory or in the
 `tests/` directory depending on if it is worthwhile to be shown as an example.
 
+**Note**: The e2e tests don't build the images. So you need to ensure you have built
+the latest image(s) before running any e2e tests.
+
 To test a specific example or the e2e test, run
 
 ```shell
 $ cd tests/e2etest
 $ go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
+# To test the example in contrib
+$ go test -v ./... -run TestE2E/../../contrib/examples/$EXAMPLE_NAME
 ```
 
 If you encounter some test failure saying something like "actual diff doesn't
@@ -119,6 +148,8 @@ expected `diff.patch` or `results.yaml` by running the following commands:
 ```shell
 # Update one example
 $ KPT_E2E_UPDATE_EXPECTED=true go test -v ./... -run TestE2E/../../examples/$EXAMPLE_NAME
+# Update one example in contrib 
+$ KPT_E2E_UPDATE_EXPECTED=true go test -v ./... -run TestE2E/../../contrib/examples/$EXAMPLE_NAME
 
 # Update all examples
 $ KPT_E2E_UPDATE_EXPECTED=true go test -v ./...
@@ -152,8 +183,7 @@ pip install pyyaml
 To install `mdrip`, run the following commands:
 
 ```shell
-$ go get github.com/russross/blackfriday/v2@v2.0.1
-$ go get github.com/monopole/mdrip@v1.0.2
+$ go install github.com/monopole/mdrip@v1.0.2
 ```
 
 And you need to ensure `$GOPATH/bin` is in your `PATH`.
@@ -195,6 +225,8 @@ Do you need a review or release of functions? We’d love to hear from you!
 [golang-template]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/functions/go/_template/README.md
 
 [ts-template]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/functions/ts/_template/README.md
+
+[docker-common]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/build/docker
 
 [example-template]: https://raw.githubusercontent.com/GoogleContainerTools/kpt-functions-catalog/master/examples/_template/README.md
 

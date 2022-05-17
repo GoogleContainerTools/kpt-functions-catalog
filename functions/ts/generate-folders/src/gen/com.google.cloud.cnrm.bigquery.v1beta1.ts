@@ -23,14 +23,18 @@ export class BigQueryDatasetList {
 }
 
 export function isBigQueryDatasetList(o: any): o is BigQueryDatasetList {
-  return o && o.apiVersion === BigQueryDatasetList.apiVersion && o.kind === BigQueryDatasetList.kind;
+  return (
+    o &&
+    o.apiVersion === BigQueryDatasetList.apiVersion &&
+    o.kind === BigQueryDatasetList.kind
+  );
 }
 
 export namespace BigQueryDatasetList {
-  export const apiVersion = "bigquery.cnrm.cloud.google.com/v1beta1";
-  export const group = "bigquery.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "BigQueryDatasetList";
+  export const apiVersion = 'bigquery.cnrm.cloud.google.com/v1beta1';
+  export const group = 'bigquery.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'BigQueryDatasetList';
 
   // BigQueryDatasetList is a list of BigQueryDataset
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace BigQueryDatasetList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,18 @@ export class BigQueryJobList {
 }
 
 export function isBigQueryJobList(o: any): o is BigQueryJobList {
-  return o && o.apiVersion === BigQueryJobList.apiVersion && o.kind === BigQueryJobList.kind;
+  return (
+    o &&
+    o.apiVersion === BigQueryJobList.apiVersion &&
+    o.kind === BigQueryJobList.kind
+  );
 }
 
 export namespace BigQueryJobList {
-  export const apiVersion = "bigquery.cnrm.cloud.google.com/v1beta1";
-  export const group = "bigquery.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "BigQueryJobList";
+  export const apiVersion = 'bigquery.cnrm.cloud.google.com/v1beta1';
+  export const group = 'bigquery.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'BigQueryJobList';
 
   // BigQueryJobList is a list of BigQueryJob
   export interface Interface {
@@ -112,7 +120,7 @@ export namespace BigQueryJobList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -143,14 +151,18 @@ export class BigQueryTableList {
 }
 
 export function isBigQueryTableList(o: any): o is BigQueryTableList {
-  return o && o.apiVersion === BigQueryTableList.apiVersion && o.kind === BigQueryTableList.kind;
+  return (
+    o &&
+    o.apiVersion === BigQueryTableList.apiVersion &&
+    o.kind === BigQueryTableList.kind
+  );
 }
 
 export namespace BigQueryTableList {
-  export const apiVersion = "bigquery.cnrm.cloud.google.com/v1beta1";
-  export const group = "bigquery.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "BigQueryTableList";
+  export const apiVersion = 'bigquery.cnrm.cloud.google.com/v1beta1';
+  export const group = 'bigquery.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'BigQueryTableList';
 
   // BigQueryTableList is a list of BigQueryTable
   export interface Interface {
@@ -172,7 +184,7 @@ export namespace BigQueryTableList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

@@ -26,18 +26,22 @@ export class BackendConfig implements KubernetesObject {
 }
 
 export function isBackendConfig(o: any): o is BackendConfig {
-  return o && o.apiVersion === BackendConfig.apiVersion && o.kind === BackendConfig.kind;
+  return (
+    o &&
+    o.apiVersion === BackendConfig.apiVersion &&
+    o.kind === BackendConfig.kind
+  );
 }
 
 export namespace BackendConfig {
-  export const apiVersion = "cloud.google.com/v1";
-  export const group = "cloud.google.com";
-  export const version = "v1";
-  export const kind = "BackendConfig";
+  export const apiVersion = 'cloud.google.com/v1';
+  export const group = 'cloud.google.com';
+  export const version = 'v1';
+  export const kind = 'BackendConfig';
 
   // named constructs a BackendConfig with metadata.name set to name.
   export function named(name: string): BackendConfig {
-    return new BackendConfig({metadata: {name}});
+    return new BackendConfig({ metadata: { name } });
   }
   export interface Interface {
     // Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -223,14 +227,18 @@ export class BackendConfigList {
 }
 
 export function isBackendConfigList(o: any): o is BackendConfigList {
-  return o && o.apiVersion === BackendConfigList.apiVersion && o.kind === BackendConfigList.kind;
+  return (
+    o &&
+    o.apiVersion === BackendConfigList.apiVersion &&
+    o.kind === BackendConfigList.kind
+  );
 }
 
 export namespace BackendConfigList {
-  export const apiVersion = "cloud.google.com/v1";
-  export const group = "cloud.google.com";
-  export const version = "v1";
-  export const kind = "BackendConfigList";
+  export const apiVersion = 'cloud.google.com/v1';
+  export const group = 'cloud.google.com';
+  export const version = 'v1';
+  export const kind = 'BackendConfigList';
 
   // BackendConfigList is a list of BackendConfig
   export interface Interface {
@@ -252,7 +260,7 @@ export namespace BackendConfigList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

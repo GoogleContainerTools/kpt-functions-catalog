@@ -11,6 +11,15 @@ on:
   schedule:
     - cron:  '0 17 * * *'
 
+concurrency:
+  # If a job with a concurrency group is running with cancel-in-progress, that job is cancelled when a new job with same concurrency group is started.
+  # In a workflow github.head_ref exists only for PRs while github.ref exists for the repo branches/tags.
+  # Concurrency group will be of form ${{ github.head_ref }}-ci when triggered via PR creating 1 group per PR. Older jobs are cancelled when new commits are pushed to that PR branch.
+  # Concurrency group will be of form ${{ github.ref }}-ci when triggered from repo branch or tag ref. Older jobs are cancelled when new jobs are triggered from that same branch/tag.
+  # `-ci` suffix is to namespace the concurrency group incase you want to add a group for another workflow in the future.
+  group: '${{ github.head_ref || github.ref }}-ci'
+  cancel-in-progress: true
+
 jobs:
   shell-ci:
     strategy:
@@ -28,7 +37,7 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest]
-        node-version: [12.x]
+        node-version: [14.x]
     runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v2
@@ -50,10 +59,10 @@ jobs:
       GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
       GO111MODULE: on
     steps:
-    - name: Set up Go 1.16
+    - name: Set up Go 1.17
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16
+        go-version: 1.17
       id: go
     - name: Check out code into GOPATH
       uses: actions/checkout@v1
@@ -72,7 +81,7 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest]
-        node-version: [12.x]
+        node-version: [14.x]
     runs-on: ${{ matrix.platform }}
     env:
       GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
@@ -83,13 +92,13 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Set up Go 1.16
+    - name: Set up Go 1.17
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16
+        go-version: 1.17
     - name: Install kpt
       run: |
-        go get github.com/GoogleContainerTools/kpt@main
+        go install github.com/GoogleContainerTools/kpt@main
     - name: Build node and Go docker images
       if: matrix.platform == 'ubuntu-latest'
       run: |

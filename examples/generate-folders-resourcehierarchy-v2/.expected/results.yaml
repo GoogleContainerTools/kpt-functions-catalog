@@ -1,0 +1,17 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 0
+items:
+  - image: gcr.io/kpt-fn/generate-folders:unstable
+    exitCode: 0
+    results:
+      - message: ResourceHierarchy test-simple references an older Resource Hierarchy GroupVersion. Latest GroupVersion is blueprints.cloud.google.com/v1alpha3.
+        severity: warn
+        resourceRef:
+          apiVersion: cft.dev/v1alpha2
+          kind: ResourceHierarchy
+          name: test-simple
+        file:
+          path: resource-hierarchy.yaml

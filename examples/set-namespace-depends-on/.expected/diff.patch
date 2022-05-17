@@ -1,0 +1,36 @@
+diff --git a/resources.yaml b/resources.yaml
+index e45cae5..2ff45d5 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,11 +2,11 @@ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+   annotations:
+-    config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/wordpress-mysql
++    config.kubernetes.io/depends-on: apps/namespaces/example-ns/StatefulSet/wordpress-mysql
+   labels:
+     app: wordpress
+   name: wordpress
+-  namespace: default
++  namespace: example-ns
+ ---
+ apiVersion: apps/v1
+ kind: StatefulSet
+@@ -14,7 +14,7 @@ metadata:
+   labels:
+     app: wordpress
+   name: wordpress-mysql
+-  namespace: default
++  namespace: example-ns
+ ---
+ apiVersion: apps/v1
+ kind: Deployment
+@@ -24,7 +24,7 @@ metadata:
+   labels:
+     app: bar
+   name: bar
+-  namespace: default
++  namespace: example-ns
+ ---
+ apiVersion: rbac.authorization.k8s.io/v1
+ kind: ClusterRoleBinding

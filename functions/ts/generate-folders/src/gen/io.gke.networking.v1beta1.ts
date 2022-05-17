@@ -23,14 +23,18 @@ export class ManagedCertificateList {
 }
 
 export function isManagedCertificateList(o: any): o is ManagedCertificateList {
-  return o && o.apiVersion === ManagedCertificateList.apiVersion && o.kind === ManagedCertificateList.kind;
+  return (
+    o &&
+    o.apiVersion === ManagedCertificateList.apiVersion &&
+    o.kind === ManagedCertificateList.kind
+  );
 }
 
 export namespace ManagedCertificateList {
-  export const apiVersion = "networking.gke.io/v1beta1";
-  export const group = "networking.gke.io";
-  export const version = "v1beta1";
-  export const kind = "ManagedCertificateList";
+  export const apiVersion = 'networking.gke.io/v1beta1';
+  export const group = 'networking.gke.io';
+  export const version = 'v1beta1';
+  export const kind = 'ManagedCertificateList';
 
   // ManagedCertificateList is a list of ManagedCertificate
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace ManagedCertificateList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

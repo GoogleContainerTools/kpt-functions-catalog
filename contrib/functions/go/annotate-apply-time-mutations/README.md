@@ -4,15 +4,17 @@
 
 <!--mdtogo:Short-->
 
-The `annotate-apply-time-mutations` function enables authors to use inline comments,
-rather than annotations, to specify field replacements using the apply time mutation feature.
+The `annotate-apply-time-mutations` function enables authors to use alternate
+input methods to generate
+[apply-time-mutation annotations](https://kpt.dev/reference/annotations/apply-time-mutation/).
 
-It works by reading `# apply-time-mutation:` comments on resource YAML and adds the equivalent
-`config.kubernetes.io/apply-time-mutation` annotation to the resource.
+Input formats:
+- [Inline field comment: apply-time-mutation](#inline-field-comment-input)
+- [Custom resource object: ApplyTimeMutation](#custom-resource-object-input)
 
-The `config.kubernetes.io/apply-time-mutation` annotation is read by the [apply time mutation]
-functionality which patches the resource config at apply time, during `kpt live apply`, with
-the referenced resource's live value.
+This can help simplify the authoring of apply-time-mutation annotations, without
+needing to directly generate, manipulate, or template the YAML strings used by
+those annotations.
 
 <!--mdtogo-->
 
@@ -20,7 +22,17 @@ the referenced resource's live value.
 
 ## Usage
 
-The annotate-apply-time-mutations function can be executed declaratively as part of `kpt fn render`
+The `annotate-apply-time-mutations` function can be executed by itself or as
+part of a [kpt workflow](https://kpt.dev/book/02-concepts/02-workflows).
+
+To execute by itself:
+
+```shell
+kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+```
+
+To execute as part of a kpt workflow, first modify the Kptfile to add the
+function to the pipeline:
 
 ```yaml
 apiVersion: kpt.dev/v1
@@ -30,26 +42,123 @@ pipeline:
     - image: gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
-or imperatively like:
+Then execute the pipeline:
 
-```shell
-kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+```
+kpt fn render
 ```
 
+Either way, the function will read the input files and generate 
+`config.kubernetes.io/apply-time-mutation` annotations on the target object(s).
 
-The `annotate-apply-time-mutations` function does the following:
+The `annotate-apply-time-mutations` function does not perform the mutation on
+the target object itself. The mutation is performed by `kpt live apply`, which
+reads the annotation as input. So the function needs to be run by the user
+before applying.
 
-1.  Scans the package for `apply-time-mutation` comment markup.
-2.  Appends the equivalent `config.k8s.io/apply-time-mutation` annotation to the same.
+### Inline Field Comment Input
 
-The expected `apply-time-mutation` comment format is:
+Inline field comments can be used as an alternate way to specify mutations. This
+function will convert `apply-time-mutation` comments into apply-time-mutation
+annotations.
 
-`# apply-time-mutation: [prefix]${[group]/[version]/namespaces/[source namespace]/[kind]/[source name]:[source field path]}[suffix]`
+With inline comments, the mutation is specified closer to the target field that
+will be updated. This can aid debugging and onboarding by reducing indireciton.
+It also reduces the configuration required, because the target object and field
+don't need to be explicitly specified.
 
-Prefix, version, and suffix are optional fields.
+Inline field comments can be specified with the following format:
 
-For fields with a substitution as well as a constant prefix and/or suffix, this function will insert a replacement token in the field, matched in the annotation.
-`field: [prefix]replaceme[suffix] # apply-time-mutation: ...`
+```yaml
+field: "" # apply-time-mutation: [PREFIX]${GROUP/[VERSION/][namespaces/NAMESPACE/]KIND/NAME:FIELD_PATH}[SUFFIX]
+```
+
+Fields and delimiters surrounded in square brackets (`[]`) are optional. Your
+comment should include the curly braces (`${}`) but NOT the square brackets.
+
+- `PREFIX` (Optional) - A string to prepend to the substituted value.
+- `GROUP` - The API group of the source object. For "core" resources, the group
+  is the empty string, with the trailing slash (`/`) delimiter retained.
+- `VERSION` (Optional) - The API version of the source object. When supplied, it
+  will match only objects using this exact API version. It's recommended to
+  just use `GROUP` without version to make the reference less brittle and able
+  to survive CRD version updates.
+- `NAMESPACE` (Optional) - The namespace of the source object, required for 
+  namespace-scoped resources
+- `KIND` - The kind of the source object
+- `NAME` - The name of the source object
+- `FIELD_PATH` - A JSONPath expression that identifies the source object field
+- `SUFFIX` (Optional) - A string to append to the substituted value
+
+When the function runs, if `PREFIX` or `SUFFIX` is specified, the field value
+will be replaced with a string including the `PREFIX` and `SUFFIX`, surrounding
+a generated token for substitution.
+
+```yaml
+field: "PREFIX${ref1}SUFFIX" # apply-time-mutation: ...
+```
+
+When the function runs, if neither `PREFIX` nor `SUFFIX` are specified, the
+field value will not be replaced and no token will be specified, causing the
+whole field value to be replaced, using the type of the source object field.
+
+The apply-time-mutation comment will be preserved so that the function is
+idempotent, producing the same output when run multiple times.
+
+### Custom Resource Object Input
+
+Custom resource objects can be used to specify mutations. This function will
+convert `ApplyTimeMutation` objects into apply-time-mutation annotations.
+
+With custom resource objects, the mutation is specified with KRM, which is
+more indirect, but allows for generation, manipulation, and templating of the
+mutation specification. One big win with this method is that kpt setters can be
+used to configure the source and target object references (ex: name & namespace).
+
+`ApplyTimeMutation` resource objects can be specified with the following format:
+
+```yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: ApplyTimeMutation
+metadata:
+  name: example
+  annotations:
+    config.kubernetes.io/local-config: "true"
+spec:
+  targetRef:
+    kind: ConfigMap
+    name: target-object
+    namespace: test-namespace
+  substitutions:
+  - sourceRef:
+      kind: ConfigMap
+      name: source-object
+      namespace: test-namespace
+    sourcePath: $.spec.data
+    targetPath: $.spec.data
+```
+
+The `ApplyTimeMutation` resource follows the standard
+[Kubernetes Resource Model (KRM)](https://github.com/kubernetes/design-proposals-archive/blob/main/architecture/resource-management.md)
+with top level `apiVersion`, `kind`, `metadata` fields, as well as the
+conventional `spec` field for specification configuration. Like other KRM
+resources, the `ApplyTimeMutation` resource also supports the standard metadata
+fields, like label and annotation. The function will simply ignore them.
+
+If you're familiar with the apply-time-mutation annotation syntax, the
+`spec.substitutions` field of the `ApplyTimeMutation` resource should look
+familiar. For details about the substitution schema, see the
+[apply-time-mutation reference docs](https://kpt.dev/reference/annotations/apply-time-mutation/).
+
+In addition to the substitutions, when using the `ApplyTimeMutation` resource,
+the target object must be referenced. The `spec.targetRef` field uses the
+[ObjectReference schema](https://kpt.dev/reference/annotations/apply-time-mutation/?id=objectreference).
+The target object reference specifies which object will receive the
+apply-time-mutation annotation, the object with target fields to be modified.
+
+Remember to use the
+[local-config annotation](https://kpt.dev/reference/annotations/local-config/)
+so the resource is not applied by `kpt live apply`.
 
 <!--mdtogo-->
 
@@ -57,9 +166,31 @@ For fields with a substitution as well as a constant prefix and/or suffix, this 
 
 <!--mdtogo:Examples-->
 
-Appending an `config.kubernetes.io/apply-time-mutation` annotation based on a comment.
+### Inline Field Comment Example
 
-Let's start with a sample resource.
+This example demonstrates generating an `config.kubernetes.io/apply-time-mutation`
+annotation based on an `apply-time-mutation` comment.
+
+Start with a source object:
+
+```yaml
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Project
+metadata:
+  name: my-project
+  namespace: example-namespace
+spec:
+  name: My Project
+  organizationRef:
+    external: "123456789012"
+  billingAccountRef:
+    external: "AAAAAA-BBBBBB-CCCCCC"
+# The status will be populated by a controller after the object is created
+# status:
+#   number: "1234567890123"
+```
+
+Add an `apply-time-mutation` comment to the target object:
 
 ```yaml
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
@@ -68,7 +199,7 @@ metadata:
   name: my-policy
   namespace: example-namespace
 spec:
-  member: placeholder # apply-time-mutation: "serviceAccount:service-${resourcemanager.cnrm.cloud.google.com/namespaces/example-namespace/Project/example-name:$.status.number}@container-engine-robot.iam.gserviceaccount.com"
+  member: placeholder # apply-time-mutation: "serviceAccount:service-${resourcemanager.cnrm.cloud.google.com/namespaces/example-namespace/Project/my-project:$.status.number}@container-engine-robot.iam.gserviceaccount.com"
 ```
 
 Invoke the function:
@@ -77,7 +208,7 @@ Invoke the function:
 kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
 ```
 
-Resource will be updated to the following:
+The target object will be updated to the following:
 
 ```yaml
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
@@ -90,15 +221,101 @@ metadata:
       - sourceRef:
           group: resourcemanager.cnrm.cloud.google.com
           kind: Project
-          name: example-name
+          name: my-project
           namespace: example-namespace
         sourcePath: $.status.number
         targetPath: $.spec.member
-        token: $ref0
+        token: ${ref0}
 spec:
-  member: serviceAccount:service-$ref0@container-engine-robot.iam.gserviceaccount.com # apply-time-mutation: ...
+  member: serviceAccount:service-${ref0}@container-engine-robot.iam.gserviceaccount.com # apply-time-mutation: ...
+```
+
+### Custom Resource Object Example
+
+This example demonstrates generating an `config.kubernetes.io/apply-time-mutation`
+annotation based on an `ApplyTimeMutation` object.
+
+Start with source and target objects:
+
+```yaml
+apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+kind: Project
+metadata:
+  name: my-project
+  namespace: example-namespace
+spec:
+  name: My Project
+  organizationRef:
+    external: "123456789012"
+  billingAccountRef:
+    external: "AAAAAA-BBBBBB-CCCCCC"
+# The status will be populated by a controller after the object is created
+# status:
+#   number: "1234567890123"
+```
+
+```yaml
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
+metadata:
+  name: my-policy
+  namespace: example-namespace
+spec:
+  member: serviceAccount:service-${project-number}@container-engine-robot.iam.gserviceaccount.com
+```
+
+Specify the mutation with an `ApplyTimeMutation` object:
+
+```yaml
+apiVersion: fn.kpt.dev/v1alpha1
+kind: ApplyTimeMutation
+metadata:
+  name: example
+  annotations:
+    config.kubernetes.io/local-config: "true"
+spec:
+  targetRef:
+    group: iam.cnrm.cloud.google.com
+    kind: IAMPolicyMember
+    name: my-policy
+    namespace: example-namespace
+  substitutions:
+  - sourceRef:
+      group: resourcemanager.cnrm.cloud.google.com
+      kind: Project
+      name: my-project
+      namespace: example-namespace
+    sourcePath: $.status.number
+    targetPath: $.spec.member
+    token: "${project-number}"
+```
+
+Invoke the function:
+
+```shell
+kpt fn eval --image gcr.io/kpt-fn-contrib/annotate-apply-time-mutations:unstable
+```
+
+The target object will be updated to the following:
+
+```yaml
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
+metadata:
+  name: my-policy
+  namespace: example-namespace
+  annotations:
+    config.kubernetes.io/apply-time-mutation: |
+      - sourceRef:
+          group: resourcemanager.cnrm.cloud.google.com
+          kind: Project
+          name: my-project
+          namespace: example-namespace
+        sourcePath: $.status.number
+        targetPath: $.spec.member
+        token: ${project-number}
+spec:
+  member: serviceAccount:service-${project-number}@container-engine-robot.iam.gserviceaccount.com
 ```
 
 <!--mdtogo-->
-
-[apply time mutation] https://kpt.dev/reference/cli/live/apply/

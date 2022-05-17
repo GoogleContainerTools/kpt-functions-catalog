@@ -23,14 +23,18 @@ export class SQLDatabaseList {
 }
 
 export function isSQLDatabaseList(o: any): o is SQLDatabaseList {
-  return o && o.apiVersion === SQLDatabaseList.apiVersion && o.kind === SQLDatabaseList.kind;
+  return (
+    o &&
+    o.apiVersion === SQLDatabaseList.apiVersion &&
+    o.kind === SQLDatabaseList.kind
+  );
 }
 
 export namespace SQLDatabaseList {
-  export const apiVersion = "sql.cnrm.cloud.google.com/v1beta1";
-  export const group = "sql.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "SQLDatabaseList";
+  export const apiVersion = 'sql.cnrm.cloud.google.com/v1beta1';
+  export const group = 'sql.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'SQLDatabaseList';
 
   // SQLDatabaseList is a list of SQLDatabase
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace SQLDatabaseList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,18 @@ export class SQLInstanceList {
 }
 
 export function isSQLInstanceList(o: any): o is SQLInstanceList {
-  return o && o.apiVersion === SQLInstanceList.apiVersion && o.kind === SQLInstanceList.kind;
+  return (
+    o &&
+    o.apiVersion === SQLInstanceList.apiVersion &&
+    o.kind === SQLInstanceList.kind
+  );
 }
 
 export namespace SQLInstanceList {
-  export const apiVersion = "sql.cnrm.cloud.google.com/v1beta1";
-  export const group = "sql.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "SQLInstanceList";
+  export const apiVersion = 'sql.cnrm.cloud.google.com/v1beta1';
+  export const group = 'sql.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'SQLInstanceList';
 
   // SQLInstanceList is a list of SQLInstance
   export interface Interface {
@@ -112,7 +120,7 @@ export namespace SQLInstanceList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -143,14 +151,18 @@ export class SQLSSLCertList {
 }
 
 export function isSQLSSLCertList(o: any): o is SQLSSLCertList {
-  return o && o.apiVersion === SQLSSLCertList.apiVersion && o.kind === SQLSSLCertList.kind;
+  return (
+    o &&
+    o.apiVersion === SQLSSLCertList.apiVersion &&
+    o.kind === SQLSSLCertList.kind
+  );
 }
 
 export namespace SQLSSLCertList {
-  export const apiVersion = "sql.cnrm.cloud.google.com/v1beta1";
-  export const group = "sql.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "SQLSSLCertList";
+  export const apiVersion = 'sql.cnrm.cloud.google.com/v1beta1';
+  export const group = 'sql.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'SQLSSLCertList';
 
   // SQLSSLCertList is a list of SQLSSLCert
   export interface Interface {
@@ -172,7 +184,7 @@ export namespace SQLSSLCertList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -203,14 +215,16 @@ export class SQLUserList {
 }
 
 export function isSQLUserList(o: any): o is SQLUserList {
-  return o && o.apiVersion === SQLUserList.apiVersion && o.kind === SQLUserList.kind;
+  return (
+    o && o.apiVersion === SQLUserList.apiVersion && o.kind === SQLUserList.kind
+  );
 }
 
 export namespace SQLUserList {
-  export const apiVersion = "sql.cnrm.cloud.google.com/v1beta1";
-  export const group = "sql.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "SQLUserList";
+  export const apiVersion = 'sql.cnrm.cloud.google.com/v1beta1';
+  export const group = 'sql.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'SQLUserList';
 
   // SQLUserList is a list of SQLUser
   export interface Interface {
@@ -232,7 +246,7 @@ export namespace SQLUserList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

@@ -34,14 +34,14 @@ export function isCronJob(o: any): o is CronJob {
 }
 
 export namespace CronJob {
-  export const apiVersion = "batch/v1beta1";
-  export const group = "batch";
-  export const version = "v1beta1";
-  export const kind = "CronJob";
+  export const apiVersion = 'batch/v1beta1';
+  export const group = 'batch';
+  export const version = 'v1beta1';
+  export const kind = 'CronJob';
 
   // named constructs a CronJob with metadata.name set to name.
   export function named(name: string): CronJob {
-    return new CronJob({metadata: {name}});
+    return new CronJob({ metadata: { name } });
   }
   // CronJob represents the configuration of a single cron job.
   export interface Interface {
@@ -79,14 +79,16 @@ export class CronJobList {
 }
 
 export function isCronJobList(o: any): o is CronJobList {
-  return o && o.apiVersion === CronJobList.apiVersion && o.kind === CronJobList.kind;
+  return (
+    o && o.apiVersion === CronJobList.apiVersion && o.kind === CronJobList.kind
+  );
 }
 
 export namespace CronJobList {
-  export const apiVersion = "batch/v1beta1";
-  export const group = "batch";
-  export const version = "v1beta1";
-  export const kind = "CronJobList";
+  export const apiVersion = 'batch/v1beta1';
+  export const group = 'batch';
+  export const version = 'v1beta1';
+  export const kind = 'CronJobList';
 
   // CronJobList is a collection of cron jobs.
   export interface Interface {

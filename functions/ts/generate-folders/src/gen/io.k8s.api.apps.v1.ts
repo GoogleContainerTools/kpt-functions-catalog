@@ -31,14 +31,18 @@ export class ControllerRevision implements KubernetesObject {
 }
 
 export function isControllerRevision(o: any): o is ControllerRevision {
-  return o && o.apiVersion === ControllerRevision.apiVersion && o.kind === ControllerRevision.kind;
+  return (
+    o &&
+    o.apiVersion === ControllerRevision.apiVersion &&
+    o.kind === ControllerRevision.kind
+  );
 }
 
 export namespace ControllerRevision {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "ControllerRevision";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'ControllerRevision';
 
   // ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
   export interface Interface {
@@ -76,14 +80,18 @@ export class ControllerRevisionList {
 }
 
 export function isControllerRevisionList(o: any): o is ControllerRevisionList {
-  return o && o.apiVersion === ControllerRevisionList.apiVersion && o.kind === ControllerRevisionList.kind;
+  return (
+    o &&
+    o.apiVersion === ControllerRevisionList.apiVersion &&
+    o.kind === ControllerRevisionList.kind
+  );
 }
 
 export namespace ControllerRevisionList {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "ControllerRevisionList";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'ControllerRevisionList';
 
   // ControllerRevisionList is a resource containing a list of ControllerRevision objects.
   export interface Interface {
@@ -122,18 +130,20 @@ export class DaemonSet implements KubernetesObject {
 }
 
 export function isDaemonSet(o: any): o is DaemonSet {
-  return o && o.apiVersion === DaemonSet.apiVersion && o.kind === DaemonSet.kind;
+  return (
+    o && o.apiVersion === DaemonSet.apiVersion && o.kind === DaemonSet.kind
+  );
 }
 
 export namespace DaemonSet {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "DaemonSet";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'DaemonSet';
 
   // named constructs a DaemonSet with metadata.name set to name.
   export function named(name: string): DaemonSet {
-    return new DaemonSet({metadata: {name}});
+    return new DaemonSet({ metadata: { name } });
   }
   // DaemonSet represents the configuration of a daemon set.
   export interface Interface {
@@ -197,14 +207,18 @@ export class DaemonSetList {
 }
 
 export function isDaemonSetList(o: any): o is DaemonSetList {
-  return o && o.apiVersion === DaemonSetList.apiVersion && o.kind === DaemonSetList.kind;
+  return (
+    o &&
+    o.apiVersion === DaemonSetList.apiVersion &&
+    o.kind === DaemonSetList.kind
+  );
 }
 
 export namespace DaemonSetList {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "DaemonSetList";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'DaemonSetList';
 
   // DaemonSetList is a collection of daemon sets.
   export interface Interface {
@@ -324,18 +338,20 @@ export class Deployment implements KubernetesObject {
 }
 
 export function isDeployment(o: any): o is Deployment {
-  return o && o.apiVersion === Deployment.apiVersion && o.kind === Deployment.kind;
+  return (
+    o && o.apiVersion === Deployment.apiVersion && o.kind === Deployment.kind
+  );
 }
 
 export namespace Deployment {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "Deployment";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'Deployment';
 
   // named constructs a Deployment with metadata.name set to name.
   export function named(name: string): Deployment {
-    return new Deployment({metadata: {name}});
+    return new Deployment({ metadata: { name } });
   }
   // Deployment enables declarative updates for Pods and ReplicaSets.
   export interface Interface {
@@ -403,14 +419,18 @@ export class DeploymentList {
 }
 
 export function isDeploymentList(o: any): o is DeploymentList {
-  return o && o.apiVersion === DeploymentList.apiVersion && o.kind === DeploymentList.kind;
+  return (
+    o &&
+    o.apiVersion === DeploymentList.apiVersion &&
+    o.kind === DeploymentList.kind
+  );
 }
 
 export namespace DeploymentList {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "DeploymentList";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'DeploymentList';
 
   // DeploymentList is a list of Deployments.
   export interface Interface {
@@ -523,18 +543,20 @@ export class ReplicaSet implements KubernetesObject {
 }
 
 export function isReplicaSet(o: any): o is ReplicaSet {
-  return o && o.apiVersion === ReplicaSet.apiVersion && o.kind === ReplicaSet.kind;
+  return (
+    o && o.apiVersion === ReplicaSet.apiVersion && o.kind === ReplicaSet.kind
+  );
 }
 
 export namespace ReplicaSet {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "ReplicaSet";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'ReplicaSet';
 
   // named constructs a ReplicaSet with metadata.name set to name.
   export function named(name: string): ReplicaSet {
-    return new ReplicaSet({metadata: {name}});
+    return new ReplicaSet({ metadata: { name } });
   }
   // ReplicaSet ensures that a specified number of pod replicas are running at any given time.
   export interface Interface {
@@ -598,14 +620,18 @@ export class ReplicaSetList {
 }
 
 export function isReplicaSetList(o: any): o is ReplicaSetList {
-  return o && o.apiVersion === ReplicaSetList.apiVersion && o.kind === ReplicaSetList.kind;
+  return (
+    o &&
+    o.apiVersion === ReplicaSetList.apiVersion &&
+    o.kind === ReplicaSetList.kind
+  );
 }
 
 export namespace ReplicaSetList {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "ReplicaSetList";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'ReplicaSetList';
 
   // ReplicaSetList is a collection of ReplicaSets.
   export interface Interface {
@@ -719,18 +745,20 @@ export class StatefulSet implements KubernetesObject {
 }
 
 export function isStatefulSet(o: any): o is StatefulSet {
-  return o && o.apiVersion === StatefulSet.apiVersion && o.kind === StatefulSet.kind;
+  return (
+    o && o.apiVersion === StatefulSet.apiVersion && o.kind === StatefulSet.kind
+  );
 }
 
 export namespace StatefulSet {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "StatefulSet";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'StatefulSet';
 
   // named constructs a StatefulSet with metadata.name set to name.
   export function named(name: string): StatefulSet {
-    return new StatefulSet({metadata: {name}});
+    return new StatefulSet({ metadata: { name } });
   }
   // StatefulSet represents a set of pods with consistent identities. Identities are defined as:
   //  - Network: A single stable DNS and hostname.
@@ -794,14 +822,18 @@ export class StatefulSetList {
 }
 
 export function isStatefulSetList(o: any): o is StatefulSetList {
-  return o && o.apiVersion === StatefulSetList.apiVersion && o.kind === StatefulSetList.kind;
+  return (
+    o &&
+    o.apiVersion === StatefulSetList.apiVersion &&
+    o.kind === StatefulSetList.kind
+  );
 }
 
 export namespace StatefulSetList {
-  export const apiVersion = "apps/v1";
-  export const group = "apps";
-  export const version = "v1";
-  export const kind = "StatefulSetList";
+  export const apiVersion = 'apps/v1';
+  export const group = 'apps';
+  export const version = 'v1';
+  export const kind = 'StatefulSetList';
 
   // StatefulSetList is a collection of StatefulSets.
   export interface Interface {
@@ -845,7 +877,12 @@ export class StatefulSetSpec {
     this.serviceName = desc.serviceName;
     this.template = desc.template;
     this.updateStrategy = desc.updateStrategy;
-    this.volumeClaimTemplates = (desc.volumeClaimTemplates !== undefined) ? desc.volumeClaimTemplates.map((i) => new apiCoreV1.PersistentVolumeClaim(i)) : undefined;
+    this.volumeClaimTemplates =
+      desc.volumeClaimTemplates !== undefined
+        ? desc.volumeClaimTemplates.map(
+            (i) => new apiCoreV1.PersistentVolumeClaim(i)
+          )
+        : undefined;
   }
 }
 

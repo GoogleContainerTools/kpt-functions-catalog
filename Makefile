@@ -43,7 +43,8 @@ check-licenses:
 	cd contrib/functions/ts && $(MAKE) check-licenses
 
 verify-docs:
-	GO111MODULE=on go get github.com/monopole/mdrip
+	go install github.com/monopole/mdrip@v1.0.2
+	(cd scripts/patch_reader/ && go build -o patch_reader .)
 	scripts/verify-docs.py
 
 build: ## Build all function images. Variable 'TAG' is used to specify tag. 'dev' will be used if not set.
@@ -69,3 +70,7 @@ site-run: ## Run the site locally.
 site-check: ## Test site for broken catalog links.
 	make site-run
 	./scripts/check-site.sh
+
+update-function-docs: ## Update documentation for a function release branch
+	(cd scripts/update_function_docs/ && go build -o update_function_docs .)
+	RELEASE_BRANCH=$(RELEASE_BRANCH) ./scripts/update_function_docs/update_function_docs

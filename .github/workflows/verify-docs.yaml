@@ -19,14 +19,13 @@ jobs:
     - name: Install libs
       run: |
         pip install pyyaml
-    - name: Set up Go 1.16
+    - name: Set up Go 1.17
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16
+        go-version: 1.17
     - name: Install mdrip
       run: |
-        go get github.com/russross/blackfriday/v2@v2.0.1
-        go get github.com/monopole/mdrip@v1.0.2
+        go install github.com/monopole/mdrip@v1.0.2
     - name: Verify docs
       run: |
         make verify-docs

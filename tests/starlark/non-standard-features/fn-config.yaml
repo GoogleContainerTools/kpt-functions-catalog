@@ -16,4 +16,5 @@ source: |
   print(fib(3))
 
   for resource in ctx.resource_list["items"]:
-    resource["metadata"]["namespace"] = "test"
+    if resource["kind"] not in ["StarlarkRun", "Kptfile"]:
+      resource["metadata"]["namespace"] = "test"

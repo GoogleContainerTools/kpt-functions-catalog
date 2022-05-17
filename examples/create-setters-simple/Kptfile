@@ -6,3 +6,6 @@ pipeline:
   mutators:
     - image: gcr.io/kpt-fn/create-setters:unstable
       configPath: setters.yaml
+      selectors:
+        - kind: Deployment
+        - kind: MyKind

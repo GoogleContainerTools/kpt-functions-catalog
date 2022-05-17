@@ -35,6 +35,25 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var keywordsPool = []string{
+	"setters",
+	"replacement",
+	"setters",
+	"name",
+	"gcp",
+	"terraform",
+	"gatekeeper",
+	"generate",
+	"kubeval",
+	"helm",
+	"annotation",
+	"image",
+	"label",
+	"namespace",
+	"project-id",
+	"starlark",
+}
+
 var (
 	branchesToSkip = []string{
 		"sops/v0.2",
@@ -76,7 +95,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	err = writeExampleIndexV2(curatedFns, source, dest)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
 	err = writeExampleIndex(contribFns, source, filepath.Join(dest, "contrib"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+
+	err = writeExampleIndexV2(contribFns, source, filepath.Join(dest, "contrib"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
@@ -92,6 +122,8 @@ type function struct {
 	Description       string
 	Tags              string
 	Gcp               bool
+	Types             []string
+	Keywords          []string
 }
 
 type example struct {
@@ -107,12 +139,25 @@ type metadata struct {
 	SourceUrl          string   `yaml:"sourceURL"`
 	ExamplePackageUrls []string `yaml:"examplePackageURLs"`
 	Hidden             bool
+	Types              []string `yaml:"types"`
+	Keywords           []string `yaml:"keywords"`
+}
+
+type catalogEntry struct {
+	// LatestPatchVersion is the latest Patch semver for a MajorMinor semver
+	LatestPatchVersion string
+	// Examples maps exampleName->example
+	Examples map[string]example
+	// Types are the function types, only `validator` and `mutator` are accepted.
+	Types    []string
+	Keywords []string
 }
 
 var (
 	// Match start of a version such as v1.9.1
 	branchSemverPrefix = regexp.MustCompile(`[-\w]*\/(v\d*\.\d*)`)
 	functionDirPrefix  = regexp.MustCompile(`.+/functions/`)
+	patchTagPattern    = regexp.MustCompile(`.*(go|ts)\/[-\w]*\/(v\d*\.\d*\.\d*)`)
 )
 
 func getBranches() ([]string, error) {
@@ -143,6 +188,68 @@ func getBranches() ([]string, error) {
 		}
 	}
 	return verBranches, err
+}
+
+type functionRelease struct {
+	FunctionName string
+	MajorMinor   string
+}
+
+type patchVersionReader struct {
+	latestPatchVersions map[functionRelease]string
+}
+
+// NewPatchVersionReader constructs a new patchVersionReader
+func NewPatchVersionReader() (*patchVersionReader, error) {
+	pvr := &patchVersionReader{}
+	err := pvr.Init()
+	return pvr, err
+}
+
+// Init initializes patchVersionReader
+func (pvr *patchVersionReader) Init() error {
+	pvr.latestPatchVersions = make(map[functionRelease]string)
+
+	var buf bytes.Buffer
+	cmd := exec.Command("git", "tag")
+	cmd.Stdout = &buf
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	for _, tag := range strings.Split(buf.String(), "\n") {
+		segments := strings.Split(tag, "/")
+		// e.g. functions/go/some-fn/v1.2.3, go/some-fn/v1.2.3
+		if len(segments) < 3 || !patchTagPattern.MatchString(tag) {
+			continue
+		}
+
+		patchVersion := segments[len(segments)-1]
+		fr := functionRelease{
+			FunctionName: segments[len(segments)-2],
+			MajorMinor:   semver.MajorMinor(patchVersion),
+		}
+		ver, ok := pvr.latestPatchVersions[fr]
+		if !ok {
+			pvr.latestPatchVersions[fr] = patchVersion
+		} else if semver.Compare(patchVersion, ver) == 1 {
+			pvr.latestPatchVersions[fr] = patchVersion
+		}
+	}
+	return nil
+}
+
+// LatestPatchVersion for a given major/minor version of a function
+func (pvr *patchVersionReader) LatestPatchVersion(funcName, majorMinor string) (string, error) {
+	val, ok := pvr.latestPatchVersions[functionRelease{
+		FunctionName: funcName,
+		MajorMinor:   majorMinor,
+	}]
+	if !ok {
+		return "", fmt.Errorf("could not find patch version for %s %s\n",
+			funcName, majorMinor)
+	}
+	return val, nil
 }
 
 func getFunctions(branches []string, source string, dest string) []function {
@@ -216,16 +323,17 @@ func copyExamples(b string, exampleSources []string, versionDest, minorVersion s
 	}
 
 	for _, exampleSource := range exampleSources {
-		splitedPaths := strings.SplitN(exampleSource, minorVersion+string(filepath.Separator), 2)
+		// We will split something like "https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/set-namespace/v0.3.2/examples/set-namespace-simple" by something like "v0.3/" or "v0.3.2/"
+		splitedPaths := regexp.MustCompile(fmt.Sprintf("%v(.[0-9])?/", minorVersion)).Split(exampleSource, 2)
 		if len(splitedPaths) != 2 {
-			return fmt.Errorf("expect 2 substring after spliting %q by %q", exampleSource, minorVersion+string(filepath.Separator))
+			return fmt.Errorf("expect 2 substring after spliting %q by %q", exampleSource, minorVersion)
 		}
 		relativePath := splitedPaths[1]
 		// Fetch example into temporary directory.
 		cmd := exec.Command("git", fmt.Sprintf("--work-tree=%v", tempDir), "checkout", b, "--", relativePath)
-		err = cmd.Run()
+		out, err := cmd.CombinedOutput()
 		if err != nil {
-			return fmt.Errorf("Error running %v: %v", cmd, err)
+			return fmt.Errorf("Error running %v: %v\nCombined output: %v", cmd, err, string(out))
 		}
 
 		exampleName := filepath.Base(relativePath)
@@ -323,6 +431,9 @@ func parseMetadata(f function, md metadata, version string, versionDest string) 
 	f.Path = versionDest
 	f.Description = md.Description
 	functionTags := make([]string, 0)
+	if len(md.Types) != 0 {
+		addType(&f, md.Types...)
+	}
 	for _, tag := range md.Tags {
 		normalizedTag := strings.ToLower(tag)
 		if normalizedTag == "gcp" {
@@ -330,12 +441,72 @@ func parseMetadata(f function, md metadata, version string, versionDest string) 
 		} else {
 			functionTags = append(functionTags, normalizedTag)
 		}
+		// If function type is not given, read the "types" from "tags". The types have to be `mutator` or/and `validator`.
+		// While "tags" can be custom field like `config sync`, `gcp`
+		addType(&f, tag)
 	}
 	sort.Strings(functionTags)
 	f.Tags = strings.Join(functionTags, ", ")
 	f.ImagePath = md.Image
-
+	addKeywordsFromTag(&f, md.Tags, md.Keywords)
 	return f
+}
+
+// Ideally, we should read the keywords from the function metadata. However, each function has its own git release branch,
+// so adding a single meta field requires code changing and releasing for each function branch.
+// As a workaround before we take advantage of the "keywords" meta, we get keywords from two sources
+// 1. For horizontal functions, we keep a KeywordPool and find keywords if it's a substring of the function.
+// 2. For product specific functions, we use its `tags` excluding `mutator` and `validator` as keywords. These keywords can be
+// `gcp`, `config-sync`, `terraform` etc.
+func addKeywordsFromTag(f *function, tags []string, customKeywords []string) {
+	var newKeywords []string
+	keywordMap := map[string]bool{}
+	keywords := append(tags, customKeywords...)
+	for _, kw := range keywords {
+		kw = strings.ToLower(kw)
+		kw = strings.ReplaceAll(kw, " ", "-")
+		if kw == "mutator" {
+			continue
+		}
+		if kw == "validator" {
+			continue
+		}
+		if ok := keywordMap[kw]; !ok {
+			newKeywords = append(newKeywords, kw)
+			keywordMap[kw] = true
+		}
+	}
+	for _, kw := range keywordsPool {
+		if strings.Contains(f.FunctionName, kw) {
+			if ok := keywordMap[kw]; !ok {
+				newKeywords = append(newKeywords, kw)
+				keywordMap[kw] = true
+			}
+		}
+	}
+	f.Keywords = newKeywords
+}
+
+func addType(f *function, fnTypes ...string) {
+	uniqueMap := map[string]bool{}
+	allTypes := append(fnTypes, f.Types...)
+	var newTypes []string
+	for _, fnType := range allTypes {
+		var k string
+		switch strings.ToLower(fnType) {
+		case "validator":
+			k = "validator"
+		case "mutator":
+			k = "mutator"
+		default:
+			continue
+		}
+		if ok := uniqueMap[k]; !ok {
+			uniqueMap[k] = true
+			newTypes = append(newTypes, k)
+		}
+	}
+	f.Types = newTypes
 }
 
 func getRelativeFunctionPath(source string, funcName string) (string, error) {
@@ -434,5 +605,47 @@ func writeExampleIndex(functions []function, source string, dest string) error {
 	}
 
 	err = ioutil.WriteFile(filepath.Join(dest, "catalog.json"), funcJson, 0600)
+	return err
+}
+
+// writeExampleIndexV2 forms and writes the output for catalog-v2.json
+func writeExampleIndexV2(functions []function, source string, dest string) error {
+	// Map functionName->majorMinor->catalogEntry
+	functionVersionMap := make(map[string]map[string]catalogEntry)
+	pvr, err := NewPatchVersionReader()
+	if err != nil {
+		return err
+	}
+	for _, f := range functions {
+		// majorMinor->CatalogEntry
+		catalogEntryMap := make(map[string]catalogEntry)
+		for majorMinor, examples := range f.VersionToExamples {
+			// exampleName->example
+			exampleMap := make(map[string]example)
+			for exName, ex := range examples {
+				e := ex
+				e.LocalExamplePath = strings.Replace(ex.LocalExamplePath, filepath.Join(source, "site"), "", 1)
+				exampleMap[exName] = e
+			}
+			patch, err := pvr.LatestPatchVersion(f.FunctionName, majorMinor)
+			if err != nil {
+				return err
+			}
+			catalogEntryMap[majorMinor] = catalogEntry{
+				LatestPatchVersion: patch,
+				Examples:           exampleMap,
+				Types:              f.Types,
+				Keywords:           f.Keywords,
+			}
+		}
+		functionVersionMap[f.FunctionName] = catalogEntryMap
+	}
+
+	funcJson, err := json.Marshal(functionVersionMap)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(dest, "catalog-v2.json"), funcJson, 0600)
 	return err
 }

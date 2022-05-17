@@ -23,14 +23,16 @@ export class FolderList {
 }
 
 export function isFolderList(o: any): o is FolderList {
-  return o && o.apiVersion === FolderList.apiVersion && o.kind === FolderList.kind;
+  return (
+    o && o.apiVersion === FolderList.apiVersion && o.kind === FolderList.kind
+  );
 }
 
 export namespace FolderList {
-  export const apiVersion = "resourcemanager.cnrm.cloud.google.com/v1beta1";
-  export const group = "resourcemanager.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "FolderList";
+  export const apiVersion = 'resourcemanager.cnrm.cloud.google.com/v1beta1';
+  export const group = 'resourcemanager.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'FolderList';
 
   // FolderList is a list of Folder
   export interface Interface {
@@ -52,7 +54,7 @@ export namespace FolderList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +85,16 @@ export class ProjectList {
 }
 
 export function isProjectList(o: any): o is ProjectList {
-  return o && o.apiVersion === ProjectList.apiVersion && o.kind === ProjectList.kind;
+  return (
+    o && o.apiVersion === ProjectList.apiVersion && o.kind === ProjectList.kind
+  );
 }
 
 export namespace ProjectList {
-  export const apiVersion = "resourcemanager.cnrm.cloud.google.com/v1beta1";
-  export const group = "resourcemanager.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ProjectList";
+  export const apiVersion = 'resourcemanager.cnrm.cloud.google.com/v1beta1';
+  export const group = 'resourcemanager.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ProjectList';
 
   // ProjectList is a list of Project
   export interface Interface {
@@ -112,7 +116,7 @@ export namespace ProjectList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

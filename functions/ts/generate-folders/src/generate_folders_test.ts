@@ -1,12 +1,29 @@
-import { Configs, Result, TestRunner, KubernetesObject, isKubernetesObject } from 'kpt-functions';
+import {
+  Configs,
+  Result,
+  TestRunner,
+  KubernetesObject,
+  isKubernetesObject,
+} from 'kpt-functions';
 import { load } from 'js-yaml';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import { isResourceHierarchy as isV3ResourceHierarchy } from './gen/com.google.cloud.blueprints.v1alpha3';
 import { isResourceHierarchy as isV2ResourceHierarchy } from './gen/dev.cft.v1alpha2';
 import { isResourceHierarchy as isV1ResourceHierarchy } from './gen/dev.cft.v1alpha1';
-import { generateFolders, missingSubtreeErrorResult, badParentErrorResult, badParentKindErrorResult, oldHierarchyWarning, normalize, Annotations } from './generate_folders';
-import { FolderList, Folder } from './gen/com.google.cloud.cnrm.resourcemanager.v1beta1';
+import {
+  generateFolders,
+  missingSubtreeErrorResult,
+  badParentErrorResult,
+  badParentKindErrorResult,
+  oldHierarchyWarning,
+  normalize,
+  Annotations,
+} from './generate_folders';
+import {
+  FolderList,
+  Folder,
+} from './gen/com.google.cloud.cnrm.resourcemanager.v1beta1';
 
 const RUNNER = new TestRunner(generateFolders);
 
@@ -40,10 +57,10 @@ describe('normalize', () => {
 
 interface HierarchyNode {
   length: 2;
-  readonly 0: string;    // Name of the folder
+  readonly 0: string; // Name of the folder
   readonly 1: Hierarchy; // Nested folders
 }
-interface Hierarchy extends Array<string | HierarchyNode> { }
+interface Hierarchy extends Array<string | HierarchyNode> {}
 
 type ErrorFn = (hierarchy: KubernetesObject) => Result;
 
@@ -106,7 +123,8 @@ describe('generateFolders', () => {
         'shallow',
         ['nested', [['very', ['nested']]]],
       ],
-    }, {
+    },
+    {
       file: 'nested_v3',
       expected: [
         ['Dev', ['Team "One"', 'Team_2']],
@@ -120,7 +138,13 @@ describe('generateFolders', () => {
       expected: [
         ['Dev', ['Team "One"', 'Team_2']],
         ['Prod', ['Team "One"', 'Team_2']],
-        ['services', [['core', ['apps', 'networking']], ['extra', ['devops']]]],
+        [
+          'services',
+          [
+            ['core', ['apps', 'networking']],
+            ['extra', ['devops']],
+          ],
+        ],
       ],
     },
     {
@@ -128,7 +152,13 @@ describe('generateFolders', () => {
       expected: [
         ['Dev', ['Team "One"', 'Team_2']],
         ['Prod', ['Team "One"', 'Team_2']],
-        ['services', [['core', ['apps', 'networking']], ['extra', ['devops']]]],
+        [
+          'services',
+          [
+            ['core', ['apps', 'networking']],
+            ['extra', ['devops']],
+          ],
+        ],
       ],
     },
     {
@@ -167,7 +197,7 @@ describe('generateFolders', () => {
     {
       file: 'missing_subtree',
       expected: [],
-      errors: [(o: KubernetesObject) => missingSubtreeErrorResult("taems", o)],
+      errors: [(o: KubernetesObject) => missingSubtreeErrorResult('taems', o)],
     },
     {
       file: 'wrong_parent_kind',
@@ -176,9 +206,7 @@ describe('generateFolders', () => {
     },
     {
       file: 'annotations_v1',
-      expected: [
-        ['Dev', ['One', 'Two']],
-      ],
+      expected: [['Dev', ['One', 'Two']]],
     },
     {
       file: 'annotations_v2',
@@ -216,27 +244,48 @@ describe('generateFolders', () => {
   ];
 
   for (const test of tests) {
-    it((test.errors !== undefined && test.errors.length > 0) ?
-      `yields errors from ${test.file}` :
-      `generates folders from ${test.file}`, async () => {
+    it(
+      test.errors !== undefined && test.errors.length > 0
+        ? `yields errors from ${test.file}`
+        : `generates folders from ${test.file}`,
+      async () => {
         const hierarchy = readTestFile(test.file);
         const input = new Configs([hierarchy]);
         const expectedStructure = test.expected;
 
-        const errorResults = (test.errors || []).map((errorFunction) => errorFunction(hierarchy));
+        const errorResults = (test.errors || []).map((errorFunction) =>
+          errorFunction(hierarchy)
+        );
 
-        const warnings = isV2ResourceHierarchy(hierarchy) || isV1ResourceHierarchy(hierarchy) ? [oldHierarchyWarning(hierarchy)] : [];
+        const warnings =
+          isV2ResourceHierarchy(hierarchy) || isV1ResourceHierarchy(hierarchy)
+            ? [oldHierarchyWarning(hierarchy)]
+            : [];
 
-        const parentType = test.parent?.folder ? "Folder" : "Organization";
-        const parentRef = test.parent?.folder ? test.parent.folder : "test-organization";
+        const parentType = test.parent?.folder ? 'Folder' : 'Organization';
+        const parentRef = test.parent?.folder
+          ? test.parent.folder
+          : 'test-organization';
         const annotations: Annotations = test.annotations || {};
 
-        const expectedOutput = new Configs([
-          hierarchy,
-          ...getHierarchyConfig(expectedStructure, [], parentRef, parentType, annotations, isV3ResourceHierarchy(hierarchy)),
-        ], undefined, [...warnings, ...errorResults]);
+        const expectedOutput = new Configs(
+          [
+            hierarchy,
+            ...getHierarchyConfig(
+              expectedStructure,
+              [],
+              parentRef,
+              parentType,
+              annotations,
+              isV3ResourceHierarchy(hierarchy)
+            ),
+          ],
+          undefined,
+          [...warnings, ...errorResults]
+        );
         await RUNNER.assert(input, expectedOutput);
-      });
+      }
+    );
   }
 });
 
@@ -246,16 +295,34 @@ describe('generateFolders', () => {
  * @param children array containing a representation of the folder structure
  * @param organization The name of the expected organization
  */
-function getHierarchyConfig(children: Hierarchy, parents: string[], rootRef: string, rootType: string, annotations: Annotations, nativeRef = false): KubernetesObject[] {
+function getHierarchyConfig(
+  children: Hierarchy,
+  parents: string[],
+  rootRef: string,
+  rootType: string,
+  annotations: Annotations,
+  nativeRef = false
+): KubernetesObject[] {
   let res: Folder[] = [];
   for (const child of children) {
     if (Array.isArray(child)) {
       const name = child[0];
-      res.push(makeFolder(name, parents, rootRef, rootType, annotations, nativeRef));
-      const childTree = getHierarchyConfig(child[1], [...parents, name], rootRef, rootType, annotations, nativeRef);
+      res.push(
+        makeFolder(name, parents, rootRef, rootType, annotations, nativeRef)
+      );
+      const childTree = getHierarchyConfig(
+        child[1],
+        [...parents, name],
+        rootRef,
+        rootType,
+        annotations,
+        nativeRef
+      );
       res = res.concat(childTree);
     } else if (typeof child === 'string') {
-      res.push(makeFolder(child, parents, rootRef, rootType, annotations, nativeRef));
+      res.push(
+        makeFolder(child, parents, rootRef, rootType, annotations, nativeRef)
+      );
     }
   }
   return res as KubernetesObject[];
@@ -268,7 +335,14 @@ function getHierarchyConfig(children: Hierarchy, parents: string[], rootRef: str
  * @param path The ancestry path of folders above this folder
  * @param organization The name of the expected organization
  */
-function makeFolder(name: string, path: string[], rootRef: string, rootType: string, annotations: Annotations, nativeRef = false): Folder {
+function makeFolder(
+  name: string,
+  path: string[],
+  rootRef: string,
+  rootType: string,
+  annotations: Annotations,
+  nativeRef = false
+): Folder {
   const isRoot = path.length === 0;
   let annotationRef: Annotations = {};
   // Parent Ref
@@ -277,24 +351,34 @@ function makeFolder(name: string, path: string[], rootRef: string, rootType: str
     const parent = isRoot ? rootRef : normalize(path.join('.'));
     // root node has no parent and both org/folder ref is external
     if (isRoot) {
-      ref = rootType === "Organization" ? { organizationRef: { external: parent } } : { folderRef: { external: parent } };
-    }
-    else {
+      ref =
+        rootType === 'Organization'
+          ? { organizationRef: { external: parent } }
+          : { folderRef: { external: parent } };
+    } else {
       ref = { folderRef: { name: parent } };
     }
   } else {
-    const annotationName = isRoot && rootType === "Organization" ? 'cnrm.cloud.google.com/organization-id' : 'cnrm.cloud.google.com/folder-ref';
-    annotationRef = { [annotationName]: isRoot ? rootRef : normalize(path.join('.')) };
+    const annotationName =
+      isRoot && rootType === 'Organization'
+        ? 'cnrm.cloud.google.com/organization-id'
+        : 'cnrm.cloud.google.com/folder-ref';
+    annotationRef = {
+      [annotationName]: isRoot ? rootRef : normalize(path.join('.')),
+    };
   }
 
   let combinedAnnotations = {};
-  if (Object.keys(annotations).length > 0 || Object.keys(annotationRef).length > 0) {
+  if (
+    Object.keys(annotations).length > 0 ||
+    Object.keys(annotationRef).length > 0
+  ) {
     combinedAnnotations = { annotations: { ...annotations, ...annotationRef } };
   }
 
   return {
     apiVersion: FolderList.apiVersion,
-    kind: "Folder",
+    kind: 'Folder',
     metadata: {
       name: normalize([...path, name].join('.')),
       ...combinedAnnotations,

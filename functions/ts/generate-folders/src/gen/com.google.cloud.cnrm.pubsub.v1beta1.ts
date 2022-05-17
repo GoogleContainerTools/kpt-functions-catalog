@@ -23,14 +23,18 @@ export class PubSubSubscriptionList {
 }
 
 export function isPubSubSubscriptionList(o: any): o is PubSubSubscriptionList {
-  return o && o.apiVersion === PubSubSubscriptionList.apiVersion && o.kind === PubSubSubscriptionList.kind;
+  return (
+    o &&
+    o.apiVersion === PubSubSubscriptionList.apiVersion &&
+    o.kind === PubSubSubscriptionList.kind
+  );
 }
 
 export namespace PubSubSubscriptionList {
-  export const apiVersion = "pubsub.cnrm.cloud.google.com/v1beta1";
-  export const group = "pubsub.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "PubSubSubscriptionList";
+  export const apiVersion = 'pubsub.cnrm.cloud.google.com/v1beta1';
+  export const group = 'pubsub.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'PubSubSubscriptionList';
 
   // PubSubSubscriptionList is a list of PubSubSubscription
   export interface Interface {
@@ -52,7 +56,7 @@ export namespace PubSubSubscriptionList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +87,18 @@ export class PubSubTopicList {
 }
 
 export function isPubSubTopicList(o: any): o is PubSubTopicList {
-  return o && o.apiVersion === PubSubTopicList.apiVersion && o.kind === PubSubTopicList.kind;
+  return (
+    o &&
+    o.apiVersion === PubSubTopicList.apiVersion &&
+    o.kind === PubSubTopicList.kind
+  );
 }
 
 export namespace PubSubTopicList {
-  export const apiVersion = "pubsub.cnrm.cloud.google.com/v1beta1";
-  export const group = "pubsub.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "PubSubTopicList";
+  export const apiVersion = 'pubsub.cnrm.cloud.google.com/v1beta1';
+  export const group = 'pubsub.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'PubSubTopicList';
 
   // PubSubTopicList is a list of PubSubTopic
   export interface Interface {
@@ -112,7 +120,7 @@ export namespace PubSubTopicList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

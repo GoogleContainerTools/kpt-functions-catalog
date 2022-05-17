@@ -24,15 +24,21 @@ export class ConfigConnectorContextList {
   }
 }
 
-export function isConfigConnectorContextList(o: any): o is ConfigConnectorContextList {
-  return o && o.apiVersion === ConfigConnectorContextList.apiVersion && o.kind === ConfigConnectorContextList.kind;
+export function isConfigConnectorContextList(
+  o: any
+): o is ConfigConnectorContextList {
+  return (
+    o &&
+    o.apiVersion === ConfigConnectorContextList.apiVersion &&
+    o.kind === ConfigConnectorContextList.kind
+  );
 }
 
 export namespace ConfigConnectorContextList {
-  export const apiVersion = "core.cnrm.cloud.google.com/v1beta1";
-  export const group = "core.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ConfigConnectorContextList";
+  export const apiVersion = 'core.cnrm.cloud.google.com/v1beta1';
+  export const group = 'core.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ConfigConnectorContextList';
 
   // ConfigConnectorContextList is a list of ConfigConnectorContext
   export interface Interface {
@@ -54,7 +60,7 @@ export namespace ConfigConnectorContextList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }
@@ -83,14 +89,18 @@ export class ConfigConnectorList {
 }
 
 export function isConfigConnectorList(o: any): o is ConfigConnectorList {
-  return o && o.apiVersion === ConfigConnectorList.apiVersion && o.kind === ConfigConnectorList.kind;
+  return (
+    o &&
+    o.apiVersion === ConfigConnectorList.apiVersion &&
+    o.kind === ConfigConnectorList.kind
+  );
 }
 
 export namespace ConfigConnectorList {
-  export const apiVersion = "core.cnrm.cloud.google.com/v1beta1";
-  export const group = "core.cnrm.cloud.google.com";
-  export const version = "v1beta1";
-  export const kind = "ConfigConnectorList";
+  export const apiVersion = 'core.cnrm.cloud.google.com/v1beta1';
+  export const group = 'core.cnrm.cloud.google.com';
+  export const version = 'v1beta1';
+  export const kind = 'ConfigConnectorList';
 
   // ConfigConnectorList is a list of ConfigConnector
   export interface Interface {
@@ -112,7 +122,7 @@ export namespace ConfigConnectorList {
     public resourceVersion?: string;
 
     // selfLink is a URL representing this object. Populated by the system. Read-only.
-    // 
+    //
     // DEPRECATED Kubernetes will stop propagating this field in 1.20 release and the field is planned to be removed in 1.21 release.
     public selfLink?: string;
   }

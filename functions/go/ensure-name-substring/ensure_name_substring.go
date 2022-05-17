@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
@@ -17,10 +18,19 @@ import (
 )
 
 const (
-	fnConfigGroup      = "fn.kpt.dev"
-	fnConfigVersion    = "v1alpha1"
-	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
-	fnConfigKind       = "EnsureNameSubstring"
+	fnConfigGroup       = "fn.kpt.dev"
+	fnConfigVersion     = "v1alpha1"
+	fnConfigAPIVersion  = fnConfigGroup + "/" + fnConfigVersion
+	fnConfigKind        = "EnsureNameSubstring"
+	dependsOnAnnotation = "config.kubernetes.io/depends-on"
+)
+
+var (
+	// Assumes alphanumeric characters, '-', or '.'
+	// <group>/namespaces/<namespace>/<kind>/<name>
+	namespacedResourcePattern = regexp.MustCompile(`\A([-.\w]*)/namespaces/([-.\w]*)/([-.\w]*)/([-.\w]*)\z`)
+	// <group>/<kind>/<name>
+	clusterScopedResourcePattern = regexp.MustCompile(`\A([-.\w]*)/([-.\w]*)/([-.\w]*)\z`)
 )
 
 type EnsureNameSubstring struct {
@@ -34,6 +44,8 @@ type EnsureNameSubstring struct {
 	FieldSpecs []types.FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
 	// AdditionalNameFields is used to specify additional fields to modify name.
 	AdditionalNameFields []types.FieldSpec `json:"additionalNameFields,omitempty" yaml:"additionalNameFields,omitempty"`
+	// inputResourceLookup is used internally to track input resources
+	inputResourceLookup resourceLookup
 }
 
 type EditMode string
@@ -70,6 +82,7 @@ func (ens *EnsureNameSubstring) Validate() error {
 }
 
 func (ens *EnsureNameSubstring) Transform(m resmap.ResMap) error {
+	ens.inputResourceLookup.FromResMap(m)
 	for _, r := range m.Resources() {
 		if shouldSkip(r.OrgId()) {
 			continue
@@ -115,6 +128,9 @@ func (ens *EnsureNameSubstring) Transform(m resmap.ResMap) error {
 			if err != nil {
 				return err
 			}
+			if err = ens.updateDependsOnAnnotation(r); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -155,6 +171,65 @@ func (ens *EnsureNameSubstring) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+// set name substring if input matches one of the following:
+// - namespaced resource:     <group>/namespaces/<namespace>/<kind>/<name>
+// - cluster-scoped resource: <group>/<kind>/<name>
+// returns (string, bool) where the bool indicates if namespace was set
+func (ens *EnsureNameSubstring) setDependsOnNameSubstring(dependsOn string) (string, bool) {
+	var groupIdx, kindIdx, nameIdx int
+	if namespacedResourcePattern.MatchString(dependsOn) {
+		groupIdx = 0
+		kindIdx = 3
+		nameIdx = 4
+	} else if clusterScopedResourcePattern.MatchString(dependsOn) {
+		groupIdx = 0
+		kindIdx = 1
+		nameIdx = 2
+	} else {
+		return dependsOn, false
+	}
+	segments := strings.Split(dependsOn, "/")
+	rk := resourceKey{
+		Group: segments[groupIdx],
+		Kind:  segments[kindIdx],
+		Name:  segments[nameIdx],
+	}
+	if !ens.inputResourceLookup.HasResource(rk) {
+		return dependsOn, false
+	}
+	switch ens.EditMode {
+	case Prepend:
+		segments[nameIdx] = ens.Substring + segments[nameIdx]
+	case Append:
+		segments[nameIdx] = segments[nameIdx] + ens.Substring
+	default:
+		return dependsOn, false
+	}
+	dependsOn = strings.Join(segments, "/")
+	return dependsOn, true
+}
+
+// updateDependsOnAnnotation updates the name for the depends-on annotation.
+// The expected syntax is one of the following:
+// - namespaced resource:     <group>/namespaces/<namespace>/<kind>/<name>
+// - cluster-scoped resource: <group>/<kind>/<name>
+func (ens *EnsureNameSubstring) updateDependsOnAnnotation(r *resource.Resource) error {
+	annotations := r.GetAnnotations()
+	dependsOn, ok := annotations[dependsOnAnnotation]
+	if !ok {
+		return nil
+	}
+	dependsOn, ok = ens.setDependsOnNameSubstring(dependsOn)
+	if !ok {
+		return nil
+	}
+	annotations[dependsOnAnnotation] = dependsOn
+	if err := r.SetAnnotations(annotations); err != nil {
+		return err
+	}
+	return nil
+}
+
 func configMapToEnsureNameSubstring(cm *corev1.ConfigMap, ens *EnsureNameSubstring) error {
 	if len(cm.Data) != 1 {
 		return fmt.Errorf("only 1 entry is allowed in the ConfigMap, but got: %d", len(cm.Data))
@@ -179,6 +254,7 @@ var prefixSuffixFieldSpecsToSkip = types.FsSlice{
 	{Gvk: resid.Gvk{Kind: "CustomResourceDefinition"}},
 	{Gvk: resid.Gvk{Group: "apiregistration.k8s.io", Kind: "APIService"}},
 	{Gvk: resid.Gvk{Kind: "Namespace"}},
+	{Gvk: resid.Gvk{Group: "kpt.dev", Kind: "Kptfile"}},
 }
 
 func shouldSkip(id resid.ResId) bool {
@@ -219,4 +295,34 @@ func resourceContainsSubstring(r *resource.Resource, substring string, fs types.
 		return false, fmt.Errorf("unable to check if the substring exsits in %v: %w", r.OrgId().String(), err)
 	}
 	return strings.Contains(valStr, substring), nil
+}
+
+// resourceKey provides a key for looking up resources in resourceLookup
+type resourceKey struct {
+	Group string
+	Kind  string
+	Name  string
+}
+
+// resourceLookup provides an API for tracking resources
+type resourceLookup struct {
+	resourceMap map[resourceKey]bool
+}
+
+// FromResMap reads through a ResMap to populate ResourceLookup
+func (rl *resourceLookup) FromResMap(m resmap.ResMap) {
+	rl.resourceMap = make(map[resourceKey]bool)
+	for _, r := range m.Resources() {
+		gvk := r.GetGvk()
+		rl.resourceMap[resourceKey{
+			Group: gvk.Group,
+			Kind:  gvk.Kind,
+			Name:  r.GetName(),
+		}] = true
+	}
+}
+
+// HasResource returns whether a Resource with the provided resourceKey is present
+func (rl *resourceLookup) HasResource(rk resourceKey) bool {
+	return rl.resourceMap[rk]
 }
