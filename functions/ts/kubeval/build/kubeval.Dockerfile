@@ -40,6 +40,6 @@ WORKDIR /home/node/app
 
 COPY --from=builder /home/node/app /home/node/app
 COPY --from=builder /usr/local/bin /usr/local/bin
-COPY openapi.json /home/node/
+COPY openapi/openapi.json /home/node/
 
 ENTRYPOINT ["node", "/home/node/app/dist/kubeval_run.js"]
