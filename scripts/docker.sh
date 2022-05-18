@@ -51,6 +51,13 @@ function docker_build {
   [[ -f "${override_dockerfile}" ]] && dockerfile="${override_dockerfile}"
   [[ -f "${dockerfile}" ]] || err "Dockerfile does not exist: ${dockerfile}"
 
+  defaults="${repo_base}/build/docker/${lang}/defaults.env"
+  [[ -f "${defaults}" ]] || err "defaults file does not exist: ${defaults}"
+  # shellcheck source=/dev/null
+  source "${defaults}"
+  build_args+=(--build-arg "BUILDER_IMAGE=${BUILDER_IMAGE}")
+  build_args+=(--build-arg "BASE_IMAGE=${BASE_IMAGE}")
+
   # Use + conditional parameter expansion to protect from unbound array variable
   docker build \
     -t "${GCR_REGISTRY}/${name}:${UNSTABLE_TAG}" \
