@@ -50,14 +50,13 @@ FUNCTION_TYPE="$2"
 
 case "$1" in
   build)
-    docker_build "${FUNCTION_TYPE}" "go" "${CURRENT_FUNCTION}"
     for version in ${versions}; do
-      docker_tag "${CURRENT_FUNCTION}" "${version}"
+      docker_build "load" "${FUNCTION_TYPE}" "go" "${CURRENT_FUNCTION}" "${version}"
     done
     ;;
   push)
     for version in ${versions}; do
-      docker_push "${CURRENT_FUNCTION}" "${version}"
+      docker_build "push" "${FUNCTION_TYPE}" "go" "${CURRENT_FUNCTION}" "${version}"
     done
     ;;
   *)

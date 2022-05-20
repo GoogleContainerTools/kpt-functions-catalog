@@ -53,15 +53,13 @@ export npm_package_kpt_docker_repo_base="${GCR_REGISTRY}"
 
 case "$1" in
   build)
-    docker_build "${FUNCTION_TYPE}" "ts" "${CURRENT_FUNCTION}"
     for version in ${versions}; do
-      docker_tag "${CURRENT_FUNCTION}" "${version}"
+      docker_build "load" "${FUNCTION_TYPE}" "ts" "${CURRENT_FUNCTION}" "${version}"
     done
     ;;
   push)
     for version in ${versions}; do
-      docker_tag "${CURRENT_FUNCTION}" "${version}"
-      docker_push "${CURRENT_FUNCTION}" "${version}"
+      docker_build "push" "${FUNCTION_TYPE}" "ts" "${CURRENT_FUNCTION}" "${version}"
     done
     ;;
   *)

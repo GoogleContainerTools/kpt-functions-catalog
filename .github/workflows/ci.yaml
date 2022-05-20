@@ -7,9 +7,9 @@ on:
   pull_request:
     branches:
       - master
-      - '*/v[0-9]+.[0-9]+'
+      - "*/v[0-9]+.[0-9]+"
   schedule:
-    - cron:  '0 17 * * *'
+    - cron: "0 17 * * *"
 
 concurrency:
   # If a job with a concurrency group is running with cancel-in-progress, that job is cancelled when a new job with same concurrency group is started.
@@ -17,7 +17,7 @@ concurrency:
   # Concurrency group will be of form ${{ github.head_ref }}-ci when triggered via PR creating 1 group per PR. Older jobs are cancelled when new commits are pushed to that PR branch.
   # Concurrency group will be of form ${{ github.ref }}-ci when triggered from repo branch or tag ref. Older jobs are cancelled when new jobs are triggered from that same branch/tag.
   # `-ci` suffix is to namespace the concurrency group incase you want to add a group for another workflow in the future.
-  group: '${{ github.head_ref || github.ref }}-ci'
+  group: "${{ github.head_ref || github.ref }}-ci"
   cancel-in-progress: true
 
 jobs:
@@ -27,11 +27,11 @@ jobs:
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Lint shell scripts, ignoring third-party files
-      run: |
-        find . -name "*.sh" > shell_files.out
-        shellcheck $(cat shell_files.out)
+      - uses: actions/checkout@v2
+      - name: Lint shell scripts, ignoring third-party files
+        run: |
+          find . -name "*.sh" > shell_files.out
+          shellcheck $(cat shell_files.out)
 
   ts-unit-test-ci:
     strategy:
@@ -40,18 +40,18 @@ jobs:
         node-version: [14.x]
     runs-on: ${{ matrix.platform }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Run unit tests
-      run: |
-        make unit-test-ts
-    - name: Check licenses
-      run: |
-        cd functions/ts
-        make check-licenses
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Run unit tests
+        run: |
+          make unit-test-ts
+      - name: Check licenses
+        run: |
+          cd functions/ts
+          make check-licenses
 
   go-unit-test-ci:
     runs-on: ubuntu-latest
@@ -59,25 +59,25 @@ jobs:
       GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
       GO111MODULE: on
     steps:
-    - name: Set up Go 1.17
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17
-      id: go
-    - name: Check out code into GOPATH
-      uses: actions/checkout@v1
-      with:
-        path: go/src/github.com/${{ github.repository }}
-    - name: Run unit tests
-      run: |
-        make unit-test-go
-    - name: Check licenses
-      run: |
-        cd functions/go
-        make check-licenses
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+        id: go
+      - name: Check out code into GOPATH
+        uses: actions/checkout@v1
+        with:
+          path: go/src/github.com/${{ github.repository }}
+      - name: Run unit tests
+        run: |
+          make unit-test-go
+      - name: Check licenses
+        run: |
+          cd functions/go
+          make check-licenses
 
   e2e-ci:
-    needs: [ts-unit-test-ci, go-unit-test-ci]
+    timeout-minutes: 60
     strategy:
       matrix:
         platform: [ubuntu-latest]
@@ -87,23 +87,23 @@ jobs:
       GOPATH: /home/runner/work/kpt-functions-catalog/functions/go
       GO111MODULE: on
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Set up Go 1.17
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17
-    - name: Install kpt
-      run: |
-        go install github.com/GoogleContainerTools/kpt@main
-    - name: Build node and Go docker images
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        make build
-    - name: Run all tests
-      if: matrix.platform == 'ubuntu-latest'
-      run: |
-        make e2e-test
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Install kpt
+        run: |
+          go install github.com/GoogleContainerTools/kpt@main
+      - name: Build node and Go docker images
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          make build
+      - name: Run all tests
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          make e2e-test
