@@ -34,7 +34,7 @@ resource "google_compute_firewall" "{{ $fw.GetResourceName }}" {
   log_config {
       metadata = "INCLUDE_ALL_METADATA"
     }
-{{end}}{{ range $fwAllow := $fw.GetFirewallAllow }}
+{{end}}{{ range $fwAllow := $fw.GetFirewallAllowPortsProtocol }}
   allow {
     protocol = "{{ .Protocol }}"{{ if .Ports }}
     ports    = [{{ range .Ports }}"{{ . }}",{{end}}]{{end}}

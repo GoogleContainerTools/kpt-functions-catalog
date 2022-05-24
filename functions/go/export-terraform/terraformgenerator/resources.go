@@ -180,8 +180,8 @@ type referencePath struct {
 	customRetriever func(*sdk.KubeObject) string // custom func to retrieve ref from KubeObject
 }
 
-// singleCACustomRetriever creates a customRetriever for a compute address ref
-func singleCACustomRetriever(path []string) func(*sdk.KubeObject) string {
+// singleComputeAddressRetriever creates a customRetriever for a compute address ref
+func singleComputeAddressRetriever(path []string) func(*sdk.KubeObject) string {
 	return func(r *sdk.KubeObject) string {
 		f := make([]struct {
 			Name string `yaml:"name"`
@@ -204,8 +204,8 @@ func (resource *terraformResource) attachReferences() error {
 		{kind: "StorageBucket", path: []string{"spec", "destination", "storageBucketRef", "name"}},
 		{kind: "ComputeNetwork", path: []string{"spec", "networkRef", "name"}},
 		{kind: "ComputeRouter", path: []string{"spec", "routerRef", "name"}},
-		{kind: "ComputeAddress", customRetriever: singleCACustomRetriever([]string{"spec", "natIps"})},
-		{kind: "ComputeAddress", customRetriever: singleCACustomRetriever([]string{"spec", "reservedPeeringRanges"})},
+		{kind: "ComputeAddress", customRetriever: singleComputeAddressRetriever([]string{"spec", "natIps"})},
+		{kind: "ComputeAddress", customRetriever: singleComputeAddressRetriever([]string{"spec", "reservedPeeringRanges"})},
 	}
 	for _, path := range paths {
 		kind := path.kind

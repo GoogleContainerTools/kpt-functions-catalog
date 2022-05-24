@@ -23,7 +23,7 @@ type firewallAllow struct {
 	Protocol string   `yaml:"protocol"`
 }
 
-func (resource *terraformResource) GetFirewallAllow() []firewallAllow {
+func (resource *terraformResource) GetFirewallAllowPortsProtocol() []firewallAllow {
 	var firewallAllows []firewallAllow
 	found, err := resource.Item.Get(&firewallAllows, "spec", "allow")
 	if !found || err != nil {
