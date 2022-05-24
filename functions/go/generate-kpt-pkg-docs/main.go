@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/contrib/functions/go/blueprint-docs/docs"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/contrib/functions/go/blueprint-docs/generated"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/generate-kpt-pkg-docs/docs"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/generate-kpt-pkg-docs/generated"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
