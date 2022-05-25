@@ -36,7 +36,7 @@ func (rs *terraformResources) getHCL() (map[string]string, error) {
 	groupedResources := rs.getGrouped()
 
 	data := make(map[string]string)
-	resourceFiles := []string{"folders.tf", "iam.tf", "projects.tf", "log-export.tf"}
+	resourceFiles := []string{"folders.tf", "iam.tf", "projects.tf", "log-export.tf", "network.tf"}
 	for _, file := range resourceFiles {
 		err := addFile(tmpl, file, groupedResources, data)
 		if err != nil {

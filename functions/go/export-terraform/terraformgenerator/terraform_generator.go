@@ -35,17 +35,24 @@ const (
 func Processor(rl *sdk.ResourceList) error {
 	var resources terraformResources
 	supportedKinds := map[string]bool{
-		"Folder":           true,
-		"Organization":     true,
-		"IAMPolicyMember":  true,
-		"IAMPartialPolicy": true,
-		"IAMPolicy":        true,
-		"Project":          true,
-		"LoggingLogSink":   true,
-		"BigQueryDataset":  true,
-		"PubSubTopic":      true,
-		"StorageBucket":    true,
-		"IAMAuditConfig":   true,
+		"Folder":                      true,
+		"Organization":                true,
+		"IAMPolicyMember":             true,
+		"IAMPartialPolicy":            true,
+		"IAMPolicy":                   true,
+		"Project":                     true,
+		"LoggingLogSink":              true,
+		"BigQueryDataset":             true,
+		"PubSubTopic":                 true,
+		"StorageBucket":               true,
+		"IAMAuditConfig":              true,
+		"ComputeNetwork":              true,
+		"ComputeSubnetwork":           true,
+		"ComputeRouter":               true,
+		"ComputeRouterNAT":            true,
+		"ComputeAddress":              true,
+		"ServiceNetworkingConnection": true,
+		"ComputeFirewall":             true,
 	}
 
 	for _, item := range rl.Items {
