@@ -108,6 +108,8 @@ $ make unit-test
 
 #### Building a function image
 
+Note: We use `docker buildx` to build images. Please ensure you have it installed.
+
 To build all function images
 ```shell
 $ make build
