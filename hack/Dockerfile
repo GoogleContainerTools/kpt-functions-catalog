@@ -19,10 +19,10 @@
 FROM docker
 
 # Install gcc, bash, make and curl
-RUN apk add --no-cache build-base
-RUN apk add --no-cache bash
-RUN apk add --no-cache make
-RUN apk add --no-cache curl
+RUN apk add --no-cache build-base bash make curl
+
+# Install buildx
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
 # Install golang
 COPY --from=golang:1.17-alpine /usr/local/go/ /usr/local/go/
