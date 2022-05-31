@@ -45,4 +45,14 @@ module "{{ .GetResourceName }}-destination" {
     is_locked             = {{ .GetBool "spec" "retentionPolicy" "isLocked" }}
   }{{end}}
 }
+{{end}}{{with $logsink.References.LoggingLogBucket }}
+module "{{ .GetResourceName }}-destination" {
+  source  = "terraform-google-modules/log-export/google//modules/logbucket"
+  version = "~> 7.3.0"
+
+  project_id                  = module.{{ .Parent.GetResourceName }}.project_id
+  log_bucket_name             = "{{ .GetResourceName }}"
+  location                    = "{{.}}"{{end}}{{ with .GetStringFromObject "spec" "location" }}
+  retention_days              = "{{.}}"{{end}}{{ if .GetInt "spec" "retentionDays"}}
+}
 {{end}}{{end}}
