@@ -20,6 +20,27 @@ module "bqlogexportdataset-destination" {
   location                 = "US"
 }
 
+module "logsink-123456789012-orglogbucketsink" {
+  source  = "terraform-google-modules/log-export/google"
+  version = "~> 7.3.0"
+
+  destination_uri      = module.my-log-k8s-bucket-destination.destination_uri
+  log_sink_name        = "123456789012-orglogbucketsink"
+  parent_resource_id   = var.org_id
+  parent_resource_type = "organization"
+  include_children     = true
+}
+
+module "my-log-k8s-bucket-destination" {
+  source  = "terraform-google-modules/log-export/google//modules/logbucket"
+  version = "~> 7.4.0"
+
+  project_id      = module.prj-logging.project_id
+  name            = "my-log-k8s-bucket"
+  location        = "global"
+  retention_days  = 30
+}
+
 module "logsink-123456789012-pubsubsink" {
   source  = "terraform-google-modules/log-export/google"
   version = "~> 7.3.0"
