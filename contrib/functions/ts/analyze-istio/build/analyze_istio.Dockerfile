@@ -2,17 +2,15 @@ ARG BUILDER_IMAGE
 ARG BASE_IMAGE
 
 
-FROM $BUILDER_IMAGE as builder
+FROM --platform=$BUILDPLATFORM $BUILDER_IMAGE as builder
 
 RUN apk add bash curl git && apk update
 
+ARG TARGETOS TARGETARCH
 ARG ISTIOCTL_VERSION="1.6.5"
-RUN curl -fsSL -o /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz https://github.com/istio/istio/releases/download/${ISTIOCTL_VERSION}/istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
-    tar -zxvf /istio-${ISTIOCTL_VERSION}-linux-amd64.tar.gz && \
+RUN curl -fsSL -o /istio-${ISTIOCTL_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz https://github.com/istio/istio/releases/download/${ISTIOCTL_VERSION}/istio-${ISTIOCTL_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz && \
+    tar -zxvf /istio-${ISTIOCTL_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz && \
     mv /istio-${ISTIOCTL_VERSION}/bin/istioctl /usr/local/bin/istioctl
-
-RUN curl -fsSL -o /usr/local/bin/kpt https://storage.googleapis.com/kpt-dev/latest/linux_amd64/kpt && \
-    chmod +x /usr/local/bin/kpt
 
 RUN mkdir -p /home/node/app && \
     chown -R node:node /home/node/app

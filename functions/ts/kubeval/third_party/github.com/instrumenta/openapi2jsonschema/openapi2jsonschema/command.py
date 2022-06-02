@@ -57,7 +57,9 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict, a
     """
     Converts a valid OpenAPI specification into a set of JSON Schema files
     """
-    apiVersionKindSet = set(apiversionkind.strip("'\"").split(";"))
+    apiVersionKindSet = None
+    if apiversionkind:
+        apiVersionKindSet = set(apiversionkind.strip("'\"").split(";"))
 
     info("Downloading schema")
     if sys.version_info < (3, 0):
@@ -138,7 +140,7 @@ def default(output, schema, prefix, stand_alone, expanded, kubernetes, strict, a
         if title not in type_name_to_apiversion_kind:
             continue
         apiversion_kind = type_name_to_apiversion_kind[title]
-        if apiversion_kind not in apiVersionKindSet:
+        if apiVersionKindSet and apiversion_kind not in apiVersionKindSet:
             continue
 
         kind = title.split(".")[-1].lower()
