@@ -45,21 +45,15 @@ func main() {
 	}
 }
 
-type HelmChartProcessor struct{}
-
-func (slp *HelmChartProcessor) Process(resourceList *framework.ResourceList) error {
-	err := run(resourceList)
+func run(resourceList *framework.ResourceList) error {
+	var fn helmChartInflatorFunction
+	err := fn.Config(resourceList.FunctionConfig)
 	if err != nil {
-		resourceList.Result = &framework.Result{
-			Name: "render-helm-chart",
-			Items: []framework.ResultItem{
-				{
-					Message:  err.Error(),
-					Severity: framework.Error,
-				},
-			},
-		}
-		return resourceList.Result
+		return fmt.Errorf("failed to configure function: %w", err)
+	}
+	resourceList.Items, err = fn.Run(resourceList.Items)
+	if err != nil {
+		return fmt.Errorf("failed to run function: %w", err)
 	}
 	return nil
 }
@@ -70,34 +64,16 @@ type helmChartInflatorFunction struct {
 }
 
 func (f *helmChartInflatorFunction) Config(rn *kyaml.RNode) error {
-	y, err := rn.String()
-	if err != nil {
-		return fmt.Errorf("cannot get YAML from RNode: %w", err)
-	}
-	kind, err := f.getKind(rn)
-	if err != nil {
-		return err
-	}
-	switch kind {
+	var err error
+	switch rn.GetKind() {
 	case fnConfigKind:
-		err = f.RenderHelmChartArgs([]byte(y))
-		if err != nil {
-			return err
-		}
+		err = f.RenderHelmChartArgs(rn)
 	case configMap:
-		dataMap := rn.GetDataMap()
-		bytes, err := kyaml.Marshal(dataMap)
-		if err != nil {
-			return err
-		}
-		err = f.ConfigMapArgs(bytes)
-		if err != nil {
-			return err
-		}
+		err = f.ConfigMapArgs(rn.GetDataMap())
 	default:
-		return fmt.Errorf("`functionConfig` must be `%s` or `%s`", configMap, fnConfigKind)
+		err = fmt.Errorf("`functionConfig` must be `%s` or `%s`", configMap, fnConfigKind)
 	}
-	return nil
+	return err
 }
 
 func (f *helmChartInflatorFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, error) {
@@ -108,6 +84,10 @@ func (f *helmChartInflatorFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, e
 	}
 	var rm resmap.ResMap
 	for _, p := range f.plugins {
+		err := p.ConfigureAuth(items)
+		if err != nil {
+			return nil, err
+		}
 		rm, err = p.Generate()
 		if err != nil {
 			return nil, fmt.Errorf("failed to run generator: %w", err)
@@ -136,28 +116,12 @@ func (f *helmChartInflatorFunction) Run(items []*kyaml.RNode) ([]*kyaml.RNode, e
 	return resMap.ToRNodeSlice(), nil
 }
 
-func run(resourceList *framework.ResourceList) error {
-	var fn helmChartInflatorFunction
-	err := fn.Config(resourceList.FunctionConfig)
+func (f *helmChartInflatorFunction) RenderHelmChartArgs(rn *kyaml.RNode) (err error) {
+	y, err := rn.String()
 	if err != nil {
-		return fmt.Errorf("failed to configure function: %w", err)
+		return fmt.Errorf("cannot get YAML from RNode: %w", err)
 	}
-	resourceList.Items, err = fn.Run(resourceList.Items)
-	if err != nil {
-		return fmt.Errorf("failed to run function: %w", err)
-	}
-	return nil
-}
-
-func (f *helmChartInflatorFunction) getKind(rn *kyaml.RNode) (string, error) {
-	meta, err := rn.GetMeta()
-	if err != nil {
-		return "", err
-	}
-	return meta.Kind, nil
-}
-
-func (f *helmChartInflatorFunction) RenderHelmChartArgs(c []byte) (err error) {
+	c := []byte(y)
 	args := &builtins.HelmArgs{}
 	if err = kyaml.Unmarshal(c, args); err != nil {
 		return
@@ -177,13 +141,7 @@ func (f *helmChartInflatorFunction) RenderHelmChartArgs(c []byte) (err error) {
 }
 
 func (f *helmChartInflatorFunction) ConfigMapArgs(
-	bytes []byte) (err error) {
-	var m map[string]string
-
-	err = kyaml.Unmarshal(bytes, &m)
-	if err != nil {
-		return err
-	}
+	m map[string]string) (err error) {
 	var p builtins.HelmChartInflationGeneratorPlugin
 	if val, ok := m["chartHome"]; ok {
 		p.ChartHome = val
@@ -192,32 +150,35 @@ func (f *helmChartInflatorFunction) ConfigMapArgs(
 		p.ConfigHome = val
 	}
 	if val, ok := m["name"]; ok {
-		p.Name = val
+		p.ChartArgs.Name = val
 	}
 	if val, ok := m["version"]; ok {
-		p.Version = val
+		p.ChartArgs.Version = val
 	}
 	if val, ok := m["repo"]; ok {
-		p.Repo = val
+		p.ChartArgs.Repo = val
 	}
 	if val, ok := m["releaseName"]; ok {
-		p.ReleaseName = val
+		p.TemplateOptions.ReleaseName = val
 	}
 	if val, ok := m["namespace"]; ok {
-		p.Namespace = val
+		p.TemplateOptions.Namespace = val
+	}
+	if val, ok := m["nameTemplate"]; ok {
+		p.TemplateOptions.NameTemplate = val
 	}
 	if val, ok := m["includeCRDs"]; ok {
 		if val == "true" {
-			p.IncludeCRDs = true
+			p.TemplateOptions.IncludeCRDs = true
 		}
 	}
 	if val, ok := m["skipTests"]; ok {
 		if val == "true" {
-			p.SkipTests = true
+			p.TemplateOptions.SkipTests = true
 		}
 	}
 	if val, ok := m["valuesFile"]; ok {
-		p.ValuesFiles = []string{val}
+		p.TemplateOptions.ValuesFiles = []string{val}
 	}
 	if err := p.ValidateArgs(); err != nil {
 		return err
