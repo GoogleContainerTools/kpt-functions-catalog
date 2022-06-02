@@ -218,6 +218,7 @@ func (resource *terraformResource) attachReferences() error {
 		{kind: "ComputeRouter", path: []string{"spec", "routerRef", "name"}},
 		{kind: "ComputeAddress", customRetriever: singleComputeAddressRetriever([]string{"spec", "natIps"})},
 		{kind: "ComputeAddress", customRetriever: singleComputeAddressRetriever([]string{"spec", "reservedPeeringRanges"})},
+		//todo:awmalik@ - remove customerRetriver when this issue is addressed: https://github.com/GoogleCloudPlatform/k8s-config-connector/issues/665
 		{kind: "LoggingLogBucket", customRetriever: logBucketNameRetriever([]string{"spec", "destination", "loggingLogBucketRef", "external"})},
 	}
 	for _, path := range paths {
