@@ -72,7 +72,7 @@ spec:
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn render upsert-resource-simple
+$ kpt fn eval -i upsert-resource:unstable --fn-config .expected/fn-config.yaml
 ```
 
 ### Expected result
