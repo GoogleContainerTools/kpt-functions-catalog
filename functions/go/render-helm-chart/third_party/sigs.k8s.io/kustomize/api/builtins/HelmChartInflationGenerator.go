@@ -139,7 +139,7 @@ func (p *HelmChartInflationGeneratorPlugin) createNewMergedValuesFiles(path stri
 	pValues, err := ioutil.ReadFile(path)
 	if err != nil {
 		if u, urlErr := url.Parse(path); urlErr == nil {
-			if (u.Scheme == "http" || u.Scheme == "https") {
+			if u.Scheme == "http" || u.Scheme == "https" {
 				resp, err := http.Get(path)
 				if err != nil {
 					return "", err

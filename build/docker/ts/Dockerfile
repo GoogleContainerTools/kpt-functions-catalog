@@ -2,7 +2,7 @@ ARG BUILDER_IMAGE
 ARG BASE_IMAGE
 
 
-FROM $BUILDER_IMAGE as builder
+FROM --platform=$BUILDPLATFORM $BUILDER_IMAGE as builder
 
 RUN mkdir -p /home/node/app && \
     chown -R node:node /home/node/app

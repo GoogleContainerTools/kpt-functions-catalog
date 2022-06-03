@@ -2,14 +2,12 @@ import {
   Configs,
   KubernetesObject,
   kubernetesObjectResult,
-  generalResult,
   Result,
 } from 'kpt-functions';
-import { ChildProcess, spawn, spawnSync } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import { Writable } from 'stream';
 
-const DEFAULT_SCHEMA_LOCATION = '/tmp';
-const DEFAULT_OPENAPI_LOCATION = '/home/node/openapi.json';
+const DEFAULT_SCHEMA_LOCATION = '/jsonschema';
 
 const SCHEMA_LOCATION = 'schema_location';
 const ADDITIONAL_SCHEMA_LOCATIONS = 'additional_schema_locations';
@@ -43,12 +41,6 @@ export async function kubeval(configs: Configs): Promise<void> {
 
   const results: Result[] = [];
 
-  // Convert openapi to json schema if neither schema_location nor
-  // additional_schema_locations is provided.
-  if (!schemaLocation && additionalSchemaLocations.length === 0) {
-    await runOpenapi2jsonschema(configs, strict, results);
-  }
-
   const args = buildKubevalArgs(
     schemaLocation,
     additionalSchemaLocations,
@@ -62,60 +54,6 @@ export async function kubeval(configs: Configs): Promise<void> {
   }
 
   configs.addResults(...results);
-}
-
-async function runOpenapi2jsonschema(
-  configs: Configs,
-  strict: boolean,
-  results: Result[]
-): Promise<void> {
-  const apiVersionKindSet = new Set();
-  for (const object of configs.getAll()) {
-    const avk = object.apiVersion + ',' + object.kind;
-    if (!apiVersionKindSet.has(avk)) {
-      apiVersionKindSet.add(avk);
-    }
-  }
-  if (apiVersionKindSet.size > 0) {
-    const openapi2jsonschemaArgs = [
-      '--kubernetes',
-      '--expanded',
-      '--stand-alone',
-      '--apiversionkind',
-      Array.from(apiVersionKindSet).join(';'),
-    ];
-    if (strict) {
-      openapi2jsonschemaArgs.push('--strict');
-      openapi2jsonschemaArgs.push(
-        '-o',
-        DEFAULT_SCHEMA_LOCATION + '/master-standalone-strict'
-      );
-    } else {
-      openapi2jsonschemaArgs.push(
-        '-o',
-        DEFAULT_SCHEMA_LOCATION + '/master-standalone'
-      );
-    }
-    openapi2jsonschemaArgs.push(DEFAULT_OPENAPI_LOCATION);
-
-    const openapi2jsonschemaProcess = spawnSync(
-      'openapi2jsonschema',
-      openapi2jsonschemaArgs,
-      {
-        encoding: 'utf-8',
-        stdio: [process.stdin, 'pipe', 'pipe'],
-      }
-    );
-    if (openapi2jsonschemaProcess.status !== 0) {
-      const result = generalResult(
-        String(openapi2jsonschemaProcess.stdout) +
-          String(openapi2jsonschemaProcess.stderr),
-        'error',
-        undefined
-      );
-      results.push(result);
-    }
-  }
 }
 
 async function runKubeval(
