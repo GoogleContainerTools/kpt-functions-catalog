@@ -8,9 +8,13 @@ Insert a resource, or if the resource already exists, update the existing resour
 
 <!--mdtogo-->
 
-### FunctionConfig
-
 <!--mdtogo:Long-->
+
+## Usage
+
+This function can be used imperatively only.
+
+### FunctionConfig
 
 Upsert is an operation that adds resources(uniquely identified by Group, Kind, Name, Namespace and Path)
 if they do not already exist, or replaces them if they already exist in the input list of resources.

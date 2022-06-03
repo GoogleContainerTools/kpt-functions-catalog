@@ -1,5 +1,3 @@
 testType: eval
 image: upsert-resource:unstable
-fnConfig: fn-config.yaml
-# Skip this until v1.0.0-beta.9 of kpt is released
-skip: true
+fnConfig: ../fn-config.yaml
