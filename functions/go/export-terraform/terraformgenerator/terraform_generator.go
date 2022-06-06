@@ -53,6 +53,7 @@ func Processor(rl *sdk.ResourceList) error {
 		"ComputeAddress":              true,
 		"ServiceNetworkingConnection": true,
 		"ComputeFirewall":             true,
+		"LoggingLogBucket":            true,
 	}
 
 	for _, item := range rl.Items {

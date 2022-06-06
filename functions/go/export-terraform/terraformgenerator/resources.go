@@ -194,6 +194,18 @@ func singleComputeAddressRetriever(path []string) func(*sdk.KubeObject) string {
 	}
 }
 
+// logBucketNameRetriever creates a customRetriever for extracting Log Bucket's name from an external ref
+func logBucketNameRetriever(path []string) func(*sdk.KubeObject) string {
+	return func(r *sdk.KubeObject) string {
+		externalName, found, err := r.GetString(path...)
+		if found && err == nil {
+			i := strings.LastIndex(externalName, "/")
+			return externalName[i+1:]
+		}
+		return ""
+	}
+}
+
 // Attach parents and other references to a resource
 func (resource *terraformResource) attachReferences() error {
 	resource.References = make(map[string]*terraformResource)
@@ -206,6 +218,8 @@ func (resource *terraformResource) attachReferences() error {
 		{kind: "ComputeRouter", path: []string{"spec", "routerRef", "name"}},
 		{kind: "ComputeAddress", customRetriever: singleComputeAddressRetriever([]string{"spec", "natIps"})},
 		{kind: "ComputeAddress", customRetriever: singleComputeAddressRetriever([]string{"spec", "reservedPeeringRanges"})},
+		//TODO:awmalik@ - remove customerRetriver when this issue is addressed: https://github.com/GoogleCloudPlatform/k8s-config-connector/issues/665
+		{kind: "LoggingLogBucket", customRetriever: logBucketNameRetriever([]string{"spec", "destination", "loggingLogBucketRef", "external"})},
 	}
 	for _, path := range paths {
 		kind := path.kind

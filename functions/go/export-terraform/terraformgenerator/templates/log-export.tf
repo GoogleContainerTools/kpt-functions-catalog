@@ -3,7 +3,7 @@ module "logsink-{{ $logsink.GetResourceName }}" {
   source  = "terraform-google-modules/log-export/google"
   version = "~> 7.3.0"
 
-  destination_uri      = module.{{with or $logsink.References.BigQueryDataset $logsink.References.PubSubTopic $logsink.References.StorageBucket }}{{.GetResourceName}}{{end}}-destination.destination_uri
+  destination_uri      = module.{{with or $logsink.References.BigQueryDataset $logsink.References.PubSubTopic $logsink.References.StorageBucket $logsink.References.LoggingLogBucket }}{{.GetResourceName}}{{end}}-destination.destination_uri
   log_sink_name        = "{{ $logsink.GetDisplayName }}"
   parent_resource_id   = {{ $logsink.GetOrganization.GetTerraformId false }}
   parent_resource_type = "organization"
@@ -44,5 +44,15 @@ module "{{ .GetResourceName }}-destination" {
     retention_period_days = {{ .GetInt "spec" "retentionPolicy" "retentionPeriod" | sToDays }},
     is_locked             = {{ .GetBool "spec" "retentionPolicy" "isLocked" }}
   }{{end}}
+}
+{{end}}{{with $logsink.References.LoggingLogBucket }}
+module "{{ .GetResourceName }}-destination" {
+  source  = "terraform-google-modules/log-export/google//modules/logbucket"
+  version = "~> 7.4.0"
+
+  project_id      = module.{{ .Parent.GetResourceName }}.project_id
+  name            = "{{ .GetResourceName }}"{{ with .GetStringFromObject "spec" "location" }}
+  location        = "{{.}}"{{end}}{{ if .GetInt "spec" "retentionDays" }}
+  retention_days  = {{ .GetInt "spec" "retentionDays" }}{{end}}
 }
 {{end}}{{end}}
