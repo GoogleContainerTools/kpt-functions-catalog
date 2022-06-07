@@ -103,6 +103,12 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           make build
+      - name: Write creds to files for render-helm-chart tests
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          echo -e 'username=${{ secrets.RENDER_HELM_CHART_BOT_TOKEN }}\npassword=${{ secrets.RENDER_HELM_CHART_BOT_TOKEN }}' \
+          > ./examples/render-helm-chart-kustomize-private-git/credentials.env
+          echo ${{ secrets.RENDER_HELM_CHART_GCP_SERVICE_ACCOUNT }} | base64 -d > ./examples/render-helm-chart-kustomize-private-oci/password
       - name: Run all tests
         if: matrix.platform == 'ubuntu-latest'
         run: |
