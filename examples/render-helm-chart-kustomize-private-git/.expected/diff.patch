@@ -1,9 +1,9 @@
 diff --git a/resources.yaml b/resources.yaml
 new file mode 100644
-index 0000000..c8b2ac6
+index 0000000..fff8926
 --- /dev/null
 +++ b/resources.yaml
-@@ -0,0 +1,105 @@
+@@ -0,0 +1,96 @@
 +apiVersion: v1
 +kind: ServiceAccount
 +metadata:

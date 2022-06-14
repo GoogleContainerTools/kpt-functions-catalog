@@ -1,6 +1,3 @@
-# TODO: Change https://raw.githubusercontent.com/natasha41575/private-helm-repo/main both here and in the README
-#    to the correct URL after the private repo is created under the bot
-
 secretGenerator:
   - name: my-secret
     envs:
@@ -24,7 +21,7 @@ transformers:
     helmCharts:
     - chartArgs:
         name: mychart
-        repo: https://raw.githubusercontent.com/natasha41575/private-helm-repo/main
+        repo: https://raw.githubusercontent.com/kpt-helmfn-test-bot/private-helm-repo/main
         auth:
           kind: Secret
           name: my-secret

@@ -36,7 +36,7 @@ transformers:
     helmCharts:
       - chartArgs:
           name: mychart
-          repo: https://raw.githubusercontent.com/natasha41575/private-helm-repo/main # change this to point to your private chart
+          repo: https://raw.githubusercontent.com/kpt-helmfn-test-bot/private-helm-repo/main # change this to point to your private chart
           auth:
             kind: Secret
             name: my-secret

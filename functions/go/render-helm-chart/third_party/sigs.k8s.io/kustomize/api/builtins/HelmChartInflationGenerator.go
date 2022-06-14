@@ -20,11 +20,8 @@ import (
 	"strings"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/render-helm-chart/third_party/sigs.k8s.io/kustomize/api/types"
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"github.com/imdario/mergo"
-	"sigs.k8s.io/kustomize/api/hasher"
-	"sigs.k8s.io/kustomize/api/resmap"
-	"sigs.k8s.io/kustomize/api/resource"
-	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 	"sigs.k8s.io/yaml"
 )
 
@@ -65,7 +62,7 @@ func (p *HelmChartInflationGeneratorPlugin) establishTmpDir() (err error) {
 	return err
 }
 
-func (p *HelmChartInflationGeneratorPlugin) ConfigureAuth(items []*kyaml.RNode) (err error) {
+func (p *HelmChartInflationGeneratorPlugin) ConfigureAuth(items []*fn.KubeObject) (err error) {
 	if p.Auth == nil {
 		return nil
 	}
@@ -73,7 +70,7 @@ func (p *HelmChartInflationGeneratorPlugin) ConfigureAuth(items []*kyaml.RNode) 
 		return fmt.Errorf("auth `kind` must be `Secret`")
 	}
 
-	var targetSecret *kyaml.RNode
+	var targetSecret *fn.KubeObject
 	for _, i := range items {
 		iNamespace := i.GetNamespace()
 		if iNamespace == "" {
@@ -91,14 +88,19 @@ func (p *HelmChartInflationGeneratorPlugin) ConfigureAuth(items []*kyaml.RNode) 
 		return fmt.Errorf("could not find Secret %q identified by auth", p.Auth)
 	}
 
-	data := targetSecret.GetDataMap()
-
-	u, foundUsername := data["username"]
-	if !foundUsername {
+	u, found, err := targetSecret.NestedString("data", "username")
+	if err != nil {
+		return err
+	}
+	if !found {
 		return fmt.Errorf("could not find username in Secret")
 	}
-	pass, foundPassword := data["password"]
-	if !foundPassword {
+
+	pass, found, err := targetSecret.NestedString("data", "password")
+	if err != nil {
+		return err
+	}
+	if !found {
 		return fmt.Errorf("could not find password in Secret")
 	}
 	username, err := base64.StdEncoding.DecodeString(u)
@@ -262,7 +264,7 @@ func (p *HelmChartInflationGeneratorPlugin) cleanup() {
 	}
 }
 
-func (p *HelmChartInflationGeneratorPlugin) Generate() (rm resmap.ResMap, err error) {
+func (p *HelmChartInflationGeneratorPlugin) Generate() (objects fn.KubeObjects, err error) {
 	defer p.cleanup()
 	if err = p.checkHelmVersion(); err != nil {
 		return nil, err
@@ -295,18 +297,24 @@ func (p *HelmChartInflationGeneratorPlugin) Generate() (rm resmap.ResMap, err er
 		return nil, err
 	}
 
-	factory := NewResMapFactory()
-	rm, err = factory.NewResMapFromBytes(stdout)
-	if err == nil {
-		return rm, nil
+	s := strings.Split(string(stdout), "---")
+	for i := range s {
+		if len(s[i]) == 0 {
+			continue
+		}
+		o, err := fn.ParseKubeObject([]byte(s[i]))
+		if err != nil {
+			if strings.Contains(err.Error(), "expected exactly one object, got 0") {
+				// sometimes helm produces some messages in between resources, we can safely
+				// ignore these
+				continue
+			}
+			return nil, fmt.Errorf("failed to parse %s: %s", s[i], err.Error())
+		}
+		objects = append(objects, o)
 	}
-	// try to remove the contents before first "---" because
-	// helm may produce messages to stdout before it
-	stdoutStr := string(stdout)
-	if idx := strings.Index(stdoutStr, "---"); idx != -1 {
-		return factory.NewResMapFromBytes([]byte(stdoutStr[idx:]))
-	}
-	return nil, err
+
+	return objects, nil
 }
 
 func (p *HelmChartInflationGeneratorPlugin) processValuesFiles() error {
@@ -474,10 +482,4 @@ func (p *HelmChartInflationGeneratorPlugin) checkHelmVersion() error {
 		return fmt.Errorf("this HelmChartInflationGeneratorPlugin requires helm V3 but got v%s", v)
 	}
 	return nil
-}
-
-func NewResMapFactory() *resmap.Factory {
-	resourceFactory := resource.NewFactory(&hasher.Hasher{})
-	resourceFactory.IncludeLocalConfigs = true
-	return resmap.NewFactory(resourceFactory)
 }
