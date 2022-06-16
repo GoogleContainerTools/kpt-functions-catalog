@@ -1,0 +1,6 @@
+# This example doesn't work as-is because the credentials aren't stored in this repo.
+
+exitCode: 1
+
+stdErr: |
+  failed to run generator: unable to run: 'helm repo' with env=[]; "exit status 1": "Error: looks like \"https://raw.githubusercontent.com/kpt-helmfn-test-bot/private-helm-repo/main\" is not a valid chart repository or cannot be reached
