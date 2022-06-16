@@ -35,6 +35,7 @@ and the flag `--mount` must be used for local charts. See the examples for infla
 
 It can be used declaratively when run with kustomize. To run the function with kustomize,
 the `network` field is needed for remote charts and the `mounts` field is needed for local charts.
+You can see an example of the former in the [kustomize inline values] example.
 
 ### FunctionConfig
 
@@ -66,22 +67,6 @@ data:
   valuesFile: string
 ```
 
-
-| Field           |  Description | Example
-| -----------:    |  ----------- | -----------
-`chartHome`       | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/". | tmp/charts
-`configHome`      | Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm. This option is not supported when running in a container. It is supported only in exec mode (e.g. with kustomize) | /tmp/helm/config
-`name`            | The name of the chart | minecraft
-`version`         | The version of the chart | 3.1.3
-`repo`            | A URL locating the chart on the internet | https://itzg.github.io/minecraft-server-charts
-`releaseName`     | Replaces RELEASE_NAME in the chart template output | test
-`namespace`       | Sets the target namespace for a release (`.Release.Namespace` in the template) | my-namespace
-`nameTemplate`    | Specify the template used to name the release | gatekeeper
-`includeCRDs`     | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default). | "true"
-`skipTests`       | If set, skip tests from templated output. Legal values: "true", "false" (default). | "true"
-`valuesFile`      | valuesFile is a remote or local file path to a values file to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
-
-
 #### `RenderHelmChart`
 A `functionConfig` of kind `RenderHelmChart` has the following supported parameters: 
 
@@ -94,6 +79,12 @@ helmCharts:
     name: string
     version: string
     repo: string
+    registry: string
+    auth:
+      apiVersion: string (optional)
+      kind: string
+      name: string
+      namespace: string (optional, default is "default")
   templateOptions:
     apiVersions: []string
     releaseName: string
@@ -108,26 +99,32 @@ helmCharts:
 
 ```
 
-| Field           |  Description | Example
-| -----------:    |  ----------- | -----------
-`helmGlobals`     | Parameters applied to all Helm charts
-`helmCharts`      | An array of helm chart parameters
-`chartArgs`       | Arguments that describe the chart being rendered. 
-`templateOptions` | A collection of fields that map to flag options of `helm template`. 
-`chartHome`       | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/". | tmp/charts
-`configHome`      | Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable. If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary directory created by the function for the benefit of helm. This option is not supported when running in a container. It is supported only in exec mode (e.g. with kustomize) | /tmp/helm/config
-`name`            | The name of the chart | minecraft
-`version`         | The version of the chart | 3.1.3
-`repo`            | A URL locating the chart on the internet | https://itzg.github.io/minecraft-server-charts
-`releaseName`     | Replaces RELEASE_NAME in the chart template output | test
-`namespace`       | Sets the target namespace for a release (`.Release.Namespace` in the template) | my-namespace
-`nameTemplate`    | Specify the template used to name the release | gatekeeper
-`includeCRDs`     | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default). | "true"
-`skipTests`       | If set, skip tests from templated output. Legal values: "true", "false" (default). | "true"
-`values`          | Values to use instead of the default values that accompany the chart. This can be defined inline or in a file. 
-`valuesInline`    | Values defined inline to use instead of default values that accompany the chart |  global: <br> &emsp; enabled: false <br> tests: <br> &emsp; enabled: false  
-`valuesFiles`     | Remote or local filepaths to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above. | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml
-`valuesMerge`     | ValuesMerge specifies how to treat ValuesInline with respect to ValuesFiles. Legal values: 'merge', 'override' (default), 'replace'. | replace
+#### functionConfig Field Descriptions and examples 
+
+|             Field | Description                                                                                                                                                                                                                                               | Example                                                                                                                                                                                        |
+|------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|     `helmGlobals` | Parameters applied to all Helm charts                                                                                                                                                                                                                     |                                                                                                                                                                                                |
+|      `helmCharts` | An array of helm chart parameters                                                                                                                                                                                                                         |                                                                                                                                                                                                |
+|       `chartArgs` | Arguments that describe the chart being rendered.                                                                                                                                                                                                         |                                                                                                                                                                                                |
+| `templateOptions` | A collection of fields that map to flag options of `helm template`.                                                                                                                                                                                       |                                                                                                                                                                                                |
+|       `chartHome` | A filepath to a directory of charts. The function will look for the chart in this local directory before attempting to pull the chart from a specified repo. Defaults to "tmp/charts". When run in a container, this path MUST have the prefix "tmp/".    | tmp/charts                                                                                                                                                                                     |
+|      `configHome` | Defines a value that the function should pass to helm via the HELM_CONFIG_HOME environment variable.                                                                                                                                                      | /tmp/helm/config                                                                                                                                                                               |
+|            `name` | The name of the chart.                                                                                                                                                                                                                                    | minecraft                                                                                                                                                                                      |
+|         `version` | The version of the chart                                                                                                                                                                                                                                  | 3.1.3                                                                                                                                                                                          |
+|            `repo` | For remote charts, the URL locating the chart on the internet, equivalent to the `--repo` flag of `helm pull`.                                                                                                                                            | https://itzg.github.io/minecraft-server-charts                                                                                                                                                 |
+|        `registry` | Necessary with private OCI registries. This is the URL if the OCI registry, and equivalent to the first argument \<registry\> in `helm registry login \<registry\>.                                                                                       | https://us-west2-docker.pkg.dev                                                                                                                                                                |
+|            `auth` | Necessary with private repos or registries. This field is the object reference of a Secret containing credentials in its `data.username` and `data.password` fields. The Secret must be passed into the function as part of the input ResourcceList.      |                                                                                                                                                                                                |
+|     `apiVersions` | Kubernetes api versions used for Capabilities.APIVersions                                                                                                                                                                                                 |                                                                                                                                                                                                |
+|     `releaseName` | Replaces RELEASE_NAME in the chart template output                                                                                                                                                                                                        | test                                                                                                                                                                                           |
+|       `namespace` | Sets the target namespace for a release (`.Release.Namespace` in the template)                                                                                                                                                                            | my-namespace                                                                                                                                                                                   |
+|    `nameTemplate` | Specify the template used to name the release                                                                                                                                                                                                             | gatekeeper                                                                                                                                                                                     |
+|     `includeCRDs` | Specifies if Helm should also generate CustomResourceDefinitions. Legal values: "true", "false" (default).                                                                                                                                                | "true"                                                                                                                                                                                         |
+|       `skipTests` | If set, skip tests from templated output. Legal values: "true", "false" (default).                                                                                                                                                                        | "true"                                                                                                                                                                                         |
+|          `values` | Values to use instead of the default values that accompany the chart. This can be defined inline or in a file.                                                                                                                                            |                                                                                                                                                                                                |
+|    `valuesInline` | Values defined inline to use instead of default values that accompany the chart                                                                                                                                                                           | global: <br> &emsp; enabled: false <br> tests: <br> &emsp; enabled: false                                                                                                                                |
+|     `valuesFile`  | Remote or local filepath to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above.                                      | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml |
+|     `valuesFiles` | Remote or local filepaths to use instead of the default values that accompanied the chart. The default values are in '{chartHome}/{name}/values.yaml', where `chartHome` and `name` are the parameters defined above.                                     | Using a local values file: path/to/your/values.yaml <br> <br> Using a remote values file: https://raw.githubusercontent.com/config-sync-examples/helm-components/main/cert-manager-values.yaml |
+|     `valuesMerge` | ValuesMerge specifies how to treat ValuesInline with respect to ValuesFiles. Legal values: 'merge', 'override' (default), 'replace'.                                                                                                                      | replace                                                                                                                                                                                        |
 
 <!--mdtogo-->
 
@@ -159,4 +156,5 @@ $ kpt pkg tree
 [charts]: https://helm.sh/docs/topics/charts/
 [local]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-local
 [remote]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-remote
+[kustomize inline values]: https://github.com/GoogleContainerTools/kpt-functions-catalog/tree/master/examples/render-helm-chart-kustomize-inline-values
 [helm template command]: https://helm.sh/docs/helm/helm_template/

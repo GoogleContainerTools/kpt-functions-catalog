@@ -3,6 +3,8 @@
 
 package types
 
+import "sigs.k8s.io/kustomize/kyaml/yaml"
+
 type HelmGlobals struct {
 	// ChartHome is a file path to a directory containing a subdirectory for
 	// each chart to be included in the output. The default value of this field
@@ -17,11 +19,8 @@ type HelmGlobals struct {
 	ChartHome string `json:"chartHome,omitempty" yaml:"chartHome,omitempty"`
 
 	// ConfigHome defines a value that the function should pass to helm via
-	// the HELM_CONFIG_HOME environment variable. The function doesn't attempt
-	// to read or write this directory.
-	// If omitted, {tmpDir}/helm is used, where {tmpDir} is some temporary
-	// directory created by the function for the benefit of helm.
-	// Likewise, the function sets
+	// the HELM_CONFIG_HOME environment variable. If this is set, the function
+	// also sets
 	//   HELM_CACHE_HOME={ConfigHome}/.cache
 	//   HELM_DATA_HOME={ConfigHome}/.data
 	// for the helm subprocess.
@@ -49,6 +48,15 @@ type ChartArgs struct {
 	// This is the argument to helm's  `--repo` flag, e.g.
 	// `https://itzg.github.io/minecraft-server-charts`.
 	Repo string `json:"repo,omitempty" yaml:"repo,omitempty"`
+
+	// Auth is a reference to the kubernetes resource that
+	// contains credentials necessary to access the repository if
+	// it is private
+	Auth *yaml.ResourceIdentifier `json:"auth,omitempty" yaml:"auth,omitempty"`
+
+	// Registry is the name of the chart registry (only required if
+	// the chart comes from an OCI repository)
+	Registry string `json:"registry,omitempty" yaml:"registry,omitempty"`
 }
 
 type TemplateOptions struct {
