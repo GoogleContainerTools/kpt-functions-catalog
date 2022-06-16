@@ -7,7 +7,6 @@ package builtins
 import (
 	"bytes"
 	"crypto/md5"
-	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
@@ -22,6 +21,7 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/render-helm-chart/third_party/sigs.k8s.io/kustomize/api/types"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"github.com/imdario/mergo"
+	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/yaml"
 )
 
@@ -88,32 +88,23 @@ func (p *HelmChartInflationGeneratorPlugin) ConfigureAuth(items []*fn.KubeObject
 		return fmt.Errorf("could not find Secret %q identified by auth", p.Auth)
 	}
 
-	u, found, err := targetSecret.NestedString("data", "username")
-	if err != nil {
-		return err
-	}
-	if !found {
-		return fmt.Errorf("could not find username in Secret")
+	var secret corev1.Secret
+	if err := targetSecret.As(&secret); err != nil {
+		return fmt.Errorf("could not unmarshal Secret: %s", err.Error())
 	}
 
-	pass, found, err := targetSecret.NestedString("data", "password")
-	if err != nil {
-		return err
-	}
-	if !found {
-		return fmt.Errorf("could not find password in Secret")
-	}
-	username, err := base64.StdEncoding.DecodeString(u)
-	if err != nil {
-		return err
-	}
-	password, err := base64.StdEncoding.DecodeString(pass)
-	if err != nil {
-		return err
+	user, ok := secret.Data["username"]
+	if !ok || len(user) == 0 {
+		return fmt.Errorf("could not find username in Secret %s", secret.Name)
 	}
 
-	p.username = string(username)
-	p.password = string(password)
+	pass, ok := secret.Data["password"]
+	if !ok || len(pass) == 0 {
+		return fmt.Errorf("could not find password in Secret %s", secret.Name)
+	}
+
+	p.username = string(user)
+	p.password = string(pass)
 	return nil
 }
 
@@ -254,7 +245,7 @@ func (p *HelmChartInflationGeneratorPlugin) cleanup() {
 	if p.tmpDir != "" {
 		os.RemoveAll(p.tmpDir)
 	}
-	if strings.HasPrefix(p.Repo, "oci://") && p.password != "" {
+	if isOciRepo(p.Repo) && p.password != "" {
 		// log out of the registry
 		p.runHelmCommand([]string{
 			"registry",
@@ -271,13 +262,12 @@ func (p *HelmChartInflationGeneratorPlugin) Generate() (objects fn.KubeObjects, 
 	}
 	if _, exists := p.chartExistsLocally(); !exists {
 		var pullArgs []string
-		switch strings.HasPrefix(p.Repo, "oci://") {
-		case true:
+		if isOciRepo(p.Repo) {
 			pullArgs, err = p.pullOCIRepo()
 			if err != nil {
 				return nil, err
 			}
-		case false:
+		} else {
 			pullArgs, err = p.pullNonOCIRepo()
 			if err != nil {
 				return nil, err
@@ -482,4 +472,8 @@ func (p *HelmChartInflationGeneratorPlugin) checkHelmVersion() error {
 		return fmt.Errorf("this HelmChartInflationGeneratorPlugin requires helm V3 but got v%s", v)
 	}
 	return nil
+}
+
+func isOciRepo(repo string) bool {
+	return strings.HasPrefix(repo, "oci://")
 }
