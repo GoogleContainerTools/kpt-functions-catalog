@@ -51,6 +51,8 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 		if len(p.NewLabels) == 0 {
 			return fmt.Errorf("`data` should not be empty")
 		}
+	case o.IsGVK(fnConfigGroup, fnConfigAPIVersion, legacyFnConfigKind):
+		fallthrough
 	case o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
 		p.NewLabels = o.NestedStringMapOrDie("labels")
 		if len(p.NewLabels) == 0 {
@@ -73,7 +75,7 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 		if exist {
 			var addFields []FieldSpec
 			for _, sub := range arr {
-				addFields = append(addFields, FieldSpec{
+				addFields = append(addFields, FieldSpec{ //TODO: initialize in kyaml
 					sub.GetString("group"),
 					sub.GetString("version"), sub.GetString("kind"),
 					sub.GetString("path"),
