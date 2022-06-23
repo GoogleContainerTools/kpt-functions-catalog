@@ -56,7 +56,7 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 	case o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
 		p.NewLabels = o.NestedStringMapOrDie("labels")
 		if len(p.NewLabels) == 0 {
-			return fmt.Errorf("`labels` should not be empty")
+			return fmt.Errorf("failed to configure function: input label list cannot be empty")
 		}
 	default:
 		return fmt.Errorf("unknown functionConfig Kind=%v ApiVersion=%v, expect `%v` or `ConfigMap`",
@@ -75,12 +75,11 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 		if exist {
 			var addFields []FieldSpec
 			for _, sub := range arr {
-				addFields = append(addFields, FieldSpec{ //TODO: initialize in kyaml
-					sub.GetString("group"),
-					sub.GetString("version"), sub.GetString("kind"),
-					sub.GetString("path"),
-					sub.GetBool("create"),
-				})
+				var curField FieldSpec
+				if err := sub.As(&curField); err != nil {
+					return err
+				}
+				addFields = append(addFields, curField)
 			}
 			p.AdditionalLabelFields = append(p.AdditionalLabelFields, addFields...)
 		}
