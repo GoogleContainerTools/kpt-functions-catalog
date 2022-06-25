@@ -1,6 +1,7 @@
 package transformer
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/yaml"
@@ -26,6 +27,9 @@ func SetLabels(rl *fn.ResourceList) (bool, error) {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
 		return false, nil
 	}
+
+	rl.Results = append(rl.Results, transformer.Results...)
+	// TODO: another way to pass result.
 	return true, nil
 }
 
@@ -34,7 +38,7 @@ type LabelTransformer struct {
 	NewLabels map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
 	// FieldSpecs is deprecated, please use AdditionalLabelFields instead.
 	FieldSpecs []FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
-	// AdditionalLabelFields is used to specify additional fields to add labels.
+	// AdditionalLabelFields is used to specify additional fields to add labels. TODO: deprecated soon
 	AdditionalLabelFields []FieldSpec `json:"additionalLabelFields,omitempty" yaml:"additionalLabelFields,omitempty"`
 	// Results is used to track labels that have been applied
 	Results fn.Results
@@ -45,8 +49,8 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 	// parse labels to NewLabels
 	switch {
 	case o.IsEmpty():
-		return fmt.Errorf("FunctionConfig is missing. Expect `ConfigMap` or `SetNamespace`")
-	case o.IsGVK("", "", "ConfigMap"):
+		return fmt.Errorf("FunctionConfig is missing. Expect `ConfigMap` or `SetLabel`")
+	case o.IsGVK("", "v1", "ConfigMap"):
 		p.NewLabels = o.NestedStringMapOrDie("data")
 		if len(p.NewLabels) == 0 {
 			return fmt.Errorf("`data` should not be empty")
@@ -68,21 +72,11 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 	}
 	// add additional fields
 	if o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind) {
-		arr, exist, err := o.NestedSlice("additionalLabelFields")
-		if err != nil {
-			return fmt.Errorf("`additionalLabelFields` format is wrong")
+		var add []FieldSpec
+		if _, err := o.Get(&add, "additionalLabelFields"); err != nil {
+			return err
 		}
-		if exist {
-			var addFields []FieldSpec
-			for _, sub := range arr {
-				var curField FieldSpec
-				if err := sub.As(&curField); err != nil {
-					return err
-				}
-				addFields = append(addFields, curField)
-			}
-			p.AdditionalLabelFields = append(p.AdditionalLabelFields, addFields...)
-		}
+		p.AdditionalLabelFields = append(p.AdditionalLabelFields, add...)
 	}
 	return nil
 }
@@ -91,10 +85,12 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	for _, o := range objects {
 		for _, sp := range p.AdditionalLabelFields {
 			if (sp.Group == "" && sp.Version == "" && sp.Kind == "") || o.IsGVK(sp.Group, sp.Version, sp.Kind) {
+				// generate msg
+				res, _ := json.Marshal(p.NewLabels)
 				newResult := fn.Result{
-					Message:     "Replace labels",
-					Severity:    "INFO",
-					ResourceRef: nil, // TODO: initialize in kyaml
+					Message:     "set labels: " + string(res),
+					Severity:    "",
+					ResourceRef: nil,
 					Field: &fn.Field{
 						Path:          sp.Path,
 						CurrentValue:  nil, // values to be updated in setLabel()
@@ -106,7 +102,7 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 					},
 					Tags: nil,
 				}
-				err := updateLabels(o, sp.Path, p.NewLabels, sp.CreateIfNotPresent, &newResult)
+				err := updateLabels(o, sp.Path, p.NewLabels, sp.CreateIfNotPresent)
 				if err != nil {
 					return err
 				}
@@ -117,44 +113,23 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	return nil
 }
 
-// TODO: Is there any helper function insdie fn package to help with copy map
-func copyStringMap(m map[string]string) map[string]string {
-	if m == nil {
-		return nil
-	}
-	newMap := make(map[string]string)
-	for k, v := range m {
-		newMap[k] = v
-	}
-	return newMap
-}
-
-func updateLabels(o *fn.KubeObject, fieldPath string, newLabels map[string]string, create bool, result *fn.Result) error {
-	paths := strings.Split(fieldPath, "/")
-
-	oldLabels, exist, err := o.NestedStringMap(paths...)
-	if err != nil {
-		return err
-	}
-	if !exist {
-		oldLabels = make(map[string]string)
-	}
-	result.Field.CurrentValue = copyStringMap(oldLabels)
-	replaceLabels(oldLabels, newLabels, create)
-	result.Field.ProposedValue = copyStringMap(oldLabels)
-	o.SetNestedStringMapOrDie(oldLabels, paths...)
-	return nil
-}
-
-// replaceLabels replace old labels map with new labels map according to create
-// oldLabels must not be nil
-func replaceLabels(oldLabels map[string]string, newLabels map[string]string, create bool) {
+func updateLabels(o *fn.KubeObject, fieldPath string, newLabels map[string]string, create bool) error {
+	//TODO: should support user configurable field for labels
+	basePath := strings.Split(fieldPath, "/")
 	for k, v := range newLabels {
-		_, exist := oldLabels[k]
-		if create || exist {
-			oldLabels[k] = v
+		newPath := append(basePath, k)
+		_, exist, err := o.NestedString(newPath...)
+		if err != nil {
+			return err
+		}
+		if exist || create {
+			if err = o.SetNestedString(v, newPath...); err != nil {
+				return err
+			}
 		}
 	}
+	return nil
+
 }
 
 func (p *LabelTransformer) addDefaultLabelFields() error {
