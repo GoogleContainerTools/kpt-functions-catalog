@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
-	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/yaml"
 	"sort"
 	"strings"
@@ -53,11 +52,13 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 	case o.IsEmpty():
 		return fmt.Errorf("FunctionConfig is missing. Expect `ConfigMap` or `SetLabel`")
 	case o.IsGVK("", "v1", "ConfigMap"):
-		var cm corev1.ConfigMap
-		if err := o.As(&cm); err != nil {
-			return err
-		}
-		p.NewLabels = cm.Data
+
+		//var cm corev1.ConfigMap
+		//if err := o.As(&cm); err != nil {
+		//	return err
+		//}
+		//p.NewLabels = cm.Data
+		p.NewLabels = o.NestedStringMapOrDie("data")
 		//if len(p.NewLabels) == 0 {
 		//	return fmt.Errorf("`data` should not be empty")
 		//}
