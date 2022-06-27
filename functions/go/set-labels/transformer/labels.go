@@ -22,11 +22,11 @@ func SetLabels(rl *fn.ResourceList) (bool, error) {
 	transformer := LabelTransformer{}
 	if err := transformer.Config(rl.FunctionConfig); err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
-		return false, nil
+		return false, err
 	}
 	if err := transformer.Transform(rl.Items); err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
-		return false, nil
+		return false, err
 	}
 
 	rl.Results = append(rl.Results, transformer.Results...)
@@ -78,7 +78,7 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 		return err
 	}
 	// add additional fields
-	if o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind) {
+	if o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind) || o.IsGVK(fnConfigGroup, fnConfigAPIVersion, legacyFnConfigKind) {
 		var add []FieldSpec
 		if _, err := o.Get(&add, "additionalLabelFields"); err != nil {
 			return err
