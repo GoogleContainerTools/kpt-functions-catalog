@@ -124,19 +124,20 @@ func updateLabels(o *fn.KubeObject, fieldPath string, newLabels map[string]strin
 	//TODO: should support user configurable field for labels
 	basePath := strings.Split(fieldPath, "/")
 	keys := make([]string, 0)
-	for k, _ := range newLabels {
+	for k := range newLabels {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
-	for _, k := range keys {
-		v, _ := newLabels[k]
-		newPath := append(basePath, k)
+	for i := 0; i < len(keys); i++ {
+		key := keys[i]
+		val := newLabels[key]
+		newPath := append(basePath, key)
 		_, exist, err := o.NestedString(newPath...)
 		if err != nil {
 			return err
 		}
 		if exist || create {
-			if err = o.SetNestedString(v, newPath...); err != nil {
+			if err = o.SetNestedString(val, newPath...); err != nil {
 				return err
 			}
 		}
