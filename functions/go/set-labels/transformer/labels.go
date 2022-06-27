@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/yaml"
+	"sort"
 	"strings"
 )
 
@@ -116,7 +117,13 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 func updateLabels(o *fn.KubeObject, fieldPath string, newLabels map[string]string, create bool) error {
 	//TODO: should support user configurable field for labels
 	basePath := strings.Split(fieldPath, "/")
-	for k, v := range newLabels {
+	keys := make([]string, 0)
+	for k, _ := range newLabels {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v, _ := newLabels[k]
 		newPath := append(basePath, k)
 		_, exist, err := o.NestedString(newPath...)
 		if err != nil {

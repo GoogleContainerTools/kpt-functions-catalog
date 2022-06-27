@@ -3,18 +3,18 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-la
 go 1.17
 
 require (
-	github.com/stretchr/testify v1.7.1
-	sigs.k8s.io/kustomize/api v0.10.2-0.20220110181313-a1a0a4982226
-	sigs.k8s.io/kustomize/kyaml v0.13.7-0.20220418212550-9d5491c2e20c
+	github.com/stretchr/testify v1.7.1 // indirect
+	sigs.k8s.io/kustomize/kyaml v0.13.7-0.20220418212550-9d5491c2e20c // indirect
 	sigs.k8s.io/yaml v1.3.0
 )
 
 require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220608182028-78748f08d997
 
+require github.com/google/go-cmp v0.5.8
+
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-logr/logr v1.2.0 // indirect
@@ -23,16 +23,12 @@ require (
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/spf13/cobra v1.2.1 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
 	golang.org/x/text v0.3.7 // indirect
@@ -41,5 +37,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/klog/v2 v2.60.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20220401212409-b28bf2818661 // indirect
-	k8s.io/utils v0.0.0-20210802155522-efc7438f0176 // indirect
 )

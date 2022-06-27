@@ -26,16 +26,18 @@ metadata:
   name: whatever
 `
 
-	expected := `apiVersion: apps/v1
+	expected := `
+apiVersion: apps/v1
 kind: ConfigMap
 metadata:
   name: whatever
   labels:
-    env: production
     app: myApp
+    env: production
     quotedBoolean: "true"
     quotedFruit: peach
-    unquotedBoolean: "true"`
+    unquotedBoolean: "true"
+`
 
 	transformer := LabelTransformer{}
 	config, _ := fn.ParseKubeObject([]byte(functionConfig))
@@ -86,9 +88,9 @@ kind: ConfigMap
 metadata:
   name: whatever
   labels:
+    extra: nil
     env: production
     app: myApp
-    extra: nil
     quotedBoolean: "true"
     quotedFruit: peach
     unquotedBoolean: "true"`
@@ -101,7 +103,6 @@ metadata:
 	if err != nil {
 		return
 	}
-	fmt.Println(result.String())
 	exp, _ := fn.ParseKubeObject([]byte(expected))
 
 	if exp.String() != result.String() {
@@ -128,7 +129,8 @@ additionalLabelFields:
   group: apps
   version: v1
   create: true
-  path: spec/selector/labels`
+  path: spec/selector/labels
+`
 
 	input := `
 apiVersion: apps/v1
@@ -151,16 +153,16 @@ kind: MyResource
 metadata:
   name: whatever
   labels:
+    extra: nil
     env: dev
     color: orange
-    extra: nil
     fruit: apple
 spec:
   selector:
     labels:
+      fruit: apple
       name: jemma
       color: orange
-      fruit: apple
 `
 
 	transformer := LabelTransformer{}
@@ -171,9 +173,8 @@ spec:
 	if err != nil {
 		return
 	}
-	fmt.Println(result.String())
+	//fmt.Println(result.String())
 	exp, _ := fn.ParseKubeObject([]byte(expected))
-
 	if exp.String() != result.String() {
 		fmt.Println("Actual:")
 		fmt.Println(result)
