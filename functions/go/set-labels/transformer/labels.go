@@ -3,6 +3,7 @@ package transformer
 import (
 	"encoding/json"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
+	"log"
 	"sigs.k8s.io/yaml"
 	"sort"
 	"strings"
@@ -107,6 +108,9 @@ func updateLabels(o *fn.KubeObject, newLabels map[string]string, spec FieldSpec)
 
 func readDefaultFieldSpec() []FieldSpec {
 	var defaultFieldSpecs []FieldSpec
-	yaml.Unmarshal([]byte(commonLabelFieldSpecs), &defaultFieldSpecs)
+	err := yaml.Unmarshal([]byte(commonLabelFieldSpecs), &defaultFieldSpecs)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return defaultFieldSpecs
 }

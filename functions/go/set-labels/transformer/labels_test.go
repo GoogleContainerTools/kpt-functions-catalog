@@ -9,7 +9,10 @@ import (
 
 func runTest(t *testing.T, config, input, expected string) {
 	var sl SetLabels
-	yaml.Unmarshal([]byte(config), &sl)
+	err := yaml.Unmarshal([]byte(config), &sl)
+	if err != nil {
+		return
+	}
 	in, _ := fn.ParseKubeObject([]byte(input))
 	sl.Run(nil, nil, fn.KubeObjects{in})
 	//fmt.Println(ctx)
