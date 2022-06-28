@@ -22,7 +22,11 @@ import (
 
 //nolint
 func main() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(transformer.SetLabels)); err != nil {
+	//path := "/home/zyuanyi/GolandProjects/kpt-functions-catalog-personal/functions/go/set-labels/e2etest.yaml"
+	//file, _ := os.Open(path)
+	//defer file.Close()
+	//os.Stdin = file
+	if err := fn.AsMain(&transformer.SetLabels{}); err != nil {
 		os.Exit(1)
 	}
 }
