@@ -29,7 +29,6 @@ func SetLabels(rl *fn.ResourceList) (bool, error) {
 	}
 
 	rl.Results = append(rl.Results, transformer.Results...)
-	// TODO: another way to pass result.
 	return true, nil
 }
 
@@ -51,16 +50,7 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 	case o.IsEmpty():
 		return fmt.Errorf("failed to configure function: `functionConfig` must be either a `ConfigMap` or `SetLabels`")
 	case o.IsGVK("", "v1", "ConfigMap"):
-
-		//var cm corev1.ConfigMap
-		//if err := o.As(&cm); err != nil {
-		//	return err
-		//}
-		//p.NewLabels = cm.Data
 		p.NewLabels = o.NestedStringMapOrDie("data")
-		//if len(p.NewLabels) == 0 {
-		//	return fmt.Errorf("`data` should not be empty")
-		//}
 	case o.IsGVK(fnConfigGroup, fnConfigAPIVersion, legacyFnConfigKind):
 		fallthrough
 	case o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
