@@ -9,11 +9,11 @@ items:
     results:
       - message: 'set labels: {"color":"orange","fruit":"apple"}'
         field:
-          path: metadata.labels
+          path: metadata/labels
         file:
           path: local-config.yaml
       - message: 'set labels: {"color":"orange","fruit":"apple"}'
         field:
-          path: metadata.labels
+          path: metadata/labels
         file:
           path: resources.yaml
