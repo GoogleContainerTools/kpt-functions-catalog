@@ -166,7 +166,6 @@ spec:
 	if err != nil {
 		return
 	}
-	//fmt.Println(result.String())
 	exp, _ := fn.ParseKubeObject([]byte(expected))
 	if exp.String() != result.String() {
 		fmt.Println("Actual:")
