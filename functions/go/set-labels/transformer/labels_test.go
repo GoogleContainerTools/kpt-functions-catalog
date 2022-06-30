@@ -2,8 +2,9 @@ package transformer
 
 import (
 	"fmt"
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"testing"
+
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
 func TestLabelTransformer_simple_ConfigMap(t *testing.T) {

@@ -3,9 +3,10 @@ package transformer
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sort"
 	"strings"
+
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
 // the similar struct esxits in resid.GVK, but there is no function to create an GVK struct without using kyaml

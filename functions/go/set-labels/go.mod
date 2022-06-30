@@ -5,7 +5,6 @@ go 1.17
 require (
 	github.com/stretchr/testify v1.7.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.13.7-0.20220418212550-9d5491c2e20c // indirect
-	sigs.k8s.io/yaml v1.3.0
 )
 
 require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220608182028-78748f08d997
