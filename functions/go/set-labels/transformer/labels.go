@@ -42,21 +42,24 @@ type LabelTransformer struct {
 }
 
 // Config parse the functionConfig kubeObject to the fields in the LabelTransformer
-func (p *LabelTransformer) Config(o *fn.KubeObject) error {
+func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 	// parse labels to NewLabels
 	switch {
-	case o.IsEmpty():
+	case functionConfig.IsEmpty():
 		return fmt.Errorf("failed to configure function: `functionConfig` must be either a `ConfigMap` or `SetLabels`")
-	case o.IsGVK("", "v1", "ConfigMap"):
-		p.NewLabels = o.NestedStringMapOrDie("data")
-	case o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
-		p.NewLabels = o.NestedStringMapOrDie("labels")
+	case functionConfig.IsGVK("", "v1", "ConfigMap"):
+		p.NewLabels = functionConfig.NestedStringMapOrDie("data")
+	case functionConfig.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
+		if _, exist, err := functionConfig.NestedSlice("additionalLabelFields"); exist || err != nil {
+			return fmt.Errorf("`additionalLabelFields` has been deprecated")
+		}
+		p.NewLabels = functionConfig.NestedStringMapOrDie("labels")
 		if len(p.NewLabels) == 0 {
 			return fmt.Errorf("failed to configure function: input label list cannot be empty")
 		}
 	default:
 		return fmt.Errorf("unknown functionConfig Kind=%v ApiVersion=%v, expect `%v` or `ConfigMap`",
-			o.GetKind(), o.GetAPIVersion(), fnConfigKind)
+			functionConfig.GetKind(), functionConfig.GetAPIVersion(), fnConfigKind)
 	}
 	// add default fields
 	if err := p.addDefaultLabelFields(); err != nil {

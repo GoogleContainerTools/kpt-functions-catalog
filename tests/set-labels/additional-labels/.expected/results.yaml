@@ -1,0 +1,12 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 1
+items:
+  - image: gcr.io/kpt-fn/set-labels:unstable
+    stderr: 'failed to evaluate function: `additionalLabelFields` has been deprecated'
+    exitCode: 1
+    results:
+      - message: '`additionalLabelFields` has been deprecated'
+        severity: error

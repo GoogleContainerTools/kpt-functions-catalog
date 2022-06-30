@@ -2,4 +2,6 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: SetLabels
 metadata:
   name: my-config
-labels: {}
+labels:
+  color: orange
+  fruit: apple
