@@ -1,5 +1,5 @@
 diff --git a/resources.yaml b/resources.yaml
-index 1e641f7..0dde4b3 100644
+index 1e641f7..bb4be90 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -2,6 +2,9 @@ apiVersion: v1
@@ -12,7 +12,7 @@ index 1e641f7..0dde4b3 100644
  data:
    some-key: some-value
  ---
-@@ -10,7 +13,12 @@ kind: MyResource
+@@ -10,6 +13,9 @@ kind: MyResource
  metadata:
    name: the-service
    namespace: the-namespace
@@ -22,6 +22,3 @@ index 1e641f7..0dde4b3 100644
  spec:
    selector:
      labels:
-       foo: bar
-+      color: orange
-+      fruit: apple
