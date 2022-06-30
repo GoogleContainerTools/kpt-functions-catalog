@@ -37,8 +37,6 @@ type LabelTransformer struct {
 	NewLabels map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
 	// FieldSpecs is deprecated, please use AdditionalLabelFields instead.
 	FieldSpecs []FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
-	// AdditionalLabelFields is used to specify additional fields to add labels. TODO: deprecated soon
-	AdditionalLabelFields []FieldSpec `json:"additionalLabelFields,omitempty" yaml:"additionalLabelFields,omitempty"`
 	// Results is used to track labels that have been applied
 	Results fn.Results
 }
@@ -51,8 +49,6 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 		return fmt.Errorf("failed to configure function: `functionConfig` must be either a `ConfigMap` or `SetLabels`")
 	case o.IsGVK("", "v1", "ConfigMap"):
 		p.NewLabels = o.NestedStringMapOrDie("data")
-	case o.IsGVK(fnConfigGroup, fnConfigAPIVersion, legacyFnConfigKind):
-		fallthrough
 	case o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
 		p.NewLabels = o.NestedStringMapOrDie("labels")
 		if len(p.NewLabels) == 0 {
@@ -66,14 +62,6 @@ func (p *LabelTransformer) Config(o *fn.KubeObject) error {
 	if err := p.addDefaultLabelFields(); err != nil {
 		return err
 	}
-	// add additional fields
-	//if o.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind) || o.IsGVK(fnConfigGroup, fnConfigAPIVersion, legacyFnConfigKind) {
-	//	var add []FieldSpec
-	//	if _, err := o.Get(&add, "additionalLabelFields"); err != nil {
-	//		return err
-	//	}
-	//	p.AdditionalLabelFields = append(p.AdditionalLabelFields, add...)
-	//}
 	return nil
 }
 
@@ -89,8 +77,8 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 					ResourceRef: nil,
 					Field: &fn.Field{
 						Path:          sp.Path,
-						CurrentValue:  nil, // values to be updated in setLabel()
-						ProposedValue: nil, // values to be updated in setLabel()
+						CurrentValue:  nil,
+						ProposedValue: nil,
 					},
 					File: &fn.File{
 						Path:  o.PathAnnotation(),
