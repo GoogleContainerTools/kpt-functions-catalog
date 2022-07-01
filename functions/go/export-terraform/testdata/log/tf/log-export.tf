@@ -35,10 +35,11 @@ module "my-log-k8s-bucket-destination" {
   source  = "terraform-google-modules/log-export/google//modules/logbucket"
   version = "~> 7.4.0"
 
-  project_id      = module.prj-logging.project_id
-  name            = "my-log-k8s-bucket"
-  location        = "global"
-  retention_days  = 30
+  project_id               = module.prj-logging.project_id
+  name                     = "my-log-k8s-bucket"
+  location                 = "global"
+  retention_days           = 30
+  log_sink_writer_identity = module.logsink-123456789012-orglogbucketsink.writer_identity
 }
 
 module "logsink-123456789012-pubsubsink" {
