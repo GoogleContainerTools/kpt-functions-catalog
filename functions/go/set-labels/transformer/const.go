@@ -4,7 +4,8 @@ const (
 	fnConfigGroup         = "fn.kpt.dev"
 	fnConfigAPIVersion    = "v1alpha1"
 	fnConfigKind          = "SetLabels"
-	commonLabelFieldSpecs = `
+	fnDeprecateField      = "additionalLabelFields"
+	CommonLabelFieldSpecs = `
 [
   {
     "path": "metadata/labels",

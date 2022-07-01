@@ -8,4 +8,4 @@ pipeline:
       configPath: fn-config.yaml
       selectors:
         - kind: ConfigMap
-        - kind: MyResource
+        - kind: Service
