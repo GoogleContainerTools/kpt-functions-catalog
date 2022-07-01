@@ -48,11 +48,12 @@ module "{{ .GetResourceName }}-destination" {
 {{end}}{{with $logsink.References.LoggingLogBucket }}
 module "{{ .GetResourceName }}-destination" {
   source  = "terraform-google-modules/log-export/google//modules/logbucket"
-  version = "~> 7.4.0"
+  version = "~> 7.4.1"
 
-  project_id      = module.{{ .Parent.GetResourceName }}.project_id
-  name            = "{{ .GetResourceName }}"{{ with .GetStringFromObject "spec" "location" }}
-  location        = "{{.}}"{{end}}{{ if .GetInt "spec" "retentionDays" }}
-  retention_days  = {{ .GetInt "spec" "retentionDays" }}{{end}}
+  project_id               = module.{{ .Parent.GetResourceName }}.project_id
+  name                     = "{{ .GetResourceName }}"{{ with .GetStringFromObject "spec" "location" }}
+  location                 = "{{.}}"{{end}}{{ if .GetInt "spec" "retentionDays" }}
+  retention_days           = {{ .GetInt "spec" "retentionDays" }}{{end}}
+  log_sink_writer_identity = module.logsink-{{ $logsink.GetResourceName }}.writer_identity
 }
 {{end}}{{end}}
