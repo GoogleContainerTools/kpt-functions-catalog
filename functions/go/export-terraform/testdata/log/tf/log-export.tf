@@ -33,7 +33,7 @@ module "logsink-123456789012-orglogbucketsink" {
 
 module "my-log-k8s-bucket-destination" {
   source  = "terraform-google-modules/log-export/google//modules/logbucket"
-  version = "~> 7.4.0"
+  version = "~> 7.4.1"
 
   project_id               = module.prj-logging.project_id
   name                     = "my-log-k8s-bucket"
