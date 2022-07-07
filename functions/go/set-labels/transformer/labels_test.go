@@ -59,7 +59,6 @@ spec:
 	if err != nil {
 		return
 	}
-	fmt.Println(transformer.Results)
 	exp, _ := fn.ParseKubeObject([]byte(expected))
 
 	if exp.String() != result.String() {
@@ -143,7 +142,6 @@ spec:
 	if err != nil {
 		return
 	}
-	fmt.Println(transformer.Results)
 	exp, _ := fn.ParseKubeObject([]byte(expected))
 
 	if exp.String() != result.String() {

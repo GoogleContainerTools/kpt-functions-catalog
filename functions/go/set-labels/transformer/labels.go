@@ -26,158 +26,13 @@ type FieldSpec struct {
 
 type FieldSpecs []FieldSpec
 
-// generate common label paths
-var Specs = FieldSpecs{
-	FieldSpec{
-		Identifier:         GVK{"", "v1", "Service"},
-		Path:               FieldPath{"spec", "selector"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"", "v1", "ReplicationController"},
-		Path:               FieldPath{"spec", "selector"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"", "v1", "ReplicationController"},
-		Path:               FieldPath{"spec", "template", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"", "", "Deployment"},
-		Path:               FieldPath{"spec", "selector", "matchLabels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"", "", "Deployment"},
-		Path:               FieldPath{"spec", "template", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "Deployment"},
-		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "Deployment"},
-		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "Deployment"},
-		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "Deployment"},
-		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "Deployment"},
-		Path:               FieldPath{"spec", "template", "spec", "topologySpreadConstraints", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"", "", "ReplicaSet"},
-		Path:               FieldPath{"spec", "selector", "matchLabels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"", "", "ReplicaSet"},
-		Path:               FieldPath{"spec", "template", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"", "", "DaemonSet"},
-		Path:               FieldPath{"spec", "selector", "matchLabels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"", "", "DaemonSet"},
-		Path:               FieldPath{"spec", "template", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "StatefulSet"},
-		Path:               FieldPath{"spec", "selector", "matchLabels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "StatefulSet"},
-		Path:               FieldPath{"spec", "template", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "StatefulSet"},
-		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "StatefulSet"},
-		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "StatefulSet"},
-		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "StatefulSet"},
-		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"apps", "", "StatefulSet"},
-		Path:               FieldPath{"spec", "template", "spec", "topologySpreadConstraints", "labelSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"batch", "", "Job"},
-		Path:               FieldPath{"spec", "selector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"batch", "", "Job"},
-		Path:               FieldPath{"spec", "template", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"batch", "", "CronJob"},
-		Path:               FieldPath{"spec", "jobTemplate", "spec", "selector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"batch", "", "CronJob"},
-		Path:               FieldPath{"spec", "jobTemplate", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"batch", "", "CronJob"},
-		Path:               FieldPath{"spec", "jobTemplate", "spec", "template", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
-		Identifier:         GVK{"policy", "", "PodDisruptionBudget"},
-		Path:               FieldPath{"spec", "selector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"networking.k8s.io", "", "NetworkPolicy"},
-		Path:               FieldPath{"spec", "podSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"networking.k8s.io", "", "NetworkPolicy"},
-		Path:               FieldPath{"spec", "ingress", "from", "podSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
-	FieldSpec{
-		Identifier:         GVK{"networking.k8s.io", "", "NetworkPolicy"},
-		Path:               FieldPath{"spec", "egress", "to", "podSelector", "matchLabels"},
-		CreateIfNotPresent: false,
-	},
+type LabelTransformer struct {
+	// Desired labels
+	NewLabels map[string]string
+	// FieldSpecs storing default label fields
+	FieldSpecs []FieldSpec
+	// Results is used to track labels that have been applied
+	Results fn.Results
 }
 
 // perform the whole set labels operation according to given resourcelist
@@ -194,15 +49,6 @@ func SetLabels(rl *fn.ResourceList) (bool, error) {
 
 	rl.Results = append(rl.Results, transformer.Results...)
 	return true, nil
-}
-
-type LabelTransformer struct {
-	// Desired labels
-	NewLabels map[string]string
-	// FieldSpecs storing default label fields
-	FieldSpecs []FieldSpec
-	// Results is used to track labels that have been applied
-	Results fn.Results
 }
 
 // Config parse the functionConfig kubeObject to the fields in the LabelTransformer
@@ -230,7 +76,7 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 
 // set labels according to the generated common label
 func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
-	for _, spec := range Specs {
+	for _, spec := range CommonSpecs {
 		if o.IsGVK(spec.Identifier.group, spec.Identifier.version, spec.Identifier.kind) {
 			err := updateLabels(&o.SubObject, spec.Path, p.NewLabels, spec.CreateIfNotPresent)
 			p.LogResult(o, spec.Path)
