@@ -9,25 +9,192 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
+type FieldPath []string
+type GVK struct {
+	group   string
+	version string
+	kind    string
+}
+
 // the similar struct esxits in resid.GVK, but there is no function to create an GVK struct without using kyaml
 type FieldSpec struct {
-	Group              string `json:"group,omitempty" yaml:"group,omitempty"`
-	Version            string `json:"version,omitempty" yaml:"version,omitempty"`
-	Kind               string `json:"kind,omitempty" yaml:"kind,omitempty"`
-	Path               string `json:"path,omitempty" yaml:"path,omitempty"` // seperated by /
-	CreateIfNotPresent bool   `json:"create,omitempty" yaml:"create,omitempty"`
+	Identifier         GVK
+	Path               FieldPath
+	CreateIfNotPresent bool
 	//TODO: should support user configurable field for labels
 }
 
+type FieldSpecs []FieldSpec
+
+// generate common label paths
+var Specs = FieldSpecs{
+	FieldSpec{
+		Identifier:         GVK{"", "v1", "Service"},
+		Path:               FieldPath{"spec", "selector"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"", "v1", "ReplicationController"},
+		Path:               FieldPath{"spec", "selector"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"", "v1", "ReplicationController"},
+		Path:               FieldPath{"spec", "template", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"", "", "Deployment"},
+		Path:               FieldPath{"spec", "selector", "matchLabels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"", "", "Deployment"},
+		Path:               FieldPath{"spec", "template", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "Deployment"},
+		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "Deployment"},
+		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "Deployment"},
+		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "Deployment"},
+		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "Deployment"},
+		Path:               FieldPath{"spec", "template", "spec", "topologySpreadConstraints", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"", "", "ReplicaSet"},
+		Path:               FieldPath{"spec", "selector", "matchLabels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"", "", "ReplicaSet"},
+		Path:               FieldPath{"spec", "template", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"", "", "DaemonSet"},
+		Path:               FieldPath{"spec", "selector", "matchLabels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"", "", "DaemonSet"},
+		Path:               FieldPath{"spec", "template", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "StatefulSet"},
+		Path:               FieldPath{"spec", "selector", "matchLabels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "StatefulSet"},
+		Path:               FieldPath{"spec", "template", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "StatefulSet"},
+		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "StatefulSet"},
+		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "StatefulSet"},
+		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "StatefulSet"},
+		Path:               FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "StatefulSet"},
+		Path:               FieldPath{"spec", "template", "spec", "topologySpreadConstraints", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"apps", "", "StatefulSet"},
+		Path:               FieldPath{"spec", "volumeClaimTemplates[]", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"batch", "", "Job"},
+		Path:               FieldPath{"spec", "selector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"batch", "", "Job"},
+		Path:               FieldPath{"spec", "template", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"batch", "", "CronJob"},
+		Path:               FieldPath{"spec", "jobTemplate", "spec", "selector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"batch", "", "CronJob"},
+		Path:               FieldPath{"spec", "jobTemplate", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"batch", "", "CronJob"},
+		Path:               FieldPath{"spec", "jobTemplate", "spec", "template", "metadata", "labels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Identifier:         GVK{"policy", "", "PodDisruptionBudget"},
+		Path:               FieldPath{"spec", "selector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"networking.k8s.io", "", "NetworkPolicy"},
+		Path:               FieldPath{"spec", "podSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"networking.k8s.io", "", "NetworkPolicy"},
+		Path:               FieldPath{"spec", "ingress", "from", "podSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Identifier:         GVK{"networking.k8s.io", "", "NetworkPolicy"},
+		Path:               FieldPath{"spec", "egress", "to", "podSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+}
+
+// perform the whole set labels operation according to given resourcelist
 func SetLabels(rl *fn.ResourceList) (bool, error) {
 	transformer := LabelTransformer{}
 	if err := transformer.Config(rl.FunctionConfig); err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
-		return false, err
+		return false, nil
 	}
 	if err := transformer.Transform(rl.Items); err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
-		return false, err
+		return false, nil
 	}
 
 	rl.Results = append(rl.Results, transformer.Results...)
@@ -36,9 +203,9 @@ func SetLabels(rl *fn.ResourceList) (bool, error) {
 
 type LabelTransformer struct {
 	// Desired labels
-	NewLabels map[string]string `json:"labels,omitempty" yaml:"labels,omitempty"`
+	NewLabels map[string]string
 	// FieldSpecs storing default label fields
-	FieldSpecs []FieldSpec `json:"fieldSpecs,omitempty" yaml:"fieldSpecs,omitempty"`
+	FieldSpecs []FieldSpec
 	// Results is used to track labels that have been applied
 	Results fn.Results
 }
@@ -66,136 +233,48 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 	return nil
 }
 
+// set labels according to the generated common label
+func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
+	for _, spec := range Specs {
+		if o.IsGVK(spec.Identifier.group, spec.Identifier.version, spec.Identifier.kind) {
+			err := updateLabels(o, spec.Path, p.NewLabels, spec.CreateIfNotPresent)
+			p.LogResult(o, spec.Path)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 // Transform updates the labels in the right path using configured logic
 func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
-
 	for _, o := range objects {
-		var path = "metadata/labels"
-		err := updateLabels(o, path, p.NewLabels, true)
+		// this label need to set for all GKV
+		defaultPath := FieldPath{"metadata", "labels"}
+		err := updateLabels(o, defaultPath, p.NewLabels, true)
+		p.LogResult(o, defaultPath)
 		if err != nil {
 			return err
 		}
-		p.LogResult(o, path)
-		// check all default path to update labels
-		switch {
-		case o.IsGVK("", "", ""):
-			path = "metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("", "v1", "Service"):
-			path = "spec/selector"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("", "v1", "ReplicationController"):
-			path = "spec/selector"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("", "v1", "ReplicationController"):
-			path = "spec/template/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("", "", "Deployment"):
-			path = "spec/selector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("", "", "Deployment"):
-			path = "spec/template/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("apps", "", "Deployment"):
-			path = "spec/template/spec/affinity/podAffinity/preferredDuringSchedulingIgnoredDuringExecution/podAffinityTerm/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "Deployment"):
-			path = "spec/template/spec/affinity/podAffinity/requiredDuringSchedulingIgnoredDuringExecution/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "Deployment"):
-			path = "spec/template/spec/affinity/podAntiAffinity/preferredDuringSchedulingIgnoredDuringExecution/podAffinityTerm/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "Deployment"):
-			path = "spec/template/spec/affinity/podAntiAffinity/requiredDuringSchedulingIgnoredDuringExecution/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "Deployment"):
-			path = "spec/template/spec/topologySpreadConstraints/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("", "", "ReplicaSet"):
-			path = "spec/selector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("", "", "ReplicaSet"):
-			path = "spec/template/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("", "", "DaemonSet"):
-			path = "spec/selector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("", "", "DaemonSet"):
-			path = "spec/template/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("apps", "", "StatefulSet"):
-			path = "spec/selector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("apps", "", "StatefulSet"):
-			path = "spec/template/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("apps", "", "StatefulSet"):
-			path = "spec/template/spec/affinity/podAffinity/preferredDuringSchedulingIgnoredDuringExecution/podAffinityTerm/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "StatefulSet"):
-			path = "spec/template/spec/affinity/podAffinity/requiredDuringSchedulingIgnoredDuringExecution/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "StatefulSet"):
-			path = "spec/template/spec/affinity/podAntiAffinity/preferredDuringSchedulingIgnoredDuringExecution/podAffinityTerm/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "StatefulSet"):
-			path = "spec/template/spec/affinity/podAntiAffinity/requiredDuringSchedulingIgnoredDuringExecution/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "StatefulSet"):
-			path = "spec/template/spec/topologySpreadConstraints/labelSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("apps", "", "StatefulSet"):
-			path = "spec/volumeClaimTemplates[]/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("batch", "", "Job"):
-			path = "spec/selector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("batch", "", "Job"):
-			path = "spec/template/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("batch", "", "CronJob"):
-			path = "spec/jobTemplate/spec/selector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("batch", "", "CronJob"):
-			path = "spec/jobTemplate/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("batch", "", "CronJob"):
-			path = "spec/jobTemplate/spec/template/metadata/labels"
-			err = updateLabels(o, path, p.NewLabels, true)
-		case o.IsGVK("policy", "", "PodDisruptionBudget"):
-			path = "spec/selector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("networking.k8s.io", "", "NetworkPolicy"):
-			path = "spec/podSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("networking.k8s.io", "", "NetworkPolicy"):
-			path = "spec/ingress/from/podSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		case o.IsGVK("networking.k8s.io", "", "NetworkPolicy"):
-			path = "spec/egress/to/podSelector/matchLabels"
-			err = updateLabels(o, path, p.NewLabels, false)
-		default:
-			continue
-		}
-
+		// set other common labels according to specific GKV
+		err = p.setLabelsInSpecs(o)
 		if err != nil {
 			return err
 		}
-
-		p.LogResult(o, path)
 	}
 	return nil
 }
 
 // Logs the result of each operation, can also modify into other logs user wants
-func (p *LabelTransformer) LogResult(o *fn.KubeObject, path string) {
+func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string) {
 	res, _ := json.Marshal(p.NewLabels)
 	newResult := fn.Result{
 		Message:     "set labels: " + string(res),
 		Severity:    "",
 		ResourceRef: nil,
 		Field: &fn.Field{
-			Path:          path,
+			Path:          strings.Join(path, "."),
 			CurrentValue:  nil,
 			ProposedValue: nil,
 		},
@@ -209,8 +288,7 @@ func (p *LabelTransformer) LogResult(o *fn.KubeObject, path string) {
 }
 
 // the update process for each label, sort the keys to preserve sequence
-func updateLabels(o *fn.KubeObject, fieldPath string, newLabels map[string]string, create bool) error {
-	basePath := strings.Split(fieldPath, "/")
+func updateLabels(o *fn.KubeObject, labelPath FieldPath, newLabels map[string]string, create bool) error {
 	keys := make([]string, 0)
 	for k := range newLabels {
 		keys = append(keys, k)
@@ -219,11 +297,12 @@ func updateLabels(o *fn.KubeObject, fieldPath string, newLabels map[string]strin
 	for i := 0; i < len(keys); i++ {
 		key := keys[i]
 		val := newLabels[key]
-		newPath := append(basePath, key)
+		newPath := append(labelPath, key)
 		_, exist, err := o.NestedString(newPath...)
 		if err != nil {
 			return err
 		}
+		//TODO: should support user configurable field for labels
 		if exist || create {
 			if err = o.SetNestedString(val, newPath...); err != nil {
 				return err
@@ -231,5 +310,4 @@ func updateLabels(o *fn.KubeObject, fieldPath string, newLabels map[string]strin
 		}
 	}
 	return nil
-
 }

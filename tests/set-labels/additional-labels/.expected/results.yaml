@@ -5,7 +5,7 @@ metadata:
 exitCode: 1
 items:
   - image: gcr.io/kpt-fn/set-labels:unstable
-    stderr: 'failed to evaluate function: `additionalLabelFields` has been deprecated'
+    stderr: 'failed to evaluate function: error: function failure'
     exitCode: 1
     results:
       - message: '`additionalLabelFields` has been deprecated'

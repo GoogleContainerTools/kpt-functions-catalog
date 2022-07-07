@@ -7,7 +7,7 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
-func TestLabelTransformer_simple_ConfigMap(t *testing.T) {
+func TestLabelTransformer_simple_ConfigMap_Service(t *testing.T) {
 	functionConfig := `
 apiVersion: v1
 kind: ConfigMap
@@ -21,18 +21,29 @@ data:
   env: production
 `
 	input := `
-apiVersion: apps/v1
-kind: ConfigMap
+apiVersion: v1
+kind: Service
 metadata:
   name: whatever
+spec:
+  selector:
+    a: b
 `
 
 	expected := `
-apiVersion: apps/v1
-kind: ConfigMap
+apiVersion: v1
+kind: Service
 metadata:
   name: whatever
   labels:
+    app: myApp
+    env: production
+    quotedBoolean: "true"
+    quotedFruit: peach
+    unquotedBoolean: "true"
+spec:
+  selector:
+    a: b
     app: myApp
     env: production
     quotedBoolean: "true"
@@ -61,7 +72,7 @@ metadata:
 	}
 }
 
-func TestLabelTransformer_simple_ConfigMap2(t *testing.T) {
+func TestLabelTransformer_simple_ConfigMap(t *testing.T) {
 	functionConfig := `
 apiVersion: v1
 kind: ConfigMap
