@@ -134,11 +134,6 @@ var Specs = FieldSpecs{
 		CreateIfNotPresent: false,
 	},
 	FieldSpec{
-		Identifier:         GVK{"apps", "", "StatefulSet"},
-		Path:               FieldPath{"spec", "volumeClaimTemplates[]", "metadata", "labels"},
-		CreateIfNotPresent: true,
-	},
-	FieldSpec{
 		Identifier:         GVK{"batch", "", "Job"},
 		Path:               FieldPath{"spec", "selector", "matchLabels"},
 		CreateIfNotPresent: false,
@@ -237,7 +232,7 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
 	for _, spec := range Specs {
 		if o.IsGVK(spec.Identifier.group, spec.Identifier.version, spec.Identifier.kind) {
-			err := updateLabels(o, spec.Path, p.NewLabels, spec.CreateIfNotPresent)
+			err := updateLabels(&o.SubObject, spec.Path, p.NewLabels, spec.CreateIfNotPresent)
 			p.LogResult(o, spec.Path)
 			if err != nil {
 				return err
@@ -252,7 +247,7 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	for _, o := range objects {
 		// this label need to set for all GKV
 		defaultPath := FieldPath{"metadata", "labels"}
-		err := updateLabels(o, defaultPath, p.NewLabels, true)
+		err := updateLabels(&o.SubObject, defaultPath, p.NewLabels, true)
 		p.LogResult(o, defaultPath)
 		if err != nil {
 			return err
@@ -261,6 +256,16 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 		err = p.setLabelsInSpecs(o)
 		if err != nil {
 			return err
+		}
+		// handle special case with slice
+		if o.IsGVK("apps", "", "StatefulSet") {
+			for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
+				err = updateLabels(vctObj, defaultPath, p.NewLabels, true)
+				p.LogResult(o, defaultPath)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
@@ -288,7 +293,7 @@ func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string) {
 }
 
 // the update process for each label, sort the keys to preserve sequence
-func updateLabels(o *fn.KubeObject, labelPath FieldPath, newLabels map[string]string, create bool) error {
+func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool) error {
 	keys := make([]string, 0)
 	for k := range newLabels {
 		keys = append(keys, k)
