@@ -16,26 +16,27 @@ type GVK struct {
 	kind    string
 }
 
-// the similar struct esxits in resid.GVK, but there is no function to create an GVK struct without using kyaml
+// FieldSpec stores information about how to modify a specific label
 type FieldSpec struct {
-	Identifier         GVK
-	Path               FieldPath
+	Gvk       GVK
+	FieldPath FieldPath
+	// TODO: should support user configurable field for labels
 	CreateIfNotPresent bool
-	//TODO: should support user configurable field for labels
 }
 
 type FieldSpecs []FieldSpec
 
+// LabelTransformer stores information during the transform label process
 type LabelTransformer struct {
-	// Desired labels
+	// NewLabels is the desired labels
 	NewLabels map[string]string
 	// FieldSpecs storing default label fields
 	FieldSpecs []FieldSpec
-	// Results is used to track labels that have been applied
+	// Results records the operations performed, user can log here what information they want
 	Results fn.Results
 }
 
-// perform the whole set labels operation according to given resourcelist
+// SetLabels perform the whole set labels operation according to given resourcelist
 func SetLabels(rl *fn.ResourceList) (bool, error) {
 	transformer := LabelTransformer{}
 	if err := transformer.Config(rl.FunctionConfig); err != nil {
@@ -74,42 +75,44 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 	return nil
 }
 
-// set labels according to the generated common label
+// setLabelsInSpecs sets labels according to the generated common label
 func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
 	for _, spec := range CommonSpecs {
-		if o.IsGVK(spec.Identifier.group, spec.Identifier.version, spec.Identifier.kind) {
-			err := updateLabels(&o.SubObject, spec.Path, p.NewLabels, spec.CreateIfNotPresent)
-			p.LogResult(o, spec.Path)
+		if o.IsGVK(spec.Gvk.group, spec.Gvk.version, spec.Gvk.kind) {
+			err := updateLabels(&o.SubObject, spec.FieldPath, p.NewLabels, spec.CreateIfNotPresent)
 			if err != nil {
 				return err
 			}
+			p.LogResult(o, spec.FieldPath)
 		}
 	}
 	return nil
 }
 
-// Transform updates the labels in the right path using configured logic
+// Transform updates the labels in the right path using GVK filter and other configurable fields
 func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	for _, o := range objects {
-		// this label need to set for all GKV
-		defaultPath := FieldPath{"metadata", "labels"}
-		err := updateLabels(&o.SubObject, defaultPath, p.NewLabels, true)
-		p.LogResult(o, defaultPath)
+		// this label need to set for all GVK
+		metaLabelsPath := FieldPath{"metadata", "labels"}
+		err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
 		if err != nil {
 			return err
 		}
-		// set other common labels according to specific GKV
+		p.LogResult(o, metaLabelsPath)
+		// set other common labels according to specific GVK
 		err = p.setLabelsInSpecs(o)
 		if err != nil {
 			return err
 		}
 		// handle special case with slice
 		if o.IsGVK("apps", "", "StatefulSet") {
-			for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
-				err = updateLabels(vctObj, defaultPath, p.NewLabels, true)
-				p.LogResult(o, defaultPath)
-				if err != nil {
-					return err
+			if o.GetMap("spec") != nil {
+				for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
+					err = updateLabels(vctObj, metaLabelsPath, p.NewLabels, true)
+					if err != nil {
+						return err
+					}
+					p.LogResult(o, metaLabelsPath)
 				}
 			}
 		}
@@ -117,7 +120,7 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	return nil
 }
 
-// Logs the result of each operation, can also modify into other logs user wants
+// LogResult Logs the result of each operation, can also modify into other logs user wants
 func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string) {
 	res, _ := json.Marshal(p.NewLabels)
 	newResult := fn.Result{
@@ -138,7 +141,7 @@ func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string) {
 	p.Results = append(p.Results, &newResult)
 }
 
-// the update process for each label, sort the keys to preserve sequence
+// updateLabels the update process for each label, sort the keys to preserve sequence
 func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool) error {
 	keys := make([]string, 0)
 	for k := range newLabels {
