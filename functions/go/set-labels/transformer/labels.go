@@ -26,13 +26,13 @@ type FieldSpec struct {
 
 type FieldSpecs []FieldSpec
 
-// LabelTransformer stores information during the transform label process
+// LabelTransformer supports the set-labels workflow, it uses Config to parse functionConfig, Transform to change the labels
 type LabelTransformer struct {
 	// NewLabels is the desired labels
 	NewLabels map[string]string
-	// FieldSpecs storing default label fields
+	// FieldSpecs stores default label fields
 	FieldSpecs []FieldSpec
-	// Results records the operations performed, user can log here what information they want
+	// Results logs the changes to the KRM resource labels
 	Results fn.Results
 }
 
@@ -120,7 +120,7 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	return nil
 }
 
-// LogResult Logs the result of each operation, can also modify into other logs user wants
+// LogResult logs the KRM resource that has the labels changed
 func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string) {
 	res, _ := json.Marshal(p.NewLabels)
 	newResult := fn.Result{
