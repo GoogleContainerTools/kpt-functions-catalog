@@ -10,6 +10,7 @@ import (
 )
 
 type FieldPath []string
+
 type GVK struct {
 	group   string
 	version string
