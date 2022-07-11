@@ -209,6 +209,66 @@ metadata:
 	}
 }
 
+func TestLabelTransformer_simple_ConfigMap_Result(t *testing.T) {
+	functionConfig := `
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  app: myApp
+  quotedBoolean: "true"
+  quotedFruit: "peach"
+  unquotedBoolean: true
+  env: production
+`
+	input := `
+apiVersion: apps/v1
+kind: ConfigMap
+metadata:
+  name: whatever
+  labels:
+    extra: nil
+    env: production
+`
+
+	expected := `apiVersion: apps/v1
+kind: ConfigMap
+metadata:
+  name: whatever
+  labels:
+    extra: nil
+    env: production
+    app: myApp
+    quotedBoolean: "true"
+    quotedFruit: peach
+    unquotedBoolean: "true"`
+
+	transformer := LabelTransformer{}
+	config, _ := fn.ParseKubeObject([]byte(functionConfig))
+	_ = transformer.Config(config)
+	result, _ := fn.ParseKubeObject([]byte(input))
+	err := transformer.Transform(fn.KubeObjects{result})
+	if err != nil {
+		return
+	}
+	exp, _ := fn.ParseKubeObject([]byte(expected))
+
+	expectedResult := "set labels: {\"app\":\"myApp\",\"quotedBoolean\":\"true\",\"quotedFruit\":\"peach\",\"unquotedBoolean\":\"true\"}"
+	if transformer.Results[0].Message != expectedResult {
+		t.Fatalf("Actual doesn't equal to expected")
+	}
+
+	if exp.String() != result.String() {
+		fmt.Println("Actual:")
+		fmt.Println(result)
+		fmt.Println("===")
+		fmt.Println("Expected:")
+		fmt.Println(exp)
+		t.Fatalf("Actual doesn't equal to expected")
+	}
+}
+
 func TestLabelTransformer_simple_ConfigFile(t *testing.T) {
 	functionConfig := `
 apiVersion: fn.kpt.dev/v1alpha1

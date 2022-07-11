@@ -58,7 +58,7 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 	// parse labels to NewLabels
 	switch {
 	case functionConfig.IsEmpty():
-		return fmt.Errorf("failed to configure function: `functionConfig` must be either a `ConfigMap` or `SetLabels`")
+		return fmt.Errorf("Config is Empty, failed to configure function: `functionConfig` must be either a `ConfigMap` or `SetLabels`")
 	case functionConfig.IsGVK("", "v1", "ConfigMap"):
 		p.NewLabels = functionConfig.NestedStringMapOrDie("data")
 	case functionConfig.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
@@ -70,7 +70,7 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 			return fmt.Errorf("failed to configure function: input label list cannot be empty, required valid `labels` field")
 		}
 	default:
-		return fmt.Errorf("unknown functionConfig Kind=%v ApiVersion=%v, expect `%v` or `ConfigMap`",
+		return fmt.Errorf("unknown functionConfig Kind=%v ApiVersion=%v, expect `%v` or `ConfigMap` with correct formatting",
 			functionConfig.GetKind(), functionConfig.GetAPIVersion(), fnConfigKind)
 	}
 	return nil
@@ -80,11 +80,11 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
 	for _, spec := range CommonSpecs {
 		if o.IsGVK(spec.Gvk.group, spec.Gvk.version, spec.Gvk.kind) {
-			err := updateLabels(&o.SubObject, spec.FieldPath, p.NewLabels, spec.CreateIfNotPresent)
+			updatedLabels, err := updateLabels(&o.SubObject, spec.FieldPath, p.NewLabels, spec.CreateIfNotPresent)
 			if err != nil {
 				return err
 			}
-			p.LogResult(o, spec.FieldPath)
+			p.LogResult(o, spec.FieldPath, updatedLabels)
 		}
 	}
 	return nil
@@ -95,11 +95,11 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	for _, o := range objects {
 		// this label need to set for all GVK
 		metaLabelsPath := FieldPath{"metadata", "labels"}
-		err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
+		updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
 		if err != nil {
 			return err
 		}
-		p.LogResult(o, metaLabelsPath)
+		p.LogResult(o, metaLabelsPath, updatedLabels)
 		// set other common labels according to specific GVK
 		err = p.setLabelsInSpecs(o)
 		if err != nil {
@@ -109,11 +109,11 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 		if o.IsGVK("apps", "", "StatefulSet") {
 			if o.GetMap("spec") != nil {
 				for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
-					err = updateLabels(vctObj, metaLabelsPath, p.NewLabels, true)
+					updatedLabels, err = updateLabels(vctObj, metaLabelsPath, p.NewLabels, true)
 					if err != nil {
 						return err
 					}
-					p.LogResult(o, metaLabelsPath)
+					p.LogResult(o, FieldPath{"spec", "volumeClaimTemplates[]", "metadata", "labels"}, updatedLabels)
 				}
 			}
 		}
@@ -122,8 +122,8 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 }
 
 // LogResult logs the KRM resource that has the labels changed
-func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string) {
-	res, _ := json.Marshal(p.NewLabels)
+func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string, labels map[string]string) {
+	res, _ := json.Marshal(labels)
 	newResult := fn.Result{
 		Message:     "set labels: " + string(res),
 		Severity:    "",
@@ -142,27 +142,29 @@ func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string) {
 	p.Results = append(p.Results, &newResult)
 }
 
-// updateLabels the update process for each label, sort the keys to preserve sequence
-func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool) error {
+// updateLabels the update process for each label, sort the keys to preserve sequence, return if the update was performed and potential error
+func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool) (map[string]string, error) {
 	keys := make([]string, 0)
 	for k := range newLabels {
 		keys = append(keys, k)
 	}
+	updatedLabels := make(map[string]string)
 	sort.Strings(keys)
 	for i := 0; i < len(keys); i++ {
 		key := keys[i]
 		val := newLabels[key]
 		newPath := append(labelPath, key)
-		_, exist, err := o.NestedString(newPath...)
+		oldValue, exist, err := o.NestedString(newPath...)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		//TODO: should support user configurable field for labels
-		if exist || create {
+		if (exist && oldValue != val) || (!exist && create) {
 			if err = o.SetNestedString(val, newPath...); err != nil {
-				return err
+				return nil, err
 			}
+			updatedLabels[key] = val
 		}
 	}
-	return nil
+	return updatedLabels, nil
 }
