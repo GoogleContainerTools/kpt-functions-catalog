@@ -2,7 +2,10 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-la
 
 go 1.17
 
-require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220608182028-78748f08d997
+require (
+	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220608182028-78748f08d997
+	github.com/google/go-cmp v0.5.7
+)
 
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect

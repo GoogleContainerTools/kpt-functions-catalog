@@ -5,7 +5,62 @@ import (
 	"testing"
 
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
+	"github.com/google/go-cmp/cmp"
 )
+
+func generateResourceList(functionConfig string, items []string) *fn.ResourceList {
+	// generate recourse list, config function config, then upsert items
+	rl := &fn.ResourceList{}
+	config, _ := fn.ParseKubeObject([]byte(functionConfig))
+	rl.FunctionConfig = config
+	for _, item := range items {
+		itemObj, _ := fn.ParseKubeObject([]byte(item))
+		if err := rl.UpsertObjectToItems(itemObj, nil, false); err != nil {
+			panic("add items failed")
+		}
+	}
+	return rl
+}
+
+func runTest(functionConfig string, items []string, expectedItems []string, expMsg []string) bool {
+	rl := generateResourceList(functionConfig, items)
+	_, err := SetLabels(rl)
+	if err != nil {
+		return false
+	}
+	// compare items
+	if expectedItems != nil {
+		for idx, item := range expectedItems {
+			if !compareString(rl.Items[idx].String(), item) {
+				return false
+			}
+		}
+	}
+	if expMsg != nil {
+		msgIdx := 0
+		for idx := 0; idx < rl.Items.Len(); idx++ {
+			if !compareString(rl.Results[idx].Message, expMsg[msgIdx]) {
+				return false
+			}
+			msgIdx++
+		}
+	}
+
+	return true
+}
+
+func compareString(actual string, expected string) bool {
+	if !cmp.Equal(actual, expected) {
+		fmt.Println("Actual:")
+		fmt.Println(actual)
+		fmt.Println("===")
+		fmt.Println("Expected:")
+		fmt.Println(expected)
+		fmt.Println(cmp.Diff(actual, expected))
+		return false
+	}
+	return true
+}
 
 func TestLabelTransformer_ConfigMap_Service(t *testing.T) {
 	functionConfig := `
@@ -30,8 +85,7 @@ spec:
     a: b
 `
 
-	expected := `
-apiVersion: v1
+	expected := `apiVersion: v1
 kind: Service
 metadata:
   name: whatever
@@ -51,22 +105,7 @@ spec:
     unquotedBoolean: "true"
 `
 
-	transformer := LabelTransformer{}
-	config, _ := fn.ParseKubeObject([]byte(functionConfig))
-	_ = transformer.Config(config)
-	result, _ := fn.ParseKubeObject([]byte(input))
-	err := transformer.Transform(fn.KubeObjects{result})
-	if err != nil {
-		return
-	}
-	exp, _ := fn.ParseKubeObject([]byte(expected))
-
-	if exp.String() != result.String() {
-		fmt.Println("Actual:")
-		fmt.Println(result)
-		fmt.Println("===")
-		fmt.Println("Expected:")
-		fmt.Println(exp)
+	if !runTest(functionConfig, []string{input}, []string{expected}, nil) {
 		t.Fatalf("Actual doesn't equal to expected")
 	}
 }
@@ -96,8 +135,7 @@ spec:
           testkey: testvalue
 `
 
-	expected := `
-apiVersion: apps/
+	expected := `apiVersion: apps/
 kind: StatefulSet
 metadata:
   name: my-config
@@ -134,22 +172,7 @@ spec:
         unquotedBoolean: "true"
 `
 
-	transformer := LabelTransformer{}
-	config, _ := fn.ParseKubeObject([]byte(functionConfig))
-	_ = transformer.Config(config)
-	result, _ := fn.ParseKubeObject([]byte(input))
-	err := transformer.Transform(fn.KubeObjects{result})
-	if err != nil {
-		return
-	}
-	exp, _ := fn.ParseKubeObject([]byte(expected))
-
-	if exp.String() != result.String() {
-		fmt.Println("Actual:")
-		fmt.Println(result)
-		fmt.Println("===")
-		fmt.Println("Expected:")
-		fmt.Println(exp)
+	if !runTest(functionConfig, []string{input}, []string{expected}, nil) {
 		t.Fatalf("Actual doesn't equal to expected")
 	}
 }
@@ -187,24 +210,11 @@ metadata:
     app: myApp
     quotedBoolean: "true"
     quotedFruit: peach
-    unquotedBoolean: "true"`
+    unquotedBoolean: "true"
+`
+	expectedLogResult := `set labels: {"app":"myApp","env":"production","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
 
-	transformer := LabelTransformer{}
-	config, _ := fn.ParseKubeObject([]byte(functionConfig))
-	_ = transformer.Config(config)
-	result, _ := fn.ParseKubeObject([]byte(input))
-	err := transformer.Transform(fn.KubeObjects{result})
-	if err != nil {
-		return
-	}
-	exp, _ := fn.ParseKubeObject([]byte(expected))
-
-	if exp.String() != result.String() {
-		fmt.Println("Actual:")
-		fmt.Println(result)
-		fmt.Println("===")
-		fmt.Println("Expected:")
-		fmt.Println(exp)
+	if !runTest(functionConfig, []string{input}, []string{expected}, []string{expectedLogResult}) {
 		t.Fatalf("Actual doesn't equal to expected")
 	}
 }
@@ -242,29 +252,12 @@ metadata:
     app: myApp
     quotedBoolean: "true"
     quotedFruit: peach
-    unquotedBoolean: "true"`
+    unquotedBoolean: "true"
+`
 
-	transformer := LabelTransformer{}
-	config, _ := fn.ParseKubeObject([]byte(functionConfig))
-	_ = transformer.Config(config)
-	result, _ := fn.ParseKubeObject([]byte(input))
-	err := transformer.Transform(fn.KubeObjects{result})
-	if err != nil {
-		return
-	}
-	exp, _ := fn.ParseKubeObject([]byte(expected))
+	expectedLogResult := `set labels: {"app":"myApp","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
 
-	expectedResult := "set labels: {\"app\":\"myApp\",\"quotedBoolean\":\"true\",\"quotedFruit\":\"peach\",\"unquotedBoolean\":\"true\"}"
-	if transformer.Results[0].Message != expectedResult {
-		t.Fatalf("Actual doesn't equal to expected")
-	}
-
-	if exp.String() != result.String() {
-		fmt.Println("Actual:")
-		fmt.Println(result)
-		fmt.Println("===")
-		fmt.Println("Expected:")
-		fmt.Println(exp)
+	if !runTest(functionConfig, []string{input}, []string{expected}, []string{expectedLogResult}) {
 		t.Fatalf("Actual doesn't equal to expected")
 	}
 }
@@ -295,8 +288,7 @@ spec:
       name: jemma
 `
 
-	expected := `
-apiVersion: apps/v1
+	expected := `apiVersion: apps/v1
 kind: MyResource
 metadata:
   name: whatever
@@ -312,21 +304,7 @@ spec:
       name: jemma
 `
 
-	transformer := LabelTransformer{}
-	config, _ := fn.ParseKubeObject([]byte(functionConfig))
-	_ = transformer.Config(config)
-	result, _ := fn.ParseKubeObject([]byte(input))
-	err := transformer.Transform(fn.KubeObjects{result})
-	if err != nil {
-		return
-	}
-	exp, _ := fn.ParseKubeObject([]byte(expected))
-	if exp.String() != result.String() {
-		fmt.Println("Actual:")
-		fmt.Println(result)
-		fmt.Println("===")
-		fmt.Println("Expected:")
-		fmt.Println(exp)
+	if !runTest(functionConfig, []string{input}, []string{expected}, nil) {
 		t.Fatalf("Actual doesn't equal to expected")
 	}
 }
