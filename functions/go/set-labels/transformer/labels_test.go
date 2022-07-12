@@ -1,69 +1,14 @@
 package transformer
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
 
-func generateResourceList(functionConfig string, items []string) *fn.ResourceList {
-	// generate recourse list, config function config, then upsert items
-	rl := &fn.ResourceList{}
-	config, _ := fn.ParseKubeObject([]byte(functionConfig))
-	rl.FunctionConfig = config
-	for _, item := range items {
-		itemObj, _ := fn.ParseKubeObject([]byte(item))
-		if err := rl.UpsertObjectToItems(itemObj, nil, false); err != nil {
-			panic("add items failed")
-		}
-	}
-	return rl
-}
-
-func runTest(functionConfig string, items []string, expectedItems []string, expMsg []string) bool {
-	rl := generateResourceList(functionConfig, items)
-	_, err := SetLabels(rl)
-	if err != nil {
-		return false
-	}
-	// compare items
-	if expectedItems != nil {
-		for idx, item := range expectedItems {
-			if !compareString(rl.Items[idx].String(), item) {
-				return false
-			}
-		}
-	}
-	if expMsg != nil {
-		msgIdx := 0
-		for idx := 0; idx < rl.Items.Len(); idx++ {
-			if !compareString(rl.Results[idx].Message, expMsg[msgIdx]) {
-				return false
-			}
-			msgIdx++
-		}
-	}
-
-	return true
-}
-
-func compareString(actual string, expected string) bool {
-	if !cmp.Equal(actual, expected) {
-		fmt.Println("Actual:")
-		fmt.Println(actual)
-		fmt.Println("===")
-		fmt.Println("Expected:")
-		fmt.Println(expected)
-		fmt.Println(cmp.Diff(actual, expected))
-		return false
-	}
-	return true
-}
-
-func TestLabelTransformer_ConfigMap_Service(t *testing.T) {
-	functionConfig := `
+func TestSetLabels(t *testing.T) {
+	configMap := `
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -75,6 +20,18 @@ data:
   unquotedBoolean: true
   env: production
 `
+	setLabelsConfig := `
+apiVersion: fn.kpt.dev/v1alpha1
+kind: SetLabels
+metadata:
+  name: my-config
+labels:
+  app: myApp
+  quotedBoolean: "true"
+  unquotedBoolean: true
+  env: production
+  quotedFruit: "peach"
+`
 	input := `
 apiVersion: v1
 kind: Service
@@ -83,6 +40,39 @@ metadata:
 spec:
   selector:
     a: b
+`
+	sliceInput := `
+apiVersion: apps/
+kind: StatefulSet
+metadata:
+  name: my-config
+spec:
+  volumeClaimTemplates:
+    - metadata:
+        labels:
+          testkey: testvalue
+`
+
+	sameLabelInput := `
+apiVersion: apps/v1
+kind: ConfigMap
+metadata:
+  name: whatever
+  labels:
+    extra: nil
+    env: production
+`
+	sameLabelExpected := `apiVersion: apps/v1
+kind: ConfigMap
+metadata:
+  name: whatever
+  labels:
+    extra: nil
+    env: production
+    app: myApp
+    quotedBoolean: "true"
+    quotedFruit: peach
+    unquotedBoolean: "true"
 `
 
 	expected := `apiVersion: v1
@@ -105,37 +95,11 @@ spec:
     unquotedBoolean: "true"
 `
 
-	if !runTest(functionConfig, []string{input}, []string{expected}, nil) {
-		t.Fatalf("Actual doesn't equal to expected")
-	}
-}
+	sameLableLogResult := `set labels: {"app":"myApp","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
 
-func TestLabelTransformer_ConfigMap_Slice(t *testing.T) {
-	functionConfig := `
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  app: myApp
-  quotedBoolean: "true"
-  quotedFruit: "peach"
-  unquotedBoolean: true
-  env: production
-`
-	input := `
-apiVersion: apps/
-kind: StatefulSet
-metadata:
-  name: my-config
-spec:
-  volumeClaimTemplates:
-    - metadata:
-        labels:
-          testkey: testvalue
-`
+	logResult := `set labels: {"app":"myApp","env":"production","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
 
-	expected := `apiVersion: apps/
+	sliceExpected := `apiVersion: apps/
 kind: StatefulSet
 metadata:
   name: my-config
@@ -171,140 +135,69 @@ spec:
         quotedFruit: peach
         unquotedBoolean: "true"
 `
+	var testCases = map[string]struct {
+		resourcelist *fn.ResourceList
+		expected     []*fn.KubeObject
+		logResult    []string
+	}{
+		"Update resources with ConfigMap": {
+			resourcelist: generateResourceList(configMap, []string{input}),
+			expected:     generateExpectedResult([]string{expected}),
+			logResult:    []string{logResult},
+		},
+		"Update resources that contains slice structure with configMap, ": {
+			resourcelist: generateResourceList(configMap, []string{sliceInput}),
+			expected:     generateExpectedResult([]string{sliceExpected}),
+		},
+		"Update resources using setLabel kind": {
+			resourcelist: generateResourceList(setLabelsConfig, []string{input}),
+			expected:     generateExpectedResult([]string{expected}),
+		},
+		"Resource has the same label as configMap, log results omit this log": {
+			resourcelist: generateResourceList(configMap, []string{sameLabelInput}),
+			expected:     generateExpectedResult([]string{sameLabelExpected}),
+			logResult:    []string{sameLableLogResult},
+		},
+	}
 
-	if !runTest(functionConfig, []string{input}, []string{expected}, nil) {
-		t.Fatalf("Actual doesn't equal to expected")
+	for testName, data := range testCases {
+		success, _ := SetLabels(data.resourcelist)
+		if success != true {
+			t.Fatalf("Set labels error")
+		}
+
+		for idx, item := range data.expected {
+			assert.Equal(t, item.String(), data.resourcelist.Items[idx].String(), testName)
+		}
+
+		if data.logResult != nil {
+			for idx, item := range data.logResult {
+				assert.Equal(t, item, data.resourcelist.Results[idx].Message, testName+" log error")
+			}
+		}
+
 	}
 }
 
-func TestLabelTransformer_simple_ConfigMap(t *testing.T) {
-	functionConfig := `
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  app: myApp
-  quotedBoolean: "true"
-  quotedFruit: "peach"
-  unquotedBoolean: true
-  env: production
-`
-	input := `
-apiVersion: apps/v1
-kind: ConfigMap
-metadata:
-  name: whatever
-  labels:
-    extra: nil
-    env: dev
-`
-
-	expected := `apiVersion: apps/v1
-kind: ConfigMap
-metadata:
-  name: whatever
-  labels:
-    extra: nil
-    env: production
-    app: myApp
-    quotedBoolean: "true"
-    quotedFruit: peach
-    unquotedBoolean: "true"
-`
-	expectedLogResult := `set labels: {"app":"myApp","env":"production","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
-
-	if !runTest(functionConfig, []string{input}, []string{expected}, []string{expectedLogResult}) {
-		t.Fatalf("Actual doesn't equal to expected")
+func generateExpectedResult(expected []string) []*fn.KubeObject {
+	var res []*fn.KubeObject
+	for _, exp := range expected {
+		obj, _ := fn.ParseKubeObject([]byte(exp))
+		res = append(res, obj)
 	}
+	return res
 }
 
-func TestLabelTransformer_simple_ConfigMap_Result(t *testing.T) {
-	functionConfig := `
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-config
-data:
-  app: myApp
-  quotedBoolean: "true"
-  quotedFruit: "peach"
-  unquotedBoolean: true
-  env: production
-`
-	input := `
-apiVersion: apps/v1
-kind: ConfigMap
-metadata:
-  name: whatever
-  labels:
-    extra: nil
-    env: production
-`
-
-	expected := `apiVersion: apps/v1
-kind: ConfigMap
-metadata:
-  name: whatever
-  labels:
-    extra: nil
-    env: production
-    app: myApp
-    quotedBoolean: "true"
-    quotedFruit: peach
-    unquotedBoolean: "true"
-`
-
-	expectedLogResult := `set labels: {"app":"myApp","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
-
-	if !runTest(functionConfig, []string{input}, []string{expected}, []string{expectedLogResult}) {
-		t.Fatalf("Actual doesn't equal to expected")
+func generateResourceList(functionConfig string, items []string) *fn.ResourceList {
+	// generate recourse list, config function config, then upsert items
+	rl := &fn.ResourceList{}
+	config, _ := fn.ParseKubeObject([]byte(functionConfig))
+	rl.FunctionConfig = config
+	for _, item := range items {
+		itemObj, _ := fn.ParseKubeObject([]byte(item))
+		if err := rl.UpsertObjectToItems(itemObj, nil, false); err != nil {
+			panic("add items failed")
+		}
 	}
-}
-
-func TestLabelTransformer_simple_ConfigFile(t *testing.T) {
-	functionConfig := `
-apiVersion: fn.kpt.dev/v1alpha1
-kind: SetLabels
-metadata:
-  name: my-config
-labels:
-  color: orange
-  fruit: apple
-`
-
-	input := `
-apiVersion: apps/v1
-kind: MyResource
-metadata:
-  name: whatever
-  labels:
-    extra: nil
-    env: dev
-spec:
-  selector:
-    labels:
-      fruit: apple
-      name: jemma
-`
-
-	expected := `apiVersion: apps/v1
-kind: MyResource
-metadata:
-  name: whatever
-  labels:
-    extra: nil
-    env: dev
-    color: orange
-    fruit: apple
-spec:
-  selector:
-    labels:
-      fruit: apple
-      name: jemma
-`
-
-	if !runTest(functionConfig, []string{input}, []string{expected}, nil) {
-		t.Fatalf("Actual doesn't equal to expected")
-	}
+	return rl
 }
