@@ -20,6 +20,7 @@ data:
   unquotedBoolean: true
   env: production
 `
+
 	setLabelsConfig := `
 apiVersion: fn.kpt.dev/v1alpha1
 kind: SetLabels
@@ -32,6 +33,7 @@ labels:
   env: production
   quotedFruit: "peach"
 `
+
 	input := `
 apiVersion: v1
 kind: Service
@@ -41,6 +43,7 @@ spec:
   selector:
     a: b
 `
+
 	sliceInput := `
 apiVersion: apps/
 kind: StatefulSet
@@ -62,6 +65,7 @@ metadata:
     extra: nil
     env: production
 `
+
 	sameLabelExpected := `apiVersion: apps/v1
 kind: ConfigMap
 metadata:
@@ -135,6 +139,7 @@ spec:
         quotedFruit: peach
         unquotedBoolean: "true"
 `
+
 	var testCases = map[string]struct {
 		resourcelist *fn.ResourceList
 		expected     []*fn.KubeObject
@@ -175,10 +180,10 @@ spec:
 				assert.Equal(t, item, data.resourcelist.Results[idx].Message, testName+" log error")
 			}
 		}
-
 	}
 }
 
+// generateExpectedResult parse the expected from string to kubeObject
 func generateExpectedResult(expected []string) []*fn.KubeObject {
 	var res []*fn.KubeObject
 	for _, exp := range expected {
@@ -188,8 +193,8 @@ func generateExpectedResult(expected []string) []*fn.KubeObject {
 	return res
 }
 
+// generateResourceList generate recourse list, config function config, then upsert items
 func generateResourceList(functionConfig string, items []string) *fn.ResourceList {
-	// generate recourse list, config function config, then upsert items
 	rl := &fn.ResourceList{}
 	config, _ := fn.ParseKubeObject([]byte(functionConfig))
 	rl.FunctionConfig = config
