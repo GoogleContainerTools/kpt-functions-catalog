@@ -154,4 +154,4 @@ docs-generate:
 	$(GOBIN)/mdtogo $(CURRENT_FUNCTION) $(CURRENT_FUNCTION)/generated --license=none --strategy=cmdDocs
 
 license:
-	GOBIN=$(GOBIN) hack/update-license.sh
+	GOBIN=$(GOBIN) ../hack/update-license.sh
