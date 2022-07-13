@@ -1,5 +1,5 @@
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetLabel
+kind: BadKind
 metadata:
   name: my-config
 labels:
