@@ -2,10 +2,4 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: SetLabels
 metadata:
   name: my-config
-additionalLabelFields:
-  - kind: MyResource
-    group: dev.example.com
-    version: v1
-    create: true
-    path: spec/selector/labels
 labels: {}

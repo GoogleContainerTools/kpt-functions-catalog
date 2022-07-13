@@ -20,7 +20,7 @@ items:
           index: 1
       - message: 'set labels: {"color":"orange","fruit":"apple"}'
         field:
-          path: spec.selector.labels
+          path: spec.selector
         file:
           path: resources.yaml
           index: 1

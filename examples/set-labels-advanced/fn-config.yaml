@@ -7,9 +7,3 @@ metadata:
 labels:
   color: orange
   fruit: apple
-additionalLabelFields:
-  - kind: MyResource
-    create: true
-    group: dev.example.com
-    path: spec/selector/labels
-    version: v1

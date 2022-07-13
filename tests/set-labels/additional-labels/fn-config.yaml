@@ -1,5 +1,5 @@
 apiVersion: fn.kpt.dev/v1alpha1
-kind: SetLabelConfig
+kind: SetLabels
 metadata:
   name: my-config
   annotations:
@@ -8,6 +8,6 @@ labels:
   color: orange
   fruit: apple
 additionalLabelFields:
-- path: data/selector/annotations
-  kind: ConfigMap
-  create: true
+  - path: data/selector/annotations
+    kind: ConfigMap
+    create: true
