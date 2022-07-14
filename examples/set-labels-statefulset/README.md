@@ -1,4 +1,4 @@
-# set-labels: CronJob Example
+# set-labels: StatefulSet Example
 
 ### Overview
 
@@ -10,7 +10,7 @@ to upsert labels to the `.metadata.labels` field on all resources.
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels-CronJob
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels-statefulset
 ```
 
 We use the following `Kptfile` and `fn-config.yaml` to configure the function.
@@ -25,7 +25,7 @@ pipeline:
     - image: gcr.io/kpt-fn/set-labels:unstable
       configPath: fn-config.yaml
       selectors:
-        - kind: CronJob
+        - kind: StatefulSet
 ```
 
 ```yaml
@@ -40,19 +40,19 @@ labels:
 ```
 
 The desired labels is provided using `labels` field. We have a CRD with group
-`batch` and kind `CronJob`. 
+`apps` and kind `StatefulSet`. 
 
 ### Function invocation
 
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn render set-labels-CronJob
+$ kpt fn render set-labels-statefulset
 ```
 
 ### Expected result
 
-Check all resources have 2 labels: `color: orange` and `fruit: apple`. 
-The `CronJob` should have new labels in `spec.jobTemplate.metadata.labels` and `"spec.jobTemplate.spec.template.metadata.labels"` as well.
+Check all resources have 2 labels: `color: orange` and `fruit: apple`. Especially for each resource in slice 
+under path `spec.volumeClaimTemplates[].metatdata.label`
 
 [`set-labels`]: https://catalog.kpt.dev/set-labels/v0.1/
