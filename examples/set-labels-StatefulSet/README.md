@@ -1,4 +1,4 @@
-# set-labels-StatefulSet: StatefulSet
+# set-labels: StatefulSet example
 
 ### Overview
 

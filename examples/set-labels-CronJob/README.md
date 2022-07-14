@@ -1,4 +1,4 @@
-# set-labels-CronJob: CronJob
+# set-labels: CronJob example
 
 ### Overview
 
