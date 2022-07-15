@@ -54,6 +54,11 @@ spec:
     - metadata:
         labels:
           testkey: testvalue
+          app: testvalue
+          env: testvalue
+          quotedBoolean: testvalue
+          quotedFruit: testvalue
+          unquotedBoolean: testvalue
 `
 
 	sameLabelInput := `

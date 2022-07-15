@@ -108,18 +108,6 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 		if err != nil {
 			return err
 		}
-		// handle special case with slice
-		if o.IsGVK("apps", "", "StatefulSet") {
-			if o.GetMap("spec") != nil {
-				for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
-					updatedLabels, err = updateLabels(vctObj, metaLabelsPath, p.NewLabels, true)
-					if err != nil {
-						return err
-					}
-					p.LogResult(o, FieldPath{"spec", "volumeClaimTemplates[]", "metadata", "labels"}, updatedLabels)
-				}
-			}
-		}
 	}
 	return nil
 }
@@ -147,27 +135,104 @@ func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string, labels map
 
 // updateLabels the update process for each label, sort the keys to preserve sequence, return if the update was performed and potential error
 func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool) (map[string]string, error) {
-	keys := make([]string, 0)
-	for k := range newLabels {
-		keys = append(keys, k)
-	}
+
 	updatedLabels := make(map[string]string)
-	sort.Strings(keys)
-	for i := 0; i < len(keys); i++ {
-		key := keys[i]
-		val := newLabels[key]
-		newPath := append(labelPath, key)
-		oldValue, exist, err := o.NestedString(newPath...)
+
+	// if this is a slice
+	if checkPathContainsSlice(labelPath) {
+		err := checkExistAndSet(o, labelPath, newLabels, updatedLabels)
+		// if the slice path does not exist, no need to keep iterating, just return
 		if err != nil {
 			return nil, err
 		}
-		//TODO: should support user configurable field for labels
-		if (exist && oldValue != val) || (!exist && create) {
-			if err = o.SetNestedString(val, newPath...); err != nil {
+		return updatedLabels, nil
+	} else {
+		keys := make([]string, 0)
+		for k := range newLabels {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for i := 0; i < len(keys); i++ {
+			key := keys[i]
+			val := newLabels[key]
+			newPath := append(labelPath, key)
+			oldValue, exist, err := o.NestedString(newPath...)
+			if err != nil {
 				return nil, err
 			}
-			updatedLabels[key] = val
+			//TODO: should support user configurable field for labels
+			if (exist && oldValue != val) || (!exist && create) {
+				if err = o.SetNestedString(val, newPath...); err != nil {
+					return nil, err
+				}
+				updatedLabels[key] = val
+			}
+		}
+		return updatedLabels, nil
+	}
+}
+
+// checkPathContainsSlice check if the path contains slice type
+func checkPathContainsSlice(path FieldPath) bool {
+	for _, p := range path {
+		if strings.Contains(p, "[]") {
+			return true
 		}
 	}
-	return updatedLabels, nil
+	return false
+}
+
+// checkExistAndSet uses recursion to deal with all elements, this method is used only if the path contains slice. All path that contains slice does not need to create fieldspec if not existed
+// return if an error happened
+func checkExistAndSet(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, updatedLabelsMap map[string]string) error {
+	// recursively reach the end of path, check if key already here and set key value
+	if len(labelPath) == 0 {
+		keys := make([]string, 0)
+		for k := range newLabels {
+			keys = append(keys, k)
+		}
+		for i := 0; i < len(keys); i++ {
+			key := keys[i]
+			value := newLabels[key]
+			// check if fieldspec exist and if the value need to be updated
+			val, exist, err := o.NestedString(key)
+			if err != nil {
+				return err
+			}
+			if value == val || !exist {
+				return nil
+			}
+			o.SetNestedStringOrDie(value, key)
+			updatedLabelsMap[key] = value
+		}
+		return nil
+	}
+	field := labelPath[0]
+	nextLabelPath := labelPath[1:]
+	// this is slice, recursively run into each element
+	if strings.Contains(field, "[]") {
+		// if this field exists, recursive into next level
+		field = strings.Trim(field, "[]")
+		if o.GetSlice(field) != nil {
+			// see if any element contains next level of fieldpath
+			for _, vecObj := range o.GetSlice(field) {
+				err := checkExistAndSet(vecObj, nextLabelPath, newLabels, updatedLabelsMap)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+		// no field, no more recursion
+		return nil
+	} else {
+		// this is map, we just get it directly and see if exists
+		// did not expose error here. Should I use NestedString method?
+		nextObj := o.GetMap(field)
+		// no field, no more recursion
+		if nextObj == nil {
+			return nil
+		}
+		return checkExistAndSet(nextObj, nextLabelPath, newLabels, updatedLabelsMap)
+	}
 }
