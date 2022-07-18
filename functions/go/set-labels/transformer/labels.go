@@ -93,6 +93,11 @@ func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
 // Transform updates the labels in the right path using GVK filter and other configurable fields
 func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	for _, o := range objects {
+		// check if local config
+		localConfigPath := FieldPath{"metadata", "annotations", "config.kubernetes.io/local-config"}
+		if o.NestedStringOrDie(localConfigPath...) == "true" {
+			continue
+		}
 		// this label need to set for all GVK
 		metaLabelsPath := FieldPath{"metadata", "labels"}
 		updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
