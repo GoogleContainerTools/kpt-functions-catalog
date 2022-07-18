@@ -96,6 +96,11 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 		return fmt.Errorf("no resources found")
 	}
 	for _, o := range objects {
+		// check if local config
+		localConfigPath := FieldPath{"metadata", "annotations", "config.kubernetes.io/local-config"}
+		if o.NestedStringOrDie(localConfigPath...) == "true" {
+			continue
+		}
 		// this label need to set for all GVK
 		metaLabelsPath := FieldPath{"metadata", "labels"}
 		updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
