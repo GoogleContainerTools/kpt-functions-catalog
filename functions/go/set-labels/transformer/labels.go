@@ -90,18 +90,11 @@ func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
 	return nil
 }
 
-// IsLocalConfig checks if the object is annotated as local config
-func IsLocalConfig(o *fn.KubeObject) bool {
-	return o.IsLocalConfig()
-}
-
 // Transform updates the labels in the right path using GVK filter and other configurable fields
 func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	if objects.Len() == 0 || objects[0] == nil {
 		return fmt.Errorf("no resources found")
 	}
-	// check if local config
-	objects = objects.WhereNot(IsLocalConfig)
 	for _, o := range objects {
 		// this label need to set for all GVK
 		metaLabelsPath := FieldPath{"metadata", "labels"}
