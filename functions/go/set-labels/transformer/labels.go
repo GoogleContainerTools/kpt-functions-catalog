@@ -205,7 +205,7 @@ func checkExistAndSet(o *fn.SubObject, labelPath FieldPath, newLabels map[string
 				return err
 			}
 			if value == val || !exist {
-				return nil
+				continue
 			}
 			o.SetNestedStringOrDie(value, key)
 			updatedLabelsMap[key] = value

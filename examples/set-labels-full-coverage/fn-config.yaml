@@ -7,3 +7,4 @@ metadata:
 labels:
   color: orange
   fruit: apple
+  app: new
