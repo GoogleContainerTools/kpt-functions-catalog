@@ -55,8 +55,7 @@ $ kpt fn render set-labels-full-coverage
 
 ### Expected result
 
-Check all resources, if the labels to the path should be upsert, 
-then we can see 3 labels have been updated, `color: orange`, `fruit: apple` and `app: new`. 
-If the path does not need to create, just update labels if the key already exists, otherwise, ignore. 
+Check all resources, the following labels should be upserted to the `labels`, `matchingLabels` or `seletors(labelSelector)` fields: 
+`color: orange`, `fruit: apple` and `app: new`.
 
 [`set-labels`]: https://catalog.kpt.dev/set-labels/v0.1/
