@@ -90,6 +90,7 @@ func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
 	return nil
 }
 
+// IsLocalConfig checks if the object annotations is local config or not
 func IsLocalConfig(o *fn.KubeObject) bool {
 	return o.IsLocalConfig()
 }
