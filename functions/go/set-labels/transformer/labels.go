@@ -95,7 +95,7 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	if objects.Len() == 0 || objects[0] == nil {
 		return fmt.Errorf("no resources found")
 	}
-	for _, o := range objects {
+	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
 		// this label need to set for all GVK
 		metaLabelsPath := FieldPath{"metadata", "labels"}
 		updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)

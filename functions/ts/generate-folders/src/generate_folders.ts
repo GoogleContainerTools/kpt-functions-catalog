@@ -38,6 +38,13 @@ export interface Annotations {
   [key: string]: string;
 }
 
+// Folder GK
+export const FOLDER_GROUP = 'resourcemanager.cnrm.cloud.google.com';
+export const FOLDER_KIND = 'Folder';
+
+// Depends on anno
+export const DEPENDS_ON_ANNOTATION = 'config.kubernetes.io/depends-on';
+
 /**
  * Entrypoint for kpt function business logic. See `usage` field for more details.
  *
@@ -399,6 +406,8 @@ function generateManifest(
 
   // hold annotationRef if any
   let annotationRef = {};
+  // hold dependsOnAnno if any
+  let annotationDependsOn = {};
   // hold nativeRefs if any
   let ref = {};
 
@@ -411,6 +420,14 @@ function generateManifest(
           : { folderRef: { external: parentName } };
     } else {
       ref = { folderRef: { name: normalize(parentName) } };
+      if (namespace !== undefined) {
+        // https://kpt.dev/reference/annotations/depends-on/?id=resource-reference
+        annotationDependsOn = {
+          [DEPENDS_ON_ANNOTATION]: `${FOLDER_GROUP}/namespaces/${namespace}/${FOLDER_KIND}/${normalize(
+            parentName
+          )}`,
+        };
+      }
     }
   } else {
     // generate annotation based ref
@@ -424,9 +441,12 @@ function generateManifest(
   let combinedAnnotations = {};
   if (
     Object.keys(annotations).length > 0 ||
-    Object.keys(annotationRef).length > 0
+    Object.keys(annotationRef).length > 0 ||
+    Object.keys(annotationDependsOn).length > 0
   ) {
-    combinedAnnotations = { annotations: { ...annotations, ...annotationRef } };
+    combinedAnnotations = {
+      annotations: { ...annotations, ...annotationRef, ...annotationDependsOn },
+    };
   }
 
   const config = {

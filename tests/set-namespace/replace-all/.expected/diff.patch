@@ -1,0 +1,46 @@
+diff --git a/resources.yaml b/resources.yaml
+index 7d75912..b143b9d 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -1,7 +1,7 @@
+ apiVersion: v1
+ kind: Namespace
+ metadata:
+-  name: example1
++  name: new-ns
+   annotations:
+     internal.kpt.dev/upstream-identifier: "|Namespace|~C|example"
+ ---
+@@ -9,7 +9,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: the-service
+-  namespace: example2
++  namespace: new-ns
+   annotations:
+     internal.kpt.dev/upstream-identifier: "|Service|example|the-service"
+ ---
+@@ -26,7 +26,7 @@ spec:
+       clientConfig:
+         service:
+           name: crd-svc
+-          namespace: example3
++          namespace: new-ns
+ ---
+ apiVersion: apiregistration.k8s.io/v1
+ kind: APIService
+@@ -37,7 +37,7 @@ metadata:
+ spec:
+   service:
+     name: api-svc
+-    namespace: example4
++    namespace: new-ns
+ ---
+ apiVersion: rbac.authorization.k8s.io/v1
+ kind: ClusterRoleBinding
+@@ -48,4 +48,4 @@ metadata:
+ subjects:
+   - kind: ServiceAccount
+     name: default
+-    namespace: example5
++    namespace: new-ns

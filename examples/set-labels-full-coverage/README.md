@@ -3,7 +3,7 @@
 ### Overview
 
 This example demonstrates how to declaratively run [`set-labels`] function
-to upsert all common labels to different type of resources, as well as self-defined resource.
+to upsert all common labels to different built-in resources and CustomResourceDefinition (CRD) resources.
 
 ### Fetch the example package
 

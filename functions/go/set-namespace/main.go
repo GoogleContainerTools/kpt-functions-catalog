@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(transformer.SetNamespace)); err != nil {
+	if err := fn.AsMain(fn.ResourceListProcessorFunc(transformer.Run)); err != nil {
 		os.Exit(1)
 	}
 }

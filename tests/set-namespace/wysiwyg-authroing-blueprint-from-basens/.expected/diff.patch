@@ -1,21 +1,22 @@
 diff --git a/resources.yaml b/resources.yaml
-index 5d0e20c..439ca4a 100644
+index e11ee44..c31f0b5 100644
 --- a/resources.yaml
 +++ b/resources.yaml
-@@ -2,14 +2,14 @@
+@@ -2,7 +2,7 @@
  apiVersion: v1
  kind: Namespace
  metadata:
 -  name: example
 +  name: istio-backend1
+   annotations:
+     internal.kpt.dev/upstream-identifier: "|Namespace|~C|example"
  ---
- # from upstream basens/role-binding.yaml
- apiVersion: rbac.authorization.k8s.io/v1
+@@ -11,7 +11,7 @@ apiVersion: rbac.authorization.k8s.io/v1
  kind: RoleBinding
  metadata:
    name: app-admin
 -  namespace: example
 +  namespace: istio-backend1
+   annotations:
+     internal.kpt.dev/upstream-identifier: rbac.authorization.k8s.io|RoleBinding|example|app-admin
  roleRef:
-   kind: ClusterRole
-   name: app-admin
