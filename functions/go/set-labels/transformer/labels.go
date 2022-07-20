@@ -92,7 +92,7 @@ func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
 
 // Transform updates the labels in the right path using GVK filter and other configurable fields
 func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
-	for _, o := range objects {
+	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
 		// this label need to set for all GVK
 		metaLabelsPath := FieldPath{"metadata", "labels"}
 		updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
