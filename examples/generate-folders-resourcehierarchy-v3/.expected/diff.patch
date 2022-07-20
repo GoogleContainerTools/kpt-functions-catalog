@@ -8,130 +8,143 @@ index bfbf712..6dd3f52 100644
    mutators:
 -    - image: gcr.io/kpt-fn/generate-folders:unstable
 +    - image: 'gcr.io/kpt-fn/generate-folders:unstable'
-diff --git a/folder_dev.team-2.yaml b/folder_dev.team-2.yaml
+diff --git a/hierarchy/folder_dev.team-2.yaml b/hierarchy/folder_dev.team-2.yaml
 new file mode 100644
-index 0000000..badf925
+index 0000000..f7d0445
 --- /dev/null
-+++ b/folder_dev.team-2.yaml
-@@ -0,0 +1,10 @@
++++ b/hierarchy/folder_dev.team-2.yaml
+@@ -0,0 +1,12 @@
 +apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
 +kind: Folder
 +metadata:
 +  name: dev.team-2
 +  annotations:
++    config.kubernetes.io/depends-on: resourcemanager.cnrm.cloud.google.com/namespaces/hierarchy/Folder/dev
 +    cnrm.cloud.google.com/blueprint: 'kpt-fn'
++  namespace: hierarchy
 +spec:
 +  displayName: Team_2
 +  folderRef:
 +    name: dev
-diff --git a/folder_dev.team-one.yaml b/folder_dev.team-one.yaml
+diff --git a/hierarchy/folder_dev.team-one.yaml b/hierarchy/folder_dev.team-one.yaml
 new file mode 100644
-index 0000000..12e55a6
+index 0000000..dc01db4
 --- /dev/null
-+++ b/folder_dev.team-one.yaml
-@@ -0,0 +1,10 @@
++++ b/hierarchy/folder_dev.team-one.yaml
+@@ -0,0 +1,12 @@
 +apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
 +kind: Folder
 +metadata:
 +  name: dev.team-one
 +  annotations:
++    config.kubernetes.io/depends-on: resourcemanager.cnrm.cloud.google.com/namespaces/hierarchy/Folder/dev
 +    cnrm.cloud.google.com/blueprint: 'kpt-fn'
++  namespace: hierarchy
 +spec:
 +  displayName: Team "One"
 +  folderRef:
 +    name: dev
-diff --git a/folder_dev.yaml b/folder_dev.yaml
+diff --git a/hierarchy/folder_dev.yaml b/hierarchy/folder_dev.yaml
 new file mode 100644
-index 0000000..61c9222
+index 0000000..824137e
 --- /dev/null
-+++ b/folder_dev.yaml
-@@ -0,0 +1,10 @@
++++ b/hierarchy/folder_dev.yaml
+@@ -0,0 +1,11 @@
 +apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
 +kind: Folder
 +metadata:
 +  name: dev
 +  annotations:
 +    cnrm.cloud.google.com/blueprint: 'kpt-fn'
++  namespace: hierarchy
 +spec:
 +  displayName: Dev
 +  organizationRef:
 +    external: test-organization
-diff --git a/folder_foo.bar.yaml b/folder_foo.bar.yaml
+diff --git a/hierarchy/folder_foo.bar.yaml b/hierarchy/folder_foo.bar.yaml
 new file mode 100644
-index 0000000..6b092cc
+index 0000000..acb1f59
 --- /dev/null
-+++ b/folder_foo.bar.yaml
-@@ -0,0 +1,10 @@
++++ b/hierarchy/folder_foo.bar.yaml
+@@ -0,0 +1,12 @@
 +apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
 +kind: Folder
 +metadata:
 +  name: foo.bar
 +  annotations:
++    config.kubernetes.io/depends-on: resourcemanager.cnrm.cloud.google.com/namespaces/hierarchy/Folder/foo
 +    cnrm.cloud.google.com/blueprint: 'kpt-fn'
++  namespace: hierarchy
 +spec:
 +  displayName: bar
 +  folderRef:
 +    name: foo
-diff --git a/folder_foo.yaml b/folder_foo.yaml
+diff --git a/hierarchy/folder_foo.yaml b/hierarchy/folder_foo.yaml
 new file mode 100644
-index 0000000..9f03442
+index 0000000..a2c15b6
 --- /dev/null
-+++ b/folder_foo.yaml
-@@ -0,0 +1,10 @@
++++ b/hierarchy/folder_foo.yaml
+@@ -0,0 +1,11 @@
 +apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
 +kind: Folder
 +metadata:
 +  name: foo
 +  annotations:
 +    cnrm.cloud.google.com/blueprint: 'kpt-fn'
++  namespace: hierarchy
 +spec:
 +  displayName: Foo
 +  organizationRef:
 +    external: test-organization
-diff --git a/folder_prod.team-2.yaml b/folder_prod.team-2.yaml
+diff --git a/hierarchy/folder_prod.team-2.yaml b/hierarchy/folder_prod.team-2.yaml
 new file mode 100644
-index 0000000..2a5da7a
+index 0000000..f609d94
 --- /dev/null
-+++ b/folder_prod.team-2.yaml
-@@ -0,0 +1,10 @@
++++ b/hierarchy/folder_prod.team-2.yaml
+@@ -0,0 +1,12 @@
 +apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
 +kind: Folder
 +metadata:
 +  name: prod.team-2
 +  annotations:
++    config.kubernetes.io/depends-on: resourcemanager.cnrm.cloud.google.com/namespaces/hierarchy/Folder/prod
 +    cnrm.cloud.google.com/blueprint: 'kpt-fn'
++  namespace: hierarchy
 +spec:
 +  displayName: Team_2
 +  folderRef:
 +    name: prod
-diff --git a/folder_prod.team-one.yaml b/folder_prod.team-one.yaml
+diff --git a/hierarchy/folder_prod.team-one.yaml b/hierarchy/folder_prod.team-one.yaml
 new file mode 100644
-index 0000000..2d84fc3
+index 0000000..26a4734
 --- /dev/null
-+++ b/folder_prod.team-one.yaml
-@@ -0,0 +1,10 @@
++++ b/hierarchy/folder_prod.team-one.yaml
+@@ -0,0 +1,12 @@
 +apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
 +kind: Folder
 +metadata:
 +  name: prod.team-one
 +  annotations:
++    config.kubernetes.io/depends-on: resourcemanager.cnrm.cloud.google.com/namespaces/hierarchy/Folder/prod
 +    cnrm.cloud.google.com/blueprint: 'kpt-fn'
++  namespace: hierarchy
 +spec:
 +  displayName: Team "One"
 +  folderRef:
 +    name: prod
-diff --git a/folder_prod.yaml b/folder_prod.yaml
+diff --git a/hierarchy/folder_prod.yaml b/hierarchy/folder_prod.yaml
 new file mode 100644
-index 0000000..f283df9
+index 0000000..2d98124
 --- /dev/null
-+++ b/folder_prod.yaml
-@@ -0,0 +1,10 @@
++++ b/hierarchy/folder_prod.yaml
+@@ -0,0 +1,11 @@
 +apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
 +kind: Folder
 +metadata:
 +  name: prod
 +  annotations:
 +    cnrm.cloud.google.com/blueprint: 'kpt-fn'
++  namespace: hierarchy
 +spec:
 +  displayName: Prod
 +  organizationRef:
