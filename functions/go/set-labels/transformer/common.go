@@ -39,6 +39,31 @@ var CommonSpecs = FieldSpecs{
 		CreateIfNotPresent: true,
 	},
 	FieldSpec{
+		Gvk:                GVK{"", "v1", "ReplicationController"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"", "v1", "ReplicationController"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "ReplicationController"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "ReplicationController"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "Deployment"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "topologySpreadConstraints[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
 		Gvk:                GVK{"", "", "Deployment"},
 		FieldPath:          FieldPath{"spec", "selector", "matchLabels"},
 		CreateIfNotPresent: true,
@@ -84,6 +109,31 @@ var CommonSpecs = FieldSpecs{
 		CreateIfNotPresent: true,
 	},
 	FieldSpec{
+		Gvk:                GVK{"", "v1", "ReplicaSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"", "v1", "ReplicaSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "ReplicaSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "ReplicaSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "ReplicaSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "topologySpreadConstraints[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
 		Gvk:                GVK{"", "", "DaemonSet"},
 		FieldPath:          FieldPath{"spec", "selector", "matchLabels"},
 		CreateIfNotPresent: true,
@@ -92,6 +142,31 @@ var CommonSpecs = FieldSpecs{
 		Gvk:                GVK{"", "", "DaemonSet"},
 		FieldPath:          FieldPath{"spec", "template", "metadata", "labels"},
 		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Gvk:                GVK{"", "v1", "DaemonSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"", "v1", "DaemonSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "DaemonSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "DaemonSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "DaemonSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "topologySpreadConstraints[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
 	},
 	FieldSpec{
 		Gvk:                GVK{"apps", "", "StatefulSet"},
@@ -144,6 +219,31 @@ var CommonSpecs = FieldSpecs{
 		CreateIfNotPresent: true,
 	},
 	FieldSpec{
+		Gvk:                GVK{"", "v1", "Job"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"", "v1", "Job"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "Job"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "Job"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "Job"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "topologySpreadConstraints[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
 		Gvk:                GVK{"batch", "", "CronJob"},
 		FieldPath:          FieldPath{"spec", "jobTemplate", "spec", "selector", "matchLabels"},
 		CreateIfNotPresent: false,
@@ -157,6 +257,31 @@ var CommonSpecs = FieldSpecs{
 		Gvk:                GVK{"batch", "", "CronJob"},
 		FieldPath:          FieldPath{"spec", "jobTemplate", "spec", "template", "metadata", "labels"},
 		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Gvk:                GVK{"batch", "", "CronJob"},
+		FieldPath:          FieldPath{"spec", "jobTemplate", "spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Gvk:                GVK{"", "v1", "CronJob"},
+		FieldPath:          FieldPath{"spec", "jobTemplate", "spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "CronJob"},
+		FieldPath:          FieldPath{"spec", "jobTemplate", "spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution[]", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "CronJob"},
+		FieldPath:          FieldPath{"spec", "jobTemplate", "spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "CronJob"},
+		FieldPath:          FieldPath{"spec", "jobTemplate", "spec", "template", "spec", "topologySpreadConstraints[]", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
 	},
 	FieldSpec{
 		Gvk:                GVK{"policy", "", "PodDisruptionBudget"},
