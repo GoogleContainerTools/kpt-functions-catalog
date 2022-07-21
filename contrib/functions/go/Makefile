@@ -134,4 +134,4 @@ docs-generate:
 
 license:
 	@echo Update license in path: contrib/functions/go
-	GOBIN=$(GOBIN) LICENSEPATH=../contrib/functions/go ../../../hack/update-license.sh
+	GOBIN=$(GOBIN) ../../../hack/update-license.sh

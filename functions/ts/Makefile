@@ -90,4 +90,4 @@ func-push:
 
 license:
 	@echo Update license in path: functions/ts
-	GOBIN=$(GOBIN) LICENSEPATH=../functions/ts ../../hack/update-license.sh
+	GOBIN=$(GOBIN) ../../hack/update-license.sh
