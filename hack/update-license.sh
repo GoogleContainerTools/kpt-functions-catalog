@@ -17,4 +17,4 @@
 # don't add licenses to the site directory, it will break the docs
 # and will add them to the theme which is a submodule (bad)
 command -v addlicense || go install github.com/google/addlicense@v1.0.0
-find ../go -print0 | xargs "$GOBIN"/addlicense -y 2022 -l apache
+find "$LICENSEPATH" -print0 | xargs "$GOBIN"/addlicense -y 2022 -l apache

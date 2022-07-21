@@ -132,3 +132,6 @@ func-push:
 docs-generate:
 	$(GOBIN)/mdtogo $(CURRENT_FUNCTION) $(CURRENT_FUNCTION)/generated --license=none --strategy=cmdDocs
 
+license:
+	@echo Update license in path: contrib/functions/go
+	GOBIN=$(GOBIN) LICENSEPATH=../contrib/functions/go ../../../hack/update-license.sh

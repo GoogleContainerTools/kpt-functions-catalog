@@ -54,7 +54,7 @@ FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
 # Targets to push images
 FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
 # Current function name used by individual function targets
-CURRENT_FUNCTION ?= unknown
+CURRENT_FUNCTION = set-labels
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -154,4 +154,5 @@ docs-generate:
 	$(GOBIN)/mdtogo $(CURRENT_FUNCTION) $(CURRENT_FUNCTION)/generated --license=none --strategy=cmdDocs
 
 license:
-	GOBIN=$(GOBIN) ../hack/update-license.sh
+	@echo Update license in path: functions/go
+	GOBIN=$(GOBIN) LICENSEPATH=../functions/go ../../hack/update-license.sh

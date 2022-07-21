@@ -77,3 +77,6 @@ update-function-docs: ## Update documentation for a function release branch
 
 license:
 	cd functions/go && $(MAKE) license
+	cd functions/ts && $(MAKE) license
+	cd contrib/functions/go && $(MAKE) license
+	cd contrib/functions/ts && $(MAKE) license

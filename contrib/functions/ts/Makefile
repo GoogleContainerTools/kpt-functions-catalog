@@ -14,6 +14,7 @@
 SHELL=/bin/bash
 TAG ?= unstable
 GCR = gcr.io/kpt-fn-contrib
+GOBIN := $(shell go env GOPATH)/bin
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -86,3 +87,7 @@ func-build: func-test
 
 func-push:
 	../../../scripts/ts-function-release.sh push contrib
+
+license:
+	@echo Update license in path: contrib/functions/ts
+	GOBIN=$(GOBIN) LICENSEPATH=../contrib/functions/ts ../../../hack/update-license.sh
