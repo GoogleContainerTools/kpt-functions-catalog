@@ -54,7 +54,7 @@ FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
 # Targets to push images
 FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
 # Current function name used by individual function targets
-CURRENT_FUNCTION = set-labels
+CURRENT_FUNCTION ?= unknown
 
 .DEFAULT_GOAL := help
 .PHONY: help
