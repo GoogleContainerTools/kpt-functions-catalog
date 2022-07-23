@@ -77,7 +77,7 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 }
 
 // setLabelsInSpecs sets labels according to the generated common label
-func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
+func (p *LabelTransformer) setCommonSpecLabels(o *fn.KubeObject) error {
 	for _, spec := range CommonSpecs {
 		if o.IsGVK(spec.Gvk.group, spec.Gvk.version, spec.Gvk.kind) {
 			updatedLabels, err := updateLabels(&o.SubObject, spec.FieldPath, p.NewLabels, spec.CreateIfNotPresent)
@@ -97,22 +97,28 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	}
 	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
 		// this label need to set for all GVK
-		metaLabelsPath := FieldPath{"metadata", "labels"}
-		updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
-		if err != nil {
+		if err := p.setMetadataForAll(o); err != nil {
 			return err
 		}
-		p.LogResult(o, metaLabelsPath, updatedLabels)
 		// set other common labels according to specific GVK
-		err = p.setLabelsInSpecs(o)
-		if err != nil {
+		if err := p.setCommonSpecLabels(o); err != nil {
 			return err
 		}
 		// handle special cases when slices are involved
-		if err = p.setLabelsInSlice(o); err != nil {
+		if err := p.setLabelsInSlice(o); err != nil {
 			return err
 		}
 	}
+	return nil
+}
+
+func (p *LabelTransformer) setMetadataForAll(o *fn.KubeObject) error {
+	metaLabelsPath := FieldPath{"metadata", "labels"}
+	updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
+	if err != nil {
+		return err
+	}
+	p.LogResult(o, metaLabelsPath, updatedLabels)
 	return nil
 }
 
