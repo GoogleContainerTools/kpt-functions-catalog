@@ -143,46 +143,48 @@ spec:
         name: xxx
         labels:
           key: xxx
-      spec:
-        accessModes: ["ReadWrite"]
-        storageClassName: "my-storage-class"
-        resources:
-          requests:
-            storage: 1Gi
+        spec:
+          accessModes: ["ReadWrite"]
+          storageClassName: "my-storage-class"
+          resources:
+            requests:
+              storage: 1Gi
   template:
     metadata:
       labels:
         app: nginx
     spec:
-      containers:
-        - name: my-container
       topologySpreadConstraints:
-        labelSelector:
-          matchLabels:
-            app: nginx
+        - labelSelector:
+            matchLabels:
+              app: nginx
       affinity:
         podAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
             - podAffinityTerm:
                 labelSelector:
-                  matchLabels:
-                    color: app
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - cockroachdb
           requiredDuringSchedulingIgnoredDuringExecution:
-            - topologyKey: some-value
-              labelSelector:
+            - labelSelector:
                 matchLabels:
-                  app: k8s
+                  apps: k8s
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
             - podAffinityTerm:
                 labelSelector:
-                  matchLabels:
-                    color: app
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - cockroachdb
           requiredDuringSchedulingIgnoredDuringExecution:
-            - topologyKey: some-value
-              labelSelector:
+            - labelSelector:
                 matchLabels:
-                  app: k8s
+                  apps: k8s
 ---
 apiVersion: batch/v1
 kind: Job

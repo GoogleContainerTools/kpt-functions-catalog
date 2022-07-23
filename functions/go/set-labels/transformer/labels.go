@@ -108,12 +108,142 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 		if err != nil {
 			return err
 		}
+		// handle special cases when slices are involved
+		if err = p.setLabelsInSlice(o); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *LabelTransformer) setLabelsInSlice(o *fn.KubeObject) error {
+	// handle resources that have podSpec struct
+	if o.IsGVK("", "v1", "ReplicationController") ||
+		o.IsGVK("", "", "Deployment") ||
+		o.IsGVK("", "", "ReplicaSet") ||
+		o.IsGVK("", "", "DaemonSet") ||
+		o.IsGVK("apps", "", "StatefulSet") ||
+		o.IsGVK("batch", "", "Job") {
+		_, exist, _ := o.NestedString(FieldPath{"spec", "template", "spec"}...)
+		if exist {
+			podSpecObj := o.GetMap("spec").GetMap("template").GetMap("spec")
+			if err := p.podSpecSliceCheckAndUpdate(podSpecObj, o); err != nil {
+				return err
+			}
+		}
+	}
+	// handle other special case resources
+	if err := p.specialCasesCheckAndUpdate(o); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *LabelTransformer) podSpecSliceCheckAndUpdate(o *fn.SubObject, parentO *fn.KubeObject) error {
+	labelSelector := FieldPath{"labelSelector", "matchLabels"}
+
+	_, exist, _ := o.NestedSlice("topologySpreadConstraints")
+	if exist {
+		for _, obj := range o.GetSlice("topologySpreadConstraints") {
+			updatedLabels, err := updateLabels(obj, labelSelector, p.NewLabels, false)
+			if err != nil {
+				return err
+			}
+			fullPath := FieldPath{"spec", "template", "spec", "topologySpreadConstraints", "labelSelector", "matchLabels"}
+			p.LogResult(parentO, fullPath, updatedLabels)
+		}
+	}
+
+	subObj := o.GetMap("affinity")
+	if subObj != nil {
+		for _, aff := range []string{"podAffinity", "podAntiAffinity"} {
+			ssubObj := subObj.GetMap(aff)
+			if ssubObj != nil {
+				for _, obj := range subObj.GetSlice("preferredDuringSchedulingIgnoredDuringExecution") {
+					nxtObj := obj.GetMap("podAffinityTerm")
+					if nxtObj != nil {
+						updatedLabels, err := updateLabels(nxtObj, labelSelector, p.NewLabels, false)
+						if err != nil {
+							return err
+						}
+						fullPath := FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"}
+						p.LogResult(parentO, fullPath, updatedLabels)
+					}
+
+				}
+				for _, obj := range subObj.GetSlice("requiredDuringSchedulingIgnoredDuringExecution") {
+					updatedLabels, err := updateLabels(obj, labelSelector, p.NewLabels, false)
+					if err != nil {
+						return err
+					}
+					fulPath := FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"}
+					p.LogResult(parentO, fulPath, updatedLabels)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (p *LabelTransformer) specialCasesCheckAndUpdate(o *fn.KubeObject) error {
+	metaLabelPath := FieldPath{"metadata", "labels"}
+	if o.IsGVK("apps", "", "StatefulSet") {
+		if o.GetMap("spec") != nil {
+			for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
+				updatedLabels, err := updateLabels(vctObj, metaLabelPath, p.NewLabels, false)
+				if err != nil {
+					return err
+				}
+				p.LogResult(o, FieldPath{"spec", "volumeClaimTemplates", "metadata", "labels"}, updatedLabels)
+			}
+		}
+	}
+
+	if o.IsGVK("batch", "", "CronJob") {
+		_, exist, _ := o.NestedString(FieldPath{"spec", "jobTemplate", "spec", "template", "spec"}...)
+		if exist {
+			podSpecObj := o.GetMap("spec").GetMap("jobTemplate").GetMap("spec").GetMap("template").GetMap("spec")
+			if err := p.podSpecSliceCheckAndUpdate(podSpecObj, o); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.IsGVK("networking.k8s.io", "", "NetworkPolicy") {
+		podSelector := FieldPath{"podSelector", "matchLabels"}
+		spec := o.GetMap("spec")
+		if spec != nil {
+			for _, vecObj := range spec.GetSlice("ingress") {
+				for _, nextVecObj := range vecObj.GetSlice("from") {
+					updatedLabels, err := updateLabels(nextVecObj, podSelector, p.NewLabels, false)
+					if err != nil {
+						return err
+					}
+					fullPath := FieldPath{"spec", "ingress", "from", "podSelector", "matchLabels"}
+					p.LogResult(o, fullPath, updatedLabels)
+				}
+			}
+			for _, vecObj := range spec.GetSlice("egress") {
+				for _, nextVecObj := range vecObj.GetSlice("to") {
+					updatedLabels, err := updateLabels(nextVecObj, podSelector, p.NewLabels, false)
+					if err != nil {
+						return err
+					}
+					fullPath := FieldPath{"spec", "egress", "to", "podSelector", "matchLabels"}
+					p.LogResult(o, fullPath, updatedLabels)
+				}
+			}
+		}
 	}
 	return nil
 }
 
 // LogResult logs the KRM resource that has the labels changed
 func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string, labels map[string]string) {
+	// no labels get updated, no log
+	if len(labels) == 0 {
+		return
+	}
 	res, _ := json.Marshal(labels)
 	newResult := fn.Result{
 		Message:     "set labels: " + string(res),
@@ -135,42 +265,71 @@ func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string, labels map
 
 // updateLabels the update process for each label, sort the keys to preserve sequence, return if the update was performed and potential error
 func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool) (map[string]string, error) {
-
+	keys := make([]string, 0)
+	for k := range newLabels {
+		keys = append(keys, k)
+	}
 	updatedLabels := make(map[string]string)
-
-	// if this is a slice
-	if checkPathContainsSlice(labelPath) {
-		err := checkExistAndSet(o, labelPath, newLabels, updatedLabels)
-		// if the slice path does not exist, no need to keep iterating, just return
+	sort.Strings(keys)
+	for i := 0; i < len(keys); i++ {
+		key := keys[i]
+		val := newLabels[key]
+		newPath := append(labelPath, key)
+		oldValue, exist, err := o.NestedString(newPath...)
 		if err != nil {
 			return nil, err
 		}
-		return updatedLabels, nil
-	} else {
-		keys := make([]string, 0)
-		for k := range newLabels {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for i := 0; i < len(keys); i++ {
-			key := keys[i]
-			val := newLabels[key]
-			newPath := append(labelPath, key)
-			oldValue, exist, err := o.NestedString(newPath...)
-			if err != nil {
+		//TODO: should support user configurable field for labels
+
+		// check if the value is the same
+		if (exist && oldValue != val) || (!exist && create) {
+			if err = o.SetNestedString(val, newPath...); err != nil {
 				return nil, err
 			}
-			//TODO: should support user configurable field for labels
-			if (exist && oldValue != val) || (!exist && create) {
-				if err = o.SetNestedString(val, newPath...); err != nil {
-					return nil, err
-				}
-				updatedLabels[key] = val
-			}
+			updatedLabels[key] = val
 		}
-		return updatedLabels, nil
 	}
+	return updatedLabels, nil
 }
+
+//// updateLabels the update process for each label, sort the keys to preserve sequence, return if the update was performed and potential error
+//func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool) (map[string]string, error) {
+//
+//	updatedLabels := make(map[string]string)
+//
+//	// if this is a slice
+//	if checkPathContainsSlice(labelPath) {
+//		err := checkExistAndSet(o, labelPath, newLabels, updatedLabels)
+//		// if the slice path does not exist, no need to keep iterating, just return
+//		if err != nil {
+//			return nil, err
+//		}
+//		return updatedLabels, nil
+//	} else {
+//		keys := make([]string, 0)
+//		for k := range newLabels {
+//			keys = append(keys, k)
+//		}
+//		sort.Strings(keys)
+//		for i := 0; i < len(keys); i++ {
+//			key := keys[i]
+//			val := newLabels[key]
+//			newPath := append(labelPath, key)
+//			oldValue, exist, err := o.NestedString(newPath...)
+//			if err != nil {
+//				return nil, err
+//			}
+//			//TODO: should support user configurable field for labels
+//			if (exist && oldValue != val) || (!exist && create) {
+//				if err = o.SetNestedString(val, newPath...); err != nil {
+//					return nil, err
+//				}
+//				updatedLabels[key] = val
+//			}
+//		}
+//		return updatedLabels, nil
+//	}
+//}
 
 // checkPathContainsSlice check if the path contains slice type
 func checkPathContainsSlice(path FieldPath) bool {
