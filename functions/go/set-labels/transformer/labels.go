@@ -125,6 +125,18 @@ func (p *LabelTransformer) setMetadataForAll(o *fn.KubeObject) error {
 // setLabelsInSlice handles the resources that contain slice type
 func (p *LabelTransformer) setLabelsInSlice(o *fn.KubeObject) error {
 	// handle resources that have podSpec struct
+	if err := p.podSpecCheckAndUpdate(o); err != nil {
+		return err
+	}
+	// handle other special case resources
+	if err := p.specialCasesCheckAndUpdate(o); err != nil {
+		return err
+	}
+	return nil
+}
+
+// podSpecCheckAndUpdate updates labels path inside podSpec struct
+func (p *LabelTransformer) podSpecCheckAndUpdate(o *fn.KubeObject) error {
 	if o.IsGVK("", "v1", "ReplicationController") ||
 		o.IsGVK("", "", "Deployment") ||
 		o.IsGVK("", "", "ReplicaSet") ||
@@ -134,20 +146,16 @@ func (p *LabelTransformer) setLabelsInSlice(o *fn.KubeObject) error {
 		_, exist, _ := o.NestedString(FieldPath{"spec", "template", "spec"}...)
 		if exist {
 			podSpecObj := o.GetMap("spec").GetMap("template").GetMap("spec")
-			if err := p.podSpecCheckAndUpdate(podSpecObj, o); err != nil {
+			if err := p.processPodSpec(podSpecObj, o); err != nil {
 				return err
 			}
 		}
 	}
-	// handle other special case resources
-	if err := p.specialCasesCheckAndUpdate(o); err != nil {
-		return err
-	}
 	return nil
 }
 
-// podSpecSliceCheckAndUpdate update labels regarding podSpec struct
-func (p *LabelTransformer) podSpecCheckAndUpdate(o *fn.SubObject, parentO *fn.KubeObject) error {
+// processPodSpec takes in podSpec object and parse its path, parent kubeObject is also passed in for logging
+func (p *LabelTransformer) processPodSpec(o *fn.SubObject, parentO *fn.KubeObject) error {
 	labelSelector := FieldPath{"labelSelector", "matchLabels"}
 
 	_, exist, _ := o.NestedSlice("topologySpreadConstraints")
@@ -212,7 +220,7 @@ func (p *LabelTransformer) specialCasesCheckAndUpdate(o *fn.KubeObject) error {
 		_, exist, _ := o.NestedString(FieldPath{"spec", "jobTemplate", "spec", "template", "spec"}...)
 		if exist {
 			podSpecObj := o.GetMap("spec").GetMap("jobTemplate").GetMap("spec").GetMap("template").GetMap("spec")
-			if err := p.podSpecCheckAndUpdate(podSpecObj, o); err != nil {
+			if err := p.processPodSpec(podSpecObj, o); err != nil {
 				return err
 			}
 		}
