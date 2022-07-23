@@ -116,6 +116,7 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	return nil
 }
 
+// setLabelsInSlice handles the resources that contain slice type
 func (p *LabelTransformer) setLabelsInSlice(o *fn.KubeObject) error {
 	// handle resources that have podSpec struct
 	if o.IsGVK("", "v1", "ReplicationController") ||
@@ -127,7 +128,7 @@ func (p *LabelTransformer) setLabelsInSlice(o *fn.KubeObject) error {
 		_, exist, _ := o.NestedString(FieldPath{"spec", "template", "spec"}...)
 		if exist {
 			podSpecObj := o.GetMap("spec").GetMap("template").GetMap("spec")
-			if err := p.podSpecSliceCheckAndUpdate(podSpecObj, o); err != nil {
+			if err := p.podSpecCheckAndUpdate(podSpecObj, o); err != nil {
 				return err
 			}
 		}
@@ -139,7 +140,8 @@ func (p *LabelTransformer) setLabelsInSlice(o *fn.KubeObject) error {
 	return nil
 }
 
-func (p *LabelTransformer) podSpecSliceCheckAndUpdate(o *fn.SubObject, parentO *fn.KubeObject) error {
+// podSpecSliceCheckAndUpdate update labels regarding podSpec struct
+func (p *LabelTransformer) podSpecCheckAndUpdate(o *fn.SubObject, parentO *fn.KubeObject) error {
 	labelSelector := FieldPath{"labelSelector", "matchLabels"}
 
 	_, exist, _ := o.NestedSlice("topologySpreadConstraints")
@@ -185,6 +187,7 @@ func (p *LabelTransformer) podSpecSliceCheckAndUpdate(o *fn.SubObject, parentO *
 	return nil
 }
 
+// specialCasesCheckAndUpdate updates other paths that contain labels
 func (p *LabelTransformer) specialCasesCheckAndUpdate(o *fn.KubeObject) error {
 	metaLabelPath := FieldPath{"metadata", "labels"}
 	if o.IsGVK("apps", "", "StatefulSet") {
@@ -203,7 +206,7 @@ func (p *LabelTransformer) specialCasesCheckAndUpdate(o *fn.KubeObject) error {
 		_, exist, _ := o.NestedString(FieldPath{"spec", "jobTemplate", "spec", "template", "spec"}...)
 		if exist {
 			podSpecObj := o.GetMap("spec").GetMap("jobTemplate").GetMap("spec").GetMap("template").GetMap("spec")
-			if err := p.podSpecSliceCheckAndUpdate(podSpecObj, o); err != nil {
+			if err := p.podSpecCheckAndUpdate(podSpecObj, o); err != nil {
 				return err
 			}
 		}
