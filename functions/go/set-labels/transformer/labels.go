@@ -61,7 +61,7 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 		return fmt.Errorf("Config is Empty, failed to configure function: `functionConfig` must be either a `ConfigMap` or `SetLabels`")
 	case functionConfig.IsGVK("", "v1", "ConfigMap"):
 		p.NewLabels = functionConfig.NestedStringMapOrDie("data")
-	case functionConfig.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
+	case functionConfig.IsGVK(fn.KptFunctionGroup, fn.KptFunctionVersion, FnConfigKind):
 		if _, exist, err := functionConfig.NestedSlice(fnDeprecateField); exist || err != nil {
 			return fmt.Errorf("`additionalLabelFields` has been deprecated")
 		}
@@ -71,7 +71,7 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 		}
 	default:
 		return fmt.Errorf("unknown functionConfig Kind=%v ApiVersion=%v, expect `%v` or `ConfigMap` with correct formatting",
-			functionConfig.GetKind(), functionConfig.GetAPIVersion(), fnConfigKind)
+			functionConfig.GetKind(), functionConfig.GetAPIVersion(), FnConfigKind)
 	}
 	return nil
 }

@@ -3,11 +3,12 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-la
 go 1.17
 
 require (
-	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220608182028-78748f08d997
+	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220723081830-33aee7fe8a2e
 	github.com/stretchr/testify v1.7.1
 )
 
 require (
+	github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20220720212527-133180134b93 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
