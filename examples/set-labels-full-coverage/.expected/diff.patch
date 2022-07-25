@@ -8,7 +8,7 @@ index 2ab6a18..cb09366 100644
        configPath: fn-config.yaml
 -
 diff --git a/resources.yaml b/resources.yaml
-index 3d60bec..219c294 100644
+index 320c6a8..3354b93 100644
 --- a/resources.yaml
 +++ b/resources.yaml
 @@ -2,39 +2,59 @@ apiVersion: v1
@@ -154,13 +154,13 @@ index 3d60bec..219c294 100644
  spec:
    selector:
      matchLabels:
--      app: nginx # has to match .spec.template.metadata.labels
-+      app: new # has to match .spec.template.metadata.labels
+-      app: nginx
++      app: new
 +      color: orange
 +      fruit: apple
    serviceName: "nginx"
-   replicas: 3 # by default is 1
-   minReadySeconds: 10 # by default is 0
+   replicas: 3
+   minReadySeconds: 10
 @@ -152,12 +194,14 @@ spec:
    template:
      metadata:
