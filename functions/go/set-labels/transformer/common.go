@@ -15,10 +15,8 @@
 package transformer
 
 const (
-	fnConfigGroup      = "fn.kpt.dev"
-	fnConfigAPIVersion = "v1alpha1"
-	fnConfigKind       = "SetLabels"
-	fnDeprecateField   = "additionalLabelFields"
+	FnConfigKind     = "SetLabels"
+	fnDeprecateField = "additionalLabelFields"
 )
 
 // generate common label paths
@@ -49,6 +47,31 @@ var CommonSpecs = FieldSpecs{
 		CreateIfNotPresent: true,
 	},
 	FieldSpec{
+		Gvk:                GVK{"apps", "", "Deployment"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "Deployment"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "Deployment"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "Deployment"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "Deployment"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "topologySpreadConstraints", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
 		Gvk:                GVK{"", "", "ReplicaSet"},
 		FieldPath:          FieldPath{"spec", "selector", "matchLabels"},
 		CreateIfNotPresent: true,
@@ -77,6 +100,31 @@ var CommonSpecs = FieldSpecs{
 		Gvk:                GVK{"apps", "", "StatefulSet"},
 		FieldPath:          FieldPath{"spec", "template", "metadata", "labels"},
 		CreateIfNotPresent: true,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "StatefulSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "StatefulSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "StatefulSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "StatefulSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"apps", "", "StatefulSet"},
+		FieldPath:          FieldPath{"spec", "template", "spec", "topologySpreadConstraints", "labelSelector", "matchLabels"},
+		CreateIfNotPresent: false,
 	},
 	FieldSpec{
 		Gvk:                GVK{"batch", "", "Job"},
@@ -111,6 +159,16 @@ var CommonSpecs = FieldSpecs{
 	FieldSpec{
 		Gvk:                GVK{"networking.k8s.io", "", "NetworkPolicy"},
 		FieldPath:          FieldPath{"spec", "podSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"networking.k8s.io", "", "NetworkPolicy"},
+		FieldPath:          FieldPath{"spec", "ingress", "from", "podSelector", "matchLabels"},
+		CreateIfNotPresent: false,
+	},
+	FieldSpec{
+		Gvk:                GVK{"networking.k8s.io", "", "NetworkPolicy"},
+		FieldPath:          FieldPath{"spec", "egress", "to", "podSelector", "matchLabels"},
 		CreateIfNotPresent: false,
 	},
 }

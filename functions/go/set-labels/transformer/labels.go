@@ -61,7 +61,7 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 		return fmt.Errorf("Config is Empty, failed to configure function: `functionConfig` must be either a `ConfigMap` or `SetLabels`")
 	case functionConfig.IsGVK("", "v1", "ConfigMap"):
 		p.NewLabels = functionConfig.NestedStringMapOrDie("data")
-	case functionConfig.IsGVK(fnConfigGroup, fnConfigAPIVersion, fnConfigKind):
+	case functionConfig.IsGVK(fn.KptFunctionGroup, fn.KptFunctionVersion, FnConfigKind):
 		if _, exist, err := functionConfig.NestedSlice(fnDeprecateField); exist || err != nil {
 			return fmt.Errorf("`additionalLabelFields` has been deprecated")
 		}
@@ -71,13 +71,13 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 		}
 	default:
 		return fmt.Errorf("unknown functionConfig Kind=%v ApiVersion=%v, expect `%v` or `ConfigMap` with correct formatting",
-			functionConfig.GetKind(), functionConfig.GetAPIVersion(), fnConfigKind)
+			functionConfig.GetKind(), functionConfig.GetAPIVersion(), FnConfigKind)
 	}
 	return nil
 }
 
 // setLabelsInSpecs sets labels according to the generated common label
-func (p *LabelTransformer) setCommonSpecLabels(o *fn.KubeObject) error {
+func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
 	for _, spec := range CommonSpecs {
 		if o.IsGVK(spec.Gvk.group, spec.Gvk.version, spec.Gvk.kind) {
 			updatedLabels, err := updateLabels(&o.SubObject, spec.FieldPath, p.NewLabels, spec.CreateIfNotPresent)
@@ -97,157 +97,26 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	}
 	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
 		// this label need to set for all GVK
-		if err := p.setMetadataForAll(o); err != nil {
+		metaLabelsPath := FieldPath{"metadata", "labels"}
+		updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
+		if err != nil {
 			return err
 		}
+		p.LogResult(o, metaLabelsPath, updatedLabels)
 		// set other common labels according to specific GVK
-		if err := p.setCommonSpecLabels(o); err != nil {
+		err = p.setLabelsInSpecs(o)
+		if err != nil {
 			return err
 		}
-		// handle special cases when slices are involved
-		if err := p.setLabelsInSlice(o); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (p *LabelTransformer) setMetadataForAll(o *fn.KubeObject) error {
-	metaLabelsPath := FieldPath{"metadata", "labels"}
-	updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
-	if err != nil {
-		return err
-	}
-	p.LogResult(o, metaLabelsPath, updatedLabels)
-	return nil
-}
-
-// setLabelsInSlice handles the resources that contain slice type
-func (p *LabelTransformer) setLabelsInSlice(o *fn.KubeObject) error {
-	// handle resources that have podSpec struct
-	if err := p.podSpecCheckAndUpdate(o); err != nil {
-		return err
-	}
-	// handle other special case resources
-	if err := p.specialCasesCheckAndUpdate(o); err != nil {
-		return err
-	}
-	return nil
-}
-
-// podSpecCheckAndUpdate updates labels path inside podSpec struct
-func (p *LabelTransformer) podSpecCheckAndUpdate(o *fn.KubeObject) error {
-	if o.IsGVK("", "v1", "ReplicationController") ||
-		o.IsGVK("", "", "Deployment") ||
-		o.IsGVK("", "", "ReplicaSet") ||
-		o.IsGVK("", "", "DaemonSet") ||
-		o.IsGVK("apps", "", "StatefulSet") ||
-		o.IsGVK("batch", "", "Job") {
-		_, exist, _ := o.NestedString(FieldPath{"spec", "template", "spec"}...)
-		if exist {
-			podSpecObj := o.GetMap("spec").GetMap("template").GetMap("spec")
-			if err := p.processPodSpec(podSpecObj, o); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-// processPodSpec takes in podSpec object and parse its path, parent kubeObject is also passed in for logging
-func (p *LabelTransformer) processPodSpec(o *fn.SubObject, parentO *fn.KubeObject) error {
-	labelSelector := FieldPath{"labelSelector", "matchLabels"}
-
-	_, exist, _ := o.NestedSlice("topologySpreadConstraints")
-	if exist {
-		for _, obj := range o.GetSlice("topologySpreadConstraints") {
-			updatedLabels, err := updateLabels(obj, labelSelector, p.NewLabels, false)
-			if err != nil {
-				return err
-			}
-			fullPath := FieldPath{"spec", "template", "spec", "topologySpreadConstraints", "labelSelector", "matchLabels"}
-			p.LogResult(parentO, fullPath, updatedLabels)
-		}
-	}
-
-	subObj := o.GetMap("affinity")
-	if subObj != nil {
-		for _, aff := range []string{"podAffinity", "podAntiAffinity"} {
-			ssubObj := subObj.GetMap(aff)
-			if ssubObj != nil {
-				for _, obj := range subObj.GetSlice("preferredDuringSchedulingIgnoredDuringExecution") {
-					nxtObj := obj.GetMap("podAffinityTerm")
-					if nxtObj != nil {
-						updatedLabels, err := updateLabels(nxtObj, labelSelector, p.NewLabels, false)
-						if err != nil {
-							return err
-						}
-						fullPath := FieldPath{"spec", "template", "spec", "affinity", "podAffinity", "requiredDuringSchedulingIgnoredDuringExecution", "labelSelector", "matchLabels"}
-						p.LogResult(parentO, fullPath, updatedLabels)
-					}
-
-				}
-				for _, obj := range subObj.GetSlice("requiredDuringSchedulingIgnoredDuringExecution") {
-					updatedLabels, err := updateLabels(obj, labelSelector, p.NewLabels, false)
+		// handle special case with slice
+		if o.IsGVK("apps", "", "StatefulSet") {
+			if o.GetMap("spec") != nil {
+				for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
+					updatedLabels, err = updateLabels(vctObj, metaLabelsPath, p.NewLabels, true)
 					if err != nil {
 						return err
 					}
-					fulPath := FieldPath{"spec", "template", "spec", "affinity", "podAntiAffinity", "preferredDuringSchedulingIgnoredDuringExecution", "podAffinityTerm", "labelSelector", "matchLabels"}
-					p.LogResult(parentO, fulPath, updatedLabels)
-				}
-			}
-		}
-	}
-	return nil
-}
-
-// specialCasesCheckAndUpdate updates other paths that contain labels
-func (p *LabelTransformer) specialCasesCheckAndUpdate(o *fn.KubeObject) error {
-	metaLabelPath := FieldPath{"metadata", "labels"}
-	if o.IsGVK("apps", "", "StatefulSet") {
-		if o.GetMap("spec") != nil {
-			for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
-				updatedLabels, err := updateLabels(vctObj, metaLabelPath, p.NewLabels, false)
-				if err != nil {
-					return err
-				}
-				p.LogResult(o, FieldPath{"spec", "volumeClaimTemplates", "metadata", "labels"}, updatedLabels)
-			}
-		}
-	}
-
-	if o.IsGVK("batch", "", "CronJob") {
-		_, exist, _ := o.NestedString(FieldPath{"spec", "jobTemplate", "spec", "template", "spec"}...)
-		if exist {
-			podSpecObj := o.GetMap("spec").GetMap("jobTemplate").GetMap("spec").GetMap("template").GetMap("spec")
-			if err := p.processPodSpec(podSpecObj, o); err != nil {
-				return err
-			}
-		}
-	}
-
-	if o.IsGVK("networking.k8s.io", "", "NetworkPolicy") {
-		podSelector := FieldPath{"podSelector", "matchLabels"}
-		spec := o.GetMap("spec")
-		if spec != nil {
-			for _, vecObj := range spec.GetSlice("ingress") {
-				for _, nextVecObj := range vecObj.GetSlice("from") {
-					updatedLabels, err := updateLabels(nextVecObj, podSelector, p.NewLabels, false)
-					if err != nil {
-						return err
-					}
-					fullPath := FieldPath{"spec", "ingress", "from", "podSelector", "matchLabels"}
-					p.LogResult(o, fullPath, updatedLabels)
-				}
-			}
-			for _, vecObj := range spec.GetSlice("egress") {
-				for _, nextVecObj := range vecObj.GetSlice("to") {
-					updatedLabels, err := updateLabels(nextVecObj, podSelector, p.NewLabels, false)
-					if err != nil {
-						return err
-					}
-					fullPath := FieldPath{"spec", "egress", "to", "podSelector", "matchLabels"}
-					p.LogResult(o, fullPath, updatedLabels)
+					p.LogResult(o, FieldPath{"spec", "volumeClaimTemplates[]", "metadata", "labels"}, updatedLabels)
 				}
 			}
 		}
@@ -257,10 +126,6 @@ func (p *LabelTransformer) specialCasesCheckAndUpdate(o *fn.KubeObject) error {
 
 // LogResult logs the KRM resource that has the labels changed
 func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string, labels map[string]string) {
-	// no labels get updated, no log
-	if len(labels) == 0 {
-		return
-	}
 	res, _ := json.Marshal(labels)
 	newResult := fn.Result{
 		Message:     "set labels: " + string(res),

@@ -35,54 +35,6 @@ spec:
     metadata:
       labels:
         app: nginx
-    spec:
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: ff
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app: appsss
-      containers:
-        - name: apps
-      affinity:
-        podAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app: k8s
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values:
-                        - cockroachdb
-                topologyKey: dd
-              weight: 78
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - topologyKey: dd
-              labelSelector:
-                matchLabels:
-                  app: k8s
-
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app: k8s
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values:
-                        - cockroachdb
-                topologyKey: ff
-              weight: 77
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - topologyKey: ff
-              labelSelector:
-                matchLabels:
-                  app: k8s
 ---
 apiVersion: apps/v1
 kind: ReplicaSet
@@ -153,38 +105,6 @@ spec:
     metadata:
       labels:
         app: nginx
-    spec:
-      topologySpreadConstraints:
-        - labelSelector:
-            matchLabels:
-              app: nginx
-      affinity:
-        podAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values:
-                        - cockroachdb
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  apps: k8s
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values:
-                        - cockroachdb
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  apps: k8s
 ---
 apiVersion: batch/v1
 kind: Job
@@ -253,34 +173,6 @@ spec:
   podSelector:
     matchLabels:
       role: db
-  policyTypes:
-    - Ingress
-    - Egress
-  ingress:
-    - from:
-        - ipBlock:
-            cidr: 172.17.0.0/16
-            except:
-              - 172.17.1.0/24
-        - namespaceSelector:
-            matchLabels:
-              project: myproject
-        - podSelector:
-            matchLabels:
-              role: frontend
-      ports:
-        - protocol: TCP
-          port: 6379
-  egress:
-    - to:
-        - ipBlock:
-            cidr: 10.0.0.0/24
-        - podSelector:
-            matchLabels:
-              role: frontend
-      ports:
-        - protocol: TCP
-          port: 5978
 ---
 apiVersion: dev.example.com/v1
 kind: MyResource
