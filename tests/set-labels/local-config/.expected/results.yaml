@@ -7,8 +7,9 @@ items:
   - image: gcr.io/kpt-fn/set-labels:unstable
     exitCode: 0
     results:
-      - message: 'set labels: {"color":"orange","fruit":"apple"}'
-        field:
-          path: metadata.labels
+      - message: 'set labels {color : orange} for 1 times'
+        file:
+          path: resources.yaml
+      - message: 'set labels {fruit : apple} for 1 times'
         file:
           path: resources.yaml

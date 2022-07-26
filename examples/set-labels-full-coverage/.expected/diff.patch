@@ -8,10 +8,10 @@ index 2ab6a18..cb09366 100644
        configPath: fn-config.yaml
 -
 diff --git a/resources.yaml b/resources.yaml
-index 6a06662..62df835 100644
+index 320c6a8..3354b93 100644
 --- a/resources.yaml
 +++ b/resources.yaml
-@@ -2,56 +2,84 @@ apiVersion: v1
+@@ -2,39 +2,59 @@ apiVersion: v1
  kind: Service
  metadata:
    name: my-service
@@ -74,9 +74,27 @@ index 6a06662..62df835 100644
 +        app: new
 +        color: orange
 +        fruit: apple
- ---
- apiVersion: apps/v1
- kind: ReplicaSet
+     spec:
+       topologySpreadConstraints:
+         - maxSkew: 1
+@@ -42,7 +62,7 @@ spec:
+           whenUnsatisfiable: DoNotSchedule
+           labelSelector:
+             matchLabels:
+-              app: appsss
++              app: new
+       containers:
+         - name: apps
+       affinity:
+@@ -64,7 +84,6 @@ spec:
+               labelSelector:
+                 matchLabels:
+                   app: k8s
+-
+         podAntiAffinity:
+           preferredDuringSchedulingIgnoredDuringExecution:
+             - podAffinityTerm:
+@@ -89,17 +108,25 @@ kind: ReplicaSet
  metadata:
    name: frontend
    labels:
@@ -103,7 +121,7 @@ index 6a06662..62df835 100644
  ---
  apiVersion: apps/v1
  kind: DaemonSet
-@@ -60,23 +88,38 @@ metadata:
+@@ -108,23 +135,38 @@ metadata:
    namespace: kube-system
    labels:
      k8s-app: fluentd-logging
@@ -143,27 +161,7 @@ index 6a06662..62df835 100644
    serviceName: "nginx"
    replicas: 3
    minReadySeconds: 10
-@@ -85,6 +128,9 @@ spec:
-         name: www
-         labels:
-           key: www
-+          app: new
-+          color: orange
-+          fruit: apple
-       spec:
-         accessModes: ["ReadWriteOnce"]
-         storageClassName: "my-storage-class"
-@@ -95,6 +141,9 @@ spec:
-         name: xxx
-         labels:
-           key: xxx
-+          app: new
-+          color: orange
-+          fruit: apple
-         spec:
-           accessModes: ["ReadWrite"]
-           storageClassName: "my-storage-class"
-@@ -104,12 +153,18 @@ spec:
+@@ -152,12 +194,14 @@ spec:
    template:
      metadata:
        labels:
@@ -171,8 +169,16 @@ index 6a06662..62df835 100644
 +        app: new
 +        color: orange
 +        fruit: apple
- ---
- apiVersion: batch/v1
+     spec:
+       topologySpreadConstraints:
+         - labelSelector:
+             matchLabels:
+-              app: nginx
++              app: new
+       affinity:
+         podAffinity:
+           preferredDuringSchedulingIgnoredDuringExecution:
+@@ -190,6 +234,10 @@ apiVersion: batch/v1
  kind: Job
  metadata:
    name: pi
@@ -183,7 +189,7 @@ index 6a06662..62df835 100644
  spec:
    selector:
      matchLabels:
-@@ -117,12 +172,14 @@ spec:
+@@ -197,12 +245,14 @@ spec:
    template:
      metadata:
        labels:
@@ -200,7 +206,7 @@ index 6a06662..62df835 100644
        restartPolicy: Never
    backoffLimit: 4
  ---
-@@ -130,12 +187,19 @@ apiVersion: batch/v1
+@@ -210,12 +260,19 @@ apiVersion: batch/v1
  kind: CronJob
  metadata:
    name: hello
@@ -220,7 +226,7 @@ index 6a06662..62df835 100644
      spec:
        selector:
          matchLabels:
-@@ -144,6 +208,9 @@ spec:
+@@ -224,6 +281,9 @@ spec:
          metadata:
            labels:
              testkey: testvalue
@@ -230,7 +236,7 @@ index 6a06662..62df835 100644
          spec:
            containers:
              - name: hello
-@@ -159,6 +226,10 @@ apiVersion: policy/v1
+@@ -239,6 +299,10 @@ apiVersion: policy/v1
  kind: PodDisruptionBudget
  metadata:
    name: hello
@@ -241,7 +247,7 @@ index 6a06662..62df835 100644
  spec:
    selector:
      matchLabels:
-@@ -169,6 +240,10 @@ kind: NetworkPolicy
+@@ -249,6 +313,10 @@ kind: NetworkPolicy
  metadata:
    name: test-network-policy
    namespace: default
@@ -252,7 +258,7 @@ index 6a06662..62df835 100644
  spec:
    podSelector:
      matchLabels:
-@@ -179,6 +254,10 @@ kind: MyResource
+@@ -287,6 +355,10 @@ kind: MyResource
  metadata:
    name: the-service
    namespace: the-namespace
