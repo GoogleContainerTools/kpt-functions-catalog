@@ -115,7 +115,6 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 		if err := p.setLabelsInSlice(o); err != nil {
 			return err
 		}
-
 		p.LogResult(o, p.ResultCount)
 	}
 	return nil
