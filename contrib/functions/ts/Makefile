@@ -67,6 +67,10 @@ $(FUNCTION_PUSH):
 
 check-licenses: $(FUNCTION_CHECKLICENSES) ## Run license checker for source files
 
+add-licenses:
+	@echo Update license in path: contrib/functions/ts
+	GOBIN=$(GOBIN) ../../../hack/update-license.sh
+
 .PHONY: $(FUNCTION_CHECKLICENSES)
 $(FUNCTION_CHECKLICENSES):
 	$(MAKE) CURRENT_FUNCTION=$(subst -CHECKLICENSES,,$@) func-check-licenses
@@ -87,7 +91,3 @@ func-build: func-test
 
 func-push:
 	../../../scripts/ts-function-release.sh push contrib
-
-license:
-	@echo Update license in path: contrib/functions/ts
-	GOBIN=$(GOBIN) ../../../hack/update-license.sh

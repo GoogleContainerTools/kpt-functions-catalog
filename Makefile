@@ -42,6 +42,12 @@ check-licenses:
 	cd contrib/functions/go && $(MAKE) check-licenses
 	cd contrib/functions/ts && $(MAKE) check-licenses
 
+add-licenses:
+	cd functions/go && $(MAKE) add-licenses
+	cd functions/ts && $(MAKE) add-licenses
+	cd contrib/functions/go && $(MAKE) add-licenses
+	cd contrib/functions/ts && $(MAKE) add-licenses
+
 verify-docs:
 	go install github.com/monopole/mdrip@v1.0.2
 	(cd scripts/patch_reader/ && go build -o patch_reader .)
@@ -74,9 +80,3 @@ site-check: ## Test site for broken catalog links.
 update-function-docs: ## Update documentation for a function release branch
 	(cd scripts/update_function_docs/ && go build -o update_function_docs .)
 	RELEASE_BRANCH=$(RELEASE_BRANCH) ./scripts/update_function_docs/update_function_docs
-
-license:
-	cd functions/go && $(MAKE) license
-	cd functions/ts && $(MAKE) license
-	cd contrib/functions/go && $(MAKE) license
-	cd contrib/functions/ts && $(MAKE) license
