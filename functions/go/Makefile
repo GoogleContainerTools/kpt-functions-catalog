@@ -122,7 +122,7 @@ install-mdtogo:
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
-	func-build func-push func-verify func-check-licenses docs-generate license
+	func-build func-push func-verify func-check-licenses docs-generate add-licenses
 func-verify: docs-generate func-fix func-vet func-fmt func-test func-lint func-check-licenses
 
 func-fix:
@@ -156,3 +156,4 @@ func-push:
 
 docs-generate:
 	$(GOBIN)/mdtogo $(CURRENT_FUNCTION) $(CURRENT_FUNCTION)/generated --license=none --strategy=cmdDocs
+
