@@ -84,24 +84,9 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 	return nil
 }
 
-// setLabelsInSpecs sets labels according to the generated common label
-func (p *LabelTransformer) setCommonSpecLabels(o *fn.KubeObject) error {
-	for _, spec := range CommonSpecs {
-		if o.IsGVK(spec.Gvk.group, spec.Gvk.version, spec.Gvk.kind) {
-			err := updateLabels(&o.SubObject, spec.FieldPath, p.NewLabels, spec.CreateIfNotPresent, p.ResultCount)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 // Transform updates the labels in the right path using GVK filter and other configurable fields
 func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
-		// this label need to set for all GVK
-
 		err := func() error {
 			// set meta labels
 			if err := p.setObjectMeta(o); err != nil {
@@ -134,6 +119,7 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	}
 	return nil
 }
+
 func (p *LabelTransformer) setNetworkPolicyRule(o *fn.KubeObject) error {
 	podSelector := FieldPath{"podSelector", "matchLabels"}
 	spec := o.GetMap("spec")
@@ -233,7 +219,7 @@ func hasSpecSelector(o *fn.KubeObject) bool {
 	return false
 }
 
-// return (if the resource has LabelSelector, if the LabelSelector need to be created if not exist)
+// hasLabelSelector return (if the resource has LabelSelector, if the LabelSelector need to be created if not exist)
 func hasLabelSelector(o *fn.KubeObject) (bool, bool) {
 	if o.IsGVK("", "", "Deployment") || o.IsGVK("", "", "ReplicaSet") || o.IsGVK("", "", "DaemonSet") || o.IsGVK("apps", "", "StatefulSet") {
 		return true, true
