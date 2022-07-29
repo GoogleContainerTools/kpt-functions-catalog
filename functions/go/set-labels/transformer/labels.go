@@ -120,6 +120,7 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	return nil
 }
 
+// setNetworkPolicyRule set ingress and egress rules for kind NetworkPolicy
 func (p *LabelTransformer) setNetworkPolicyRule(o *fn.KubeObject) error {
 	podSelector := FieldPath{"podSelector", "matchLabels"}
 	spec := o.GetMap("spec")
@@ -144,10 +145,12 @@ func (p *LabelTransformer) setNetworkPolicyRule(o *fn.KubeObject) error {
 	return nil
 }
 
+// hasJobTemplateSpec check if the object is CronJob, this kind might have JobTemplateSpec, which contains label fieldPath
 func hasJobTemplateSpec(o *fn.KubeObject) bool {
 	return o.IsGVK("batch", "", "CronJob")
 }
 
+// setJobTemplateSpecMeta set MetaObject in struct JobTemplateSpec
 func (p *LabelTransformer) setJobTemplateSpecMeta(o *fn.KubeObject) error {
 	if hasJobTemplateSpec(o) {
 		// set objectMeta
@@ -159,6 +162,7 @@ func (p *LabelTransformer) setJobTemplateSpecMeta(o *fn.KubeObject) error {
 	return nil
 }
 
+// setJobSpecObjectMeta set MetaObject in struct JobSpec
 func (p *LabelTransformer) setJobSpecObjectMeta(o *fn.KubeObject) error {
 	// set podTemplateSpec objectMeta
 	specfieldPath := FieldPath{"spec", "jobTemplate", "spec", "template", "metadata", "labels"}
@@ -168,6 +172,7 @@ func (p *LabelTransformer) setJobSpecObjectMeta(o *fn.KubeObject) error {
 	return nil
 }
 
+// setJobPodSpec set labels path in PodSpec for kind CronJob
 func (p *LabelTransformer) setJobPodSpec(o *fn.KubeObject) error {
 	// set podTemplateSpec affinity
 	if hasJobPodSpec(o) {
@@ -179,6 +184,7 @@ func (p *LabelTransformer) setJobPodSpec(o *fn.KubeObject) error {
 	return nil
 }
 
+// hasJobPodSpec check if the object contains struct JobPodSpec
 func hasJobPodSpec(o *fn.KubeObject) bool {
 	if cronJobSpec := o.GetMap("spec"); cronJobSpec != nil {
 		if jobTemplateSpec := cronJobSpec.GetMap("jobTemplate"); jobTemplateSpec != nil {
@@ -194,6 +200,7 @@ func hasJobPodSpec(o *fn.KubeObject) bool {
 	return false
 }
 
+// setSelector set labels for all selectors, including spec selector map, spec selector LabelSelector, LabelSelector in JobTemplate, and podSelector in NetworkPolicy, and
 func (p *LabelTransformer) setSelector(o *fn.KubeObject) error {
 	if hasSpecSelector(o) {
 		fieldPath := FieldPath{"spec", "selector"}
@@ -222,10 +229,12 @@ func (p *LabelTransformer) setSelector(o *fn.KubeObject) error {
 	return nil
 }
 
+// hasNetworkPolicySpec checking if this kind is NetworkPolicy, it would contain struct NetworkPolicySpec
 func hasNetworkPolicySpec(o *fn.KubeObject) bool {
 	return o.IsGVK("networking.k8s.io", "", "NetworkPolicy")
 }
 
+// hasSpecSelector check if the resource contains struct SpecSelector, kind Service and ReplicationController has it
 func hasSpecSelector(o *fn.KubeObject) bool {
 	if o.IsGVK("", "v1", "Service") || o.IsGVK("", "v1", "ReplicationController") {
 		return true
@@ -233,7 +242,7 @@ func hasSpecSelector(o *fn.KubeObject) bool {
 	return false
 }
 
-// hasLabelSelector return (if the resource has LabelSelector, if the LabelSelector need to be created if not exist)
+// hasLabelSelector check if the resource contains struct LabelSelector, return (if the resource has LabelSelector, if the LabelSelector need to be created if not exist)
 func hasLabelSelector(o *fn.KubeObject) (bool, bool) {
 	if o.IsGVK("", "", "Deployment") || o.IsGVK("", "", "ReplicaSet") || o.IsGVK("", "", "DaemonSet") || o.IsGVK("apps", "", "StatefulSet") {
 		return true, true
@@ -244,6 +253,7 @@ func hasLabelSelector(o *fn.KubeObject) (bool, bool) {
 	return false, false
 }
 
+// hasPodTemplateSpec check if the resource contains struct PodTemplateSpec, ReplicationController, Deployment, ReplicaSet, DaemonSet, StatefulSet, Job kind has it
 func hasPodTemplateSpec(o *fn.KubeObject) bool {
 	if o.IsGVK("", "v1", "ReplicationController") ||
 		o.IsGVK("", "", "Deployment") ||
@@ -256,10 +266,12 @@ func hasPodTemplateSpec(o *fn.KubeObject) bool {
 	return false
 }
 
+// hasVolumeClaimTemplates check if the resource contains struct VolumeClaimTemplates, kind StatefulSet has it
 func hasVolumeClaimTemplates(o *fn.KubeObject) bool {
 	return o.IsGVK("apps", "", "StatefulSet")
 }
 
+// setVolumeClaimTemplates set VolumeClaimTemplates label path
 func (p *LabelTransformer) setVolumeClaimTemplates(o *fn.KubeObject) error {
 	if hasVolumeClaimTemplates(o) {
 		metaLabelPath := FieldPath{"metadata", "labels"}
@@ -275,13 +287,14 @@ func (p *LabelTransformer) setVolumeClaimTemplates(o *fn.KubeObject) error {
 	return nil
 }
 
+// setPodTemplateSpec set label path for PodTemplateSpec, both its ObjectMeta and its PodSpec
 func (p *LabelTransformer) setPodTemplateSpec(o *fn.KubeObject) error {
 	if hasPodTemplateSpec(o) {
 		// set objectMeta
 		if err := p.setSpecObjectMeta(o); err != nil {
 			return err
 		}
-		// set affinity
+		// set podSpec
 		if hasPodSpec(o) {
 			if err := p.setPodSpec(o.GetMap("spec").GetMap("template").GetMap("spec")); err != nil {
 				return err
@@ -300,6 +313,7 @@ func (p *LabelTransformer) setPodTemplateSpec(o *fn.KubeObject) error {
 	return nil
 }
 
+// hasPodSpec check if the resource has struct PodSpec
 func hasPodSpec(o *fn.KubeObject) bool {
 	if spec := o.GetMap("spec"); spec != nil {
 		if template := spec.GetMap("template"); template != nil {
@@ -311,6 +325,7 @@ func hasPodSpec(o *fn.KubeObject) bool {
 	return false
 }
 
+// setPodSpec set label path in PodSpec, that include path under topologySpreadConstraints and affinity
 func (p *LabelTransformer) setPodSpec(podSpec *fn.SubObject) error {
 	labelSelector := FieldPath{"labelSelector", "matchLabels"}
 
@@ -361,6 +376,7 @@ func (p *LabelTransformer) setSpecObjectMeta(o *fn.KubeObject) error {
 	return nil
 }
 
+// setObjectMeta set ObjectMeta labels
 func (p *LabelTransformer) setObjectMeta(o *fn.KubeObject) error {
 	// all resources' ObjectMeta labels need to be updated
 	metaLabelsPath := FieldPath{"metadata", "labels"}
