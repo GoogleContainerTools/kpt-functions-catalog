@@ -170,14 +170,28 @@ func (p *LabelTransformer) setJobSpecObjectMeta(o *fn.KubeObject) error {
 
 func (p *LabelTransformer) setJobPodSpec(o *fn.KubeObject) error {
 	// set podTemplateSpec affinity
-	_, found, _ := o.NestedString(FieldPath{"spec", "jobTemplate", "spec", "template", "spec"}...)
-	if found {
+	if hasJobPodSpec(o) {
 		podSpecObj := o.GetMap("spec").GetMap("jobTemplate").GetMap("spec").GetMap("template").GetMap("spec")
 		if err := p.setPodSpec(podSpecObj); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func hasJobPodSpec(o *fn.KubeObject) bool {
+	if cronJobSpec := o.GetMap("spec"); cronJobSpec != nil {
+		if jobTemplateSpec := cronJobSpec.GetMap("jobTemplate"); jobTemplateSpec != nil {
+			if jobSpec := jobTemplateSpec.GetMap("spec"); jobSpec != nil {
+				if podTemplateSpec := jobSpec.GetMap("template"); podTemplateSpec != nil {
+					if podSpec := podTemplateSpec.GetMap("spec"); podSpec != nil {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
 }
 
 func (p *LabelTransformer) setSelector(o *fn.KubeObject) error {
@@ -287,8 +301,14 @@ func (p *LabelTransformer) setPodTemplateSpec(o *fn.KubeObject) error {
 }
 
 func hasPodSpec(o *fn.KubeObject) bool {
-	val := o.NestedStringOrDie("spec", "template", "spec")
-	return val != ""
+	if spec := o.GetMap("spec"); spec != nil {
+		if template := spec.GetMap("template"); template != nil {
+			if podSpec := template.GetMap("spec"); podSpec != nil {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (p *LabelTransformer) setPodSpec(podSpec *fn.SubObject) error {
