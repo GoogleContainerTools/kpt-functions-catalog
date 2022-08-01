@@ -9,28 +9,10 @@ import (
 
 type FieldPath []string
 
-type GVK struct {
-	group   string
-	version string
-	kind    string
-}
-
-// FieldSpec stores information about how to modify a specific label
-type FieldSpec struct {
-	Gvk       GVK
-	FieldPath FieldPath
-	// TODO: should support user configurable field for labels
-	CreateIfNotPresent bool
-}
-
-type FieldSpecs []FieldSpec
-
 // LabelTransformer supports the set-labels workflow, it uses Config to parse functionConfig, Transform to change the labels
 type LabelTransformer struct {
 	// NewLabels is the desired labels
 	NewLabels map[string]string
-	// FieldSpecs stores default label fields
-	FieldSpecs []FieldSpec
 	// Results logs the changes to the KRM resource labels
 	Results fn.Results
 	// ResultCount logs the total count of each labels change
