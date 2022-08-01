@@ -255,15 +255,22 @@ func hasLabelSelector(o *fn.KubeObject) (bool, bool) {
 
 // hasPodTemplateSpec check if the resource contains struct PodTemplateSpec, ReplicationController, Deployment, ReplicaSet, DaemonSet, StatefulSet, Job kind has it
 func hasPodTemplateSpec(o *fn.KubeObject) bool {
-	if o.IsGVK("", "v1", "ReplicationController") ||
-		o.IsGVK("", "", "Deployment") ||
-		o.IsGVK("", "", "ReplicaSet") ||
-		o.IsGVK("", "", "DaemonSet") ||
-		o.IsGVK("apps", "", "StatefulSet") ||
-		o.IsGVK("batch", "", "Job") {
+	switch {
+	case o.IsGVK("", "v1", "ReplicationController"):
 		return true
+	case o.IsGVK("", "", "Deployment"):
+		return true
+	case o.IsGVK("", "", "ReplicaSet"):
+		return true
+	case o.IsGVK("", "", "DaemonSet"):
+		return true
+	case o.IsGVK("apps", "", "StatefulSet"):
+		return true
+	case o.IsGVK("batch", "", "Job"):
+		return true
+	default:
+		return false
 	}
-	return false
 }
 
 // setPodTemplateSpec set label path for PodTemplateSpec, both its ObjectMeta and its PodSpec
