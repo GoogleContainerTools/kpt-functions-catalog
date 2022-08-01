@@ -19,17 +19,17 @@ type LabelTransformer struct {
 	ResultCount map[string]int
 }
 
-// NewTransformer is the constructor for labelTransformer
-func NewTransformer() *LabelTransformer {
-	transformer := LabelTransformer{}
+// NewLabelTransformer is the constructor for labelTransformer
+func NewLabelTransformer() *LabelTransformer {
 	resultCount := make(map[string]int)
-	transformer.ResultCount = resultCount
-	return &transformer
+	return &LabelTransformer{
+		ResultCount: resultCount,
+	}
 }
 
 // SetLabels perform the whole set labels operation according to given resourcelist
 func SetLabels(rl *fn.ResourceList) (bool, error) {
-	transformer := NewTransformer()
+	transformer := NewLabelTransformer()
 	if err := transformer.Config(rl.FunctionConfig); err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
 		return false, nil
@@ -76,27 +76,29 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	}
 	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
 		err := func() error {
-			// set meta labels
 			if err := p.setObjectMeta(o); err != nil {
 				return err
 			}
-			// set selector
 			if err := p.setSelector(o); err != nil {
 				return err
 			}
-			// set PodTemplateSpec
 			if err := p.setPodTemplateSpec(o); err != nil {
 				return err
 			}
-			// set other corner cases
-			if err := p.setVolumeClaimTemplates(o); err != nil {
-				return err
+			if hasVolumeClaimTemplates(o) {
+				if err := p.setVolumeClaimTemplates(o); err != nil {
+					return err
+				}
 			}
-			if err := p.setJobTemplateSpecMeta(o); err != nil {
-				return err
+			if hasJobTemplateSpec(o) {
+				if err := p.setJobTemplateSpecMeta(o); err != nil {
+					return err
+				}
 			}
-			if err := p.setNetworkPolicyRule(o); err != nil {
-				return err
+			if hasNetworkPolicySpec(o) {
+				if err := p.setNetworkPolicyRule(o); err != nil {
+					return err
+				}
 			}
 			return nil
 		}()
@@ -115,12 +117,10 @@ func hasJobTemplateSpec(o *fn.KubeObject) bool {
 
 // setJobTemplateSpecMeta set MetaObject in struct JobTemplateSpec
 func (p *LabelTransformer) setJobTemplateSpecMeta(o *fn.KubeObject) error {
-	if hasJobTemplateSpec(o) {
-		// set objectMeta
-		fieldPath := FieldPath{"spec", "jobTemplate", "metadata", "labels"}
-		if err := updateLabels(&o.SubObject, fieldPath, p.NewLabels, true, p.ResultCount); err != nil {
-			return err
-		}
+	// set objectMeta
+	fieldPath := FieldPath{"spec", "jobTemplate", "metadata", "labels"}
+	if err := updateLabels(&o.SubObject, fieldPath, p.NewLabels, true, p.ResultCount); err != nil {
+		return err
 	}
 	return nil
 }
