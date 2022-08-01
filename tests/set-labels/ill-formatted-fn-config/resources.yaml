@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: MyResource
+metadata:
+  name: the-map
+  labels:
+    - apps
+    - env
+data:
+  some-key: some-value

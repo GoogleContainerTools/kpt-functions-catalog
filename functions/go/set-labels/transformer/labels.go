@@ -86,6 +86,12 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 
 // Transform updates the labels in the right path using GVK filter and other configurable fields
 func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
+	// using unit test and pass in empty string would provide a nil; an empty file in e2e would provide 0 object
+	if objects.Len() == 0 || objects[0] == nil {
+		newResult := fn.GeneralResult("no input resources", fn.Info)
+		p.Results = append(p.Results, newResult)
+		return nil
+	}
 	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
 		err := func() error {
 			// set meta labels
