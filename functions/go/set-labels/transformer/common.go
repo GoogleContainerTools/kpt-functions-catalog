@@ -15,8 +15,8 @@
 package transformer
 
 const (
-	FnConfigKind       = "SetLabels"
-	fnDeprecateField   = "additionalLabelFields"
+	FnConfigKind     = "SetLabels"
+	fnDeprecateField = "additionalLabelFields"
 )
 
 // generate common label paths

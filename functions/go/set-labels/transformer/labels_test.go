@@ -45,7 +45,7 @@ spec:
 `
 
 	sliceInput := `
-apiVersion: apps/
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-config
@@ -103,7 +103,7 @@ spec:
 
 	logResult := `set labels: {"app":"myApp","env":"production","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
 
-	sliceExpected := `apiVersion: apps/
+	sliceExpected := `apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: my-config
