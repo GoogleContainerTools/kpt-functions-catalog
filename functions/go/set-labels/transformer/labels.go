@@ -394,8 +394,8 @@ func (p *LabelTransformer) LogResult(o *fn.KubeObject, labelCount map[string]int
 	sort.Strings(keys)
 	for i := 0; i < len(keys); i++ {
 		key := keys[i]
-		element := labelCount[key]
-		msg := fmt.Sprintf("set labels {%v} for %v times", key, element)
+		labelCountValue := labelCount[key]
+		msg := fmt.Sprintf("set labels {%v} %v times", key, labelCountValue)
 		newResult := fn.Result{
 			Message:     msg,
 			Severity:    "",
