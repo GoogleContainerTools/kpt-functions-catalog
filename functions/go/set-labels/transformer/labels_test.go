@@ -104,9 +104,9 @@ spec:
     unquotedBoolean: "true"
 `
 
-	sameLableLogResult := []string{"set labels {app : myApp} for 1 times", "set labels {quotedBoolean : true} for 1 times", "set labels {quotedFruit : peach} for 1 times", "set labels {unquotedBoolean : true} for 1 times"}
+	sameLableLogResult := []string{"set labels {app : myApp} 1 times", "set labels {quotedBoolean : true} 1 times", "set labels {quotedFruit : peach} 1 times", "set labels {unquotedBoolean : true} 1 times"}
 
-	logResult := []string{"set labels {app : myApp} for 2 times", "set labels {env : production} for 2 times", "set labels {quotedBoolean : true} for 2 times", "set labels {quotedFruit : peach} for 2 times", "set labels {unquotedBoolean : true} for 2 times"}
+	logResult := []string{"set labels {app : myApp} 2 times", "set labels {env : production} 2 times", "set labels {quotedBoolean : true} 2 times", "set labels {quotedFruit : peach} 2 times", "set labels {unquotedBoolean : true} 2 times"}
 
 	sliceExpected := `apiVersion: apps/v1
 kind: StatefulSet
