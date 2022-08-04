@@ -54,6 +54,11 @@ spec:
     - metadata:
         labels:
           testkey: testvalue
+          app: testvalue1
+          env: testvalue2
+          quotedBoolean: testvalue3
+          quotedFruit: testvalue4
+          unquotedBoolean: testvalue5
 `
 
 	sameLabelInput := `
@@ -99,9 +104,9 @@ spec:
     unquotedBoolean: "true"
 `
 
-	sameLableLogResult := `set labels: {"app":"myApp","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
+	sameLableLogResult := []string{"set labels {app : myApp} 1 times", "set labels {quotedBoolean : true} 1 times", "set labels {quotedFruit : peach} 1 times", "set labels {unquotedBoolean : true} 1 times"}
 
-	logResult := `set labels: {"app":"myApp","env":"production","quotedBoolean":"true","quotedFruit":"peach","unquotedBoolean":"true"}`
+	logResult := []string{"set labels {app : myApp} 2 times", "set labels {env : production} 2 times", "set labels {quotedBoolean : true} 2 times", "set labels {quotedFruit : peach} 2 times", "set labels {unquotedBoolean : true} 2 times"}
 
 	sliceExpected := `apiVersion: apps/v1
 kind: StatefulSet
@@ -148,7 +153,7 @@ spec:
 		"Update resources with ConfigMap": {
 			resourcelist: generateResourceList(configMap, []string{input}),
 			expected:     generateExpectedResult([]string{expected}),
-			logResult:    []string{logResult},
+			logResult:    logResult,
 		},
 		"Update resources that contains slice structure with configMap, ": {
 			resourcelist: generateResourceList(configMap, []string{sliceInput}),
@@ -161,7 +166,7 @@ spec:
 		"Resource has the same label as configMap, log results omit this log": {
 			resourcelist: generateResourceList(configMap, []string{sameLabelInput}),
 			expected:     generateExpectedResult([]string{sameLabelExpected}),
-			logResult:    []string{sameLableLogResult},
+			logResult:    sameLableLogResult,
 		},
 	}
 

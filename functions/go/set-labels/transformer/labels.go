@@ -1,45 +1,35 @@
 package transformer
 
 import (
-	"encoding/json"
 	"fmt"
 	"sort"
-	"strings"
 
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
 type FieldPath []string
 
-type GVK struct {
-	group   string
-	version string
-	kind    string
-}
-
-// FieldSpec stores information about how to modify a specific label
-type FieldSpec struct {
-	Gvk       GVK
-	FieldPath FieldPath
-	// TODO: should support user configurable field for labels
-	CreateIfNotPresent bool
-}
-
-type FieldSpecs []FieldSpec
-
 // LabelTransformer supports the set-labels workflow, it uses Config to parse functionConfig, Transform to change the labels
 type LabelTransformer struct {
 	// NewLabels is the desired labels
 	NewLabels map[string]string
-	// FieldSpecs stores default label fields
-	FieldSpecs []FieldSpec
 	// Results logs the changes to the KRM resource labels
 	Results fn.Results
+	// ResultCount logs the total count of each labels change
+	ResultCount map[string]int
+}
+
+// NewLabelTransformer is the constructor for labelTransformer
+func NewLabelTransformer() *LabelTransformer {
+	resultCount := make(map[string]int)
+	return &LabelTransformer{
+		ResultCount: resultCount,
+	}
 }
 
 // SetLabels perform the whole set labels operation according to given resourcelist
 func SetLabels(rl *fn.ResourceList) (bool, error) {
-	transformer := LabelTransformer{}
+	transformer := NewLabelTransformer()
 	if err := transformer.Config(rl.FunctionConfig); err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
 		return false, nil
@@ -76,20 +66,6 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 	return nil
 }
 
-// setLabelsInSpecs sets labels according to the generated common label
-func (p *LabelTransformer) setLabelsInSpecs(o *fn.KubeObject) error {
-	for _, spec := range CommonSpecs {
-		if o.IsGVK(spec.Gvk.group, spec.Gvk.version, spec.Gvk.kind) {
-			updatedLabels, err := updateLabels(&o.SubObject, spec.FieldPath, p.NewLabels, spec.CreateIfNotPresent)
-			if err != nil {
-				return err
-			}
-			p.LogResult(o, spec.FieldPath, updatedLabels)
-		}
-	}
-	return nil
-}
-
 // Transform updates the labels in the right path using GVK filter and other configurable fields
 func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	// using unit test and pass in empty string would provide a nil; an empty file in e2e would provide 0 object
@@ -99,27 +75,117 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 		return nil
 	}
 	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
-		// this label need to set for all GVK
-		metaLabelsPath := FieldPath{"metadata", "labels"}
-		updatedLabels, err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true)
+		err := func() error {
+			if err := p.setObjectMeta(o); err != nil {
+				return err
+			}
+			if err := p.setSelector(o); err != nil {
+				return err
+			}
+			if err := p.setPodTemplateSpec(o); err != nil {
+				return err
+			}
+			if hasVolumeClaimTemplates(o) {
+				if err := p.setVolumeClaimTemplates(o); err != nil {
+					return err
+				}
+			}
+			if hasJobTemplateSpec(o) {
+				if err := p.setJobTemplateSpecMeta(o); err != nil {
+					return err
+				}
+			}
+			if hasNetworkPolicySpec(o) {
+				if err := p.setNetworkPolicyRule(o); err != nil {
+					return err
+				}
+			}
+			return nil
+		}()
 		if err != nil {
 			return err
 		}
-		p.LogResult(o, metaLabelsPath, updatedLabels)
-		// set other common labels according to specific GVK
-		err = p.setLabelsInSpecs(o)
-		if err != nil {
-			return err
-		}
-		// handle special case with slice
-		if o.IsGVK("apps", "", "StatefulSet") {
-			if o.GetMap("spec") != nil {
-				for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
-					updatedLabels, err = updateLabels(vctObj, metaLabelsPath, p.NewLabels, true)
-					if err != nil {
-						return err
+		p.LogResult(o, p.ResultCount)
+	}
+	return nil
+}
+
+// hasJobTemplateSpec check if the object is CronJob, this kind might have JobTemplateSpec, which contains label fieldPath
+func hasJobTemplateSpec(o *fn.KubeObject) bool {
+	return o.IsGVK("batch", "", "CronJob")
+}
+
+// setJobTemplateSpecMeta set MetaObject in struct JobTemplateSpec
+func (p *LabelTransformer) setJobTemplateSpecMeta(o *fn.KubeObject) error {
+	// set objectMeta
+	fieldPath := FieldPath{"spec", "jobTemplate", "metadata", "labels"}
+	if err := updateLabels(&o.SubObject, fieldPath, p.NewLabels, true, p.ResultCount); err != nil {
+		return err
+	}
+	return nil
+}
+
+// setJobSpecObjectMeta set MetaObject in struct JobSpec
+func (p *LabelTransformer) setJobSpecObjectMeta(o *fn.KubeObject) error {
+	// set podTemplateSpec objectMeta
+	specfieldPath := FieldPath{"spec", "jobTemplate", "spec", "template", "metadata", "labels"}
+	if err := updateLabels(&o.SubObject, specfieldPath, p.NewLabels, true, p.ResultCount); err != nil {
+		return err
+	}
+	return nil
+}
+
+// hasJobPodSpec check if the object contains struct JobPodSpec
+func hasJobPodSpec(o *fn.KubeObject) bool {
+	if cronJobSpec := o.GetMap("spec"); cronJobSpec != nil {
+		if jobTemplateSpec := cronJobSpec.GetMap("jobTemplate"); jobTemplateSpec != nil {
+			if jobSpec := jobTemplateSpec.GetMap("spec"); jobSpec != nil {
+				if podTemplateSpec := jobSpec.GetMap("template"); podTemplateSpec != nil {
+					if podSpec := podTemplateSpec.GetMap("spec"); podSpec != nil {
+						return true
 					}
-					p.LogResult(o, FieldPath{"spec", "volumeClaimTemplates[]", "metadata", "labels"}, updatedLabels)
+				}
+			}
+		}
+	}
+	return false
+}
+
+// setJobPodSpec set labels path in PodSpec for kind CronJob
+func (p *LabelTransformer) setJobPodSpec(o *fn.KubeObject) error {
+	// set podTemplateSpec affinity
+	if hasJobPodSpec(o) {
+		podSpecObj := o.GetMap("spec").GetMap("jobTemplate").GetMap("spec").GetMap("template").GetMap("spec")
+		if err := p.setPodSpec(podSpecObj); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// hasNetworkPolicySpec checking if this kind is NetworkPolicy, it would contain struct NetworkPolicySpec
+func hasNetworkPolicySpec(o *fn.KubeObject) bool {
+	return o.IsGVK("networking.k8s.io", "", "NetworkPolicy")
+}
+
+// setNetworkPolicyRule set ingress and egress rules for kind NetworkPolicy
+func (p *LabelTransformer) setNetworkPolicyRule(o *fn.KubeObject) error {
+	podSelector := FieldPath{"podSelector", "matchLabels"}
+	spec := o.GetMap("spec")
+	if spec != nil {
+		for _, vecObj := range spec.GetSlice("ingress") {
+			for _, nextVecObj := range vecObj.GetSlice("from") {
+				err := updateLabels(nextVecObj, podSelector, p.NewLabels, false, p.ResultCount)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		for _, vecObj := range spec.GetSlice("egress") {
+			for _, nextVecObj := range vecObj.GetSlice("to") {
+				err := updateLabels(nextVecObj, podSelector, p.NewLabels, false, p.ResultCount)
+				if err != nil {
+					return err
 				}
 			}
 		}
@@ -127,34 +193,230 @@ func (p *LabelTransformer) Transform(objects fn.KubeObjects) error {
 	return nil
 }
 
-// LogResult logs the KRM resource that has the labels changed
-func (p *LabelTransformer) LogResult(o *fn.KubeObject, path []string, labels map[string]string) {
-	res, _ := json.Marshal(labels)
-	newResult := fn.Result{
-		Message:     "set labels: " + string(res),
-		Severity:    "",
-		ResourceRef: nil,
-		Field: &fn.Field{
-			Path:          strings.Join(path, "."),
-			CurrentValue:  nil,
-			ProposedValue: nil,
-		},
-		File: &fn.File{
-			Path:  o.PathAnnotation(),
-			Index: o.IndexAnnotation(),
-		},
-		Tags: nil,
+// hasSpecSelector check if the resource contains struct SpecSelector, kind Service and ReplicationController has it
+func hasSpecSelector(o *fn.KubeObject) bool {
+	if o.IsGVK("", "v1", "Service") || o.IsGVK("", "v1", "ReplicationController") {
+		return true
 	}
-	p.Results = append(p.Results, &newResult)
+	return false
+}
+
+// setSelector set labels for all selectors, including spec selector map, spec selector LabelSelector, LabelSelector in JobTemplate, and podSelector in NetworkPolicy, and
+func (p *LabelTransformer) setSelector(o *fn.KubeObject) error {
+	if hasSpecSelector(o) {
+		fieldPath := FieldPath{"spec", "selector"}
+		if err := updateLabels(&o.SubObject, fieldPath, p.NewLabels, true, p.ResultCount); err != nil {
+			return err
+		}
+	}
+	if found, create := hasLabelSelector(o); found {
+		fieldPath := FieldPath{"spec", "selector", "matchLabels"}
+		if err := updateLabels(&o.SubObject, fieldPath, p.NewLabels, create, p.ResultCount); err != nil {
+			return err
+		}
+	}
+	if hasJobTemplateSpec(o) {
+		fieldPath := FieldPath{"spec", "jobTemplate", "spec", "selector", "matchLabels"}
+		if err := updateLabels(&o.SubObject, fieldPath, p.NewLabels, false, p.ResultCount); err != nil {
+			return err
+		}
+	}
+	if hasNetworkPolicySpec(o) {
+		fieldPath := FieldPath{"spec", "podSelector", "matchLabels"}
+		if err := updateLabels(&o.SubObject, fieldPath, p.NewLabels, false, p.ResultCount); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// hasLabelSelector check if the resource contains struct LabelSelector, return (if the resource has LabelSelector, if the LabelSelector need to be created if not exist)
+func hasLabelSelector(o *fn.KubeObject) (bool, bool) {
+	if o.IsGVK("", "", "Deployment") || o.IsGVK("", "", "ReplicaSet") || o.IsGVK("", "", "DaemonSet") || o.IsGVK("apps", "", "StatefulSet") {
+		return true, true
+	}
+	if o.IsGVK("batch", "", "Job") || o.IsGVK("policy", "", "PodDisruptionBudget") {
+		return true, false
+	}
+	return false, false
+}
+
+// hasPodTemplateSpec check if the resource contains struct PodTemplateSpec, ReplicationController, Deployment, ReplicaSet, DaemonSet, StatefulSet, Job kind has it
+func hasPodTemplateSpec(o *fn.KubeObject) bool {
+	switch {
+	case o.IsGVK("", "v1", "ReplicationController"):
+		return true
+	case o.IsGVK("", "", "Deployment"):
+		return true
+	case o.IsGVK("", "", "ReplicaSet"):
+		return true
+	case o.IsGVK("", "", "DaemonSet"):
+		return true
+	case o.IsGVK("apps", "", "StatefulSet"):
+		return true
+	case o.IsGVK("batch", "", "Job"):
+		return true
+	default:
+		return false
+	}
+}
+
+// setPodTemplateSpec set label path for PodTemplateSpec, both its ObjectMeta and its PodSpec
+func (p *LabelTransformer) setPodTemplateSpec(o *fn.KubeObject) error {
+	if hasPodTemplateSpec(o) {
+		// set objectMeta
+		if err := p.setSpecObjectMeta(o); err != nil {
+			return err
+		}
+		// set podSpec
+		if hasPodSpec(o) {
+			if err := p.setPodSpec(o.GetMap("spec").GetMap("template").GetMap("spec")); err != nil {
+				return err
+			}
+		}
+	}
+	// PodTemplateSpec can also be in JobTemplateSpec
+	if hasJobTemplateSpec(o) {
+		if err := p.setJobSpecObjectMeta(o); err != nil {
+			return err
+		}
+		if err := p.setJobPodSpec(o); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// hasVolumeClaimTemplates check if the resource contains struct VolumeClaimTemplates, kind StatefulSet has it
+func hasVolumeClaimTemplates(o *fn.KubeObject) bool {
+	return o.IsGVK("apps", "", "StatefulSet")
+}
+
+// setVolumeClaimTemplates set VolumeClaimTemplates label path
+func (p *LabelTransformer) setVolumeClaimTemplates(o *fn.KubeObject) error {
+	if hasVolumeClaimTemplates(o) {
+		metaLabelPath := FieldPath{"metadata", "labels"}
+		if o.GetMap("spec") != nil {
+			for _, vctObj := range o.GetMap("spec").GetSlice("volumeClaimTemplates") {
+				err := updateLabels(vctObj, metaLabelPath, p.NewLabels, true, p.ResultCount)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// hasPodSpec check if the resource has struct PodSpec
+func hasPodSpec(o *fn.KubeObject) bool {
+	if spec := o.GetMap("spec"); spec != nil {
+		if template := spec.GetMap("template"); template != nil {
+			if podSpec := template.GetMap("spec"); podSpec != nil {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// setPodSpec set label path in PodSpec, that include path under topologySpreadConstraints and affinity
+func (p *LabelTransformer) setPodSpec(podSpec *fn.SubObject) error {
+	labelSelector := FieldPath{"labelSelector", "matchLabels"}
+
+	_, exist, _ := podSpec.NestedSlice("topologySpreadConstraints")
+	if exist {
+		for _, obj := range podSpec.GetSlice("topologySpreadConstraints") {
+			err := updateLabels(obj, labelSelector, p.NewLabels, false, p.ResultCount)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	subObj := podSpec.GetMap("affinity")
+	if subObj != nil {
+		for _, aff := range []string{"podAffinity", "podAntiAffinity"} {
+			podAff := subObj.GetMap(aff)
+			if podAff != nil {
+				for _, obj := range subObj.GetSlice("preferredDuringSchedulingIgnoredDuringExecution") {
+					nxtObj := obj.GetMap("podAffinityTerm")
+					if nxtObj != nil {
+						err := updateLabels(nxtObj, labelSelector, p.NewLabels, false, p.ResultCount)
+						if err != nil {
+							return err
+						}
+					}
+
+				}
+				for _, obj := range subObj.GetSlice("requiredDuringSchedulingIgnoredDuringExecution") {
+					err := updateLabels(obj, labelSelector, p.NewLabels, false, p.ResultCount)
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// setSpecObjectMeta takes in spec subObject and check its field for ObjectMeta, create key value if not existed
+func (p *LabelTransformer) setSpecObjectMeta(o *fn.KubeObject) error {
+	metaLabelsPath := FieldPath{"spec", "template", "metadata", "labels"}
+	err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true, p.ResultCount)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// setObjectMeta set ObjectMeta labels for all resources
+func (p *LabelTransformer) setObjectMeta(o *fn.KubeObject) error {
+	metaLabelsPath := FieldPath{"metadata", "labels"}
+	err := updateLabels(&o.SubObject, metaLabelsPath, p.NewLabels, true, p.ResultCount)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// LogResult logs the KRM resource that has the labels changed
+func (p *LabelTransformer) LogResult(o *fn.KubeObject, labelCount map[string]int) {
+	// no labels get updated, no log
+	if len(labelCount) == 0 {
+		return
+	}
+	keys := make([]string, 0)
+	for k := range labelCount {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for i := 0; i < len(keys); i++ {
+		key := keys[i]
+		labelCountValue := labelCount[key]
+		msg := fmt.Sprintf("set labels {%v} %v times", key, labelCountValue)
+		newResult := fn.Result{
+			Message:     msg,
+			Severity:    "",
+			ResourceRef: nil,
+			Field:       nil,
+			File: &fn.File{
+				Path:  o.PathAnnotation(),
+				Index: o.IndexAnnotation(),
+			},
+			Tags: nil,
+		}
+		p.Results = append(p.Results, &newResult)
+	}
 }
 
 // updateLabels the update process for each label, sort the keys to preserve sequence, return if the update was performed and potential error
-func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool) (map[string]string, error) {
+func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]string, create bool, updatedLabelsCount map[string]int) error {
 	keys := make([]string, 0)
 	for k := range newLabels {
 		keys = append(keys, k)
 	}
-	updatedLabels := make(map[string]string)
 	sort.Strings(keys)
 	for i := 0; i < len(keys); i++ {
 		key := keys[i]
@@ -162,15 +424,16 @@ func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]str
 		newPath := append(labelPath, key)
 		oldValue, exist, err := o.NestedString(newPath...)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		//TODO: should support user configurable field for labels
 		if (exist && oldValue != val) || (!exist && create) {
 			if err = o.SetNestedString(val, newPath...); err != nil {
-				return nil, err
+				return err
 			}
-			updatedLabels[key] = val
+			recordLabel := fmt.Sprintf("%v : %v", key, val)
+			updatedLabelsCount[recordLabel] += 1
 		}
 	}
-	return updatedLabels, nil
+	return nil
 }
