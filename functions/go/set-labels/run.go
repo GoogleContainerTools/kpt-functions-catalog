@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !(js && wasm)
+
 package main
 
 import (
-	"os"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/transformer"
+	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
-//nolint
-func main() {
-	if err := run(); err != nil {
-		os.Exit(1)
-	}
+func run() error {
+	return fn.AsMain(fn.ResourceListProcessorFunc(transformer.SetLabels))
 }
