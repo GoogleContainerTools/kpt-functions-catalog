@@ -15,11 +15,12 @@ package generator
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"reflect"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/augeasclient"
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/fn"
 )
 
 var _ fn.Generator = &NativeConfigAdaptor{}
@@ -49,14 +50,8 @@ func NewFromSource(source *augeasclient.AugeasConfigSource) (*fn.KubeObject, err
 }
 
 func (t *NativeConfigAdaptor) Generate(ctx *fn.Context, fnConfig *fn.KubeObject, items fn.KubeObjects) fn.KubeObjects {
-	/* TODO: Augeas only reads /etc and some other root access dir. maybe need to write a Augeas "lense" config file.
-	tmpDir := "tmp"
-	err := os.Mkdir(tmpDir, 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer os.RemoveAll(tmpDir)
-	*/
+	tmpDir := filepath.Join("/etc", "native-config-adaptor")
+	// defer os.RemoveAll(tmpDir)
 	var nativeConfigObjects []*fn.KubeObject
 	for _, source := range t.Spec.Source {
 		if source.LocalFileRef != "" {
@@ -74,19 +69,20 @@ func (t *NativeConfigAdaptor) Generate(ctx *fn.Context, fnConfig *fn.KubeObject,
 			})
 
 			for _, object := range localfileObjects {
-				// HACK: since I cannot let the function executable to write to /etc
-				/*
-					tmpfn := filepath.Join(tmpDir, object.GetName())
-					defer os.Remove(tmpfn)
+				tmpfn := filepath.Join(tmpDir, object.NestedStringOrDie("spec", "filename"))
+				f, err := os.Create(tmpfn)
+				if err != nil {
+					ctx.ResultErrAndDie(fmt.Sprintf("unable to create file %v: %v", tmpfn, err), nil)
+					continue
+				}
+				content := object.NestedStringOrDie("spec", "content")
+				if _, err = f.Write([]byte(content)); err != nil {
+					ctx.ResultErrAndDie(fmt.Sprintf("unable to write content %v: %v", object.GetName(), err), object)
+				}
+				source.LocalFile = tmpfn
 
-					content := object.NestedStringOrDie("spec", "content")
-					if err := ioutil.WriteFile(tmpfn, []byte(content), 0777); err != nil {
-						ctx.ResultErrAndDie(fmt.Sprintf("unable to write content %v: %v", object.GetName(), err), object)
-					}
-					source.LocalFile = filepath.Join(tmpDir, tmpfn)
-				*/
-				source.LocalFile = filepath.Join("/etc", object.NestedStringOrDie("spec", "filename"))
-				newObjects, err := augeasclient.Generate(source.LocalFile, t.Spec)
+				// source.LocalFile = filepath.Join("/etc", object.NestedStringOrDie("spec", "filename"))
+				newObjects, err := augeasclient.Generate(ctx, object.GetName(), source)
 				if err != nil {
 					ctx.ResultErrAndDie(fmt.Sprintf("unable to generate typed object from Augeas: %v", err), object)
 				}

@@ -11,17 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package main
+
+package fn
 
 import (
+	"fmt"
 	"os"
-
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/fn"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/generator"
 )
 
-func main() {
-	if err := fn.AsMain(&generator.NativeConfigAdaptor{}); err != nil {
-		os.Exit(1)
-	}
+func Log(in ...interface{}) {
+	fmt.Fprintln(os.Stderr, in...)
+}
+
+func Logf(format string, in ...interface{}) {
+	fmt.Fprintf(os.Stderr, format, in...)
 }

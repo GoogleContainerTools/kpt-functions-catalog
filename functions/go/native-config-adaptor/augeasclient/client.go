@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/fn"
 	"honnef.co/go/augeas"
 )
 
@@ -44,7 +44,7 @@ type AugeasConfigSource struct {
 	AsConfigMap  bool   `json:"asConfigMap,omitempty" yaml:"asConfigMap,omitempty"`
 }
 
-func Generate(name string, spec *AugeasConfigSpec) (fn.KubeObjects, error) {
+func Generate(ctx *fn.Context, name string, source *AugeasConfigSource) (fn.KubeObjects, error) {
 	ag, err := augeas.New("/", "", augeas.None)
 	if err != nil {
 		return nil, err
@@ -52,33 +52,35 @@ func Generate(name string, spec *AugeasConfigSpec) (fn.KubeObjects, error) {
 	defer ag.Close()
 
 	var newObjects []*fn.KubeObject
-	for _, source := range spec.Source {
-		autoload, ok := AugeasLenses[FileFormat(source.Format)]
-		if !ok {
-			return nil, fmt.Errorf("unknown lenses format %v", source.Format)
-		}
-		// TODO: use ag.transform
-		if !autoload {
-			lensPath := "/augeas/load/" + source.Format + "/lens"
-			lens := source.Format + ".lns"
-			if err = ag.Set(lensPath, lens); err != nil {
-				return nil, err
-			}
-		}
-		lensInclude := "/augeas/load/" + source.Format + "/incl"
-		ag.Set(lensInclude, filepath.Join(AugeasFilePrefix, source.Format))
-		ag.Load()
 
-		object := CreateCanonicalObject(name, source)
-		if source.AsConfigMap {
-			WalkAugeasAndBuildFlattenObject(ag, object.UpsertMap("data"), filepath.Join(AugeasFilePrefix, source.LocalFile), ConfigMapPrefixMarker)
-		} else {
-			WalkAugeasAndBuildStructuredObject(ag, object.UpsertMap("spec"), filepath.Join(AugeasFilePrefix, source.LocalFile))
-		}
-		newObjects = append(newObjects, object)
-		cmObject := StoreRawDataInConfigMap(name, source.LocalFile)
-		newObjects = append(newObjects, cmObject)
+	// TODO: use ag.transform
+	lensPath := "/augeas/load/" + source.Format + "/lens"
+	var lens string
+	if source.Format == "IniFile" {
+		lens = "Puppet.lns"
+	} else {
+		lens = source.Format + ".lns"
 	}
+	ctx.ResultWarn("set "+lensPath+" "+lens, nil)
+	if err = ag.Set(lensPath, lens); err != nil {
+		return nil, err
+	}
+	lensInclude := "/augeas/load/" + source.Format + "/incl"
+	ctx.ResultWarn("set "+lensInclude+" "+source.LocalFile, nil)
+	ag.Set(lensInclude, source.LocalFile)
+
+	if err = ag.Load(); err != nil {
+		ctx.ResultErr("load fail:"+err.Error(), nil)
+	}
+	object := CreateCanonicalObject(name, source)
+	if source.AsConfigMap {
+		WalkAugeasAndBuildFlattenObject(ctx, ag, object.UpsertMap("data"), filepath.Join(AugeasFilePrefix, source.LocalFile), ConfigMapPrefixMarker, true)
+	} else {
+		WalkAugeasAndBuildStructuredObject(ag, object.UpsertMap("spec"), filepath.Join(AugeasFilePrefix, source.LocalFile))
+	}
+	newObjects = append(newObjects, object)
+	cmObject := StoreRawDataInConfigMap(name, source.LocalFile)
+	newObjects = append(newObjects, cmObject)
 	return newObjects, nil
 }
 
@@ -118,30 +120,33 @@ func CreateCanonicalObject(name string, source *AugeasConfigSource) *fn.KubeObje
 	return object
 }
 
-func WalkAugeasAndBuildFlattenObject(ag augeas.Augeas, object *fn.SubObject, path string, prefix string) error {
+func WalkAugeasAndBuildFlattenObject(ctx *fn.Context, ag augeas.Augeas, object *fn.SubObject, path string, prefix string, getOrSet bool) error {
 	// Augueas index starts with 1.
 	// slice objects
-	_, err := ag.Get(filepath.Join(path, "*[1]"))
+	ctx.ResultInfo("print "+path, nil)
+	keys, err := ag.GetAll(path)
 	if err != nil {
-		value, e := ag.Get(path)
-		if e != nil {
-			return e
-		}
-		return object.SetNestedString(value, prefix+"."+filepath.Base(path))
+		return err
 	}
-	for i := 1; ; i++ {
-		branchPath := filepath.Join(path, fmt.Sprintf("*[%d]", i))
-		branchNode, err := ag.Get(branchPath)
+	if len(keys) == 0 {
+		ctx.ResultInfo("0 keys", nil)
+		return nil
+	}
+	if len(keys) == 1 {
+		value, err := ag.Get(keys[1])
 		if err != nil {
 			return err
 		}
-
-		subNodes, err := ag.Match(filepath.Join(branchPath, "*"))
-		if err != nil {
-			return err
-		}
-		for _, subNode := range subNodes {
-			WalkAugeasAndBuildFlattenObject(ag, object, subNode, prefix+"."+branchNode)
+		object.SetNestedStringOrDie(value, prefix+keys[0])
+	} else {
+		keyPrefix := keys[0] + "/"
+		for _, value := range keys[1:] {
+			key := strings.Split(value, keyPrefix)[1]
+			value, err = ag.Get(key)
+			if err != nil {
+				return err
+			}
+			object.SetNestedStringOrDie(value, prefix+keys[0]+"."+key)
 		}
 	}
 	return nil
