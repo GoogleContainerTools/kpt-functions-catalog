@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/configmap-generator/fn"
 )
 
 func Hash(object *fn.KubeObject) (string, error) {

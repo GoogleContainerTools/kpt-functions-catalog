@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/augeasclient"
-	generator "github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/generator"
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/configmap-generator/fn"
+	generator "github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/configmap-generator/native-config-adaptor/generator"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -31,20 +30,32 @@ type ConfigMapGeneratorSpec struct {
 
 type SourceObjectReference struct {
 	corev1.TypedLocalObjectReference `json:",inline,omitempty" yaml:",inline,omitempty"`
-	augeasclient.AugeasConfigSource  `json:",inline,omitempty" yaml:",inline,omitempty"`
+	generator.NativeConfigSource     `json:",inline,omitempty" yaml:",inline,omitempty"`
 }
 
 func (r *ConfigMapGenerator) Generate(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.KubeObjects) fn.KubeObjects {
-	var newObjects []*fn.KubeObject
-	data := map[string]string{}
+	noConfigMapItemList := items.WhereNot(func(o *fn.KubeObject) bool {
+		return o.GetKind() == "ConfigMap" && (o.GetAnnotation(fn.GeneratorIdentifier) == functionConfig.GetId().String() || o.GetAnnotation(fn.GeneratorBuiltinIdentifier) == functionConfig.GetId().String())
+	})
+	previousGeneratedConfigMapAndNonKRM := items.Where(func(o *fn.KubeObject) bool {
+		if o.GetKind() == "ConfigMap" {
+			return o.GetAnnotation(fn.GeneratorIdentifier) == functionConfig.GetId().String() || o.GetAnnotation(fn.GeneratorBuiltinIdentifier) == functionConfig.GetId().String()
+		}
+		if o.GetKind() == fn.NonKrmKind {
+			return true
+		}
+		return false
+	})
 	rawConfigMapName := ""
+	var newlyGeneratedConfigMaps, newItemsList fn.KubeObjects
+	data := map[string]string{}
 	var nativeFnConfig *fn.KubeObject
 	for _, source := range r.Spec.Source {
 		if source.LocalFile == "" && source.LocalFileRef == "" {
 			ctx.ResultErrAndDie("required either `spec.source.localFilePath` or `spec.source.localFileRef`", functionConfig)
 		}
 		// configmap generator always expects a ConfigMap object from NativeConfigAdaptor, not custom typed object.
-		source.AugeasConfigSource.AsConfigMap = true
+		source.AsConfigMap = true
 		if source.Kind != "" {
 			if source.Kind != string(NativeConfigAdaptor) {
 				ctx.ResultWarn(fmt.Sprintf("unknown generator type %s", r.Spec.Source), functionConfig)
@@ -56,35 +67,34 @@ func (r *ConfigMapGenerator) Generate(ctx *fn.Context, functionConfig *fn.KubeOb
 			}
 		} else {
 			var err error
-			nativeFnConfig, err = generator.NewFromSource(&source.AugeasConfigSource)
+			nativeFnConfig, err = generator.NewFromSource(&source.NativeConfigSource)
 			if err != nil {
 				ctx.ResultErrAndDie(fmt.Sprintf("bad source: %v", err), functionConfig)
 			}
 		}
 		nativeFnConfig.SetName(functionConfig.GetName())
 		nativeConfigAdaptor := generator.NewNativeConfigAdaptor(nativeFnConfig)
-		nativeConfigObjects := nativeConfigAdaptor.Generate(ctx, nativeFnConfig, items)
+		newlyGeneratedConfigMaps = nativeConfigAdaptor.Generate(ctx, nativeFnConfig, previousGeneratedConfigMapAndNonKRM)
 		if source.Name != "" {
 			nativeFnConfig.SetName(source.Name)
 		}
-		if nativeConfigObjects == nil || len(nativeConfigObjects) == 0 {
-			ctx.ResultErr("no native configuration generated", nativeFnConfig)
+		if newlyGeneratedConfigMaps == nil || len(newlyGeneratedConfigMaps) == 0 {
+			ctx.ResultErr("no ConfigMap generated from native-config-adaptor", nativeFnConfig)
 			continue
 		}
-		granularObj := new(fn.KubeObject)
-		rawObject := new(fn.KubeObject)
-		for _, newObj := range nativeConfigObjects {
-			if strings.HasSuffix(newObj.GetName(), "-internal") {
-				granularObj = newObj
+		var rawConfigMap, canonicalConfigMap *fn.KubeObject
+		for _, newConfigMap := range newlyGeneratedConfigMaps {
+			if strings.HasSuffix(newConfigMap.GetName(), "-internal") {
+				canonicalConfigMap = newConfigMap
 			} else {
-				rawObject = newObj
+				rawConfigMap = newConfigMap
 			}
 		}
 		// Update ConfigMap data from Raw granular object.
-		{
-			newData, found, err := granularObj.NestedStringMap("data")
+		if canonicalConfigMap != nil {
+			newData, found, err := canonicalConfigMap.NestedStringMap("data")
 			if !found || err != nil {
-				ctx.ResultErrAndDie(err.Error(), granularObj)
+				ctx.ResultErrAndDie(err.Error(), canonicalConfigMap)
 				return nil
 			}
 			for k, v := range newData {
@@ -93,21 +103,23 @@ func (r *ConfigMapGenerator) Generate(ctx *fn.Context, functionConfig *fn.KubeOb
 				}
 				data[k] = v
 			}
+			cmObject, err := r.CreateCanonicalConfigMap(functionConfig, canonicalConfigMap, data)
+			if err != nil {
+				ctx.ResultErrAndDie(err.Error(), nil)
+			}
+			newItemsList = append(newItemsList, cmObject)
 		}
 		// RawObject is exposed to user as immutable ConfigMap.
 		{
-			SetRawConfigMapObject(functionConfig, rawObject)
-			newObjects = append(newObjects, rawObject)
-			rawConfigMapName = rawObject.GetName()
+			SetRawConfigMapObject(functionConfig, rawConfigMap)
+			newItemsList = append(newItemsList, rawConfigMap)
+			rawConfigMapName = rawConfigMap.GetName()
 		}
 	}
-	cmObject, err := r.CreateConfigMap(functionConfig, data)
-	if err != nil {
-		ctx.ResultErrAndDie(err.Error(), nil)
-	}
-	newObjects = append(newObjects, cmObject)
-	UpdateConfigMapReference(items, functionConfig.GetName(), rawConfigMapName)
-	return newObjects
+	UpdateConfigMapReference(noConfigMapItemList, functionConfig.GetName(), rawConfigMapName)
+	ctx.ResultInfo("ConfigMap references are updated to "+rawConfigMapName, nil)
+	newItemsList = append(newItemsList, noConfigMapItemList...)
+	return newItemsList
 }
 
 func SetRawConfigMapObject(fnConfig *fn.KubeObject, object *fn.KubeObject) {
@@ -147,7 +159,9 @@ func UpdateConfigMapReference(items fn.KubeObjects, oldName, newName string) {
 			for _, volume := range volumes {
 				var v corev1.Volume
 				volume.As(&v)
-				if v.ConfigMap != nil && v.ConfigMap.Name == oldName {
+				// StatefulSet should hold the configmap origin.
+				// if v.ConfigMap != nil && v.ConfigMap.Name == oldName {
+				if v.ConfigMap != nil {
 					volume.GetMap("configMap").SetNestedString(newName, "name")
 				}
 			}
@@ -155,13 +169,9 @@ func UpdateConfigMapReference(items fn.KubeObjects, oldName, newName string) {
 	}
 }
 
-func (r *ConfigMapGenerator) CreateConfigMap(functionConfig *fn.KubeObject, data map[string]string) (*fn.KubeObject, error) {
+func (r *ConfigMapGenerator) CreateCanonicalConfigMap(functionConfig, object *fn.KubeObject, data map[string]string) (*fn.KubeObject, error) {
 	name := functionConfig.GetName() + "-internal"
 	namespace := functionConfig.GetNamespace()
-
-	object := fn.NewEmptyKubeObject()
-	object.SetKind("ConfigMap")
-	object.SetAPIVersion("v1")
 	object.SetName(name)
 	if namespace != "" {
 		object.SetNamespace(namespace)

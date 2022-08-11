@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/configmap-generator/fn"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/configmap-generator/generator"
-	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
 func main() {

@@ -18,8 +18,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/fn"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/native-config-adaptor/parsers"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/configmap-generator/fn"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/configmap-generator/native-config-adaptor/parsers"
 )
 
 const NativeConfigOpBackToNative = "writeBackToNativeConfig"
@@ -77,33 +77,32 @@ func (t *NativeConfigAdaptor) Generate(ctx *fn.Context, fnConfig *fn.KubeObject,
 			sotObjects := items.Where(func(o *fn.KubeObject) bool {
 				return o.GetAnnotation(fn.GeneratorBuiltinIdentifier) != ""
 			})
-
 			switch source.Operation {
 			case NativeConfigOpBackToNative:
+				ctx.ResultInfo(
+					"The structured ConfigMap is the Source-of-True, generating  to non KRM object and appliable ConfigMap...", nil)
 				for _, canonicalObject := range sotObjects {
 					nonKrmObject := t.WriteFromCanonicalToNative(ctx, canonicalObject, source)
-					existingNonKrmObjects := items.Where(func(o *fn.KubeObject) bool {
-						return o.GetId() == nonKrmObject.GetId()
-					})
-					if len(existingNonKrmObjects) > 0 {
-						content := nonKrmObject.GetMap("spec").NestedStringMapOrDie("content")
-						existingNonKrmObjects[0].GetMap("spec").SetNestedStringMap(content, "content")
-					} else {
-						generatedObjects = append(generatedObjects, nonKrmObject)
+					if !source.AsConfigMap {
+						ctx.ResultErrAndDie("unimplemented type", nonKrmObject)
 					}
-					rawObject := StoreRawDataInConfigMap(fnConfig.GetName(),
+					newRawConfigMap := StoreRawDataInConfigMap(fnConfig.GetName(),
 						filepath.Base(source.LocalFile),
 						nonKrmObject.NestedStringOrDie("spec", "content"))
-					existingrawObjects := items.Where(func(o *fn.KubeObject) bool {
-						return o.GetId() == rawObject.GetId()
+					existingRrawConfigMaps := items.Where(func(o *fn.KubeObject) bool {
+						return o.GetId() == newRawConfigMap.GetId() && o.GetKind() == "ConfigMap"
 					})
-					if len(existingrawObjects) > 0 {
-						existingrawObjects[0].SetNestedStringMapOrDie(rawObject.NestedStringMapOrDie("data"), "data")
+					if len(existingRrawConfigMaps) > 0 {
+						existingRrawConfigMaps[0].SetNestedStringMapOrDie(newRawConfigMap.NestedStringMapOrDie("data"), "data")
+						generatedObjects = append(generatedObjects, existingRrawConfigMaps[0])
 					} else {
-						generatedObjects = append(generatedObjects, rawObject)
+						generatedObjects = append(generatedObjects, newRawConfigMap)
 					}
+					canonicalObject.SetName(fnConfig.GetName() + "-internal")
+					generatedObjects = append(generatedObjects, canonicalObject)
 				}
 			default:
+				ctx.ResultInfo("The non KRM object is the Source-of-True, generating the structured ConfigMap and appliable ConfigMap...", nil)
 				for _, object := range localfileObjects {
 					content := object.NestedStringOrDie("spec", "content")
 					localFileName := object.NestedStringOrDie("spec", "filename")
@@ -163,7 +162,6 @@ func NewCanonicalObject(name string, source *NativeConfigSource) *fn.KubeObject 
 	}
 
 	object := fn.NewEmptyKubeObject()
-
 	if source.AsConfigMap {
 		object.SetKind("ConfigMap")
 		object.SetAPIVersion("v1")

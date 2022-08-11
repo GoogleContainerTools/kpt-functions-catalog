@@ -3,6 +3,7 @@ kind: NativeConfigAdaptor
 metadata:
   name: builtin
 spec:
+  operation: writeBackToNativeConfig # default to generate canonical KRM object from Native Config
   source:
     - format: IniFile # optional
       localFile: /etc/my.cnf

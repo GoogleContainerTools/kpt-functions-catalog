@@ -1,7 +1,9 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: mycnf-ini-file
+  name: mariadb-btg654b96m
+  annotations:
+    internal.kpt.dev/generator: fn.kpt.dev|ConfigMapGenerator|example|mariadb
 data:
   my.cnf: |-
     [mysqld]
@@ -12,7 +14,7 @@ data:
     port=3306
     socket=/opt/bitnami/mariadb/tmp/mysql.sock
     tmpdir=/opt/bitnami/mariadb/tmp
-    max_allowed_packet=16M
+    max_allowed_packet=32M
     bind-address=*
     pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
     log-error=/opt/bitnami/mariadb/logs/mysqld.log
@@ -32,3 +34,4 @@ data:
     port=3306
     socket=/opt/bitnami/mariadb/tmp/mysql.sock
     pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+immutable: true

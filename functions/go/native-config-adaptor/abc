@@ -18,3 +18,4 @@ functionConfig:
     source:
     - format: IniFile # optional
       localFileRef: mycnf-ini-file
+      asConfigMap: true

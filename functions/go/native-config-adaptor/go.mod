@@ -25,6 +25,7 @@ require (
 	github.com/stretchr/testify v1.8.0 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
+	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20220627174259-011e075b9cb8 // indirect
 )
