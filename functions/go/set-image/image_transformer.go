@@ -113,9 +113,9 @@ func (si *SetImage) Config(functionConfig *fn.KubeObject) (error, bool) {
 	si.Image = types.Image{}
 	si.AdditionalImageFields = nil
 	switch {
-	case functionConfig.IsGVK( "v1", "ConfigMap"):
+	case functionConfig.IsGVK("", "v1", "ConfigMap"):
 		functionConfig.GetOrDie(&si.Image, "data")
-	case functionConfig.IsGVK(fnConfigAPIVersion, fnConfigKind):
+	case functionConfig.IsGVK(fn.KptFunctionGroup, fn.KptFunctionVersion, fnConfigKind):
 		functionConfig.AsOrDie(si)
 	default:
 		return fmt.Errorf("`functionConfig` must be a `ConfigMap` or `%s`", fnConfigKind), false
@@ -175,12 +175,12 @@ func (si *SetImage) mutationTracker(objRN *yaml.RNode, ko *fn.KubeObject) func(k
 					Namespace: ko.GetNamespace(),
 				},
 			},
-			FilePath:    filePath,
-			FileIndex:   fileIndex,
-			FieldPath:   strings.Join(node.FieldPath(), "."),
+			FilePath:  filePath,
+			FileIndex: fileIndex,
+			FieldPath: strings.Join(node.FieldPath(), "."),
 		}
 		si.setImageResults[rk] = append(si.setImageResults[rk], setImageResult{
-			CurrentValue:  currentValue,
+			CurrentValue: currentValue,
 			UpdatedValue: value,
 		})
 	}

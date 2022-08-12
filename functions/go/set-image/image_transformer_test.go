@@ -30,20 +30,20 @@ func runImageTransformerResults(input, config string) (*fn.ResourceList, error) 
 	}
 	rl.FunctionConfig = functionConfig
 	in, _ := rl.ToYAML()
-	out, err := fn.Run(fn.ResourceListProcessorFunc(setImageTags), in)
+	out, err := fn.Run(fn.ResourceListProcessorFunc(SetImageTagSDK), in)
 	if err != nil {
 		return nil, err
 	}
 	rl, _ = fn.ParseResourceList(out)
 
-	ko, _ := fn.ParseKubeObject(out)
-	results := ko.GetSlice("results")
-	for _, result := range results{
-		if result.GetString("severity") == "error" {
-			return rl, fn.GeneralResult(result.GetString("message"), fn.Error)
-		}
-		rl.Results = append(rl.Results, fn.GeneralResult(result.GetString("message"), fn.Info))
-	}
+	//ko, _ := fn.ParseKubeObject(out)
+	//results := ko.GetSlice("results")
+	//for _, result := range results {
+	//	if result.GetString("severity") == "error" {
+	//		return rl, fn.GeneralResult(result.GetString("message"), fn.Error)
+	//	}
+	//	rl.Results = append(rl.Results, fn.GeneralResult(result.GetString("message"), fn.Info))
+	//}
 	return rl, nil
 }
 
@@ -228,7 +228,7 @@ data:
   newName: bar
   newTag: v1.0
 `,
-			ExpectedError: `missing image name`,
+			ExpectedError: `missing image name or container name`,
 		},
 		{
 			TestName: "set-image should return an error if image newName, newTag, and digest are unset",
@@ -265,7 +265,7 @@ kind: ConfigMap
 metadata:
   name: my-func-config
 `,
-			ExpectedError: `missing image name`,
+			ExpectedError: `missing image name or container name`,
 		},
 		{
 			TestName: "set-image should return an error when an invalid ConfigMap is used as the functionConfig",
@@ -287,7 +287,7 @@ image:
   name:
     unexpected: object
 `,
-			ExpectedError: "Resource(apiVersion=fn.kpt.dev/v1alpha1, kind=SetImage, Name=) has unmatched field type: `",
+			ExpectedError: "SubObject has unmatched field type: `image",
 		},
 	}
 
