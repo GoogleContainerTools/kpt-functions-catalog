@@ -2,6 +2,7 @@ package transformer
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/kustomize/api/image"
@@ -96,9 +97,14 @@ func (imageTrans *ImageTransformer) Transform(objects fn.KubeObjects) error {
 
 func (imageTrans *ImageTransformer) addWarning(o *fn.KubeObject) {
 	warning := &fn.Result{
-		Message:     "container name does not match, only image name matches",
-		Severity:    fn.Warning,
-		ResourceRef: nil,
+		Message:  "container name does not match, only image name matches",
+		Severity: fn.Warning,
+		ResourceRef: &fn.ResourceRef{
+			APIVersion: o.GetAPIVersion(),
+			Kind:       o.GetKind(),
+			Name:       o.GetName(),
+			Namespace:  o.GetNamespace(),
+		},
 		File: &fn.File{
 			Path:  o.PathAnnotation(),
 			Index: o.IndexAnnotation(),
@@ -113,24 +119,27 @@ func (imageTrans *ImageTransformer) setPodSpecContainers(o *fn.KubeObject) {
 		if template := spec.GetMap("template"); template != nil {
 			if podSpec := template.GetMap("spec"); podSpec != nil {
 				for _, vecObj := range podSpec.GetSlice("containers") {
-					imageTrans.updateImages(vecObj, &imageTrans.Image, o)
+					fieldPath := FieldPath{"spec", "template", "spec", "containers"}
+					imageTrans.updateImages(vecObj, &imageTrans.Image, o, fieldPath)
 				}
 				for _, vecObj := range podSpec.GetSlice("iniContainers") {
-					imageTrans.updateImages(vecObj, &imageTrans.Image, o)
+					fieldPath := FieldPath{"spec", "template", "spec", "iniContainers"}
+					imageTrans.updateImages(vecObj, &imageTrans.Image, o, fieldPath)
 				}
 			}
 		}
 	}
-
 }
 
 func (imageTrans *ImageTransformer) setPodContainers(o *fn.KubeObject) {
 	if spec := o.GetMap("spec"); spec != nil {
 		for _, vecObj := range spec.GetSlice("containers") {
-			imageTrans.updateImages(vecObj, &imageTrans.Image, o)
+			fieldPath := FieldPath{"spec", "containers"}
+			imageTrans.updateImages(vecObj, &imageTrans.Image, o, fieldPath)
 		}
 		for _, vecObj := range spec.GetSlice("iniContainers") {
-			imageTrans.updateImages(vecObj, &imageTrans.Image, o)
+			fieldPath := FieldPath{"spec", "iniContainers"}
+			imageTrans.updateImages(vecObj, &imageTrans.Image, o, fieldPath)
 		}
 	}
 }
@@ -185,7 +194,7 @@ func matchImage(oldName string, oldContainer string, newImage *Image) (bool, err
 }
 
 // updateImages the update process for each image, if error happened, it panics
-func (imageTrans *ImageTransformer) updateImages(o *fn.SubObject, newImage *Image, parentO *fn.KubeObject) {
+func (imageTrans *ImageTransformer) updateImages(o *fn.SubObject, newImage *Image, parentO *fn.KubeObject, fieldPath FieldPath) {
 	oldValue := o.NestedStringOrDie("image")
 	container := o.NestedStringOrDie("name")
 
@@ -193,7 +202,8 @@ func (imageTrans *ImageTransformer) updateImages(o *fn.SubObject, newImage *Imag
 	if matched {
 		newName := getNewImageName(oldValue, newImage)
 		o.SetNestedStringOrDie(newName, "image")
-		imageTrans.LogResult(parentO, oldValue, newName)
+		fieldPath = append(fieldPath, "image")
+		imageTrans.LogResult(parentO, oldValue, newName, fieldPath)
 		imageTrans.ResultCount += 1
 	}
 	if err != nil {
@@ -202,11 +212,21 @@ func (imageTrans *ImageTransformer) updateImages(o *fn.SubObject, newImage *Imag
 
 }
 
-func (imageTrans *ImageTransformer) LogResult(o *fn.KubeObject, oldValue string, newValue string) {
+func (imageTrans *ImageTransformer) LogResult(o *fn.KubeObject, oldValue string, newValue string, fieldPath FieldPath) {
 	newResult := fn.Result{
-		Message:     fmt.Sprintf("set image from %v to %v", oldValue, newValue),
-		Severity:    fn.Info,
-		ResourceRef: nil,
+		Message:  fmt.Sprintf("set image from %v to %v", oldValue, newValue),
+		Severity: fn.Info,
+		ResourceRef: &fn.ResourceRef{
+			APIVersion: o.GetAPIVersion(),
+			Kind:       o.GetKind(),
+			Name:       o.GetName(),
+			Namespace:  o.GetNamespace(),
+		},
+		Field: &fn.Field{
+			Path:          strings.Join(fieldPath, "."),
+			CurrentValue:  oldValue,
+			ProposedValue: newValue,
+		},
 		File: &fn.File{
 			Path:  o.PathAnnotation(),
 			Index: o.IndexAnnotation(),

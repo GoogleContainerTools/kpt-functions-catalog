@@ -36,14 +36,15 @@ func runImageTransformerResults(input, config string) (*fn.ResourceList, error) 
 	}
 	rl, _ = fn.ParseResourceList(out)
 
-	//ko, _ := fn.ParseKubeObject(out)
-	//results := ko.GetSlice("results")
-	//for _, result := range results {
-	//	if result.GetString("severity") == "error" {
-	//		return rl, fn.GeneralResult(result.GetString("message"), fn.Error)
-	//	}
-	//	rl.Results = append(rl.Results, fn.GeneralResult(result.GetString("message"), fn.Info))
-	//}
+	rl.Results = nil
+	ko, _ := fn.ParseKubeObject(out)
+	results := ko.GetSlice("results")
+	for _, result := range results {
+		if result.GetString("severity") == "error" {
+			return rl, fn.GeneralResult(result.GetString("message"), fn.Error)
+		}
+		rl.Results = append(rl.Results, fn.GeneralResult(result.GetString("message"), fn.Info))
+	}
 	return rl, nil
 }
 

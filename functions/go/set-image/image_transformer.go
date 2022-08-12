@@ -81,9 +81,14 @@ func (si *SetImage) SdkResults() fn.Results {
 					CurrentValue:  sir.CurrentValue,
 					ProposedValue: sir.UpdatedValue,
 				},
-				File:        &fn.File{Path: k.FilePath, Index: k.FileIndex},
-				Severity:    fn.Info,
-				ResourceRef: &resourceRef,
+				File:     &fn.File{Path: k.FilePath, Index: k.FileIndex},
+				Severity: fn.Info,
+				ResourceRef: &fn.ResourceRef{
+					APIVersion: resourceRef.APIVersion,
+					Kind:       resourceRef.Kind,
+					Name:       resourceRef.Name,
+					Namespace:  resourceRef.Namespace,
+				},
 			})
 		}
 	}
