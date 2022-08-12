@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220812180116-970f3e4cbc5a
-	//970f3e4cbc5af241e52ef22dc6922de8b1a3d4a1
 	github.com/stretchr/testify v1.8.0
 	sigs.k8s.io/kustomize/api v0.11.0
 	sigs.k8s.io/kustomize/kyaml v0.13.9
