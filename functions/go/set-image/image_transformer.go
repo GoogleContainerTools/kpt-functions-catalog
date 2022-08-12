@@ -15,10 +15,7 @@ import (
 )
 
 const (
-	fnConfigGroup      = "fn.kpt.dev"
-	fnConfigVersion    = "v1alpha1"
-	fnConfigAPIVersion = fnConfigGroup + "/" + fnConfigVersion
-	fnConfigKind       = "SetImage"
+	fnConfigKind = "SetImage"
 )
 
 // getDefaultImageFields returns default image FieldSpecs

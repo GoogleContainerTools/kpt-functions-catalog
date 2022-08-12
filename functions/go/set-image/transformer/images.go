@@ -90,8 +90,6 @@ func (imageTrans *ImageTransformer) Transform(objects fn.KubeObjects) error {
 	for _, o := range objects.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() }) {
 		imageTrans.setPodContainers(o)
 		imageTrans.setPodSpecContainers(o)
-
-		//imageTrans.addTotalInfo(o)
 	}
 	return nil
 }
@@ -108,20 +106,6 @@ func (imageTrans *ImageTransformer) addWarning(o *fn.KubeObject) {
 		Tags: nil,
 	}
 	imageTrans.Results = append(imageTrans.Results, warning)
-}
-
-func (imageTrans *ImageTransformer) addTotalInfo(o *fn.KubeObject) {
-	totalInfo := &fn.Result{
-		Message:     fmt.Sprintf("total number of images updates is %v", imageTrans.ResultCount),
-		Severity:    fn.Info,
-		ResourceRef: nil,
-		File: &fn.File{
-			Path:  o.PathAnnotation(),
-			Index: o.IndexAnnotation(),
-		},
-		Tags: nil,
-	}
-	imageTrans.Results = append(imageTrans.Results, totalInfo)
 }
 
 func (imageTrans *ImageTransformer) setPodSpecContainers(o *fn.KubeObject) {
