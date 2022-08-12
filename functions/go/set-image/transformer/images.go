@@ -99,6 +99,7 @@ func (imageTrans *ImageTransformer) Transform(objects fn.KubeObjects) error {
 	return nil
 }
 
+// addWarning provides a warning message when the image name matches correctly while container name does not
 func (imageTrans *ImageTransformer) addWarning(o *fn.KubeObject) {
 	warning := &fn.Result{
 		Message:  "container name does not match, only image name matches",
