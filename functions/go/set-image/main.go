@@ -8,12 +8,12 @@ import (
 )
 
 func main() {
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(SetImageTagSDK)); err != nil {
+	if err := fn.AsMain(fn.ResourceListProcessorFunc(SetImageTagsNew)); err != nil {
 		os.Exit(1)
 	}
 }
 
-func SetImageTagSDK(rl *fn.ResourceList) (bool, error) {
+func SetImageTagsNew(rl *fn.ResourceList) (bool, error) {
 	imageTransformer := transformer.ImageTransformer{}
 	if err := imageTransformer.Config(rl.FunctionConfig); err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))

@@ -14,16 +14,16 @@ const FnConfigKind = "SetImage"
 type FieldPath []string
 
 type Image struct {
-	// Name is a tag-less image name. should be deprecate, means image name
+	// (DEPRECATED): Name is a tag-less image name.
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
-	// ContainerName is the name for container
+	// ContainerName is the name for container.
 	ContainerName string `json:"containerName,omitempty" yaml:"containerName,omitempty"`
 
-	// ImageName is the image name
+	// ImageName is the image name.
 	ImageName string `json:"imageName,omitempty" yaml:"imageName,omitempty"`
 
-	// NewName is the value used to replace the original name, replace image name
+	// NewName is the value used to replace the original name, replace image name.
 	NewName string `json:"newName,omitempty" yaml:"newName,omitempty"`
 
 	// NewTag is the value used to replace the original tag.
@@ -69,10 +69,10 @@ func (imageTrans *ImageTransformer) Config(functionConfig *fn.KubeObject) error 
 // validateInput validates the inputs passed into via the functionConfig
 func (imageTrans *ImageTransformer) validateInput() error {
 	if imageTrans.Image.Name == "" && imageTrans.Image.ContainerName == "" && imageTrans.Image.ImageName == "" {
-		return fmt.Errorf("missing image name or container name")
+		return fmt.Errorf("either image name or container name is required")
 	}
 	if imageTrans.Image.NewName == "" && imageTrans.Image.NewTag == "" && imageTrans.Image.Digest == "" {
-		return fmt.Errorf("missing image newName, newTag, or digest")
+		return fmt.Errorf("either image newName, newTag, or digest is required")
 	}
 	if imageTrans.Image.NewTag != "" && imageTrans.Image.Digest != "" {
 		return fmt.Errorf("image newTag and digest both set")

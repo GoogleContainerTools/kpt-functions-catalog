@@ -30,7 +30,7 @@ func runImageTransformerResults(input, config string) (*fn.ResourceList, error) 
 	}
 	rl.FunctionConfig = functionConfig
 	in, _ := rl.ToYAML()
-	out, err := fn.Run(fn.ResourceListProcessorFunc(SetImageTagSDK), in)
+	out, err := fn.Run(fn.ResourceListProcessorFunc(SetImageTagsNew), in)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ data:
   newName: bar
   newTag: v1.0
 `,
-			ExpectedError: `missing image name or container name`,
+			ExpectedError: `either image name or container name is required`,
 		},
 		{
 			TestName: "set-image should return an error if image newName, newTag, and digest are unset",
@@ -241,7 +241,7 @@ metadata:
 data:
   name: foo
 `,
-			ExpectedError: `missing image newName, newTag, or digest`,
+			ExpectedError: `either image newName, newTag, or digest is required`,
 		},
 		{
 			TestName: "set-image should return an error when both image newTag and digest are set",
@@ -266,7 +266,7 @@ kind: ConfigMap
 metadata:
   name: my-func-config
 `,
-			ExpectedError: `missing image name or container name`,
+			ExpectedError: `either image name or container name is required`,
 		},
 		{
 			TestName: "set-image should return an error when an invalid ConfigMap is used as the functionConfig",
