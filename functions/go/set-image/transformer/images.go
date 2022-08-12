@@ -77,6 +77,10 @@ func (imageTrans *ImageTransformer) validateInput() error {
 	if imageTrans.Image.NewTag != "" && imageTrans.Image.Digest != "" {
 		return fmt.Errorf("image newTag and digest both set")
 	}
+	// deprecated name means image name
+	if imageTrans.Image.Name != "" {
+		imageTrans.Image.ImageName = imageTrans.Image.Name
+	}
 	return nil
 }
 
@@ -160,11 +164,6 @@ func getNewImageName(oldValue string, newImage *Image) string {
 }
 
 func matchImage(oldName string, oldContainer string, newImage *Image) (bool, error) {
-	// name would be deprecated later, means image name
-	if newImage.Name != "" {
-		newImage.ImageName = newImage.Name
-	}
-
 	// match image name, no container name
 	if newImage.ImageName != "" && newImage.ContainerName == "" {
 		if !image.IsImageMatched(oldName, newImage.ImageName) {
