@@ -9,8 +9,6 @@ import (
 	"sigs.k8s.io/kustomize/api/types"
 )
 
-type FieldPath []string
-
 // SetImage supports the set-image workflow, it uses Config to parse functionConfig, Transform to change the image
 type SetImage struct {
 	// Image is the desired image
@@ -146,6 +144,7 @@ func (imageTrans *SetImage) updateImages(o *fn.SubObject, newImage *types.Image,
 	return err
 }
 
+// Run implements the Runner interface that transforms the resource and log the results
 func (si SetImage) Run(ctx *fn.Context, _ *fn.KubeObject, items fn.KubeObjects) {
 	si.context = ctx
 	err := si.Config()
