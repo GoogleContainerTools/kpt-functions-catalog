@@ -13,7 +13,7 @@ type SetImage struct {
 	// Image is the desired image
 	Image image_util.Image `json:"image,omitempty" yaml:"image,omitempty"`
 	// ConfigMap keeps the data field that holds image information
-	ConfigMap map[string]string `json:"data,omitempty" yaml:"data,omitempty"`
+	DataFromDefaultConfig map[string]string `json:"data,omitempty" yaml:"data,omitempty"`
 	// ONLY for kustomize, AdditionalImageFields is the user supplied fieldspec
 	AdditionalImageFields image_util.FsSlice `json:"additionalImageFields,omitempty" yaml:"additionalImageFields,omitempty"`
 	// context logs each detailed result
@@ -24,7 +24,7 @@ type SetImage struct {
 
 // Config transforms the data from ConfigMap to SetImage struct
 func (t *SetImage) Config() error {
-	for key, val := range t.ConfigMap {
+	for key, val := range t.DataFromDefaultConfig {
 		switch key {
 		case "name":
 			t.Image.Name = val
