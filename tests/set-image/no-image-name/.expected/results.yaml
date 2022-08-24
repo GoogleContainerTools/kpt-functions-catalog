@@ -5,10 +5,10 @@ metadata:
 exitCode: 1
 items:
   - image: gcr.io/kpt-fn/set-image:unstable
-    stderr: 'failed to evaluate function: function is terminated: missing image name or typo'
+    stderr: 'failed to evaluate function: function is terminated: missing `name` to select the image'
     exitCode: 1
     results:
-      - message: missing image name or typo
+      - message: 'missing `name` for the selected image name '
         severity: error
-      - message: 'function is terminated: missing image name or typo'
+      - message: 'function is terminated: missing `name` to select the image'
         severity: error

@@ -7,7 +7,7 @@ items:
   - image: gcr.io/kpt-fn/set-image:unstable
     exitCode: 0
     results:
-      - message: set image from nginx:1.20.2 to bitnami/nginx:1.21.4
+      - message: update image from nginx:1.20.2 to bitnami/nginx:1.21.4
         severity: info
         resourceRef:
           apiVersion: v1
@@ -15,7 +15,7 @@ items:
           name: the-pod
         file:
           path: resources.yaml
-      - message: set image from nginx:1.20.2 to bitnami/nginx:1.21.4
+      - message: update image from nginx:1.20.2 to bitnami/nginx:1.21.4
         severity: info
         resourceRef:
           apiVersion: dev.example.com/v1

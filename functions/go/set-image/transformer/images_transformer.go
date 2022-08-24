@@ -4,19 +4,18 @@ import (
 	"fmt"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/custom"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/image_util"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
-	"sigs.k8s.io/kustomize/api/image"
-	"sigs.k8s.io/kustomize/api/types"
 )
 
 // SetImage supports the set-image workflow, it uses Config to parse functionConfig, Transform to change the image
 type SetImage struct {
 	// Image is the desired image
-	Image types.Image `json:"image,omitempty" yaml:"image,omitempty"`
+	Image image_util.Image `json:"image,omitempty" yaml:"image,omitempty"`
 	// ConfigMap keeps the data field that holds image information
 	ConfigMap map[string]string `json:"data,omitempty" yaml:"data,omitempty"`
 	// ONLY for kustomize, AdditionalImageFields is the user supplied fieldspec
-	AdditionalImageFields types.FsSlice `json:"additionalImageFields,omitempty" yaml:"additionalImageFields,omitempty"`
+	AdditionalImageFields image_util.FsSlice `json:"additionalImageFields,omitempty" yaml:"additionalImageFields,omitempty"`
 	// context logs each detailed result
 	context *fn.Context
 	// resultCount logs the total count image change
@@ -24,17 +23,18 @@ type SetImage struct {
 }
 
 // Config transforms the data from ConfigMap to SetImage struct
-func (imageTrans *SetImage) Config() error {
-	for key, val := range imageTrans.ConfigMap {
-		if key == "name" {
-			imageTrans.Image.Name = val
-		} else if key == "newName" {
-			imageTrans.Image.NewName = val
-		} else if key == "newTag" {
-			imageTrans.Image.NewTag = val
-		} else if key == "digest" {
-			imageTrans.Image.Digest = val
-		} else {
+func (imagetrans *SetImage) Config() error {
+	for key, val := range imagetrans.ConfigMap {
+		switch key {
+		case "name":
+			imagetrans.Image.Name = val
+		case "newName":
+			imagetrans.Image.NewName = val
+		case "newTag":
+			imagetrans.Image.NewTag = val
+		case "digest":
+			imagetrans.Image.Digest = val
+		default:
 			return fmt.Errorf("SubObject has unmatched field type: `data`")
 		}
 	}
@@ -42,80 +42,77 @@ func (imageTrans *SetImage) Config() error {
 }
 
 // validateInput validates the inputs passed into via the functionConfig
-func (imageTrans *SetImage) validateInput() error {
-	if imageTrans.Image.Name == "" {
-		return fmt.Errorf("missing image name or typo")
+func (imagetrans *SetImage) validateInput() error {
+	// TODO: support container name and only one argument input in the next PR
+	if imagetrans.Image.Name == "" {
+		return fmt.Errorf("missing `name` to select the image")
 	}
-	if imageTrans.Image.NewName == "" && imageTrans.Image.NewTag == "" && imageTrans.Image.Digest == "" {
-		return fmt.Errorf("missing image newName, newTag, or digest, could be typo or missing field")
+	if imagetrans.Image.NewName == "" && imagetrans.Image.NewTag == "" && imagetrans.Image.Digest == "" {
+		return fmt.Errorf("missing `newName`, `newTag`, or `digest`, at least one of the fields should not be empty")
 	}
-	if imageTrans.Image.NewTag != "" && imageTrans.Image.Digest != "" {
-		return fmt.Errorf("image newTag and digest both set")
+	if imagetrans.Image.NewTag != "" && imagetrans.Image.Digest != "" {
+		return fmt.Errorf("image `newTag` and `digest` both set, only one field can be set")
 	}
 	return nil
 }
 
-func (imageTrans *SetImage) setPodSpecContainers(o *fn.KubeObject) error {
-	if spec := o.GetMap("spec"); spec != nil {
-		if template := spec.GetMap("template"); template != nil {
-			if podSpec := template.GetMap("spec"); podSpec != nil {
-				for _, vecObj := range podSpec.GetSlice("containers") {
-					if err := imageTrans.updateImages(vecObj, &imageTrans.Image, o); err != nil {
-						return err
-					}
-				}
-				for _, vecObj := range podSpec.GetSlice("iniContainers") {
-					if err := imageTrans.updateImages(vecObj, &imageTrans.Image, o); err != nil {
-						return err
-					}
-				}
-			}
+func (imagetrans *SetImage) setPodSpecContainers(o *fn.KubeObject) error {
+	podSpec := o.GetMap("spec").GetMap("template").GetMap("spec")
+	for _, vecObj := range podSpec.GetSlice("containers") {
+		if err := imagetrans.updateImages(vecObj, &imagetrans.Image, o); err != nil {
+			return err
+		}
+	}
+	for _, vecObj := range podSpec.GetSlice("iniContainers") {
+		if err := imagetrans.updateImages(vecObj, &imagetrans.Image, o); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-func (imageTrans *SetImage) setPodContainers(o *fn.KubeObject) error {
-	if spec := o.GetMap("spec"); spec != nil {
-		for _, vecObj := range spec.GetSlice("containers") {
-			if err := imageTrans.updateImages(vecObj, &imageTrans.Image, o); err != nil {
-				return err
-			}
+func (imagetrans *SetImage) setPodContainers(o *fn.KubeObject) error {
+	spec := o.GetMap("spec")
+	for _, vecObj := range spec.GetSlice("containers") {
+		if err := imagetrans.updateImages(vecObj, &imagetrans.Image, o); err != nil {
+			return err
 		}
-		for _, vecObj := range spec.GetSlice("iniContainers") {
-			if err := imageTrans.updateImages(vecObj, &imageTrans.Image, o); err != nil {
-				return err
-			}
+	}
+	for _, vecObj := range spec.GetSlice("iniContainers") {
+		if err := imagetrans.updateImages(vecObj, &imagetrans.Image, o); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-func (imageTrans *SetImage) hasPodSpecContainers(o *fn.KubeObject) bool {
-	if spec := o.GetMap("spec"); spec != nil {
-		if template := spec.GetMap("template"); template != nil {
-			if podSpec := template.GetMap("spec"); podSpec != nil {
-				if spec.GetSlice("containers") != nil || spec.GetSlice("iniContainers") != nil {
-					return true
-				}
-			}
-		}
+func (imagetrans *SetImage) hasPodSpecContainers(o *fn.KubeObject) bool {
+	spec := o.GetMap("spec")
+	if spec == nil {
+		return false
 	}
-	return false
+	template := spec.GetMap("template")
+	if template == nil {
+		return false
+	}
+	podSpec := template.GetMap("spec")
+	if podSpec == nil {
+		return false
+	}
+	return true
 }
 
-func (imageTrans *SetImage) hasPodContainers(o *fn.KubeObject) bool {
-	if spec := o.GetMap("spec"); spec != nil {
-		if spec.GetSlice("containers") != nil || spec.GetSlice("iniContainers") != nil {
-			return true
-		}
+func (imagetrans *SetImage) hasPodContainers(o *fn.KubeObject) bool {
+	spec := o.GetMap("spec")
+	if spec == nil {
+		return false
 	}
-	return false
+	return true
 }
 
 // getNewImageName return the new name for image field
-func getNewImageName(oldValue string, newImage *types.Image) string {
-	name, tag := image.Split(oldValue)
+func getNewImageName(oldValue string, newImage *image_util.Image) string {
+	name, tag := image_util.Split(oldValue)
 	if newImage.NewName != "" {
 		name = newImage.NewName
 	}
@@ -130,17 +127,17 @@ func getNewImageName(oldValue string, newImage *types.Image) string {
 }
 
 // updateImages update the image for a given fieldpath
-func (imageTrans *SetImage) updateImages(o *fn.SubObject, newImage *types.Image, parentO *fn.KubeObject) error {
+func (imagetrans *SetImage) updateImages(o *fn.SubObject, newImage *image_util.Image, parentO *fn.KubeObject) error {
 	oldValue := o.NestedStringOrDie("image")
-	if !image.IsImageMatched(oldValue, newImage.Name) {
+	if !image_util.IsImageMatched(oldValue, newImage.Name) {
 		return nil
 	}
 	newName := getNewImageName(oldValue, newImage)
 	err := o.SetNestedString(newName, "image")
 
-	msg := fmt.Sprintf("set image from %v to %v", oldValue, newName)
-	imageTrans.context.ResultInfo(msg, parentO)
-	imageTrans.resultCount += 1
+	msg := fmt.Sprintf("update image from %v to %v", oldValue, newName)
+	imagetrans.context.ResultInfo(msg, parentO)
+	imagetrans.resultCount += 1
 	return err
 }
 
@@ -170,7 +167,7 @@ func (si SetImage) Run(ctx *fn.Context, _ *fn.KubeObject, items fn.KubeObjects) 
 		}
 	}
 
-	if si.AdditionalImageFields != nil && len(si.AdditionalImageFields) != 0 {
+	if si.AdditionalImageFields != nil {
 		custom.SetAdditionalFieldSpec(si.Image, items, si.AdditionalImageFields, si.context)
 	}
 
