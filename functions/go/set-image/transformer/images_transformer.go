@@ -72,7 +72,7 @@ func (t *SetImage) validateInput() error {
 	return nil
 }
 
-func (t *SetImage) updatePodImages(pod *fn.SubObject) (error, map[int][]string) {
+func (t *SetImage) updateContainerImages(pod *fn.SubObject) (error, map[int][]string) {
 	var containers fn.SliceSubObjects
 	containers = append(containers, pod.GetSlice("iniContainers")...)
 	containers = append(containers, pod.GetSlice("containers")...)
@@ -108,7 +108,7 @@ func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) (error, map[int][]stri
 		return nil, nil
 	}
 	podSpec := template.GetMap("spec")
-	err, result := t.updatePodImages(podSpec)
+	err, result := t.updateContainerImages(podSpec)
 	if err != nil {
 		return err, nil
 	}
@@ -120,7 +120,7 @@ func (t *SetImage) setPodContainers(o *fn.KubeObject) (error, map[int][]string) 
 	if spec == nil {
 		return nil, nil
 	}
-	err, result := t.updatePodImages(spec)
+	err, result := t.updateContainerImages(spec)
 	if err != nil {
 		return err, nil
 	}
