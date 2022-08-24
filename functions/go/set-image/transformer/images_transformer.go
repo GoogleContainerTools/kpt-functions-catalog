@@ -16,8 +16,6 @@ type SetImage struct {
 	DataFromDefaultConfig map[string]string `json:"data,omitempty" yaml:"data,omitempty"`
 	// ONLY for kustomize, AdditionalImageFields is the user supplied fieldspec
 	AdditionalImageFields image_util.FsSlice `json:"additionalImageFields,omitempty" yaml:"additionalImageFields,omitempty"`
-	// context logs each detailed result
-	context *fn.Context
 	// resultCount logs the total count image change
 	resultCount int
 }
@@ -56,30 +54,30 @@ func (t *SetImage) validateInput() error {
 	return nil
 }
 
-func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) error {
+func (t *SetImage) setPodSpecContainers(o *fn.KubeObject, ctx *fn.Context) error {
 	podSpec := o.GetMap("spec").GetMap("template").GetMap("spec")
 	for _, vecObj := range podSpec.GetSlice("containers") {
-		if err := t.updateImages(vecObj, &t.Image, o); err != nil {
+		if err := t.updateImages(vecObj, &t.Image, o, ctx); err != nil {
 			return err
 		}
 	}
 	for _, vecObj := range podSpec.GetSlice("iniContainers") {
-		if err := t.updateImages(vecObj, &t.Image, o); err != nil {
+		if err := t.updateImages(vecObj, &t.Image, o, ctx); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (t *SetImage) setPodContainers(o *fn.KubeObject) error {
+func (t *SetImage) setPodContainers(o *fn.KubeObject, ctx *fn.Context) error {
 	spec := o.GetMap("spec")
 	for _, vecObj := range spec.GetSlice("containers") {
-		if err := t.updateImages(vecObj, &t.Image, o); err != nil {
+		if err := t.updateImages(vecObj, &t.Image, o, ctx); err != nil {
 			return err
 		}
 	}
 	for _, vecObj := range spec.GetSlice("iniContainers") {
-		if err := t.updateImages(vecObj, &t.Image, o); err != nil {
+		if err := t.updateImages(vecObj, &t.Image, o, ctx); err != nil {
 			return err
 		}
 	}
@@ -121,7 +119,7 @@ func getNewImageName(oldValue string, newImage *image_util.Image) string {
 }
 
 // updateImages update the image for a given fieldpath
-func (t *SetImage) updateImages(o *fn.SubObject, newImage *image_util.Image, parentO *fn.KubeObject) error {
+func (t *SetImage) updateImages(o *fn.SubObject, newImage *image_util.Image, parentO *fn.KubeObject, ctx *fn.Context) error {
 	oldValue := o.NestedStringOrDie("image")
 	if !image_util.IsImageMatched(oldValue, newImage.Name) {
 		return nil
@@ -130,14 +128,13 @@ func (t *SetImage) updateImages(o *fn.SubObject, newImage *image_util.Image, par
 	err := o.SetNestedString(newName, "image")
 
 	msg := fmt.Sprintf("updated image from %v to %v", oldValue, newName)
-	t.context.ResultInfo(msg, parentO)
+	ctx.ResultInfo(msg, parentO)
 	t.resultCount += 1
 	return err
 }
 
 // Run implements the Runner interface that transforms the resource and log the results
 func (t SetImage) Run(ctx *fn.Context, _ *fn.KubeObject, items fn.KubeObjects) {
-	t.context = ctx
 	err := t.Config()
 	if err != nil {
 		ctx.ResultErrAndDie(err.Error(), nil)
@@ -148,21 +145,21 @@ func (t SetImage) Run(ctx *fn.Context, _ *fn.KubeObject, items fn.KubeObjects) {
 	}
 
 	for _, o := range items.Where(t.hasPodContainers) {
-		err = t.setPodContainers(o)
+		err = t.setPodContainers(o, ctx)
 		if err != nil {
 			ctx.ResultErr(err.Error(), o)
 		}
 	}
 
 	for _, o := range items.Where(t.hasPodSpecContainers) {
-		err = t.setPodSpecContainers(o)
+		err = t.setPodSpecContainers(o, ctx)
 		if err != nil {
 			ctx.ResultErr(err.Error(), o)
 		}
 	}
 
 	if t.AdditionalImageFields != nil {
-		custom.SetAdditionalFieldSpec(t.Image, items, t.AdditionalImageFields, t.context)
+		custom.SetAdditionalFieldSpec(t.Image, items, t.AdditionalImageFields, ctx)
 	}
 
 	summary := fmt.Sprintf("summary: updated a total of %v image(s)", t.resultCount)
