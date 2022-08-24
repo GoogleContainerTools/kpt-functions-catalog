@@ -96,18 +96,12 @@ func (imagetrans *SetImage) hasPodSpecContainers(o *fn.KubeObject) bool {
 		return false
 	}
 	podSpec := template.GetMap("spec")
-	if podSpec == nil {
-		return false
-	}
-	return true
+	return podSpec != nil
 }
 
 func (imagetrans *SetImage) hasPodContainers(o *fn.KubeObject) bool {
 	spec := o.GetMap("spec")
-	if spec == nil {
-		return false
-	}
-	return true
+	return spec != nil
 }
 
 // getNewImageName return the new name for image field

@@ -34,9 +34,6 @@ type Gvk struct {
 	Group   string `json:"group,omitempty" yaml:"group,omitempty"`
 	Version string `json:"version,omitempty" yaml:"version,omitempty"`
 	Kind    string `json:"kind,omitempty" yaml:"kind,omitempty"`
-	// isClusterScoped is true if the object is known, per the openapi
-	// data in use, to be cluster scoped, and false otherwise.
-	isClusterScoped bool
 }
 
 // IsImageMatched returns true if the value of t is identical to the
