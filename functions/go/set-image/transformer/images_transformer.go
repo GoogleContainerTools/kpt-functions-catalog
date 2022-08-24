@@ -56,12 +56,12 @@ func (t *SetImage) validateInput() error {
 
 func (t *SetImage) setContainers(spec *fn.SubObject, parentO *fn.KubeObject, ctx *fn.Context) error {
 	for _, vecObj := range spec.GetSlice("containers") {
-		if err := t.updateImages(vecObj, &t.Image, parentO, ctx); err != nil {
+		if err := t.updateImages(vecObj, parentO, ctx); err != nil {
 			return err
 		}
 	}
 	for _, vecObj := range spec.GetSlice("iniContainers") {
-		if err := t.updateImages(vecObj, &t.Image, parentO, ctx); err != nil {
+		if err := t.updateImages(vecObj, parentO, ctx); err != nil {
 			return err
 		}
 	}
@@ -119,14 +119,17 @@ func getNewImageName(oldValue string, newImage *image_util.Image) string {
 }
 
 // updateImages update the image for a given fieldpath
-func (t *SetImage) updateImages(o *fn.SubObject, newImage *image_util.Image, parentO *fn.KubeObject, ctx *fn.Context) error {
+func (t *SetImage) updateImages(o *fn.SubObject, parentO *fn.KubeObject, ctx *fn.Context) error {
 	oldValue := o.NestedStringOrDie("image")
-	if !image_util.IsImageMatched(oldValue, newImage.Name) {
+	if !image_util.IsImageMatched(oldValue, t.Image.Name) {
 		return nil
 	}
-	newName := getNewImageName(oldValue, newImage)
-	err := o.SetNestedString(newName, "image")
+	newName := getNewImageName(oldValue, &t.Image)
+	if oldValue == newName {
+		return nil
+	}
 
+	err := o.SetNestedString(newName, "image")
 	msg := fmt.Sprintf("updated image from %v to %v", oldValue, newName)
 	ctx.ResultInfo(msg, parentO)
 	t.resultCount += 1
