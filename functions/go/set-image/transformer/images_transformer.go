@@ -45,7 +45,7 @@ func (t *SetImage) Config() error {
 func (t *SetImage) validateInput() error {
 	// TODO: support container name and only one argument input in the next PR
 	if t.Image.Name == "" {
-		return fmt.Errorf("`name` field is missing from image selector")
+		return fmt.Errorf("must specify `name`")
 	}
 	if t.Image.NewName == "" && t.Image.NewTag == "" && t.Image.Digest == "" {
 		return fmt.Errorf("must specify one of `newName`, `newTag`, or `digest`")
