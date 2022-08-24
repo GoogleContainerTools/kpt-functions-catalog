@@ -8,7 +8,7 @@ items:
     stderr: 'failed to evaluate function: function is terminated: missing `newName`, `newTag`, or `digest`, at least one of the fields should not be empty'
     exitCode: 1
     results:
-      - message: missing `newName`, `newTag`, or `digest`, at least one of the field should be updated
+      - message: missing `newName`, `newTag`, or `digest`, at least one of the fields should not be empty
         severity: error
       - message: 'function is terminated: missing `newName`, `newTag`, or `digest`, at least one of the fields should not be empty'
         severity: error

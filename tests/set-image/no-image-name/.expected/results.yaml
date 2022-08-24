@@ -8,7 +8,7 @@ items:
     stderr: 'failed to evaluate function: function is terminated: missing `name` to select the image'
     exitCode: 1
     results:
-      - message: 'missing `name` for the selected image name '
+      - message: 'missing `name` to select the image'
         severity: error
       - message: 'function is terminated: missing `name` to select the image'
         severity: error

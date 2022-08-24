@@ -8,7 +8,7 @@ items:
     stderr: 'failed to evaluate function: function is terminated: image `newTag` and `digest` both set, only one field can be set'
     exitCode: 1
     results:
-      - message: image `newTag` and `digest` both set
+      - message: image `newTag` and `digest` both set, only one field can be set
         severity: error
       - message: 'function is terminated: image `newTag` and `digest` both set, only one field can be set'
         severity: error
