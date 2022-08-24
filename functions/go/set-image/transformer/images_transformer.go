@@ -72,52 +72,67 @@ func (t *SetImage) validateInput() error {
 	return nil
 }
 
-func (t *SetImage) setContainers(spec *fn.SubObject, parentO *fn.KubeObject, ctx *fn.Context) error {
-	for _, vecObj := range spec.GetSlice("containers") {
-		if err := t.updateImages(vecObj, parentO, ctx); err != nil {
-			return err
+func (t *SetImage) updatePodImages(pod *fn.SubObject) (error, map[int][]string) {
+	var containers fn.SliceSubObjects
+	containers = append(containers, pod.GetSlice("iniContainers")...)
+	containers = append(containers, pod.GetSlice("containers")...)
+
+	result := make(map[int][]string)
+	for _, o := range containers {
+		oldValue := o.NestedStringOrDie("image")
+		if !image.IsImageMatched(oldValue, t.Image.Name) {
+			continue
 		}
-	}
-	for _, vecObj := range spec.GetSlice("iniContainers") {
-		if err := t.updateImages(vecObj, parentO, ctx); err != nil {
-			return err
+		newName := getNewImageName(oldValue, t.Image)
+		if oldValue == newName {
+			return nil, nil
 		}
+
+		if err := o.SetNestedString(newName, "image"); err != nil {
+			return err, nil
+		}
+		t.resultCount += 1
+
+		result[t.resultCount] = []string{oldValue, newName}
 	}
-	return nil
+	return nil, result
 }
 
-func (t *SetImage) setPodSpecContainers(o *fn.KubeObject, ctx *fn.Context) error {
-	podSpec := o.GetMap("spec").GetMap("template").GetMap("spec")
-	if err := t.setContainers(podSpec, o, ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (t *SetImage) setPodContainers(o *fn.KubeObject, ctx *fn.Context) error {
-	spec := o.GetMap("spec")
-	if err := t.setContainers(spec, o, ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (t *SetImage) hasPodSpecContainers(o *fn.KubeObject) bool {
+func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) (error, map[int][]string) {
 	spec := o.GetMap("spec")
 	if spec == nil {
-		return false
+		return nil, nil
 	}
 	template := spec.GetMap("template")
 	if template == nil {
-		return false
+		return nil, nil
 	}
 	podSpec := template.GetMap("spec")
-	return podSpec != nil
+	err, result := t.updatePodImages(podSpec)
+	if err != nil {
+		return err, nil
+	}
+	return nil, result
+}
+
+func (t *SetImage) setPodContainers(o *fn.KubeObject) (error, map[int][]string) {
+	spec := o.GetMap("spec")
+	if spec == nil {
+		return nil, nil
+	}
+	err, result := t.updatePodImages(spec)
+	if err != nil {
+		return err, nil
+	}
+	return nil, result
+}
+
+func (t *SetImage) hasPodSpecContainers(o *fn.KubeObject) bool {
+	return o.IsGVK("", "", "PodTemplate")
 }
 
 func (t *SetImage) hasPodContainers(o *fn.KubeObject) bool {
-	spec := o.GetMap("spec")
-	return spec != nil
+	return o.IsGVK("", "", "Pod")
 }
 
 // getNewImageName return the new name for image field
@@ -136,22 +151,14 @@ func getNewImageName(oldValue string, newImage Image) string {
 	return newName
 }
 
-// updateImages update the image for a given fieldpath
-func (t *SetImage) updateImages(o *fn.SubObject, parentO *fn.KubeObject, ctx *fn.Context) error {
-	oldValue := o.NestedStringOrDie("image")
-	if !image.IsImageMatched(oldValue, t.Image.Name) {
-		return nil
+func (t SetImage) LogResult(ctx *fn.Context, err error, result map[int][]string, o *fn.KubeObject) {
+	if err != nil {
+		ctx.ResultErr(err.Error(), o)
 	}
-	newName := getNewImageName(oldValue, t.Image)
-	if oldValue == newName {
-		return nil
+	for _, val := range result {
+		msg := fmt.Sprintf("updated image from %v to %v", val[0], val[1])
+		ctx.ResultInfo(msg, o)
 	}
-
-	err := o.SetNestedString(newName, "image")
-	msg := fmt.Sprintf("updated image from %v to %v", oldValue, newName)
-	ctx.ResultInfo(msg, parentO)
-	t.resultCount += 1
-	return err
 }
 
 // Run implements the Runner interface that transforms the resource and log the results
@@ -166,17 +173,13 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 	}
 
 	for _, o := range items.Where(t.hasPodContainers) {
-		err = t.setPodContainers(o, ctx)
-		if err != nil {
-			ctx.ResultErr(err.Error(), o)
-		}
+		err, result := t.setPodContainers(o)
+		t.LogResult(ctx, err, result, o)
 	}
 
 	for _, o := range items.Where(t.hasPodSpecContainers) {
-		err = t.setPodSpecContainers(o, ctx)
-		if err != nil {
-			ctx.ResultErr(err.Error(), o)
-		}
+		err, result := t.setPodSpecContainers(o)
+		t.LogResult(ctx, err, result, o)
 	}
 
 	if t.AdditionalImageFields != nil {
