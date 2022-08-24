@@ -54,32 +54,32 @@ func (t *SetImage) validateInput() error {
 	return nil
 }
 
-func (t *SetImage) setPodSpecContainers(o *fn.KubeObject, ctx *fn.Context) error {
-	podSpec := o.GetMap("spec").GetMap("template").GetMap("spec")
-	for _, vecObj := range podSpec.GetSlice("containers") {
-		if err := t.updateImages(vecObj, &t.Image, o, ctx); err != nil {
+func (t *SetImage) setContainers(spec *fn.SubObject, parentO *fn.KubeObject, ctx *fn.Context) error {
+	for _, vecObj := range spec.GetSlice("containers") {
+		if err := t.updateImages(vecObj, &t.Image, parentO, ctx); err != nil {
 			return err
 		}
 	}
-	for _, vecObj := range podSpec.GetSlice("iniContainers") {
-		if err := t.updateImages(vecObj, &t.Image, o, ctx); err != nil {
+	for _, vecObj := range spec.GetSlice("iniContainers") {
+		if err := t.updateImages(vecObj, &t.Image, parentO, ctx); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
+func (t *SetImage) setPodSpecContainers(o *fn.KubeObject, ctx *fn.Context) error {
+	podSpec := o.GetMap("spec").GetMap("template").GetMap("spec")
+	if err := t.setContainers(podSpec, o, ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (t *SetImage) setPodContainers(o *fn.KubeObject, ctx *fn.Context) error {
 	spec := o.GetMap("spec")
-	for _, vecObj := range spec.GetSlice("containers") {
-		if err := t.updateImages(vecObj, &t.Image, o, ctx); err != nil {
-			return err
-		}
-	}
-	for _, vecObj := range spec.GetSlice("iniContainers") {
-		if err := t.updateImages(vecObj, &t.Image, o, ctx); err != nil {
-			return err
-		}
+	if err := t.setContainers(spec, o, ctx); err != nil {
+		return err
 	}
 	return nil
 }
