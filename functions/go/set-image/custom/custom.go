@@ -66,7 +66,7 @@ func SetAdditionalFieldSpec(img image_util.Image, objects fn.KubeObjects, addImg
 func LogResultCallback(ctx *fn.Context, ko *fn.KubeObject) func(key, value, tag string, node *yaml.RNode) {
 	return func(key, value, tag string, node *yaml.RNode) {
 		currentValue := node.YNode().Value
-		msg := fmt.Sprintf("update image from %v to %v", currentValue, value)
+		msg := fmt.Sprintf("updated image from %v to %v", currentValue, value)
 		ctx.ResultInfo(msg, ko)
 	}
 }

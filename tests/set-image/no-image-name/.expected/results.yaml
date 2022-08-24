@@ -5,10 +5,10 @@ metadata:
 exitCode: 1
 items:
   - image: gcr.io/kpt-fn/set-image:unstable
-    stderr: 'failed to evaluate function: function is terminated: missing `name` to select the image'
+    stderr: 'failed to evaluate function: function is terminated: `name` field is missing from image selector'
     exitCode: 1
     results:
-      - message: missing `name` to select the image
+      - message: '`name` field is missing from image selector'
         severity: error
-      - message: 'function is terminated: missing `name` to select the image'
+      - message: 'function is terminated: `name` field is missing from image selector'
         severity: error

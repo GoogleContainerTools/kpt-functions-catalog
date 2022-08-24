@@ -5,10 +5,10 @@ metadata:
 exitCode: 1
 items:
   - image: gcr.io/kpt-fn/set-image:unstable
-    stderr: 'failed to evaluate function: function is terminated: missing `newName`, `newTag`, or `digest`, at least one of the fields should not be empty'
+    stderr: 'failed to evaluate function: function is terminated: must specify one of `newName`, `newTag`, or `digest`'
     exitCode: 1
     results:
-      - message: missing `newName`, `newTag`, or `digest`, at least one of the fields should not be empty
+      - message: must specify one of `newName`, `newTag`, or `digest`
         severity: error
-      - message: 'function is terminated: missing `newName`, `newTag`, or `digest`, at least one of the fields should not be empty'
+      - message: 'function is terminated: must specify one of `newName`, `newTag`, or `digest`'
         severity: error

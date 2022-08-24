@@ -35,7 +35,7 @@ func (imagetrans *SetImage) Config() error {
 		case "digest":
 			imagetrans.Image.Digest = val
 		default:
-			return fmt.Errorf("SubObject has unmatched field type: `data`")
+			return fmt.Errorf("SubObject has unmatched field type: `data` with wrong field name %v", key)
 		}
 	}
 	return nil
@@ -45,13 +45,13 @@ func (imagetrans *SetImage) Config() error {
 func (imagetrans *SetImage) validateInput() error {
 	// TODO: support container name and only one argument input in the next PR
 	if imagetrans.Image.Name == "" {
-		return fmt.Errorf("missing `name` to select the image")
+		return fmt.Errorf("`name` field is missing from image selector")
 	}
 	if imagetrans.Image.NewName == "" && imagetrans.Image.NewTag == "" && imagetrans.Image.Digest == "" {
-		return fmt.Errorf("missing `newName`, `newTag`, or `digest`, at least one of the fields should not be empty")
+		return fmt.Errorf("must specify one of `newName`, `newTag`, or `digest`")
 	}
 	if imagetrans.Image.NewTag != "" && imagetrans.Image.Digest != "" {
-		return fmt.Errorf("image `newTag` and `digest` both set, only one field can be set")
+		return fmt.Errorf("image `newTag` and `digest` both set, set only one")
 	}
 	return nil
 }
@@ -129,7 +129,7 @@ func (imagetrans *SetImage) updateImages(o *fn.SubObject, newImage *image_util.I
 	newName := getNewImageName(oldValue, newImage)
 	err := o.SetNestedString(newName, "image")
 
-	msg := fmt.Sprintf("update image from %v to %v", oldValue, newName)
+	msg := fmt.Sprintf("updated image from %v to %v", oldValue, newName)
 	imagetrans.context.ResultInfo(msg, parentO)
 	imagetrans.resultCount += 1
 	return err
@@ -165,6 +165,6 @@ func (si SetImage) Run(ctx *fn.Context, _ *fn.KubeObject, items fn.KubeObjects) 
 		custom.SetAdditionalFieldSpec(si.Image, items, si.AdditionalImageFields, si.context)
 	}
 
-	summary := fmt.Sprintf("summary: total number of images updated %v", si.resultCount)
+	summary := fmt.Sprintf("summary: updated a total of %v image(s)", si.resultCount)
 	ctx.ResultInfo(summary, nil)
 }
