@@ -4,18 +4,36 @@ import (
 	"fmt"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/custom"
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/image_util"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/third_party/sigs.k8s.io/kustomize/api/image"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/third_party/sigs.k8s.io/kustomize/api/types"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
+
+// Image contains an image name, a new name, a new tag or digest,
+// which will replace the original name and tag.
+type Image struct {
+	// Name is a tag-less image name.
+	Name string `json:"name,omitempty" yaml:"name,omitempty"`
+
+	// NewName is the value used to replace the original name.
+	NewName string `json:"newName,omitempty" yaml:"newName,omitempty"`
+
+	// NewTag is the value used to replace the original tag.
+	NewTag string `json:"newTag,omitempty" yaml:"newTag,omitempty"`
+
+	// Digest is the value used to replace the original image tag.
+	// If digest is present NewTag value is ignored.
+	Digest string `json:"digest,omitempty" yaml:"digest,omitempty"`
+}
 
 // SetImage supports the set-image workflow, it uses Config to parse functionConfig, Transform to change the image
 type SetImage struct {
 	// Image is the desired image
-	Image image_util.Image `json:"image,omitempty" yaml:"image,omitempty"`
+	Image Image `json:"image,omitempty" yaml:"image,omitempty"`
 	// ConfigMap keeps the data field that holds image information
 	DataFromDefaultConfig map[string]string `json:"data,omitempty" yaml:"data,omitempty"`
 	// ONLY for kustomize, AdditionalImageFields is the user supplied fieldspec
-	AdditionalImageFields image_util.FsSlice `json:"additionalImageFields,omitempty" yaml:"additionalImageFields,omitempty"`
+	AdditionalImageFields types.FsSlice `json:"additionalImageFields,omitempty" yaml:"additionalImageFields,omitempty"`
 	// resultCount logs the total count image change
 	resultCount int
 }
@@ -103,8 +121,8 @@ func (t *SetImage) hasPodContainers(o *fn.KubeObject) bool {
 }
 
 // getNewImageName return the new name for image field
-func getNewImageName(oldValue string, newImage *image_util.Image) string {
-	name, tag := image_util.Split(oldValue)
+func getNewImageName(oldValue string, newImage Image) string {
+	name, tag := image.Split(oldValue)
 	if newImage.NewName != "" {
 		name = newImage.NewName
 	}
@@ -121,10 +139,10 @@ func getNewImageName(oldValue string, newImage *image_util.Image) string {
 // updateImages update the image for a given fieldpath
 func (t *SetImage) updateImages(o *fn.SubObject, parentO *fn.KubeObject, ctx *fn.Context) error {
 	oldValue := o.NestedStringOrDie("image")
-	if !image_util.IsImageMatched(oldValue, t.Image.Name) {
+	if !image.IsImageMatched(oldValue, t.Image.Name) {
 		return nil
 	}
-	newName := getNewImageName(oldValue, &t.Image)
+	newName := getNewImageName(oldValue, t.Image)
 	if oldValue == newName {
 		return nil
 	}
@@ -137,7 +155,7 @@ func (t *SetImage) updateImages(o *fn.SubObject, parentO *fn.KubeObject, ctx *fn
 }
 
 // Run implements the Runner interface that transforms the resource and log the results
-func (t SetImage) Run(ctx *fn.Context, _ *fn.KubeObject, items fn.KubeObjects) {
+func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.KubeObjects) {
 	err := t.Config()
 	if err != nil {
 		ctx.ResultErrAndDie(err.Error(), nil)
@@ -162,7 +180,7 @@ func (t SetImage) Run(ctx *fn.Context, _ *fn.KubeObject, items fn.KubeObjects) {
 	}
 
 	if t.AdditionalImageFields != nil {
-		custom.SetAdditionalFieldSpec(t.Image, items, t.AdditionalImageFields, ctx)
+		custom.SetAdditionalFieldSpec(functionConfig.GetMap("image"), items, t.AdditionalImageFields, ctx)
 	}
 
 	summary := fmt.Sprintf("summary: updated a total of %v image(s)", t.resultCount)

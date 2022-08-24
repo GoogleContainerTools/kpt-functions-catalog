@@ -1,40 +1,12 @@
-package image_util
+// Copyright 2020 The Kubernetes Authors.
+// SPDX-License-Identifier: Apache-2.0
+
+package image
 
 import (
 	"regexp"
 	"strings"
 )
-
-// Image contains an image name, a new name, a new tag or digest,
-// which will replace the original name and tag.
-type Image struct {
-	// Name is a tag-less image name.
-	Name string `json:"name,omitempty" yaml:"name,omitempty"`
-
-	// NewName is the value used to replace the original name.
-	NewName string `json:"newName,omitempty" yaml:"newName,omitempty"`
-
-	// NewTag is the value used to replace the original tag.
-	NewTag string `json:"newTag,omitempty" yaml:"newTag,omitempty"`
-
-	// Digest is the value used to replace the original image tag.
-	// If digest is present NewTag value is ignored.
-	Digest string `json:"digest,omitempty" yaml:"digest,omitempty"`
-}
-
-type FsSlice []FieldSpec
-
-type FieldSpec struct {
-	Gvk                `json:",inline,omitempty" yaml:",inline,omitempty"`
-	Path               string `json:"path,omitempty" yaml:"path,omitempty"`
-	CreateIfNotPresent bool   `json:"create,omitempty" yaml:"create,omitempty"`
-}
-
-type Gvk struct {
-	Group   string `json:"group,omitempty" yaml:"group,omitempty"`
-	Version string `json:"version,omitempty" yaml:"version,omitempty"`
-	Kind    string `json:"kind,omitempty" yaml:"kind,omitempty"`
-}
 
 // IsImageMatched returns true if the value of t is identical to the
 // image name in the full image name and tag as given by s.

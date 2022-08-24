@@ -3,7 +3,7 @@ package custom
 import (
 	"fmt"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/image_util"
+	myTypes "github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/third_party/sigs.k8s.io/kustomize/api/types"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/kustomize/api/filters/imagetag"
 	"sigs.k8s.io/kustomize/api/types"
@@ -12,13 +12,13 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-// transformStruct transforms the struct inside image_util to the struct inside kustomize
-func transformStruct(img image_util.Image, addImgFields image_util.FsSlice) (types.Image, types.FsSlice) {
+// transformStruct transforms the struct inside third_party and transformer to the struct inside kustomize
+func transformStruct(imgObj *fn.SubObject, addImgFields myTypes.FsSlice) (types.Image, types.FsSlice) {
 	image := types.Image{
-		Name:    img.Name,
-		NewName: img.NewName,
-		NewTag:  img.NewTag,
-		Digest:  img.Digest,
+		Name:    imgObj.NestedStringOrDie("name"),
+		NewName: imgObj.NestedStringOrDie("newName"),
+		NewTag:  imgObj.NestedStringOrDie("newTag"),
+		Digest:  imgObj.NestedStringOrDie("digest"),
 	}
 	additionalImageFields := types.FsSlice{}
 	for _, v := range addImgFields {
@@ -37,7 +37,7 @@ func transformStruct(img image_util.Image, addImgFields image_util.FsSlice) (typ
 }
 
 // SetAdditionalFieldSpec updates the image in user given fieldPaths. To be deprecated in around a year, to avoid possible invalid fieldPaths.
-func SetAdditionalFieldSpec(img image_util.Image, objects fn.KubeObjects, addImgFields image_util.FsSlice, ctx *fn.Context) {
+func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFields myTypes.FsSlice, ctx *fn.Context) {
 	image, additionalImageFields := transformStruct(img, addImgFields)
 
 	for i, obj := range objects {
