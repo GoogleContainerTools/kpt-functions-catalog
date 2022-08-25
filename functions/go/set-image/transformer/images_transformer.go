@@ -26,6 +26,11 @@ type Image struct {
 	Digest string `json:"digest,omitempty" yaml:"digest,omitempty"`
 }
 
+type Result struct {
+	CurrentValue  string
+	ProposedValue string
+}
+
 // SetImage supports the set-image workflow, it uses Config to parse functionConfig, Transform to change the image
 type SetImage struct {
 	// Image is the desired image
@@ -39,7 +44,7 @@ type SetImage struct {
 }
 
 // Config transforms the data from ConfigMap to SetImage struct
-func (t *SetImage) Config() error {
+func (t *SetImage) ConfigDefaultData() error {
 	for key, val := range t.DataFromDefaultConfig {
 		switch key {
 		case "name":
@@ -72,12 +77,13 @@ func (t *SetImage) validateInput() error {
 	return nil
 }
 
-func (t *SetImage) updateContainerImages(pod *fn.SubObject) (error, map[int][]string) {
+// updateContainerImages updates the images inside containers, return potential error, and a list of logging results
+func (t *SetImage) updateContainerImages(pod *fn.SubObject) (error, []Result) {
 	var containers fn.SliceSubObjects
 	containers = append(containers, pod.GetSlice("iniContainers")...)
 	containers = append(containers, pod.GetSlice("containers")...)
 
-	result := make(map[int][]string)
+	var result []Result
 	for _, o := range containers {
 		oldValue := o.NestedStringOrDie("image")
 		if !image.IsImageMatched(oldValue, t.Image.Name) {
@@ -93,12 +99,15 @@ func (t *SetImage) updateContainerImages(pod *fn.SubObject) (error, map[int][]st
 		}
 		t.resultCount += 1
 
-		result[t.resultCount] = []string{oldValue, newName}
+		result = append(result, Result{
+			CurrentValue:  oldValue,
+			ProposedValue: newName,
+		})
 	}
 	return nil, result
 }
 
-func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) (error, map[int][]string) {
+func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) (error, []Result) {
 	spec := o.GetMap("spec")
 	if spec == nil {
 		return nil, nil
@@ -115,7 +124,7 @@ func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) (error, map[int][]stri
 	return nil, result
 }
 
-func (t *SetImage) setPodContainers(o *fn.KubeObject) (error, map[int][]string) {
+func (t *SetImage) setPodContainers(o *fn.KubeObject) (error, []Result) {
 	spec := o.GetMap("spec")
 	if spec == nil {
 		return nil, nil
@@ -151,19 +160,19 @@ func getNewImageName(oldValue string, newImage Image) string {
 	return newName
 }
 
-func (t SetImage) LogResult(ctx *fn.Context, err error, result map[int][]string, o *fn.KubeObject) {
+func (t SetImage) LogResult(ctx *fn.Context, err error, result []Result, o *fn.KubeObject) {
 	if err != nil {
 		ctx.ResultErr(err.Error(), o)
 	}
 	for _, val := range result {
-		msg := fmt.Sprintf("updated image from %v to %v", val[0], val[1])
+		msg := fmt.Sprintf("updated image from %v to %v", val.CurrentValue, val.ProposedValue)
 		ctx.ResultInfo(msg, o)
 	}
 }
 
 // Run implements the Runner interface that transforms the resource and log the results
 func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.KubeObjects) {
-	err := t.Config()
+	err := t.ConfigDefaultData()
 	if err != nil {
 		ctx.ResultErrAndDie(err.Error(), nil)
 	}
