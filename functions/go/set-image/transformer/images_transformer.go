@@ -9,8 +9,7 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
-// Image contains an image name, a new name, a new tag or digest,
-// which will replace the original name and tag.
+// Image contains an image name, a new name, a new tag or digest, which will replace the original name and tag.
 type Image struct {
 	// Name is a tag-less image name.
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
