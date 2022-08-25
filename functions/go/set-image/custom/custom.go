@@ -7,37 +7,32 @@ import (
 	"sigs.k8s.io/kustomize/api/filters/imagetag"
 	"sigs.k8s.io/kustomize/api/types"
 	"sigs.k8s.io/kustomize/kyaml/filtersutil"
-	"sigs.k8s.io/kustomize/kyaml/resid"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-// transformStruct transforms the struct inside transformer to the struct inside kustomize
-func transformStruct(imgObj *fn.SubObject, addImgFields fn.SliceSubObjects) (types.Image, types.FsSlice) {
-	image := types.Image{
-		Name:    imgObj.NestedStringOrDie("name"),
-		NewName: imgObj.NestedStringOrDie("newName"),
-		NewTag:  imgObj.NestedStringOrDie("newTag"),
-		Digest:  imgObj.NestedStringOrDie("digest"),
-	}
+// NewImageAdaptor transforms the image struct inside transformer to the struct inside kustomize
+func NewImageAdaptor(imgObj *fn.SubObject) types.Image {
+	imgPtr := &types.Image{}
+	imgObj.AsOrDie(imgPtr)
+	return *imgPtr
+}
+
+// NewFieldSpecSliceAdaptor transforms the additionalImageFields struct inside transformer to the struct inside kustomize
+func NewFieldSpecSliceAdaptor(addImgFields fn.SliceSubObjects) types.FsSlice {
 	additionalImageFields := types.FsSlice{}
 	for _, v := range addImgFields {
-		curFieldSpec := types.FieldSpec{
-			Gvk: resid.Gvk{
-				Group:   v.NestedStringOrDie("group"),
-				Version: v.NestedStringOrDie("version"),
-				Kind:    v.NestedStringOrDie("kind"),
-			},
-			Path:               v.NestedStringOrDie("path"),
-			CreateIfNotPresent: v.NestedBoolOrDie("create"),
-		}
-		additionalImageFields = append(additionalImageFields, curFieldSpec)
+		fieldPtr := &types.FieldSpec{}
+		v.AsOrDie(fieldPtr)
+		additionalImageFields = append(additionalImageFields, *fieldPtr)
 	}
-	return image, additionalImageFields
+	return additionalImageFields
 }
 
 // SetAdditionalFieldSpec updates the image in user given fieldPaths. To be deprecated in around a year, to avoid possible invalid fieldPaths.
 func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFields fn.SliceSubObjects, ctx *fn.Context) {
-	image, additionalImageFields := transformStruct(img, addImgFields)
+	//image, additionalImageFields := TransformStruct(img, addImgFields)
+	image := NewImageAdaptor(img)
+	additionalImageFields := NewFieldSpecSliceAdaptor(addImgFields)
 
 	for i, obj := range objects {
 		objRN, err := yaml.Parse(obj.String())
