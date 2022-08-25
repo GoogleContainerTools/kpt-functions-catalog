@@ -183,7 +183,7 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 	}
 
 	if t.AdditionalImageFields != nil {
-		custom.SetAdditionalFieldSpec(functionConfig.GetMap("image"), items, t.AdditionalImageFields, ctx)
+		custom.SetAdditionalFieldSpec(functionConfig.GetMap("image"), items, functionConfig.GetSlice("additionalImageFields"), ctx)
 	}
 
 	summary := fmt.Sprintf("summary: updated a total of %v image(s)", t.resultCount)

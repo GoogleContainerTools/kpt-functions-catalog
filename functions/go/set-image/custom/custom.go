@@ -3,7 +3,6 @@ package custom
 import (
 	"fmt"
 
-	myTypes "github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/third_party/sigs.k8s.io/kustomize/api/types"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/kustomize/api/filters/imagetag"
 	"sigs.k8s.io/kustomize/api/types"
@@ -13,7 +12,7 @@ import (
 )
 
 // transformStruct transforms the struct inside third_party and transformer to the struct inside kustomize
-func transformStruct(imgObj *fn.SubObject, addImgFields myTypes.FsSlice) (types.Image, types.FsSlice) {
+func transformStruct(imgObj *fn.SubObject, addImgFields fn.SliceSubObjects) (types.Image, types.FsSlice) {
 	image := types.Image{
 		Name:    imgObj.NestedStringOrDie("name"),
 		NewName: imgObj.NestedStringOrDie("newName"),
@@ -24,12 +23,12 @@ func transformStruct(imgObj *fn.SubObject, addImgFields myTypes.FsSlice) (types.
 	for _, v := range addImgFields {
 		curFieldSpec := types.FieldSpec{
 			Gvk: resid.Gvk{
-				Group:   v.Gvk.Group,
-				Version: v.Gvk.Version,
-				Kind:    v.Gvk.Kind,
+				Group:   v.NestedStringOrDie("group"),
+				Version: v.NestedStringOrDie("version"),
+				Kind:    v.NestedStringOrDie("kind"),
 			},
-			Path:               v.Path,
-			CreateIfNotPresent: v.CreateIfNotPresent,
+			Path:               v.NestedStringOrDie("path"),
+			CreateIfNotPresent: v.NestedBoolOrDie("create"),
 		}
 		additionalImageFields = append(additionalImageFields, curFieldSpec)
 	}
@@ -37,7 +36,7 @@ func transformStruct(imgObj *fn.SubObject, addImgFields myTypes.FsSlice) (types.
 }
 
 // SetAdditionalFieldSpec updates the image in user given fieldPaths. To be deprecated in around a year, to avoid possible invalid fieldPaths.
-func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFields myTypes.FsSlice, ctx *fn.Context) {
+func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFields fn.SliceSubObjects, ctx *fn.Context) {
 	image, additionalImageFields := transformStruct(img, addImgFields)
 
 	for i, obj := range objects {
