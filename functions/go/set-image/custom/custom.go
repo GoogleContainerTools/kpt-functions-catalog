@@ -10,27 +10,8 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-// NewImageAdaptor transforms the image struct inside transformer to the struct inside kustomize
-func NewImageAdaptor(imgObj *fn.SubObject) types.Image {
-	imgPtr := &types.Image{}
-	imgObj.AsOrDie(imgPtr)
-	return *imgPtr
-}
-
-// NewFieldSpecSliceAdaptor transforms the additionalImageFields struct inside transformer to the struct inside kustomize
-func NewFieldSpecSliceAdaptor(addImgFields fn.SliceSubObjects) types.FsSlice {
-	additionalImageFields := types.FsSlice{}
-	for _, v := range addImgFields {
-		fieldPtr := &types.FieldSpec{}
-		v.AsOrDie(fieldPtr)
-		additionalImageFields = append(additionalImageFields, *fieldPtr)
-	}
-	return additionalImageFields
-}
-
 // SetAdditionalFieldSpec updates the image in user given fieldPaths. To be deprecated in around a year, to avoid possible invalid fieldPaths.
 func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFields fn.SliceSubObjects, ctx *fn.Context) {
-	//image, additionalImageFields := TransformStruct(img, addImgFields)
 	image := NewImageAdaptor(img)
 	additionalImageFields := NewFieldSpecSliceAdaptor(addImgFields)
 
@@ -63,4 +44,22 @@ func logResultCallback(ctx *fn.Context, ko *fn.KubeObject) func(key, value, tag 
 		msg := fmt.Sprintf("updated image from %v to %v", currentValue, value)
 		ctx.ResultInfo(msg, ko)
 	}
+}
+
+// NewImageAdaptor transforms the image struct inside transformer to the struct inside kustomize
+func NewImageAdaptor(imgObj *fn.SubObject) types.Image {
+	imgPtr := &types.Image{}
+	imgObj.AsOrDie(imgPtr)
+	return *imgPtr
+}
+
+// NewFieldSpecSliceAdaptor transforms the additionalImageFields struct inside transformer to the struct inside kustomize
+func NewFieldSpecSliceAdaptor(addImgFields fn.SliceSubObjects) types.FsSlice {
+	additionalImageFields := types.FsSlice{}
+	for _, v := range addImgFields {
+		fieldPtr := &types.FieldSpec{}
+		v.AsOrDie(fieldPtr)
+		additionalImageFields = append(additionalImageFields, *fieldPtr)
+	}
+	return additionalImageFields
 }
