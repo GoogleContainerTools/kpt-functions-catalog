@@ -175,7 +175,7 @@ func (t *SetImage) hasPodContainers(o *fn.KubeObject) bool {
 
 // getNewImageName return the new name for image field
 func getNewImageName(oldValue string, newImage Image) string {
-	name, tag := image.Split(oldValue)
+	name, tag, digest := image.Split(oldValue)
 	if newImage.NewName != "" {
 		name = newImage.NewName
 	}
@@ -185,7 +185,13 @@ func getNewImageName(oldValue string, newImage Image) string {
 	if newImage.Digest != "" {
 		tag = "@" + newImage.Digest
 	}
-	newName := name + tag
+	var newName string
+	if tag == "" {
+		newName = name + digest
+	} else {
+		newName = name + tag
+	}
+
 	return newName
 }
 
