@@ -11,7 +11,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-// transformStruct transforms the struct inside third_party and transformer to the struct inside kustomize
+// transformStruct transforms the struct inside transformer to the struct inside kustomize
 func transformStruct(imgObj *fn.SubObject, addImgFields fn.SliceSubObjects) (types.Image, types.FsSlice) {
 	image := types.Image{
 		Name:    imgObj.NestedStringOrDie("name"),
