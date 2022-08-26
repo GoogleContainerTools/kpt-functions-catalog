@@ -1,0 +1,14 @@
+apiVersion: kpt.dev/v1
+kind: FunctionResultList
+metadata:
+  name: fnresults
+exitCode: 1
+items:
+  - image: gcr.io/kpt-fn/set-image:unstable
+    stderr: 'failed to evaluate function: function is terminated: image `newTag` and `digest` both set, set only one'
+    exitCode: 1
+    results:
+      - message: image `newTag` and `digest` both set, set only one
+        severity: error
+      - message: 'function is terminated: image `newTag` and `digest` both set, set only one'
+        severity: error
