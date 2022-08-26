@@ -54,13 +54,14 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 		ctx.ResultErrAndDie(err.Error(), nil)
 	}
 
-	for _, o := range items.Where(t.hasPodContainers) {
-		err, result := t.setPodContainers(o)
-		t.logResult(ctx, err, result, o)
-	}
-
-	for _, o := range items.Where(t.hasPodSpecContainers) {
-		err, result := t.setPodSpecContainers(o)
+	for _, o := range items {
+		var result []setImageResult
+		switch o.GetKind() {
+		case "Pod":
+			err, result = t.setPodContainers(o)
+		case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
+			err, result = t.setPodSpecContainers(o)
+		}
 		t.logResult(ctx, err, result, o)
 	}
 
@@ -163,14 +164,6 @@ func (t *SetImage) setPodContainers(o *fn.KubeObject) (error, []setImageResult) 
 		return err, nil
 	}
 	return nil, result
-}
-
-func (t *SetImage) hasPodSpecContainers(o *fn.KubeObject) bool {
-	return o.IsGVK("", "", "PodTemplate")
-}
-
-func (t *SetImage) hasPodContainers(o *fn.KubeObject) bool {
-	return o.IsGVK("", "", "Pod")
 }
 
 // getNewImageName return the new name for image field
