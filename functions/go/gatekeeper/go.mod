@@ -1,6 +1,6 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gatekeeper
 
-go 1.17
+go 1.18
 
 require (
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20220121182312-5d06dedcafb4
