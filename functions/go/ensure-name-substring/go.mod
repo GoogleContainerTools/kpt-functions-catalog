@@ -1,6 +1,6 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/ensure-name-substring
 
-go 1.17
+go 1.18
 
 require (
 	github.com/stretchr/testify v1.7.0
