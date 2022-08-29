@@ -56,12 +56,8 @@ function docker_build {
   [[ -f "${defaults}" ]] || err "defaults file does not exist: ${defaults}"
   # shellcheck source=/dev/null
   source "${defaults}"
-  # build_args+=(--build-arg "KUBEVAL_BUILDER_IMAGE=${KUBEVAL_BUILDER_IMAGE}")
   build_args+=(--build-arg "BUILDER_IMAGE=${BUILDER_IMAGE}")
   build_args+=(--build-arg "BASE_IMAGE=${BASE_IMAGE}")
-  if [ "$name" = "kubeval" ]; then
-    build_args+=(--build-arg "KUBEVAL_BUILDER_IMAGE=${KUBEVAL_BUILDER_IMAGE}")
-  fi
 
   echo "building ${GCR_REGISTRY}/${name}:${tag}"
 
