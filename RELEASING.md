@@ -23,28 +23,38 @@ be created on the [releases pages]. `RELEASE_BRANCH` is in the form of
 `${FUNCTION_NAME}/v${MAJOR_VERSION}.${MINOR_VERSION}`.
 For example `set-namespace/v0.3`, `kubeval/v0.1`, etc.
 
-
-1. Run the script:
+1. Setup the release branch 
+	Release branch should have existed in the [upstream repo](https://github.com/GoogleContainerTools/kpt-functions-catalog) in the form of `<FUNCTION_NAME>/v<MAJOR>.<MINOR>`. Let's take `set-namespace/v0.4` as an example. You should replace that to your RELEASE_BRANCH.  
+	```shell
+	> export RELEASE_BRANCH=set-namespace/v0.4
+	```
+2. Clean up the local branch
+	The release script needs to run in the local <RELEASE BRANCH>. To avoid git ref conflicts, we suggest you delete your local branch OR make it up to date with the remote <RELEASE BRANCH>
 ```shell
-# Fetch from upstream (assuming upstream is set to official repo)
-git fetch upstream
-# Make sure local release branch is up to date
-# e.g. git checkout set-namespace/v0.3 && git reset --hard upstream/set-namespace/v0.3
-git checkout <RELEASE_BRANCH> && git reset --hard upstream/<RELEASE_BRANCH>
-# Check out latest version of the make target from master
-git checkout upstream/master
-# Run the make target
-# e.g. RELEASE_BRANCH=set-namespace/v0.3 make update-function-docs
-RELEASE_BRANCH=<RELEASE_BRANCH> make update-function-docs
+> git branch -D ${RELEASE_BRANCH}
 ```
-1. The script will generate a new commit in your local repository which updates
-the docs for the provided function release. Push this commit to your remote.
+3. Fetch the upstream repository
+	Your `upstream` repo should point to the official kpt-functions-catalog. Verify your git remote is set as below
 ```shell
-# Push the commit to your remote (branch name can be anything)
-# e.g. git push origin HEAD:update-docs-set-namespace
-git push origin HEAD:<remote-branch>
+> git remote -v | grep upstream
+upstream	git@github.com:GoogleContainerTools/kpt-functions-catalog.git (fetch)
+upstream	git@github.com:GoogleContainerTools/kpt-functions-catalog.git (push)
+# Fetch the latest upstream repo
+> git fetch upstream
 ```
-1. Create a pull request targeted at the release branch.
+4. Run the doc updating script.
+```shell
+git checkout remotes/upstream/master
+RELEASE_BRANCH=${RELEASE_BRANCH} make update-function-docs
+```
+5. Send out a Pull Request. 
+	Your local git reference is now pointing to the local RELEASE BRANCH.
+	A new git commit is auto-generated which contains the function document referring to the latest function version in the form of 
+	`<FUNCTION_NAME>/v<MAJOR>.<MINOR>.<PATCH>`
+	You should be ready to submit the Pull Request against the upstream <RELEASE_BRANCH>. 
+```shell
+> git push -f origin ${RELEASE_BRANCH}
+```
 
 [repo]: https://github.com/GoogleContainerTools/kpt-functions-catalog
 [releases pages]: https://github.com/GoogleContainerTools/kpt-functions-catalog/releases
