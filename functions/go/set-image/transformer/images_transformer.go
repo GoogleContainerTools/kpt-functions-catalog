@@ -73,7 +73,7 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 	ctx.ResultInfo(summary, nil)
 }
 
-// Config transforms the data from ConfigMap to SetImage struct
+// configDefaultData transforms the data from ConfigMap to SetImage struct
 func (t *SetImage) configDefaultData() error {
 	for key, val := range t.DataFromDefaultConfig {
 		switch key {
@@ -101,9 +101,6 @@ func (t *SetImage) validateInput() error {
 	if t.Image.NewName == "" && t.Image.NewTag == "" && t.Image.Digest == "" {
 		return fmt.Errorf("must specify one of `newName`, `newTag`, or `digest`")
 	}
-	if t.Image.NewTag != "" && t.Image.Digest != "" {
-		return fmt.Errorf("image `newTag` and `digest` both set, set only one")
-	}
 	return nil
 }
 
@@ -121,7 +118,7 @@ func (t *SetImage) updateContainerImages(pod *fn.SubObject) (error, []setImageRe
 		}
 		newName := getNewImageName(oldValue, t.Image)
 		if oldValue == newName {
-			return nil, nil
+			continue
 		}
 
 		if err := o.SetNestedString(newName, "image"); err != nil {
