@@ -25,12 +25,6 @@ type Image struct {
 	Digest string `json:"digest,omitempty" yaml:"digest,omitempty"`
 }
 
-// setImageResult keeps the old value and new value for logging
-type setImageResult struct {
-	currentValue  string
-	proposedValue string
-}
-
 // SetImage supports the set-image workflow, it uses Config to parse functionConfig, Transform to change the image
 type SetImage struct {
 	// Image is the desired image
