@@ -1,8 +1,6 @@
 package custom
 
 import (
-	"fmt"
-
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"sigs.k8s.io/kustomize/api/filters/imagetag"
 	"sigs.k8s.io/kustomize/api/types"
@@ -11,7 +9,7 @@ import (
 )
 
 // SetAdditionalFieldSpec updates the image in user given fieldPaths. To be deprecated in around a year, to avoid possible invalid fieldPaths.
-func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFields fn.SliceSubObjects, ctx *fn.Context) {
+func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFields fn.SliceSubObjects, ctx *fn.Context, count *int) {
 	image := NewImageAdaptor(img)
 	additionalImageFields := NewFieldSpecSliceAdaptor(addImgFields)
 
@@ -24,8 +22,7 @@ func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFie
 			ImageTag: image,
 			FsSlice:  additionalImageFields,
 		}
-
-		filter.WithMutationTracker(logResultCallback(ctx, obj))
+		filter.WithMutationTracker(logResultCallback(count))
 		err = filtersutil.ApplyToJSON(filter, objRN)
 		if err != nil {
 			ctx.ResultErr(err.Error(), obj)
@@ -38,11 +35,9 @@ func SetAdditionalFieldSpec(img *fn.SubObject, objects fn.KubeObjects, addImgFie
 	}
 }
 
-func logResultCallback(ctx *fn.Context, ko *fn.KubeObject) func(key, value, tag string, node *yaml.RNode) {
+func logResultCallback(count *int) func(key, value, tag string, node *yaml.RNode) {
 	return func(key, value, tag string, node *yaml.RNode) {
-		currentValue := node.YNode().Value
-		msg := fmt.Sprintf("updated image from %v to %v", currentValue, value)
-		ctx.ResultInfo(msg, ko)
+		*count += 1
 	}
 }
 

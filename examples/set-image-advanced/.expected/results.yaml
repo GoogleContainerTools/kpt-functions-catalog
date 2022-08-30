@@ -7,23 +7,5 @@ items:
   - image: gcr.io/kpt-fn/set-image:unstable
     exitCode: 0
     results:
-      - message: updated image from nginx:1.20.2 to bitnami/nginx:1.21.4
-        severity: info
-        resourceRef:
-          apiVersion: v1
-          kind: Pod
-          name: the-pod
-        file:
-          path: resources.yaml
-      - message: updated image from nginx:1.20.2 to bitnami/nginx:1.21.4
-        severity: info
-        resourceRef:
-          apiVersion: dev.example.com/v1
-          kind: MyKind
-          name: the-resource
-          namespace: the-namespace
-        file:
-          path: resources.yaml
-          index: 1
-      - message: 'summary: updated a total of 1 image(s)'
+      - message: 'summary: updated a total of 2 image(s)'
         severity: info

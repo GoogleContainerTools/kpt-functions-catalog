@@ -55,18 +55,20 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 	}
 
 	for _, o := range items {
-		var result []setImageResult
 		switch o.GetKind() {
 		case "Pod":
-			err, result = t.setPodContainers(o)
+			if err = t.setPodContainers(o); err != nil {
+				ctx.ResultErr(err.Error(), o)
+			}
 		case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
-			err, result = t.setPodSpecContainers(o)
+			if err = t.setPodSpecContainers(o); err != nil {
+				ctx.ResultErr(err.Error(), o)
+			}
 		}
-		t.logResult(ctx, err, result, o)
 	}
 
 	if t.AdditionalImageFields != nil {
-		custom.SetAdditionalFieldSpec(functionConfig.GetMap("image"), items, functionConfig.GetSlice("additionalImageFields"), ctx)
+		custom.SetAdditionalFieldSpec(functionConfig.GetMap("image"), items, functionConfig.GetSlice("additionalImageFields"), ctx, &t.resultCount)
 	}
 
 	summary := fmt.Sprintf("summary: updated a total of %v image(s)", t.resultCount)
@@ -104,13 +106,12 @@ func (t *SetImage) validateInput() error {
 	return nil
 }
 
-// updateContainerImages updates the images inside containers, return potential error, and a list of logging results
-func (t *SetImage) updateContainerImages(pod *fn.SubObject) (error, []setImageResult) {
+// updateContainerImages updates the images inside containers, return potential error
+func (t *SetImage) updateContainerImages(pod *fn.SubObject) error {
 	var containers fn.SliceSubObjects
 	containers = append(containers, pod.GetSlice("iniContainers")...)
 	containers = append(containers, pod.GetSlice("containers")...)
 
-	var result []setImageResult
 	for _, o := range containers {
 		oldValue := o.NestedStringOrDie("image")
 		if !image.IsImageMatched(oldValue, t.Image.Name) {
@@ -122,45 +123,40 @@ func (t *SetImage) updateContainerImages(pod *fn.SubObject) (error, []setImageRe
 		}
 
 		if err := o.SetNestedString(newName, "image"); err != nil {
-			return err, nil
+			return err
 		}
 		t.resultCount += 1
-
-		result = append(result, setImageResult{
-			currentValue:  oldValue,
-			proposedValue: newName,
-		})
 	}
-	return nil, result
+	return nil
 }
 
-func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) (error, []setImageResult) {
+func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) error {
 	spec := o.GetMap("spec")
 	if spec == nil {
-		return nil, nil
+		return nil
 	}
 	template := spec.GetMap("template")
 	if template == nil {
-		return nil, nil
+		return nil
 	}
 	podSpec := template.GetMap("spec")
-	err, result := t.updateContainerImages(podSpec)
+	err := t.updateContainerImages(podSpec)
 	if err != nil {
-		return err, nil
+		return err
 	}
-	return nil, result
+	return nil
 }
 
-func (t *SetImage) setPodContainers(o *fn.KubeObject) (error, []setImageResult) {
+func (t *SetImage) setPodContainers(o *fn.KubeObject) error {
 	spec := o.GetMap("spec")
 	if spec == nil {
-		return nil, nil
+		return nil
 	}
-	err, result := t.updateContainerImages(spec)
+	err := t.updateContainerImages(spec)
 	if err != nil {
-		return err, nil
+		return err
 	}
-	return nil, result
+	return nil
 }
 
 // getNewImageName return the new name for image field
@@ -183,14 +179,4 @@ func getNewImageName(oldValue string, newImage Image) string {
 	}
 
 	return newName
-}
-
-func (t SetImage) logResult(ctx *fn.Context, err error, result []setImageResult, o *fn.KubeObject) {
-	if err != nil {
-		ctx.ResultErr(err.Error(), o)
-	}
-	for _, val := range result {
-		msg := fmt.Sprintf("updated image from %v to %v", val.currentValue, val.proposedValue)
-		ctx.ResultInfo(msg, o)
-	}
 }
