@@ -1,0 +1,11 @@
+diff --git a/resources.yaml b/resources.yaml
+index 76a5a25..3ee8cde 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -7,4 +7,4 @@ spec:
+     - name: server
+       image: nginx:1.20.2
+     - name: store
+-      image: nginx:1.14.1
+\ No newline at end of file
++      image: nginx:1.20.2
