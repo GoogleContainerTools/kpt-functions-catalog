@@ -1,7 +1,10 @@
-apiVersion: config.kubernetes.io/v1
-kind: ResourceList
+apiVersion: v1
+kind: Pod
 metadata:
-  name: my-resource
-items:
-- apiVersion: v1
-  kind: ConfigMap
+  name: app1
+spec:
+  containers:
+    - name: server
+      image: nginx:1.20.2
+    - name: store
+      image: nginx:14.1

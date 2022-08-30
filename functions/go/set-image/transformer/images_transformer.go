@@ -9,12 +9,18 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
-// Image contains an image name, a new name, a new tag or digest, which will replace the original name and tag.
 type Image struct {
-	// Name is a tag-less image name.
+	// DEPRECATED
+	//Name is a tag-less image name. should be deprecate, means image name
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
-	// NewName is the value used to replace the original name.
+	// ContainerName is the name for container
+	ContainerName string `json:"containerName,omitempty" yaml:"containerName,omitempty"`
+
+	// ImageName is the image name
+	ImageName string `json:"imageName,omitempty" yaml:"imageName,omitempty"`
+
+	// NewName is the value used to replace the original name, replace image name
 	NewName string `json:"newName,omitempty" yaml:"newName,omitempty"`
 
 	// NewTag is the value used to replace the original tag.
@@ -35,6 +41,10 @@ type SetImage struct {
 	AdditionalImageFields types.FsSlice `json:"additionalImageFields,omitempty" yaml:"additionalImageFields,omitempty"`
 	// resultCount logs the total count image change
 	resultCount int
+	// currentImageNames records current image name, if no image name is provided as input, there should only be one ImageNames
+	currentImageName string
+	// isImageSelected checks if the input provide the image name or not
+	isImageSelected bool
 }
 
 // Run implements the Runner interface that transforms the resource and log the results
@@ -51,12 +61,14 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 	for _, o := range items {
 		switch o.GetKind() {
 		case "Pod":
-			if err = t.setPodContainers(o); err != nil {
-				ctx.ResultErr(err.Error(), o)
+			errList := t.setPodContainers(o)
+			for _, e := range errList {
+				ctx.ResultErr(e.Error(), o)
 			}
 		case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
-			if err = t.setPodSpecContainers(o); err != nil {
-				ctx.ResultErr(err.Error(), o)
+			errList := t.setPodSpecContainers(o)
+			for _, e := range errList {
+				ctx.ResultErr(e.Error(), o)
 			}
 		}
 	}
@@ -74,7 +86,11 @@ func (t *SetImage) configDefaultData() error {
 	for key, val := range t.DataFromDefaultConfig {
 		switch key {
 		case "name":
-			t.Image.Name = val
+			t.Image.ImageName = val
+		case "containerName":
+			t.Image.ContainerName = val
+		case "imageName":
+			t.Image.ImageName = val
 		case "newName":
 			t.Image.NewName = val
 		case "newTag":
@@ -90,9 +106,15 @@ func (t *SetImage) configDefaultData() error {
 
 // validateInput validates the inputs passed into via the functionConfig
 func (t *SetImage) validateInput() error {
-	// TODO: support container name and only one argument input in the next PR
-	if t.Image.Name == "" {
-		return fmt.Errorf("must specify `name`")
+	// if user does not input image name or container name, there should be only one image name to select from
+	if t.Image.Name == "" && t.Image.ImageName == "" && t.Image.ContainerName == "" {
+		t.isImageSelected = false
+	} else {
+		t.isImageSelected = true
+	}
+
+	if t.Image.Name != "" && t.Image.ImageName != "" && t.Image.Name != t.Image.ImageName {
+		return fmt.Errorf("must not fill `imageName` and `name` at same time, their values should be equal")
 	}
 	if t.Image.NewName == "" && t.Image.NewTag == "" && t.Image.Digest == "" {
 		return fmt.Errorf("must specify one of `newName`, `newTag`, or `digest`")
@@ -100,31 +122,96 @@ func (t *SetImage) validateInput() error {
 	return nil
 }
 
+func matchImage(oldName string, oldContainer string, newImage *Image) (bool, error) {
+	// name would be deprecated, means image name
+	if newImage.Name != "" {
+		newImage.ImageName = newImage.Name
+	}
+
+	// match image name, no container name
+	if newImage.ImageName != "" && newImage.ContainerName == "" {
+		if !image.IsImageMatched(oldName, newImage.ImageName) {
+			return false, nil
+		}
+	}
+	// match container name, no image name
+	if newImage.ImageName == "" && newImage.ContainerName != "" {
+		if oldContainer != newImage.ContainerName {
+			return false, nil
+		}
+	}
+	// match both
+	if newImage.ImageName != "" && newImage.ContainerName != "" {
+		if !image.IsImageMatched(oldName, newImage.ImageName) {
+			return false, nil
+		}
+		if oldContainer != newImage.ContainerName {
+			msg := fmt.Sprintf("container name `%v` does not match `%v`, only image name matches", newImage.ContainerName, oldContainer)
+			warning := fn.Result{
+				Message:  msg,
+				Severity: fn.Warning,
+			}
+			return true, warning
+		}
+	}
+	return true, nil
+}
+
+func (t *SetImage) isImageNameUnique(oldValue string) bool {
+	name, _, _ := image.Split(oldValue)
+	if t.currentImageName == "" {
+		t.currentImageName = name
+	} else {
+		return t.currentImageName == name
+	}
+	return true
+}
+
 // updateContainerImages updates the images inside containers, return potential error
-func (t *SetImage) updateContainerImages(pod *fn.SubObject) error {
+func (t *SetImage) updateContainerImages(pod *fn.SubObject) []error {
 	var containers fn.SliceSubObjects
 	containers = append(containers, pod.GetSlice("iniContainers")...)
 	containers = append(containers, pod.GetSlice("containers")...)
 
+	var warningList []error
 	for _, o := range containers {
 		oldValue := o.NestedStringOrDie("image")
-		if !image.IsImageMatched(oldValue, t.Image.Name) {
+		oldContainer := o.NestedStringOrDie("name")
+
+		if t.isImageSelected == false {
+			if !t.isImageNameUnique(oldValue) {
+				msg := fmt.Sprintf("must specify `imageName`, resources contain non-unique image names")
+				err := fn.Result{
+					Message:  msg,
+					Severity: fn.Error,
+				}
+				return []error{err}
+			}
+		}
+
+		matched, warning := matchImage(oldValue, oldContainer, &t.Image)
+		if !matched {
 			continue
 		}
+
 		newName := getNewImageName(oldValue, t.Image)
 		if oldValue == newName {
 			continue
 		}
 
+		if warning != nil {
+			warningList = append(warningList, warning)
+		}
+
 		if err := o.SetNestedString(newName, "image"); err != nil {
-			return err
+			return []error{err}
 		}
 		t.resultCount += 1
 	}
-	return nil
+	return warningList
 }
 
-func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) error {
+func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) []error {
 	spec := o.GetMap("spec")
 	if spec == nil {
 		return nil
@@ -141,7 +228,7 @@ func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) error {
 	return nil
 }
 
-func (t *SetImage) setPodContainers(o *fn.KubeObject) error {
+func (t *SetImage) setPodContainers(o *fn.KubeObject) []error {
 	spec := o.GetMap("spec")
 	if spec == nil {
 		return nil

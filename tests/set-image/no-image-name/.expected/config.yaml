@@ -2,4 +2,4 @@ apiVersion: kpt.dev/v1
 kind: FunctionResultList
 metadata:
   name: fnresults
-exitCode: 1
+exitCode: 0

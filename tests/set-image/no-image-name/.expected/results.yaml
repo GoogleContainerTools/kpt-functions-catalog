@@ -2,13 +2,10 @@ apiVersion: kpt.dev/v1
 kind: FunctionResultList
 metadata:
   name: fnresults
-exitCode: 1
+exitCode: 0
 items:
   - image: gcr.io/kpt-fn/set-image:unstable
-    stderr: 'failed to evaluate function: function is terminated: must specify `name`'
-    exitCode: 1
+    exitCode: 0
     results:
-      - message: must specify `name`
-        severity: error
-      - message: 'function is terminated: must specify `name`'
-        severity: error
+      - message: 'summary: updated a total of 2 image(s)'
+        severity: info
