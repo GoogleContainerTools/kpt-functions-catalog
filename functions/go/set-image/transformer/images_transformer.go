@@ -2,8 +2,6 @@ package transformer
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/custom"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/third_party/sigs.k8s.io/kustomize/api/image"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/third_party/sigs.k8s.io/kustomize/api/types"
@@ -42,10 +40,6 @@ type SetImage struct {
 	AdditionalImageFields types.FsSlice `json:"additionalImageFields,omitempty" yaml:"additionalImageFields,omitempty"`
 	// resultCount logs the total count image change
 	resultCount int
-	// currentImageNames records current image name, if no image name is provided as input, there should only be one ImageNames
-	currentImageName string
-	// isImageSelected checks if the input provide the image name or not
-	isImageSelected bool
 }
 
 // Run implements the Runner interface that transforms the resource and log the results
@@ -54,7 +48,7 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 	if err != nil {
 		ctx.ResultErrAndDie(err.Error(), nil)
 	}
-	err = t.validateInput()
+	err = t.validateInput(items)
 	if err != nil {
 		ctx.ResultErrAndDie(err.Error(), nil)
 	}
@@ -64,17 +58,11 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 		case "Pod":
 			errList := t.setPodContainers(o)
 			for _, e := range errList {
-				if strings.Contains(e.Error(), "must") {
-					ctx.ResultErrAndDie(e.Error(), o)
-				}
 				ctx.ResultErr(e.Error(), o)
 			}
 		case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
 			errList := t.setPodSpecContainers(o)
 			for _, e := range errList {
-				if strings.Contains(e.Error(), "must") {
-					ctx.ResultErrAndDie(e.Error(), o)
-				}
 				ctx.ResultErr(e.Error(), o)
 			}
 		}
@@ -112,14 +100,13 @@ func (t *SetImage) configDefaultData() error {
 }
 
 // validateInput validates the inputs passed into via the functionConfig
-func (t *SetImage) validateInput() error {
+func (t *SetImage) validateInput(items fn.KubeObjects) error {
 	// if user does not input image name or container name, there should be only one image name to select from
 	if t.Image.Name == "" && t.Image.ImageName == "" && t.Image.ContainerName == "" {
-		t.isImageSelected = false
-	} else {
-		t.isImageSelected = true
+		if !t.isImageNameUnique(items) {
+			return fmt.Errorf("must specify `imageName`, resources contain non-unique image names")
+		}
 	}
-
 	if t.Image.Name != "" && t.Image.ImageName != "" && t.Image.Name != t.Image.ImageName {
 		return fmt.Errorf("must not fill `imageName` and `name` at same time, their values should be equal")
 	}
@@ -129,7 +116,8 @@ func (t *SetImage) validateInput() error {
 	return nil
 }
 
-func matchImage(oldName string, oldContainer string, newImage *Image) (bool, error) {
+// matchImage takes the resources image name and container name, return if there is a match and potential warning
+func matchImage(oldImageName string, oldContainer string, newImage *Image) (bool, error) {
 	// name would be deprecated, means image name
 	if newImage.Name != "" {
 		newImage.ImageName = newImage.Name
@@ -137,7 +125,7 @@ func matchImage(oldName string, oldContainer string, newImage *Image) (bool, err
 
 	// match image name, no container name
 	if newImage.ImageName != "" && newImage.ContainerName == "" {
-		if !image.IsImageMatched(oldName, newImage.ImageName) {
+		if !image.IsImageMatched(oldImageName, newImage.ImageName) {
 			return false, nil
 		}
 	}
@@ -149,7 +137,7 @@ func matchImage(oldName string, oldContainer string, newImage *Image) (bool, err
 	}
 	// match both
 	if newImage.ImageName != "" && newImage.ContainerName != "" {
-		if !image.IsImageMatched(oldName, newImage.ImageName) {
+		if !image.IsImageMatched(oldImageName, newImage.ImageName) {
 			return false, nil
 		}
 		if oldContainer != newImage.ContainerName {
@@ -164,12 +152,60 @@ func matchImage(oldName string, oldContainer string, newImage *Image) (bool, err
 	return true, nil
 }
 
-func (t *SetImage) isImageNameUnique(oldValue string) bool {
-	name, _, _ := image.Split(oldValue)
-	if t.currentImageName == "" {
-		t.currentImageName = name
-	} else {
-		return t.currentImageName == name
+// isImageNameUnique checks if there is only one image name in all resources, return true if name is unique
+func (t *SetImage) isImageNameUnique(items fn.KubeObjects) bool {
+	curImageName := ""
+	for _, o := range items {
+		switch o.GetKind() {
+		case "Pod":
+			if !t.checkPodContainers(o, curImageName) {
+				return false
+			}
+		case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
+			if !t.checkPodSpecContainers(o, curImageName) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// checkPodContainers check if there is only one image name in pod containers
+func (t *SetImage) checkPodContainers(o *fn.KubeObject, curImageName string) bool {
+	spec := o.GetMap("spec")
+	if spec == nil {
+		return true
+	}
+	return t.checkContainerImages(spec, curImageName)
+}
+
+// checkPodSpecContainers check if there is only one image name in pod containers
+func (t *SetImage) checkPodSpecContainers(o *fn.KubeObject, curImageName string) bool {
+	spec := o.GetMap("spec")
+	if spec == nil {
+		return true
+	}
+	template := spec.GetMap("template")
+	if template == nil {
+		return true
+	}
+	podSpec := template.GetMap("spec")
+	return t.checkContainerImages(podSpec, curImageName)
+}
+
+// checkPodSpecContainers check if there is only one image name for containers
+func (t *SetImage) checkContainerImages(pod *fn.SubObject, curImageName string) bool {
+	var containers fn.SliceSubObjects
+	containers = append(containers, pod.GetSlice("iniContainers")...)
+	containers = append(containers, pod.GetSlice("containers")...)
+	for _, o := range containers {
+		oldValue := o.NestedStringOrDie("image")
+		imageName, _, _ := image.Split(oldValue)
+		if curImageName == "" {
+			curImageName = imageName
+		} else if curImageName != imageName {
+			return false
+		}
 	}
 	return true
 }
@@ -184,17 +220,6 @@ func (t *SetImage) updateContainerImages(pod *fn.SubObject) []error {
 	for _, o := range containers {
 		oldValue := o.NestedStringOrDie("image")
 		oldContainer := o.NestedStringOrDie("name")
-
-		if t.isImageSelected == false {
-			if !t.isImageNameUnique(oldValue) {
-				msg := fmt.Sprintf("must specify `imageName`, resources contain non-unique image names")
-				err := fn.Result{
-					Message:  msg,
-					Severity: fn.Error,
-				}
-				return []error{err}
-			}
-		}
 
 		matched, warning := matchImage(oldValue, oldContainer, &t.Image)
 		if !matched {
@@ -211,7 +236,7 @@ func (t *SetImage) updateContainerImages(pod *fn.SubObject) []error {
 		}
 
 		if err := o.SetNestedString(newName, "image"); err != nil {
-			return []error{err}
+			warningList = append(warningList, err)
 		}
 		t.resultCount += 1
 	}
