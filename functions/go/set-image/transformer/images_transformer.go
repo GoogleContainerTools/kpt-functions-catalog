@@ -2,6 +2,7 @@ package transformer
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/custom"
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image/third_party/sigs.k8s.io/kustomize/api/image"
@@ -63,11 +64,17 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 		case "Pod":
 			errList := t.setPodContainers(o)
 			for _, e := range errList {
+				if strings.Contains(e.Error(), "must") {
+					ctx.ResultErrAndDie(e.Error(), o)
+				}
 				ctx.ResultErr(e.Error(), o)
 			}
 		case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
 			errList := t.setPodSpecContainers(o)
 			for _, e := range errList {
+				if strings.Contains(e.Error(), "must") {
+					ctx.ResultErrAndDie(e.Error(), o)
+				}
 				ctx.ResultErr(e.Error(), o)
 			}
 		}
