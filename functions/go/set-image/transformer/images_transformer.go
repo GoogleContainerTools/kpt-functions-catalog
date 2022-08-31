@@ -57,10 +57,8 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 		containers := getContainers(o)
 		warnings, err := t.updateContainerImages(containers)
 
-		if warnings != nil {
-			for _, w := range warnings {
-				ctx.ResultWarn(w.Message, o)
-			}
+		for _, w := range warnings {
+			ctx.ResultWarn(w.Message, o)
 		}
 
 		if err != nil {
