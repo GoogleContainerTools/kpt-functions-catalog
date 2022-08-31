@@ -16,6 +16,7 @@ The goal is to make the generated output as close to possible as what a human wo
 The following KCC resources are supported:
 - Folder
 - Project
+- ComputeSharedVPCHostProject
 - IAMPartialPolicy
 - IAMPolicy
 - IAMPolicyMember

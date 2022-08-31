@@ -31,3 +31,31 @@ func (resource *terraformResource) GetFirewallAllowPortsProtocol() []firewallAll
 	}
 	return firewallAllows
 }
+
+// IsSVPCHost checks if the resource is a SVPC Host project.
+// The resource is a SVPC Host project if and only if it is of kind Project
+// and has a corresponding ComputeSharedVPCHostProject child resource.
+func (resource *terraformResource) IsSVPCHost() bool {
+	if resource.Kind != "Project" {
+		return false
+	}
+	projectID, found, err := resource.Item.GetString("metadata", "name")
+	if !found || err != nil {
+		return false
+	}
+	for _, child := range resource.Children {
+		if child.Kind != "ComputeSharedVPCHostProject" {
+			continue
+		}
+		// ComputeSharedVPCHostProject has no spec and relies on anno
+		// https://cloud.google.com/config-connector/docs/reference/resource-docs/compute/computesharedvpchostproject#annotations
+		svpcHostProjectID, found, err := child.Item.GetString("metadata", "annotations", "cnrm.cloud.google.com/project-id")
+		if !found || err != nil {
+			continue
+		}
+		if projectID == svpcHostProjectID {
+			return true
+		}
+	}
+	return false
+}
