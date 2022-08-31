@@ -10,16 +10,16 @@ import (
 
 type Image struct {
 	// DEPRECATED
-	//Name is a tag-less image name. should be deprecate, means image name
+	//Name is a tag-less image name.
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
-	// ContainerName is the name for container
+	// ContainerName is the Pod's container name. It is used to choose the matching containers to update the images.
 	ContainerName string `json:"containerName,omitempty" yaml:"containerName,omitempty"`
 
-	// ImageName is the name for image
+	// ImageName is the image name. It is used to choose images for update.
 	ImageName string `json:"imageName,omitempty" yaml:"imageName,omitempty"`
 
-	// NewName is the value used to replace the original name, replace image name
+	// NewName is the new image name
 	NewName string `json:"newName,omitempty" yaml:"newName,omitempty"`
 
 	// NewTag is the value used to replace the original tag.
@@ -48,9 +48,16 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 	if err != nil {
 		ctx.ResultErrAndDie(err.Error(), nil)
 	}
-	err = t.validateInput(items)
-	if err != nil {
-		ctx.ResultErrAndDie(err.Error(), nil)
+
+	items = items.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() })
+
+	res := t.validateInput(items)
+	if res != nil {
+		if res.Severity == fn.Error {
+			ctx.ResultErrAndDie(res.Message, nil)
+		}
+		ctx.Result(res.Message, res.Severity)
+		return
 	}
 
 	for _, o := range items {
@@ -98,18 +105,21 @@ func (t *SetImage) configDefaultData() error {
 }
 
 // validateInput validates the inputs passed into via the functionConfig
-func (t *SetImage) validateInput(items fn.KubeObjects) error {
+func (t *SetImage) validateInput(items fn.KubeObjects) *fn.Result {
 	// if user does not input image name or container name, there should be only one image name to select from
 	if t.Image.Name == "" && t.Image.ImageName == "" && t.Image.ContainerName == "" {
 		if !t.isImageNameUnique(items) {
-			return fmt.Errorf("must specify `imageName`, resources contain non-unique image names")
+			return fn.GeneralResult("must specify `imageName`, resources contain non-unique image names", fn.Error)
 		}
 	}
 	if t.Image.Name != "" && t.Image.ImageName != "" && t.Image.Name != t.Image.ImageName {
-		return fmt.Errorf("must not fill `imageName` and `name` at same time, their values should be equal")
+		return fn.GeneralResult("must not fill `imageName` and `name` at same time, their values should be equal", fn.Error)
 	}
 	if t.Image.NewName == "" && t.Image.NewTag == "" && t.Image.Digest == "" {
-		return fmt.Errorf("must specify one of `newName`, `newTag`, or `digest`")
+		return fn.GeneralResult("must specify one of `newName`, `newTag`, or `digest`", fn.Error)
+	}
+	if len(items) == 0 {
+		return fn.GeneralResult("no input resources", fn.Info)
 	}
 	return nil
 }
@@ -211,19 +221,15 @@ func getContainers(o *fn.KubeObject) fn.SliceSubObjects {
 
 // getPodContainers gets the containers from pod
 func getPodContainers(o *fn.KubeObject) fn.SliceSubObjects {
-	var containers fn.SliceSubObjects
 	spec := o.GetMap("spec")
 	if spec == nil {
 		return nil
 	}
-	containers = append(containers, spec.GetSlice("iniContainers")...)
-	containers = append(containers, spec.GetSlice("containers")...)
-	return containers
+	return append(spec.GetSlice("iniContainers"), spec.GetSlice("containers")...)
 }
 
 // getPodSpecContainers gets the containers from podSpec
 func getPodSpecContainers(o *fn.KubeObject) fn.SliceSubObjects {
-	var containers fn.SliceSubObjects
 	spec := o.GetMap("spec")
 	if spec == nil {
 		return nil
@@ -236,9 +242,7 @@ func getPodSpecContainers(o *fn.KubeObject) fn.SliceSubObjects {
 	if podSpec == nil {
 		return nil
 	}
-	containers = append(containers, podSpec.GetSlice("iniContainers")...)
-	containers = append(containers, podSpec.GetSlice("containers")...)
-	return containers
+	return append(podSpec.GetSlice("iniContainers"), podSpec.GetSlice("containers")...)
 }
 
 // getNewImageName return the new name for image field
