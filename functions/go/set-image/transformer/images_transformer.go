@@ -16,7 +16,7 @@ type Image struct {
 	// ContainerName is the name for container
 	ContainerName string `json:"containerName,omitempty" yaml:"containerName,omitempty"`
 
-	// ImageName is the image name
+	// ImageName is the name for image
 	ImageName string `json:"imageName,omitempty" yaml:"imageName,omitempty"`
 
 	// NewName is the value used to replace the original name, replace image name
@@ -54,17 +54,17 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 	}
 
 	for _, o := range items {
-		switch o.GetKind() {
-		case "Pod":
-			errList := t.setPodContainers(o)
-			for _, e := range errList {
-				ctx.ResultErr(e.Error(), o)
+		containers := getContainers(o)
+		warnings, err := t.updateContainerImages(containers)
+
+		if warnings != nil {
+			for _, w := range warnings {
+				ctx.ResultWarn(w.Message, o)
 			}
-		case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
-			errList := t.setPodSpecContainers(o)
-			for _, e := range errList {
-				ctx.ResultErr(e.Error(), o)
-			}
+		}
+
+		if err != nil {
+			ctx.ResultErr(err.Error(), o)
 		}
 	}
 
@@ -117,7 +117,7 @@ func (t *SetImage) validateInput(items fn.KubeObjects) error {
 }
 
 // matchImage takes the resources image name and container name, return if there is a match and potential warning
-func matchImage(oldImageName string, oldContainer string, newImage *Image) (bool, error) {
+func matchImage(oldImageName string, oldContainer string, newImage *Image) (bool, *fn.Result) {
 	// name would be deprecated, means image name
 	if newImage.Name != "" {
 		newImage.ImageName = newImage.Name
@@ -140,9 +140,10 @@ func matchImage(oldImageName string, oldContainer string, newImage *Image) (bool
 		if !image.IsImageMatched(oldImageName, newImage.ImageName) {
 			return false, nil
 		}
+		//if only image name match, container name does not match, provide a warning
 		if oldContainer != newImage.ContainerName {
 			msg := fmt.Sprintf("container name `%v` does not match `%v`, only image name matches", newImage.ContainerName, oldContainer)
-			warning := fn.Result{
+			warning := &fn.Result{
 				Message:  msg,
 				Severity: fn.Warning,
 			}
@@ -156,13 +157,13 @@ func matchImage(oldImageName string, oldContainer string, newImage *Image) (bool
 func (t *SetImage) isImageNameUnique(items fn.KubeObjects) bool {
 	curImageName := ""
 	for _, o := range items {
-		switch o.GetKind() {
-		case "Pod":
-			if !t.checkPodContainers(o, curImageName) {
-				return false
-			}
-		case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
-			if !t.checkPodSpecContainers(o, curImageName) {
+		containers := getContainers(o)
+		for _, c := range containers {
+			oldValue := c.NestedStringOrDie("image")
+			imageName, _, _ := image.Split(oldValue)
+			if curImageName == "" {
+				curImageName = imageName
+			} else if curImageName != imageName {
 				return false
 			}
 		}
@@ -170,53 +171,9 @@ func (t *SetImage) isImageNameUnique(items fn.KubeObjects) bool {
 	return true
 }
 
-// checkPodContainers check if there is only one image name in pod containers
-func (t *SetImage) checkPodContainers(o *fn.KubeObject, curImageName string) bool {
-	spec := o.GetMap("spec")
-	if spec == nil {
-		return true
-	}
-	return t.checkContainerImages(spec, curImageName)
-}
-
-// checkPodSpecContainers check if there is only one image name in pod containers
-func (t *SetImage) checkPodSpecContainers(o *fn.KubeObject, curImageName string) bool {
-	spec := o.GetMap("spec")
-	if spec == nil {
-		return true
-	}
-	template := spec.GetMap("template")
-	if template == nil {
-		return true
-	}
-	podSpec := template.GetMap("spec")
-	return t.checkContainerImages(podSpec, curImageName)
-}
-
-// checkPodSpecContainers check if there is only one image name for containers
-func (t *SetImage) checkContainerImages(pod *fn.SubObject, curImageName string) bool {
-	var containers fn.SliceSubObjects
-	containers = append(containers, pod.GetSlice("iniContainers")...)
-	containers = append(containers, pod.GetSlice("containers")...)
-	for _, o := range containers {
-		oldValue := o.NestedStringOrDie("image")
-		imageName, _, _ := image.Split(oldValue)
-		if curImageName == "" {
-			curImageName = imageName
-		} else if curImageName != imageName {
-			return false
-		}
-	}
-	return true
-}
-
-// updateContainerImages updates the images inside containers, return potential error
-func (t *SetImage) updateContainerImages(pod *fn.SubObject) []error {
-	var containers fn.SliceSubObjects
-	containers = append(containers, pod.GetSlice("iniContainers")...)
-	containers = append(containers, pod.GetSlice("containers")...)
-
-	var warningList []error
+// updateContainerImages updates the images inside containers, return warnings and error
+func (t *SetImage) updateContainerImages(containers fn.SliceSubObjects) (fn.Results, error) {
+	var warningList fn.Results
 	for _, o := range containers {
 		oldValue := o.NestedStringOrDie("image")
 		oldContainer := o.NestedStringOrDie("name")
@@ -236,14 +193,39 @@ func (t *SetImage) updateContainerImages(pod *fn.SubObject) []error {
 		}
 
 		if err := o.SetNestedString(newName, "image"); err != nil {
-			warningList = append(warningList, err)
+			return warningList, err
 		}
 		t.resultCount += 1
 	}
-	return warningList
+	return warningList, nil
 }
 
-func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) []error {
+// getContainers gets the containers inside kubeObject
+func getContainers(o *fn.KubeObject) fn.SliceSubObjects {
+	switch o.GetKind() {
+	case "Pod":
+		return getPodContainers(o)
+	case "Deployment", "StatefulSet", "ReplicaSet", "DaemonSet", "PodTemplate":
+		return getPodSpecContainers(o)
+	}
+	return nil
+}
+
+// getPodContainers gets the containers from pod
+func getPodContainers(o *fn.KubeObject) fn.SliceSubObjects {
+	var containers fn.SliceSubObjects
+	spec := o.GetMap("spec")
+	if spec == nil {
+		return nil
+	}
+	containers = append(containers, spec.GetSlice("iniContainers")...)
+	containers = append(containers, spec.GetSlice("containers")...)
+	return containers
+}
+
+// getPodSpecContainers gets the containers from podSpec
+func getPodSpecContainers(o *fn.KubeObject) fn.SliceSubObjects {
+	var containers fn.SliceSubObjects
 	spec := o.GetMap("spec")
 	if spec == nil {
 		return nil
@@ -253,23 +235,12 @@ func (t *SetImage) setPodSpecContainers(o *fn.KubeObject) []error {
 		return nil
 	}
 	podSpec := template.GetMap("spec")
-	err := t.updateContainerImages(podSpec)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (t *SetImage) setPodContainers(o *fn.KubeObject) []error {
-	spec := o.GetMap("spec")
-	if spec == nil {
+	if podSpec == nil {
 		return nil
 	}
-	err := t.updateContainerImages(spec)
-	if err != nil {
-		return err
-	}
-	return nil
+	containers = append(containers, podSpec.GetSlice("iniContainers")...)
+	containers = append(containers, podSpec.GetSlice("containers")...)
+	return containers
 }
 
 // getNewImageName return the new name for image field
