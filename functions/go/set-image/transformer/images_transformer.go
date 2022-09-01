@@ -49,7 +49,7 @@ func (t SetImage) Run(ctx *fn.Context, functionConfig *fn.KubeObject, items fn.K
 		ctx.ResultErrAndDie(err.Error(), nil)
 	}
 
-	items = items.WhereNot(func(o *fn.KubeObject) bool { return o.IsLocalConfig() })
+	items = items.WhereNot(fn.IsLocalConfig)
 
 	res := t.validateInput(items)
 	if res != nil {
