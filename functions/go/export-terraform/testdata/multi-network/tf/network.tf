@@ -31,6 +31,7 @@ module "vpc-shared-dev" {
             subnet_flow_logs_interval = "INTERVAL_10_MIN"
         },
     ]
+    
 }
 # Firewall Rules
 resource "google_compute_firewall" "vpc-shared-dev-allow-iap-rdp" {
@@ -198,6 +199,7 @@ module "vpc-shared-prod" {
             subnet_flow_logs_interval = "INTERVAL_10_MIN"
         },
     ]
+    
 }
 # Firewall Rules
 resource "google_compute_firewall" "vpc-shared-prod-allow-iap-rdp" {

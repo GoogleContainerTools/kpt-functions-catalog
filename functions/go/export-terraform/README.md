@@ -27,6 +27,7 @@ The following KCC resources are supported:
 - ComputeNetwork
 - ComputeSubnetwork
 - ComputeFirewall
+- ComputeRoute
 - ComputeRouter
 - ComputeRouterNAT
 - ComputeAddress
