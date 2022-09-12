@@ -24,8 +24,9 @@ import (
 
 func (rs *terraformResources) getHCL() (map[string]string, error) {
 	tmplUtilFns := template.FuncMap{
-		"msToDays": msToDays,
-		"sToDays":  func(t int) (float64, error) { return msToDays(t * 1000) },
+		"msToDays":              msToDays,
+		"sToDays":               func(t int) (float64, error) { return msToDays(t * 1000) },
+		"strSliceToCommaSepStr": func(s []string) string { return strings.Join(s, ",") },
 	}
 
 	tmpl, err := template.New("").Funcs(tmplUtilFns).ParseFS(templates, "templates/*")

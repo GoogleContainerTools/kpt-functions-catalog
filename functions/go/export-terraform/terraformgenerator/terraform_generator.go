@@ -48,6 +48,7 @@ func Processor(rl *sdk.ResourceList) error {
 		"IAMAuditConfig":              true,
 		"ComputeNetwork":              true,
 		"ComputeSubnetwork":           true,
+		"ComputeRoute":                true,
 		"ComputeRouter":               true,
 		"ComputeRouterNAT":            true,
 		"ComputeAddress":              true,
