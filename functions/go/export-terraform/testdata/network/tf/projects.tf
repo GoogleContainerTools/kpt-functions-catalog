@@ -5,5 +5,6 @@ module "prj-network" {
   name       = "prj-network"
   org_id     = var.org_id
 
+  enable_shared_vpc_host_project = true
   billing_account = var.billing_account
 }

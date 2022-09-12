@@ -55,6 +55,7 @@ func Processor(rl *sdk.ResourceList) error {
 		"ServiceNetworkingConnection": true,
 		"ComputeFirewall":             true,
 		"LoggingLogBucket":            true,
+		"ComputeSharedVPCHostProject": true,
 	}
 
 	for _, item := range rl.Items {
