@@ -96,8 +96,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+      - name: nginx
+        image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -108,8 +108,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
+      - name: nginx
+        image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
 `,
 		},
 		{
@@ -127,8 +127,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.7.9 # kpt-set: ${image}:${tag}`,
+      - name: nginx
+        image: nginx:1.7.9 # kpt-set: ${image}:${tag}`,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -138,8 +138,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: ubuntu:1.7.9 # kpt-set: ${image}:${tag}
+      - name: nginx
+        image: ubuntu:1.7.9 # kpt-set: ${image}:${tag}
 `,
 		},
 		{
@@ -157,8 +157,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.7.9 # kpt-set: ${image-~!@#$%^&*()<>?"|}:${tag}`,
+      - name: nginx
+        image: nginx:1.7.9 # kpt-set: ${image-~!@#$%^&*()<>?"|}:${tag}`,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -168,8 +168,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: ubuntu-~!@#$%^&*()<>?"|:1.7.9 # kpt-set: ${image-~!@#$%^&*()<>?"|}:${tag}
+      - name: nginx
+        image: ubuntu-~!@#$%^&*()<>?"|:1.7.9 # kpt-set: ${image-~!@#$%^&*()<>?"|}:${tag}
 `,
 		},
 		{
@@ -187,8 +187,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+      - name: nginx
+        image: nginx:1.7.9 # kpt-set: ${image}:${tag}
  `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -199,8 +199,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+      - name: nginx
+        image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
 		},
 		{
@@ -218,8 +218,8 @@ spec:
   template:
     spec:
       containers:
-        - image: irrelevant_value # kpt-set: ${image}:${tag}
-          name: nginx
+      - image: irrelevant_value # kpt-set: ${image}:${tag}
+        name: nginx
  `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -230,8 +230,8 @@ spec:
   template:
     spec:
       containers:
-        - image: irrelevant_value # kpt-set: ${image}:${tag}
-          name: nginx
+      - image: irrelevant_value # kpt-set: ${image}:${tag}
+        name: nginx
  `,
 			errMsg: `values for setters [${tag}] must be provided`,
 		},
@@ -249,8 +249,8 @@ metadata:
   name: nginx-deployment
 spec:
   images: # kpt-set: ${images}
-    - nginx
-    - ubuntu
+  - nginx
+  - ubuntu
  `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -258,8 +258,8 @@ metadata:
   name: nginx-deployment
 spec:
   images: # kpt-set: ${images}
-    - ubuntu
-    - hbase
+  - ubuntu
+  - hbase
 `,
 		},
 		{
@@ -351,8 +351,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+      - name: nginx
+        image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
 			expectedResources: `apiVersion: apps/v1
 kind: Deployment
@@ -363,8 +363,8 @@ spec:
   template:
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.7.9 # kpt-set: ${image}:${tag}
+      - name: nginx
+        image: nginx:1.7.9 # kpt-set: ${image}:${tag}
 `,
 		},
 		{
@@ -427,11 +427,11 @@ metadata:
   namespace: "foo" # kpt-set: ${ns}
 image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 env: # kpt-set: ${env}
-  - foo
-  - bar
+- foo
+- bar
 roles: # kpt-set: ${roles}
-  - dev
-  - prod
+- dev
+- prod
 `,
 		},
 	}
@@ -454,7 +454,7 @@ roles: # kpt-set: ${roles}
 				t.FailNow()
 			}
 
-			s := &ApplySetters{}
+			s := &Setters{}
 			node, err := kyaml.Parse(test.config)
 			if !assert.NoError(t, err) {
 				t.FailNow()
