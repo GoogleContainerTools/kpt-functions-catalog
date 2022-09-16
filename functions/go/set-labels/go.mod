@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220723081830-33aee7fe8a2e
 	github.com/stretchr/testify v1.7.1
+	sigs.k8s.io/kustomize/api v0.12.1
 )
 
 require (
@@ -27,11 +28,13 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/klog/v2 v2.60.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20220401212409-b28bf2818661 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.13.7-0.20220418212550-9d5491c2e20c // indirect
+	sigs.k8s.io/kustomize/kyaml v0.13.9 // indirect
+	sigs.k8s.io/yaml v1.3.0 // indirect
 )

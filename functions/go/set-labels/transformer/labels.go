@@ -3,8 +3,10 @@ package transformer
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
+	"sigs.k8s.io/kustomize/api/types"
 )
 
 type FieldPath []string
@@ -30,7 +32,7 @@ func NewLabelTransformer() *LabelTransformer {
 // SetLabels perform the whole set labels operation according to given resourcelist
 func SetLabels(rl *fn.ResourceList) (bool, error) {
 	transformer := NewLabelTransformer()
-	if err := transformer.Config(rl.FunctionConfig); err != nil {
+	if err := transformer.Config(rl.FunctionConfig, rl); err != nil {
 		rl.Results = append(rl.Results, fn.ErrorResult(err))
 		return false, nil
 	}
@@ -44,7 +46,7 @@ func SetLabels(rl *fn.ResourceList) (bool, error) {
 }
 
 // Config parse the functionConfig kubeObject to the fields in the LabelTransformer
-func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
+func (p *LabelTransformer) Config(functionConfig *fn.KubeObject, rl *fn.ResourceList) error {
 	// parse labels to NewLabels
 	switch {
 	case functionConfig.IsEmpty():
@@ -56,6 +58,14 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject) error {
 			return fmt.Errorf("`additionalLabelFields` has been deprecated")
 		}
 		p.NewLabels = functionConfig.NestedStringMapOrDie("labels")
+		labelsFrom, err := parseLabelsFrom(functionConfig, rl)
+		if err != nil {
+			return err
+		}
+		// merge labelsFrom with labelValues
+		for k, v := range labelsFrom {
+			p.NewLabels[k] = v
+		}
 		if len(p.NewLabels) == 0 {
 			return fmt.Errorf("failed to configure function: input label list cannot be empty, required valid `labels` field")
 		}
@@ -436,4 +446,66 @@ func updateLabels(o *fn.SubObject, labelPath FieldPath, newLabels map[string]str
 		}
 	}
 	return nil
+}
+
+// parseLabelsFrom parses the `labelsFrom` input in the SetLabels functionConfig
+// and returns pairs of label and resolved value.
+func parseLabelsFrom(fnConf *fn.KubeObject, rl *fn.ResourceList) (map[string]string, error) {
+	var labelSources []labelFrom
+
+	found, err := fnConf.Get(&labelSources, "labelsFrom")
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		// labelsFrom is an optional field
+		return nil, nil
+	}
+
+	labels := map[string]string{}
+	for _, labelSource := range labelSources {
+		// iterate over the resources to extract values
+		source := labelSource.Source
+		matchedResources := rl.Items.Where(func(o *fn.KubeObject) bool {
+			id := o.GetId()
+			if source.Group != "" && (id.Group != source.Group) {
+				return false
+			}
+			if source.Kind != "" && (id.Kind != source.Kind) {
+				return false
+			}
+			if source.Name != "" && (id.Name != source.Name) {
+				return false
+			}
+			// TODO: apply other selectors
+			return true
+		})
+		if len(matchedResources) == 0 {
+			// pick the first one or possible where package matches
+			return nil, fmt.Errorf("couldn't find label source %s", source)
+		}
+		if len(matchedResources) > 1 {
+			return nil, fmt.Errorf("multiple resources matched label source %s", source)
+		}
+		matchedResource := matchedResources[0]
+		labelValue, found, err := matchedResource.NestedString(strings.Split(source.FieldPath, ".")...)
+		if err != nil {
+			return nil, err
+		}
+		if !found {
+			return nil, fmt.Errorf("fieldpath %q to extract labels does not exist in source %s", source.FieldPath, source)
+		}
+		labels[labelSource.Label] = labelValue
+	}
+	return labels, nil
+}
+
+// labelFrom represents the label and the source for the label value.
+// It uses ApplyReplacement's source syntax so that users can avoid
+// learning new syntax.
+type labelFrom struct {
+	// Label key
+	Label string `json:"label" yaml:"label"`
+	// Source of the label value
+	Source types.SourceSelector `json:"source" yaml:"source"`
 }
