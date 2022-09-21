@@ -57,7 +57,15 @@ func (p *LabelTransformer) Config(functionConfig *fn.KubeObject, rl *fn.Resource
 		if _, exist, err := functionConfig.NestedSlice(fnDeprecateField); exist || err != nil {
 			return fmt.Errorf("`additionalLabelFields` has been deprecated")
 		}
-		p.NewLabels = functionConfig.NestedStringMapOrDie("labels")
+		labels, exists, err := functionConfig.NestedStringMap("labels")
+		if err != nil {
+			return fmt.Errorf("error reading labels field")
+		}
+		if exists {
+			p.NewLabels = labels
+		} else {
+			p.NewLabels = map[string]string{}
+		}
 		labelsFrom, err := parseLabelsFrom(functionConfig, rl)
 		if err != nil {
 			return err
