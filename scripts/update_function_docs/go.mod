@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog
+module github.com/GoogleContainerTools/kpt-functions-catalog/scripts/update_function_docs
 
 go 1.17
 
