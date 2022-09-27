@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/format
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-enforcement-action
 
 go 1.18
 

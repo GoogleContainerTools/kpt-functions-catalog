@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/format
+module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/remove-local-config-resources
 
 go 1.18
 
