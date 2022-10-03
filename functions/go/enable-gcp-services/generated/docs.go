@@ -37,8 +37,8 @@ This function only supports local-config custom resources of kind ` + "`" + `Pro
   metadata:
     name: my-project-services
     annotations:
-      cnrm.cloud.google.com/deletion-policy: false
-      config.kubernetes.io/local-config: true
+      cnrm.cloud.google.com/deletion-policy: "false"
+      config.kubernetes.io/local-config: "true"
   spec:
     services: # list of services to generate
       - compute.googleapis.com
@@ -58,7 +58,7 @@ Let's start with a ` + "`" + `ProjectServiceSet` + "`" + ` CR for enabling two s
   metadata:
     name: proj1-service
     annotations:
-      config.kubernetes.io/local-config: true
+      config.kubernetes.io/local-config: "true"
   spec:
     services:
       - compute.googleapis.com
