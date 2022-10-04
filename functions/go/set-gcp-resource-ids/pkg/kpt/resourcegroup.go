@@ -1,4 +1,4 @@
-package common
+package kpt
 
 import (
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
