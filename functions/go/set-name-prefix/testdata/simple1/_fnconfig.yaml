@@ -1,0 +1,2 @@
+kind: ConfigMap
+apiVersion: v1

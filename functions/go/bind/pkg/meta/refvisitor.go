@@ -76,34 +76,37 @@ func VisitRefs(objects fn.KubeObjects, visitor func(ref Ref) error) error {
 }
 
 func visitFields(object *fn.KubeObject, subObject *fn.SubObject, fields []string, refInfo *refInfo, visitor func(ref Ref) error) error {
+	// Guard against nil objects
+	if subObject == nil {
+		return nil
+	}
+
 	if len(fields) == 0 {
-		if subObject != nil {
-			// Ignore external refs, these don't get renamed
-			// TODO: Check if supports external ??
-			external := subObject.GetString("external")
-			if external != "" {
-				return nil
-			}
+		// Ignore external refs, these don't get renamed
+		// TODO: Check if supports external ??
+		external := subObject.GetString("external")
+		if external != "" {
+			return nil
+		}
 
-			ref, err := refInfo.buildFullyQualifiedRef(object, subObject)
-			if err != nil {
-				return err
-			}
-			if err := visitor(ref); err != nil {
-				return err
-			}
+		ref, err := refInfo.buildFullyQualifiedRef(object, subObject)
+		if err != nil {
+			return err
+		}
+		if err := visitor(ref); err != nil {
+			return err
+		}
 
-			if refInfo.NamespaceFieldPath != "" {
-				namespaceFieldPath := strings.Split(refInfo.NamespaceFieldPath, ".")
-				namespace, _, _ := subObject.NestedString(namespaceFieldPath...)
-				if namespace != "" {
-					ref, err := buildRefNamespaceReference(subObject, namespaceFieldPath...)
-					if err != nil {
-						return err
-					}
-					if err := visitor(ref); err != nil {
-						return err
-					}
+		if refInfo.NamespaceFieldPath != "" {
+			namespaceFieldPath := strings.Split(refInfo.NamespaceFieldPath, ".")
+			namespace, _, _ := subObject.NestedString(namespaceFieldPath...)
+			if namespace != "" {
+				ref, err := buildRefNamespaceReference(subObject, namespaceFieldPath...)
+				if err != nil {
+					return err
+				}
+				if err := visitor(ref); err != nil {
+					return err
 				}
 			}
 		}

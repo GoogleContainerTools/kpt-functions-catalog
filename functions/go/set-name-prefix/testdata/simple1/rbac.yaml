@@ -1,0 +1,14 @@
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPartialPolicy
+metadata:
+  name: packagename-editors
+  namespace: config-control
+spec:
+  bindings:
+  - members:
+    - member: user:me@example.com
+    role: roles/editor
+  resourceRef:
+    apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+    kind: Project
+    name: packagename

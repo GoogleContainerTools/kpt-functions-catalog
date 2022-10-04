@@ -1,0 +1,74 @@
+apiVersion: config.kubernetes.io/v1
+kind: ResourceList
+items:
+- apiVersion: iam.cnrm.cloud.google.com/v1beta1
+  kind: IAMPartialPolicy
+  metadata:
+    name: simple1-editors
+    namespace: config-control
+  spec:
+    bindings:
+    - members:
+      - member: user:me@example.com
+      role: roles/editor
+    resourceRef:
+      apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+      kind: Project
+      name: simple1
+- apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+  kind: Folder
+  metadata:
+    name: simple1
+    namespace: config-control
+  spec:
+    displayName: packagename
+    folderRef:
+      name: environments
+- apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+  kind: Project
+  metadata:
+    name: simple1
+    namespace: config-control
+  spec:
+    name: packagename
+    folderRef:
+      name: environments
+- # We need to enable some services so we can enable other services
+  apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+  kind: Service
+  metadata:
+    annotations:
+      cnrm.cloud.google.com/deletion-policy: "abandon"
+    name: simple1-serviceusage
+    namespace: config-control
+  spec:
+    resourceID: serviceusage.googleapis.com
+    projectRef:
+      name: simple1
+- # Needed to grant GCP IAM permissions on projects
+  apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+  kind: Service
+  metadata:
+    annotations:
+      cnrm.cloud.google.com/deletion-policy: "abandon"
+    name: cloudresourcemanager.googleapis.com
+    namespace: packagename
+- apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+  kind: Service
+  metadata:
+    annotations:
+      cnrm.cloud.google.com/deletion-policy: "abandon"
+    name: container.googleapis.com
+    namespace: packagename
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: kptfile.kpt.dev
+    annotations:
+      config.kubernetes.io/local-config: "true"
+  data:
+    name: simple1
+functionConfig:
+  kind: ConfigMap
+  apiVersion: v1
+  data: {}
