@@ -10,46 +10,23 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+var (
+	Folder = schema.GroupVersionKind{Group: "resourcemanager.cnrm.cloud.google.com", Version: "v1beta1", Kind: "Folder"}
+	GCPProject = schema.GroupVersionKind{Group: "resourcemanager.cnrm.cloud.google.com", Version: "v1beta1", Kind: "Project"}
+	ConfigControllerContext = schema.GroupVersionKind{Group: "core.cnrm.cloud.google.com", Version: "v1beta1", Kind: "ConfigConnectorContext"}
+	)
+
 func main() {
 	// TODO: fn.AsMain should support an "easy mode" where it runs against a directory
-	if err := fn.AsMain(fn.ResourceListProcessorFunc(Run)); err != nil {
+	if err := fn.AsMain(&SetGCPProject{}); err != nil {
 		os.Exit(1)
 	}
 }
 
+var _ fn.Runner = &SetGCPProject{}
+
 type SetGCPProject struct {
 	ProjectID string `json:"projectID,omitempty"`
-}
-
-func Run(rl *fn.ResourceList) (bool, error) {
-	f := SetGCPProject{}
-
-	err := f.LoadConfig(rl.FunctionConfig)
-	if err != nil {
-		rl.Results = append(rl.Results, fn.ErrorConfigObjectResult(fmt.Errorf("functionConfig error: %w", err), rl.FunctionConfig))
-		return true, nil
-	}
-
-	if err := f.Transform(rl.Items); err != nil {
-		rl.Results = append(rl.Results, fn.ErrorResult(err))
-	}
-	return true, nil
-}
-
-func (p *SetGCPProject) LoadConfig(fnConfig *fn.KubeObject) error {
-	if fnConfig != nil {
-		switch { //TODO: o.GroupVersionKind()
-		case fnConfig.IsGVK("", "v1", "ConfigMap"):
-			data := fnConfig.UpsertMap("data") // TODO: Why does GetMap fail?
-			p.ProjectID = data.GetString("projectID")
-
-		default:
-			gvk := schema.GroupVersionKind{}                         // TODO: o.GroupVersionKind()
-			return fmt.Errorf("unknown functionConfig Kind %v", gvk) //o.GroupVersionKind())
-		}
-	}
-
-	return nil
 }
 
 func (p *SetGCPProject) GenerateProjectID(objects fn.KubeObjects) (string, error) {
@@ -58,7 +35,7 @@ func (p *SetGCPProject) GenerateProjectID(objects fn.KubeObjects) (string, error
 		return "", err
 	}
 
-	projects := objects.Where(fn.IsGVK("resourcemanager.cnrm.cloud.google.com", "v1beta1", "Project"))
+	projects := objects.Where(fn.IsGroupVersionKind(GCPProject))
 	if len(projects) == 0 {
 		return "", fmt.Errorf("did not find any Project objects in package, cannot generate project id")
 	}
@@ -75,22 +52,22 @@ func (p *SetGCPProject) GenerateProjectID(objects fn.KubeObjects) (string, error
 	return projectID, nil
 }
 
-func (p *SetGCPProject) Transform(objects fn.KubeObjects) error {
+
+func (p *SetGCPProject) Run(ctx *fn.Context, functionConfig *fn.KubeObject, objects fn.KubeObjects) {
 	projectID := p.ProjectID
 	if projectID == "" {
 		// TODO: Only if we need a project id (though there aren't many cases where we don't)
-		p, err := p.GenerateProjectID(objects)
+		var err error
+		projectID, err = p.GenerateProjectID(objects)
 		if err != nil {
-			return err
+			ctx.ResultErrAndDie(err.Error(), nil)
 		}
-		projectID = p
 	}
 
 	packageContext, err := kpt.FindPackageContext(objects)
 	if err != nil {
-		return err
+		ctx.ResultErrAndDie(err.Error(), nil)
 	}
-
 	for _, object := range objects {
 		if object.IsLocalConfig() {
 			continue
@@ -98,16 +75,15 @@ func (p *SetGCPProject) Transform(objects fn.KubeObjects) error {
 		if kpt.IsResourceGroup(object) {
 			continue // Should ResourceGroup be marked as local config?
 		}
-
 		name := object.GetName()
 
-		if object.IsGVK("resourcemanager.cnrm.cloud.google.com", "v1beta1", "Folder") {
+		if object.IsGroupVersionKind(Folder) {
 			displayName := name
 			object.SetNestedString(displayName, "spec", "displayName")
 			// resourceID should be left unset to create a new resource
 		}
 
-		if object.IsGVK("resourcemanager.cnrm.cloud.google.com", "v1beta1", "Project") {
+		if object.IsGroupVersionKind(GCPProject) {
 			// https://cloud.google.com/resource-manager/docs/creating-managing-projects
 			// A project name can contain only letters, numbers, single quotes, hyphens, spaces,
 			// or exclamation points, and must be between 4 and 30 characters.
@@ -135,18 +111,19 @@ func (p *SetGCPProject) Transform(objects fn.KubeObjects) error {
 			object.SetAnnotation("cnrm.cloud.google.com/project-id", projectID)
 		}
 
-		if object.IsGVK("core.cnrm.cloud.google.com", "v1beta1", "ConfigConnectorContext") {
+
+		if object.IsGroupVersionKind(ConfigControllerContext) {
 			// TODO: ConfigConnectorContext should accept a serviceAccountRef
 			googleServiceAccount, _, _ := object.NestedString("spec", "googleServiceAccount")
 			if googleServiceAccount != "" {
 				tokens := strings.Split(googleServiceAccount, "@")
 				if len(tokens) != 2 {
-					return fmt.Errorf("error parsing spec.googleServiceAccount=%q", googleServiceAccount)
+					ctx.ResultErrAndDie(fmt.Sprintf("error parsing spec.googleServiceAccount=%q", googleServiceAccount), nil)
 				}
 				if strings.HasSuffix(tokens[1], ".iam.gserviceaccount.com") {
 					tokens[1] = projectID + ".iam.gserviceaccount.com"
 				} else {
-					return fmt.Errorf("unexpected value for spec.googleServiceAccount=%q (expected .iam.gserviceaccount.com suffix)", googleServiceAccount)
+					ctx.ResultErrAndDie(fmt.Sprintf("unexpected value for spec.googleServiceAccount=%q (expected .iam.gserviceaccount.com suffix)", googleServiceAccount), nil)
 				}
 				googleServiceAccount = strings.Join(tokens, "@")
 				object.SetNestedString(googleServiceAccount, "spec", "googleServiceAccount")
@@ -156,6 +133,4 @@ func (p *SetGCPProject) Transform(objects fn.KubeObjects) error {
 		// ContainerNodePool has something sort of similar ... the resourceID should be the name without the prefix
 		// This is better enforced via a "should" rule, I think
 	}
-
-	return nil
 }

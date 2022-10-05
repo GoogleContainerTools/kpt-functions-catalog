@@ -6,17 +6,13 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
-func IsLocalConfig(o *fn.KubeObject) bool {
-	return o.IsLocalConfig()
-}
-
 type PackageContext struct {
 	Name       string
 	ParentPath string
 }
 
 func FindPackageContext(objects fn.KubeObjects) (*PackageContext, error) {
-	matches := objects.Where(IsLocalConfig).Where(fn.IsName("kptfile.kpt.dev"))
+	matches := objects.Where(fn.IsLocalConfig).Where(fn.IsName("kptfile.kpt.dev"))
 	if len(matches) == 0 {
 		return nil, fmt.Errorf("unable to find package context object")
 	}
