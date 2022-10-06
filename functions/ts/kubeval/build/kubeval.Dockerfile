@@ -1,6 +1,5 @@
 ARG BUILDER_IMAGE
 ARG BASE_IMAGE
-ARG KUBEVAL_BUILDER_IMAGE
 
 FROM --platform=$BUILDPLATFORM $BUILDER_IMAGE AS builder
 
@@ -24,7 +23,7 @@ RUN npm run build && \
 
 #############################################
 
-FROM --platform=$BUILDPLATFORM $KUBEVAL_BUILDER_IMAGE AS kubeval-builder
+FROM --platform=$BUILDPLATFORM golang:1.17-alpine3.15 AS kubeval-builder
 
 ARG TARGETOS TARGETARCH
 ARG KUBEVAL_VERSION="v0.16.1"
