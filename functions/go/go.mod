@@ -3,12 +3,12 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go
 go 1.18
 
 require (
-	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220929172014-8888fc9691d1
+	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221007213718-5fa523b306fe
 	k8s.io/apimachinery v0.25.2
 )
 
 require (
-	github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20220929172014-8888fc9691d1 // indirect
+	github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221007213718-5fa523b306fe // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
@@ -23,7 +23,7 @@ require (
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
-	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
+	golang.org/x/sys v0.0.0-20221010170243-090e33056c14 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

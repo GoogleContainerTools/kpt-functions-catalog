@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -18,7 +19,8 @@ var (
 
 func main() {
 	// TODO: fn.AsMain should support an "easy mode" where it runs against a directory
-	if err := fn.AsMain(&SetGCPProject{}); err != nil {
+	processor := fn.WithContext(context.Background(), &SetGCPProject{})
+	if err := fn.AsMain(processor); err != nil {
 		os.Exit(1)
 	}
 }
@@ -27,6 +29,7 @@ var _ fn.Runner = &SetGCPProject{}
 
 type SetGCPProject struct {
 	ProjectID string `json:"projectID,omitempty"`
+	Ctx fn.Context
 }
 
 func (p *SetGCPProject) GenerateProjectID(objects fn.KubeObjects) (string, error) {
@@ -53,20 +56,21 @@ func (p *SetGCPProject) GenerateProjectID(objects fn.KubeObjects) (string, error
 }
 
 
-func (p *SetGCPProject) Run(ctx *fn.Context, functionConfig *fn.KubeObject, objects fn.KubeObjects) {
+func (p *SetGCPProject) Run(ctx *fn.Context, _ *fn.KubeObject, objects fn.KubeObjects, results *fn.Results) bool {
 	projectID := p.ProjectID
 	if projectID == "" {
 		// TODO: Only if we need a project id (though there aren't many cases where we don't)
 		var err error
-		projectID, err = p.GenerateProjectID(objects)
-		if err != nil {
-			ctx.ResultErrAndDie(err.Error(), nil)
+		if projectID, err = p.GenerateProjectID(objects); err != nil {
+			results.ErrorE(err)
+			return false
 		}
 	}
 
 	packageContext, err := kpt.FindPackageContext(objects)
 	if err != nil {
-		ctx.ResultErrAndDie(err.Error(), nil)
+		results.ErrorE(err)
+		return false
 	}
 	for _, object := range objects {
 		if object.IsLocalConfig() {
@@ -79,7 +83,10 @@ func (p *SetGCPProject) Run(ctx *fn.Context, functionConfig *fn.KubeObject, obje
 
 		if object.IsGroupVersionKind(Folder) {
 			displayName := name
-			object.SetNestedString(displayName, "spec", "displayName")
+			if err = object.SetNestedString(displayName, "spec", "displayName"); err != nil {
+				results.ErrorE(err)
+				return false
+			}
 			// resourceID should be left unset to create a new resource
 		}
 
@@ -103,12 +110,23 @@ func (p *SetGCPProject) Run(ctx *fn.Context, functionConfig *fn.KubeObject, obje
 				displayName = displayName[:30]
 			}
 
-			object.SetNestedString(displayName, "spec", "name")     // name is the display name
-			object.SetNestedString(projectID, "spec", "resourceID") // resourceID is the project ID (must be unique)
+			// name is the display name
+			if err = object.SetNestedString(displayName, "spec", "name"); err != nil {
+				results.ErrorE(err)
+				return false
+			}
+			// resourceID is the project ID (must be unique)
+			if err = object.SetNestedString(projectID, "spec", "resourceID"); err != nil {
+				results.ErrorE(err)
+				return false
+			}
 		}
 
 		if object.GetAnnotation("cnrm.cloud.google.com/project-id") != "" {
-			object.SetAnnotation("cnrm.cloud.google.com/project-id", projectID)
+			if err = object.SetAnnotation( "cnrm.cloud.google.com/project-id", projectID); err != nil {
+				results.ErrorE(err)
+				return false
+			}
 		}
 
 
@@ -118,19 +136,25 @@ func (p *SetGCPProject) Run(ctx *fn.Context, functionConfig *fn.KubeObject, obje
 			if googleServiceAccount != "" {
 				tokens := strings.Split(googleServiceAccount, "@")
 				if len(tokens) != 2 {
-					ctx.ResultErrAndDie(fmt.Sprintf("error parsing spec.googleServiceAccount=%q", googleServiceAccount), nil)
+					results.Errorf("error parsing spec.googleServiceAccount=%q", googleServiceAccount)
+					return false
 				}
 				if strings.HasSuffix(tokens[1], ".iam.gserviceaccount.com") {
 					tokens[1] = projectID + ".iam.gserviceaccount.com"
 				} else {
-					ctx.ResultErrAndDie(fmt.Sprintf("unexpected value for spec.googleServiceAccount=%q (expected .iam.gserviceaccount.com suffix)", googleServiceAccount), nil)
+					results.Errorf("unexpected value for spec.googleServiceAccount=%q (expected .iam.gserviceaccount.com suffix)", googleServiceAccount)
+					return false
 				}
 				googleServiceAccount = strings.Join(tokens, "@")
-				object.SetNestedString(googleServiceAccount, "spec", "googleServiceAccount")
+				if err = object.SetNestedString(googleServiceAccount, "spec", "googleServiceAccount"); err!= nil {
+					results.ErrorE(err)
+					return false
+				}
 			}
 		}
 
 		// ContainerNodePool has something sort of similar ... the resourceID should be the name without the prefix
 		// This is better enforced via a "should" rule, I think
 	}
+	return true
 }
