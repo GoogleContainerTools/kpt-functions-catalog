@@ -3,8 +3,12 @@ cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221013190212-691c71e8ceee h1:4lvMQqHIcZFCLO0JS0YkHligjZca5Wi0CZ7QLCvMjZY=
 github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221013190212-691c71e8ceee/go.mod h1:prNhhUAODrB2VqHVead9tB8nLU9ffY4e4jjBwLMNO1M=
+github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221014182208-8e78fe927b37 h1:XBW54uFJhiVz3fvypNtWhfkthKI4PpFnLNTBXfi7DHE=
+github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221014182208-8e78fe927b37/go.mod h1:prNhhUAODrB2VqHVead9tB8nLU9ffY4e4jjBwLMNO1M=
 github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221013190212-691c71e8ceee h1:AdsG3SitnwYJrCWPVa6X/whonvmbKa5+uOI3tUm3sJU=
 github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221013190212-691c71e8ceee/go.mod h1:mqc5jH6i0Ll6T4wCmTXsVNVxhwBGlVtrtmoF/g3E9lE=
+github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221014182208-8e78fe927b37 h1:3IBAC+PIdiUyLSuUBCdfWgNUdki0aUcEyvjljfygMpo=
+github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221014182208-8e78fe927b37/go.mod h1:mqc5jH6i0Ll6T4wCmTXsVNVxhwBGlVtrtmoF/g3E9lE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/buger/jsonparser v1.1.1/go.mod h1:6RYKKt7H4d4+iWqouImQ9R2FZql3VbhNgx27UK13J/0=
@@ -103,7 +107,6 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PKk=
-github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=
 github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415/go.mod h1:GwrjFmJcFw6At/Gs6z4yjiIwzuJ1/+UwLxMQDVQXShQ=
 github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQluxsYJ78Id3Y=

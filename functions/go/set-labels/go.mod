@@ -2,13 +2,10 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-la
 
 go 1.18
 
-require (
-	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221013190212-691c71e8ceee
-	github.com/stretchr/testify v1.8.0
-)
+require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221014182208-8e78fe927b37
 
 require (
-	github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221013190212-691c71e8ceee // indirect
+	github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221014182208-8e78fe927b37 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
@@ -23,7 +20,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	golang.org/x/sys v0.0.0-20221013171732-95e765b1cc43 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
