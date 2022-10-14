@@ -17,10 +17,15 @@
 package main
 
 import (
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/transformer"
+	"context"
+
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
+func NewTransformer() fn.ResourceListProcessor {
+	return fn.WithContext(fn.Context{Context: context.Background()}, &SetLabels{})
+}
+
 func run() error {
-	return fn.AsMain(fn.ResourceListProcessorFunc(transformer.SetLabels))
+	return fn.AsMain(NewTransformer())
 }
