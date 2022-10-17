@@ -19,11 +19,12 @@ package main
 import (
 	"context"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/setlabels"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
 func NewTransformer() fn.ResourceListProcessor {
-	return fn.WithContext(fn.Context{Context: context.Background()}, &SetLabels{})
+	return fn.WithContext(fn.Context{Context: context.Background()}, &setlabels.SetLabels{})
 }
 
 func run() error {

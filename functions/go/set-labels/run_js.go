@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"syscall/js"
 
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/setlabels"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
@@ -33,7 +34,7 @@ func run() error {
 }
 
 func transformLabels(input []byte) ([]byte, error) {
-	runner := fn.WithContext(fn.Context{Context: nil}, &SetLabels{})
+	runner := fn.WithContext(fn.Context{Context: nil}, &setlabels.SetLabels{})
 	return fn.Run(runner, []byte(input))
 }
 

@@ -1,4 +1,4 @@
-package main
+package setlabels
 
 import (
 	"sort"
@@ -9,9 +9,10 @@ import (
 type FieldPath []string
 
 var (
-	selectorPath    = FieldPath{"selector", "matchLabels"}
 	metaLabelsPath  = FieldPath{"metadata", "labels"}
+	selectorPath    = FieldPath{"selector", "matchLabels"}
 	podSelectorPath = FieldPath{"podSelector", "matchLabels"}
+	labelSelector   = FieldPath{"labelSelector", "matchLabels"}
 )
 
 var _ fn.Runner = &SetLabels{}
@@ -257,8 +258,6 @@ func (p *SetLabels) setLabelsInVolume(volume *fn.SubObject) error {
 
 // setLabelsInPodSpec set label path in PodSpec, that include path under topologySpreadConstraints and affinity
 func (p *SetLabels) setLabelsInPodSpec(podSpec *fn.SubObject) error {
-	labelSelector := FieldPath{"labelSelector", "matchLabels"}
-
 	_, exist, _ := podSpec.NestedSlice("topologySpreadConstraints")
 	if exist {
 		for _, obj := range podSpec.GetSlice("topologySpreadConstraints") {
@@ -306,6 +305,7 @@ func (p *SetLabels) updateLabels(o *fn.SubObject, labelPath FieldPath, labels ma
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+
 	for i := 0; i < len(keys); i++ {
 		key := keys[i]
 		val := labels[key]
