@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"syscall/js"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels/transformer"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
@@ -34,7 +33,8 @@ func run() error {
 }
 
 func transformLabels(input []byte) ([]byte, error) {
-	return fn.Run(fn.ResourceListProcessorFunc(transformer.SetLabels), []byte(input))
+	runner := fn.WithContext(fn.Context{Context: nil}, &SetLabels{})
+	return fn.Run(runner, []byte(input))
 }
 
 func resourceListProcessorWrapper() js.Func {

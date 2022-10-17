@@ -8,5 +8,5 @@ items:
     stderr: 'failed to evaluate function: error: function failure'
     exitCode: 1
     results:
-      - message: unknown functionConfig Kind=BadKind ApiVersion=fn.kpt.dev/v1alpha1, expect `SetLabels` or `ConfigMap` with correct formatting
+      - message: unknown FunctionConfig `BadKind.fn.kpt.dev`, expect `SetLabels.fn.kpt.dev` or `ConfigMap.v1`
         severity: error
