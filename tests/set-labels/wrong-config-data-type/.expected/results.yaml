@@ -8,5 +8,5 @@ items:
     stderr: 'failed to evaluate function: error: function failure'
     exitCode: 1
     results:
-      - message: 'unable to convert object to *main.SetLabels with error: json: cannot unmarshal array into Go struct field SetLabels.labels of type map[string]string'
+      - message: 'unable to convert object to *setlabels.SetLabels with error: json: cannot unmarshal array into Go struct field SetLabels.labels of type map[string]string'
         severity: error
