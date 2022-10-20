@@ -184,7 +184,10 @@ func (p *HelmChartInflationGeneratorPlugin) createNewMergedValuesFiles(path stri
 					return "", err
 				}
 			} else { // url scheme is not http or https
-				return "", fmt.Errorf("unsupported URL scheme: %s", path)
+				schemeErr := fmt.Errorf("unsupported URL scheme: %s", path)
+				return "", fmt.Errorf(
+					"could not read provided values file %q: when reading as file path, received error %v; when reading as URL, received error %v",
+					path, err, schemeErr)
 			}
 		} else { // invalid path and invalid URL
 			return "", fmt.Errorf(
