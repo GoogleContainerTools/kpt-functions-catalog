@@ -5,6 +5,7 @@ name: Docs Deployment
 on: 
  push:
     branches:
+      - gob
       - master
       - "*/v[0-9]+.[0-9]+"
 jobs:
@@ -15,6 +16,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Merge gob branch
+        run: git worktree add ./gob gob && cp -r gob/* .
       - name: Generate Site
         run: make site-generate
       - uses: FirebaseExtended/action-hosting-deploy@276388dd6c2cde23455b30293105cc866c22282d # v0
