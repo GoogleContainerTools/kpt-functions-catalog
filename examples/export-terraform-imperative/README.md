@@ -9,7 +9,7 @@ In this example, we will see how to export Terraform configuration from KCC reso
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/export-terraform-imperative
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/export-terraform-imperative@export-terraform/v0.2.0
 ```
 
 ### Function invocation
@@ -17,14 +17,14 @@ $ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/
 Invoke the function by running the following commands:
 
 ```shell
-$ kpt fn eval export-terraform-imperative --image gcr.io/kpt-fn/export-terraform:unstable
+$ kpt fn eval export-terraform-imperative --image gcr.io/kpt-fn/export-terraform:v0.2.0
 ```
 
 ### Expected result
 The function should export successfully
 ```shell
-[RUNNING] "gcr.io/kpt-fn/export-terraform:unstable"
-[PASS] "gcr.io/kpt-fn/export-terraform:unstable" in 1.5s
+[RUNNING] "gcr.io/kpt-fn/export-terraform:v0.2.0"
+[PASS] "gcr.io/kpt-fn/export-terraform:v0.2.0" in 1.5s
 ```
 
 A `ConfigMap` will be placed in `terraform.yaml` which contains the converted Terraform code.
