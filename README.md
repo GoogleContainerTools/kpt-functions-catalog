@@ -5,13 +5,13 @@
 
 [Documentation]
 
-[Open an Issue]
-
 [Contributor Guide]
 
 [Release Process]
 
 [Code of Conduct]
+
+Please [open Issues](https://github.com/GoogleContainerTools/kpt/issues) for this repo at [GoogleContainerTools/kpt](https://github.com/GoogleContainerTools/kpt).
 
 [Documentation]: https://catalog.kpt.dev/
 [Contributor Guide]: CONTRIBUTING.md

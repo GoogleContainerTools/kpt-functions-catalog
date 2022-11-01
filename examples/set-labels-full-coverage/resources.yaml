@@ -1,0 +1,185 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: MyApp
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nginx
+spec:
+  replicas: 3
+  selector:
+    app: nginx
+  template:
+    metadata:
+      name: nginx
+      labels:
+        app: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-elasticsearch
+  namespace: kube-system
+  labels:
+    k8s-app: fluentd-logging
+spec:
+  selector:
+    matchLabels:
+      name: fluentd-elasticsearch
+  template:
+    metadata:
+      labels:
+        name: fluentd-elasticsearch
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  serviceName: "nginx"
+  replicas: 3
+  minReadySeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: www
+        labels:
+          key: www
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "my-storage-class"
+        resources:
+          requests:
+            storage: 1Gi
+    - metadata:
+        name: xxx
+        labels:
+          key: xxx
+        spec:
+          accessModes: ["ReadWrite"]
+          storageClassName: "my-storage-class"
+          resources:
+            requests:
+              storage: 1Gi
+  template:
+    metadata:
+      labels:
+        app: nginx
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+spec:
+  selector:
+    matchLabels:
+      name: pi
+  template:
+    metadata:
+      labels:
+        color: pi
+    spec:
+      containers:
+        - name: pi
+          image: perl:5.34
+          command: ["perl", "-Mbignum=bpi", "-wle", "'print bpi(2000)'"]
+      restartPolicy: Never
+  backoffLimit: 4
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    metadata:
+      labels:
+        env: dev
+    spec:
+      selector:
+        matchLabels:
+          name: pi
+      template:
+        metadata:
+          labels:
+            testkey: testvalue
+        spec:
+          containers:
+            - name: hello
+              image: busybox:1.28
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -c
+                - date; echo Hello from the Kubernetes cluster
+          restartPolicy: OnFailure
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: hello
+spec:
+  selector:
+    matchLabels:
+      name: pi
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+---
+apiVersion: dev.example.com/v1
+kind: MyResource
+metadata:
+  name: the-service
+  namespace: the-namespace
+spec:
+  selector:
+    labels:
+      foo: bar

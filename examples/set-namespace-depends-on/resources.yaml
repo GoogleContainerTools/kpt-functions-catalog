@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/wordpress-mysql
+    internal.kpt.dev/upstream-identifier: apps|Deployment|example|wordpress
   labels:
     app: wordpress
   name: wordpress
@@ -21,6 +22,7 @@ kind: Deployment
 metadata:
   annotations:
     config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/outside-resource
+    internal.kpt.dev/upstream-identifier: apps|Deployment|example|bar
   labels:
     app: bar
   name: bar
@@ -31,6 +33,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     config.kubernetes.io/depends-on: rbac.authorization.k8s.io/ClusterRole/secret-reader
+    internal.kpt.dev/upstream-identifier: rbac.authorization.k8s.io|ClusterRoleBinding|~C|read-secrets-global
   name: read-secrets-global
 roleRef:
   apiGroup: rbac.authorization.k8s.io

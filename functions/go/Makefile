@@ -101,6 +101,10 @@ $(FUNCTION_PUSH):
 .PHONY: check-licenses
 check-licenses: install-go-licenses $(FUNCTION_CHECKLICENSES)
 
+add-licenses:
+	@echo Update license in path: functions/go
+	GOBIN=$(GOBIN) ../../hack/update-license.sh
+
 .PHONY: $(FUNCTION_CHECKLICENSES)
 $(FUNCTION_CHECKLICENSES):
 	$(MAKE) CURRENT_FUNCTION=$(subst -CHECKLICENSES,,$@) func-check-licenses
@@ -118,7 +122,7 @@ install-mdtogo:
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
-	func-build func-push func-verify func-check-licenses docs-generate
+	func-build func-push func-verify func-check-licenses docs-generate add-licenses
 func-verify: docs-generate func-fix func-vet func-fmt func-test func-lint func-check-licenses
 
 func-fix:
@@ -129,7 +133,7 @@ func-fmt:
 
 func-lint:
 	(which $(GOPATH)/bin/golangci-lint || \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.45.0/install.sh | sh -s -- -b $(GOPATH)/bin v1.41.1)
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.49.0/install.sh | sh -s -- -b $(GOPATH)/bin v1.49.0)
 	cd $(CURRENT_FUNCTION) && time $(GOPATH)/bin/golangci-lint run --timeout=10m ./...
 
 func-test:

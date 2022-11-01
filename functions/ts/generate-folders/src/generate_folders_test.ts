@@ -19,6 +19,9 @@ import {
   oldHierarchyWarning,
   normalize,
   Annotations,
+  DEPENDS_ON_ANNOTATION,
+  FOLDER_GROUP,
+  FOLDER_KIND,
 } from './generate_folders';
 import {
   FolderList,
@@ -94,6 +97,14 @@ describe('generateFolders', () => {
       expected: [
         ['Dev', ['Team "One"', 'Team_2']],
         ['Prod', ['Team "One"', 'Team_2']],
+        ['Foo', ['bar']],
+      ],
+    },
+    {
+      file: 'simple_v3_ns',
+      expected: [
+        ['Dev', ['Team_2']],
+        ['Prod', ['Team_2']],
         ['Foo', ['bar']],
       ],
     },
@@ -277,6 +288,7 @@ describe('generateFolders', () => {
               parentRef,
               parentType,
               annotations,
+              hierarchy.metadata.namespace,
               isV3ResourceHierarchy(hierarchy)
             ),
           ],
@@ -301,6 +313,7 @@ function getHierarchyConfig(
   rootRef: string,
   rootType: string,
   annotations: Annotations,
+  namespace: string | undefined,
   nativeRef = false
 ): KubernetesObject[] {
   let res: Folder[] = [];
@@ -308,7 +321,15 @@ function getHierarchyConfig(
     if (Array.isArray(child)) {
       const name = child[0];
       res.push(
-        makeFolder(name, parents, rootRef, rootType, annotations, nativeRef)
+        makeFolder(
+          name,
+          parents,
+          rootRef,
+          rootType,
+          annotations,
+          namespace,
+          nativeRef
+        )
       );
       const childTree = getHierarchyConfig(
         child[1],
@@ -316,12 +337,21 @@ function getHierarchyConfig(
         rootRef,
         rootType,
         annotations,
+        namespace,
         nativeRef
       );
       res = res.concat(childTree);
     } else if (typeof child === 'string') {
       res.push(
-        makeFolder(child, parents, rootRef, rootType, annotations, nativeRef)
+        makeFolder(
+          child,
+          parents,
+          rootRef,
+          rootType,
+          annotations,
+          namespace,
+          nativeRef
+        )
       );
     }
   }
@@ -341,10 +371,12 @@ function makeFolder(
   rootRef: string,
   rootType: string,
   annotations: Annotations,
+  namespace: string | undefined,
   nativeRef = false
 ): Folder {
   const isRoot = path.length === 0;
   let annotationRef: Annotations = {};
+  let annotationDependsOn = {};
   // Parent Ref
   let ref = {};
   if (nativeRef) {
@@ -357,6 +389,11 @@ function makeFolder(
           : { folderRef: { external: parent } };
     } else {
       ref = { folderRef: { name: parent } };
+      if (namespace !== undefined) {
+        annotationDependsOn = {
+          [DEPENDS_ON_ANNOTATION]: `${FOLDER_GROUP}/namespaces/${namespace}/${FOLDER_KIND}/${parent}`,
+        };
+      }
     }
   } else {
     const annotationName =
@@ -371,9 +408,12 @@ function makeFolder(
   let combinedAnnotations = {};
   if (
     Object.keys(annotations).length > 0 ||
-    Object.keys(annotationRef).length > 0
+    Object.keys(annotationRef).length > 0 ||
+    Object.keys(annotationDependsOn).length > 0
   ) {
-    combinedAnnotations = { annotations: { ...annotations, ...annotationRef } };
+    combinedAnnotations = {
+      annotations: { ...annotations, ...annotationRef, ...annotationDependsOn },
+    };
   }
 
   return {
@@ -382,6 +422,7 @@ function makeFolder(
     metadata: {
       name: normalize([...path, name].join('.')),
       ...combinedAnnotations,
+      ...(namespace !== undefined && { namespace: namespace }),
     },
     spec: {
       displayName: name,

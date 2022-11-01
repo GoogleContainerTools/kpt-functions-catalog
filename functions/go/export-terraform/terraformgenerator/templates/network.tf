@@ -22,6 +22,17 @@ module "{{ $vpc.GetResourceName }}" {
             subnet_flow_logs_interval = "{{ $subnet.GetStringFromObject "spec" "logConfig" "aggregationInterval" }}"{{end}}
         },{{end}}
     ]
+    {{if $vpc.GetChildrenByKind "ComputeRoute"}}
+    routes = [
+      {{range $route := $vpc.GetChildrenByKind "ComputeRoute" }}{
+        name = "{{ $route.GetResourceName }}"{{ with $route.GetStringFromObject "spec" "description" }}
+        description = "{{ . }}"{{end}}{{ with $route.GetStringFromObject "spec" "destRange" }}
+        destination_range = "{{ . }}"{{end}}{{ with $route.GetInt "spec" "priority" }}
+        priority = "{{ . }}"{{end}}{{ with $route.GetStringFromObject "spec" "nextHopGateway" }}{{if eq . "default-internet-gateway"}}
+        next_hop_internet = "true"{{end}}{{end}}{{ with $route.GetStringsFromObject "spec" "tags" }}
+        tags = "{{ . | strSliceToCommaSepStr }}"{{end}}
+      },{{end}}
+    ]{{end}}
 }
 # Firewall Rules{{range $fw := $vpc.GetChildrenByKind "ComputeFirewall" }}
 resource "google_compute_firewall" "{{ $fw.GetResourceName }}" {

@@ -1,4 +1,4 @@
-module github.com/GoogleContainerTools/kpt-functions-catalog
+module github.com/GoogleContainerTools/kpt-functions-catalog/scripts/generate_catalog
 
 go 1.17
 

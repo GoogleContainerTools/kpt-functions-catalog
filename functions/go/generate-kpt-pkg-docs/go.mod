@@ -1,6 +1,6 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/generate-kpt-pkg-docs
 
-go 1.17
+go 1.18
 
 require (
 	github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/list-setters v0.1.0

@@ -14,6 +14,7 @@
 SHELL=/bin/bash
 TAG ?= unstable
 GCR = gcr.io/kpt-fn
+GOBIN := $(shell go env GOPATH)/bin
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -65,6 +66,10 @@ $(FUNCTION_PUSH):
 	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) TAG=$(TAG) DEFAULT_GCR=$(GCR) func-push
 
 check-licenses: $(FUNCTION_CHECKLICENSES) ## Run license checker for source files
+
+add-licenses:
+	@echo Update license in path: functions/ts
+	GOBIN=$(GOBIN) ../../hack/update-license.sh
 
 .PHONY: $(FUNCTION_CHECKLICENSES)
 $(FUNCTION_CHECKLICENSES):

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: the-map
+data:
+  some-key: some-value
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: the-service
+  namespace: the-namespace
+spec:
+  selector:
+    foo: bar

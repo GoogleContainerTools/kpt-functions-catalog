@@ -1,6 +1,6 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/format
 
-go 1.17
+go 1.18
 
 require sigs.k8s.io/kustomize/kyaml v0.10.21
 

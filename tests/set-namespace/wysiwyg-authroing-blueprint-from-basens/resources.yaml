@@ -3,6 +3,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: example
+  annotations:
+    internal.kpt.dev/upstream-identifier: "|Namespace|~C|example"
 ---
 # from upstream basens/role-binding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -10,6 +12,8 @@ kind: RoleBinding
 metadata:
   name: app-admin
   namespace: example
+  annotations:
+    internal.kpt.dev/upstream-identifier: rbac.authorization.k8s.io|RoleBinding|example|app-admin
 roleRef:
   kind: ClusterRole
   name: app-admin

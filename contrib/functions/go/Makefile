@@ -80,6 +80,10 @@ $(FUNCTION_PUSH):
 .PHONY: check-licenses
 check-licenses: install-go-licenses $(FUNCTION_CHECKLICENSES)
 
+add-licenses:
+	@echo Update license in path: contrib/functions/go
+	GOBIN=$(GOBIN) ../../../hack/update-license.sh
+
 .PHONY: $(FUNCTION_CHECKLICENSES)
 $(FUNCTION_CHECKLICENSES):
 	$(MAKE) CURRENT_FUNCTION=$(subst -CHECKLICENSES,,$@) func-check-licenses
@@ -131,4 +135,3 @@ func-push:
 
 docs-generate:
 	$(GOBIN)/mdtogo $(CURRENT_FUNCTION) $(CURRENT_FUNCTION)/generated --license=none --strategy=cmdDocs
-

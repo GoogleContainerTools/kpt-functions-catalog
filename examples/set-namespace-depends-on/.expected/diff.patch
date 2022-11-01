@@ -1,13 +1,14 @@
 diff --git a/resources.yaml b/resources.yaml
-index e45cae5..2ff45d5 100644
+index 7ba31da..33affca 100644
 --- a/resources.yaml
 +++ b/resources.yaml
-@@ -2,11 +2,11 @@ apiVersion: apps/v1
+@@ -2,12 +2,12 @@ apiVersion: apps/v1
  kind: Deployment
  metadata:
    annotations:
 -    config.kubernetes.io/depends-on: apps/namespaces/default/StatefulSet/wordpress-mysql
 +    config.kubernetes.io/depends-on: apps/namespaces/example-ns/StatefulSet/wordpress-mysql
+     internal.kpt.dev/upstream-identifier: apps|Deployment|example|wordpress
    labels:
      app: wordpress
    name: wordpress
@@ -16,7 +17,7 @@ index e45cae5..2ff45d5 100644
  ---
  apiVersion: apps/v1
  kind: StatefulSet
-@@ -14,7 +14,7 @@ metadata:
+@@ -15,7 +15,7 @@ metadata:
    labels:
      app: wordpress
    name: wordpress-mysql
@@ -25,7 +26,7 @@ index e45cae5..2ff45d5 100644
  ---
  apiVersion: apps/v1
  kind: Deployment
-@@ -24,7 +24,7 @@ metadata:
+@@ -26,7 +26,7 @@ metadata:
    labels:
      app: bar
    name: bar

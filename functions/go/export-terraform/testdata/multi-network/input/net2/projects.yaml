@@ -20,7 +20,7 @@ metadata:
   annotations:
     cnrm.cloud.google.com/blueprint: 'kpt-fn'
 spec:
-  name: prj-network2 # kpt-set: ${project-id}
+  name: prj-network2-diff-name # kpt-set: ${project-id}
   billingAccountRef:
     external: AAAAAA-AAAAAA-AAAAAA
   organizationRef:

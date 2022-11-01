@@ -1,0 +1,13 @@
+diff --git a/resources.yaml b/resources.yaml
+index 9502a50..44c190f 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -9,7 +9,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: the-service
+-  namespace: example2
++  namespace: new-ns
+   annotations:
+     internal.kpt.dev/upstream-identifier: "|Service|example2|the-service"
+ ---

@@ -1,0 +1,250 @@
+diff --git a/resources.yaml b/resources.yaml
+index c70e1f9..62df835 100644
+--- a/resources.yaml
++++ b/resources.yaml
+@@ -2,56 +2,84 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: my-service
++  labels:
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   selector:
+-    app: MyApp
++    app: new
++    color: orange
++    fruit: apple
+ ---
+ apiVersion: v1
+ kind: ReplicationController
+ metadata:
+   name: nginx
++  labels:
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   replicas: 3
+   selector:
+-    app: nginx
++    app: new
++    color: orange
++    fruit: apple
+   template:
+     metadata:
+       name: nginx
+       labels:
+-        app: nginx
++        app: new
++        color: orange
++        fruit: apple
+ ---
+ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+   name: nginx-deployment
+   labels:
+-    app: nginx
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   replicas: 3
+   selector:
+     matchLabels:
+-      app: nginx
++      app: new
++      color: orange
++      fruit: apple
+   template:
+     metadata:
+       labels:
+-        app: nginx
++        app: new
++        color: orange
++        fruit: apple
+ ---
+ apiVersion: apps/v1
+ kind: ReplicaSet
+ metadata:
+   name: frontend
+   labels:
+-    app: guestbook
++    app: new
+     tier: frontend
++    color: orange
++    fruit: apple
+ spec:
+   replicas: 3
+   selector:
+     matchLabels:
+       tier: frontend
++      app: new
++      color: orange
++      fruit: apple
+   template:
+     metadata:
+       labels:
+         tier: frontend
++        app: new
++        color: orange
++        fruit: apple
+ ---
+ apiVersion: apps/v1
+ kind: DaemonSet
+@@ -60,23 +88,38 @@ metadata:
+   namespace: kube-system
+   labels:
+     k8s-app: fluentd-logging
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   selector:
+     matchLabels:
+       name: fluentd-elasticsearch
++      app: new
++      color: orange
++      fruit: apple
+   template:
+     metadata:
+       labels:
+         name: fluentd-elasticsearch
++        app: new
++        color: orange
++        fruit: apple
+ ---
+ apiVersion: apps/v1
+ kind: StatefulSet
+ metadata:
+   name: web
++  labels:
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   selector:
+     matchLabels:
+-      app: nginx
++      app: new
++      color: orange
++      fruit: apple
+   serviceName: "nginx"
+   replicas: 3
+   minReadySeconds: 10
+@@ -85,6 +128,9 @@ spec:
+         name: www
+         labels:
+           key: www
++          app: new
++          color: orange
++          fruit: apple
+       spec:
+         accessModes: ["ReadWriteOnce"]
+         storageClassName: "my-storage-class"
+@@ -95,6 +141,9 @@ spec:
+         name: xxx
+         labels:
+           key: xxx
++          app: new
++          color: orange
++          fruit: apple
+         spec:
+           accessModes: ["ReadWrite"]
+           storageClassName: "my-storage-class"
+@@ -104,12 +153,18 @@ spec:
+   template:
+     metadata:
+       labels:
+-        app: nginx
++        app: new
++        color: orange
++        fruit: apple
+ ---
+ apiVersion: batch/v1
+ kind: Job
+ metadata:
+   name: pi
++  labels:
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   selector:
+     matchLabels:
+@@ -117,7 +172,9 @@ spec:
+   template:
+     metadata:
+       labels:
+-        color: pi
++        color: orange
++        app: new
++        fruit: apple
+     spec:
+       containers:
+         - name: pi
+@@ -130,12 +187,19 @@ apiVersion: batch/v1
+ kind: CronJob
+ metadata:
+   name: hello
++  labels:
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   schedule: "* * * * *"
+   jobTemplate:
+     metadata:
+       labels:
+         env: dev
++        app: new
++        color: orange
++        fruit: apple
+     spec:
+       selector:
+         matchLabels:
+@@ -144,6 +208,9 @@ spec:
+         metadata:
+           labels:
+             testkey: testvalue
++            app: new
++            color: orange
++            fruit: apple
+         spec:
+           containers:
+             - name: hello
+@@ -159,6 +226,10 @@ apiVersion: policy/v1
+ kind: PodDisruptionBudget
+ metadata:
+   name: hello
++  labels:
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   selector:
+     matchLabels:
+@@ -169,6 +240,10 @@ kind: NetworkPolicy
+ metadata:
+   name: test-network-policy
+   namespace: default
++  labels:
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   podSelector:
+     matchLabels:
+@@ -179,6 +254,10 @@ kind: MyResource
+ metadata:
+   name: the-service
+   namespace: the-namespace
++  labels:
++    app: new
++    color: orange
++    fruit: apple
+ spec:
+   selector:
+     labels:

@@ -31,6 +31,23 @@ module "vpc-shared-base" {
             subnet_flow_logs_interval = "INTERVAL_10_MIN"
         },
     ]
+    
+    routes = [
+      {
+        name = "rt-vpc-shared-base-1000-all-default-private-api"
+        description = "Route through IGW to allow private google api access."
+        destination_range = "199.36.153.8/30"
+        priority = "1000"
+        next_hop_internet = "true"
+      },{
+        name = "rt-vpc-shared-base-1000-egress-internet-default"
+        description = "Tag based route through IGW to access internet"
+        destination_range = "0.0.0.0/0"
+        priority = "1000"
+        next_hop_internet = "true"
+        tags = "egress-internet"
+      },
+    ]
 }
 # Firewall Rules
 resource "google_compute_firewall" "vpc-shared-base-allow-iap-rdp" {

@@ -27,8 +27,9 @@
 
 import json
 import os
-import yaml
 import subprocess
+
+import yaml
 
 metadata_filename = 'metadata.yaml'
 directories_to_skip = ['_template', 'dist', 'node_modules']
@@ -36,7 +37,7 @@ examples_directory = 'examples'
 functions_directory = 'functions'
 lang_dirs = ['go', 'ts']
 examples_directories_to_skip = ['_template']
-fn_directories_to_skip = ['inflate-helm-chart']
+fn_directories_to_skip = ['bind', 'inflate-helm-chart', 'set-gcp-resource-ids', 'set-name-prefix']
 required_fields = ['image', 'description', 'tags', 'sourceURL', 'examplePackageURLs', 'emails', 'license']
 kpt_team_email = 'kpt-team@google.com'
 disallowed_kpt_commands = ['kpt fn run', 'kpt cfg', 'kpt pkg cat']

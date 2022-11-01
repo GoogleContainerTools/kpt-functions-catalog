@@ -32,27 +32,9 @@ following ` + "`" + `functionConfig` + "`" + `:
     fruit: apple
 
 To use a ` + "`" + `SetLabels` + "`" + ` custom resource as the ` + "`" + `functionConfig` + "`" + `, the desired labels
-must be specified in the ` + "`" + `labels` + "`" + ` field. Sometimes you have resources (
-especially custom resources) that have labels or selectors fields in fields
-other than the [defaults][commonlabels], you can specify such label fields using
-` + "`" + `additionalLabelFields` + "`" + `. It will be used jointly with the
-[defaults][commonlabels].
+must be specified in the ` + "`" + `labels` + "`" + ` field. 
 
-` + "`" + `additionalLabelFields` + "`" + ` has following fields:
-
-- ` + "`" + `group` + "`" + `: Select the resources by API version group. Will select all groups if
-  omitted.
-- ` + "`" + `version` + "`" + `: Select the resources by API version. Will select all versions if
-  omitted.
-- ` + "`" + `kind` + "`" + `: Select the resources by resource kind. Will select all kinds if
-  omitted.
-- ` + "`" + `path` + "`" + `: Specify the path to the field that the value needs to be updated. This
-  field is required.
-- ` + "`" + `create` + "`" + `: If it's set to true, the field specified will be created if it
-  doesn't exist. Otherwise, the function will only update the existing field.
-
-To add 2 labels ` + "`" + `color: orange` + "`" + ` and ` + "`" + `fruit: apple` + "`" + ` to all built-in resources and
-the path ` + "`" + `data.selector` + "`" + ` in ` + "`" + `MyOwnKind` + "`" + ` resource, we use the
+To add 2 labels ` + "`" + `color: orange` + "`" + ` and ` + "`" + `fruit: apple` + "`" + ` to all built-in resources, we use the
 following ` + "`" + `functionConfig` + "`" + `:
 
   apiVersion: fn.kpt.dev/v1alpha1
@@ -62,8 +44,4 @@ following ` + "`" + `functionConfig` + "`" + `:
   labels:
     color: orange
     fruit: apple
-  additionalLabelFields:
-    - path: data/selector
-      kind: MyOwnKind
-      create: true
 `

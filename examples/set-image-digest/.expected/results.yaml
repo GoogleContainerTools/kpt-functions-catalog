@@ -7,28 +7,5 @@ items:
   - image: gcr.io/kpt-fn/set-image:unstable
     exitCode: 0
     results:
-      - message: set image from nginx:1.20.2 to bitnami/nginx@sha256:e1d6f00f191515945233f562777fc9ab3b7637ea75169b3dd628d46c9b24400f
+      - message: 'summary: updated a total of 2 image(s)'
         severity: info
-        resourceRef:
-          apiVersion: v1
-          kind: Pod
-          name: app1
-        field:
-          path: spec.containers.image
-          currentValue: nginx:1.20.2
-          proposedValue: bitnami/nginx@sha256:e1d6f00f191515945233f562777fc9ab3b7637ea75169b3dd628d46c9b24400f
-        file:
-          path: resources.yaml
-      - message: set image from nginx:1.20.2 to bitnami/nginx@sha256:e1d6f00f191515945233f562777fc9ab3b7637ea75169b3dd628d46c9b24400f
-        severity: info
-        resourceRef:
-          apiVersion: v1
-          kind: Pod
-          name: app2
-        field:
-          path: spec.containers.image
-          currentValue: nginx:1.20.2
-          proposedValue: bitnami/nginx@sha256:e1d6f00f191515945233f562777fc9ab3b7637ea75169b3dd628d46c9b24400f
-        file:
-          path: resources.yaml
-          index: 1
