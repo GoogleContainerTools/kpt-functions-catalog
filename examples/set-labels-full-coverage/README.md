@@ -10,7 +10,7 @@ to upsert all common labels to different built-in resources and CustomResourceDe
 Get the example package by running the following commands:
 
 ```shell
-$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels-full-coverage
+$ kpt pkg get https://github.com/GoogleContainerTools/kpt-functions-catalog.git/examples/set-labels-full-coverage@set-labels/v0.2.0
 ```
 
 We use the following `Kptfile` and `fn-config.yaml` to configure the function.
@@ -24,7 +24,7 @@ metadata:
     config.kubernetes.io/local-config: "true"
 pipeline:
   mutators:
-    - image: gcr.io/kpt-fn/set-labels:unstable
+    - image: gcr.io/kpt-fn/set-labels:v0.2.0
       configPath: fn-config.yaml
 ```
 
@@ -58,4 +58,4 @@ $ kpt fn render set-labels-full-coverage
 Check all resources, the following labels should be upserted to the `labels`, `matchingLabels` or `seletors(labelSelector)` fields: 
 `color: orange`, `fruit: apple` and `app: new`.
 
-[`set-labels`]: https://catalog.kpt.dev/set-labels/v0.1/
+[`set-labels`]: https://catalog.kpt.dev/set-labels/v0.2/
