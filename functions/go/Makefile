@@ -97,7 +97,7 @@ $(FUNCTION_BUILDS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) TAG=$(TAG) DEFAULT_GCR=$(GCR) func-build
 
 .PHONY: push
-push: install-ko $(FUNCTION_PUSH) $(FUNCTION_KO_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
+push: $(FUNCTION_KO_PUSH) $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
 
 .PHONY: $(FUNCTION_PUSH)
 $(FUNCTION_PUSH):
@@ -128,9 +128,6 @@ endif
 
 install-mdtogo:
 	go install github.com/GoogleContainerTools/kpt/mdtogo@main
-
-install-ko:
-	go install github.com/google/ko@latest
 
 # Recipes for individual function
 .PHONY: func-fix func-vet func-fmt func-test func-lint \
