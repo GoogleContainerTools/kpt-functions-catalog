@@ -8,10 +8,10 @@ export IMAGE_REPO ?= gcr.io/$(GCP_PROJECT_ID)
 export IMAGE_TAG ?= latest
 
 build: install-ko
-	GOBIN=$(GOBIN) KO_DOCKER_REPO=ko.local ko build -B --tags=${IMAGE_TAG} .
+	KO_DOCKER_REPO=ko.local $(GOBIN)/ko build -B --tags=${IMAGE_TAG} .
 
 push: install-ko
-	GOBIN=$(GOBIN) KO_DOCKER_REPO=${IMAGE_REPO} ko build -B --tags=${IMAGE_TAG} .
+	KO_DOCKER_REPO=${IMAGE_REPO} $(GOBIN)/ko build -B --tags=${IMAGE_TAG} .
 
 install-ko:
-	(which ko || go install github.com/google/ko@latest)
+	(which ko || GOBIN=$(GOBIN) go install github.com/google/ko@latest)
