@@ -1,5 +1,7 @@
 # GCP project to use for development
-export GCP_PROJECT_ID ?= $(shell gcloud config get-value project)
+export GCP_PROJECT_ID ?= \
+	$(if $(shell which gcloud),$(shell gcloud config get-value project), \
+	gcr.io/kpt-fn)
 export IMAGE_REPO ?= gcr.io/$(GCP_PROJECT_ID)
 export IMAGE_TAG ?= latest
 
