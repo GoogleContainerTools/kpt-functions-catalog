@@ -15,4 +15,4 @@ push: install-ko
 
 
 install-ko:
-	(which ko || go run github.com/google/ko@latest)
+	(which ko || go install github.com/google/ko@latest)

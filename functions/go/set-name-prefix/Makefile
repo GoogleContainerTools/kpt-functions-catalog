@@ -14,4 +14,4 @@ push: install-ko
 	GOBIN=$(GOBIN) KO_DOCKER_REPO=${IMAGE_REPO} ko build -B --tags=${IMAGE_TAG} .
 
 install-ko:
-	(which ko || go run github.com/google/ko@latest)
+	(which ko || go install github.com/google/ko@latest)
