@@ -43,6 +43,9 @@ FUNCTIONS := \
 	starlark \
 	upsert-resource
 
+FUNCTION_KO := \
+	set-name-prefix
+
 # Targets for running all function tests
 FUNCTION_TESTS := $(patsubst %,%-TEST,$(FUNCTIONS))
 # Targets for generating all functions docs
@@ -53,6 +56,8 @@ FUNCTION_CHECKLICENSES := $(patsubst %,%-CHECKLICENSES,$(FUNCTIONS))
 FUNCTION_BUILDS := $(patsubst %,%-BUILD,$(FUNCTIONS))
 # Targets to push images
 FUNCTION_PUSH := $(patsubst %,%-PUSH,$(FUNCTIONS))
+# Targets to push functions via ko
+FUNCTION_KO_PUSH := $(patsubst %,%-PUSH,$(FUNCTION_KO))
 # Current function name used by individual function targets
 CURRENT_FUNCTION ?= unknown
 
@@ -92,11 +97,15 @@ $(FUNCTION_BUILDS):
 	$(MAKE) CURRENT_FUNCTION=$(subst -BUILD,,$@) TAG=$(TAG) DEFAULT_GCR=$(GCR) func-build
 
 .PHONY: push
-push: $(FUNCTION_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
+push: $(FUNCTION_PUSH) $(FUNCTION_KO_PUSH) ## Push images to registry. WARN: This operation should only be done in CI environment.
 
 .PHONY: $(FUNCTION_PUSH)
 $(FUNCTION_PUSH):
 	$(MAKE) CURRENT_FUNCTION=$(subst -PUSH,,$@) TAG=$(TAG) DEFAULT_GCR=$(GCR) func-push
+
+.PHONY: $(FUNCTION_KO_PUSH)
+$(FUNCTION_KO_PUSH):
+	cd $(subst -PUSH,,$@) && $(MAKE) IMAGE_REPO=$(GCR) IMAGE_TAG=$(TAG) push
 
 .PHONY: check-licenses
 check-licenses: install-go-licenses $(FUNCTION_CHECKLICENSES)
