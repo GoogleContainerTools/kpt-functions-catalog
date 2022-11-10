@@ -7,7 +7,7 @@ custom resources constituting the hierarchy. Post-translation, it's necessary to
 use the `kpt-folder-parent` function from this repo to translate the results
 into Cork configs.
 
-## Usgae
+## Usage
 
 This function can be used with any KRM function orchestrators (e.g. kpt).
 
