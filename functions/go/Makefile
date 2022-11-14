@@ -29,6 +29,7 @@ FUNCTIONS := \
 	format \
 	gatekeeper \
 	generate-kpt-pkg-docs \
+	preview-hierarchy \
 	remove-local-config-resources \
 	render-helm-chart \
 	list-setters \

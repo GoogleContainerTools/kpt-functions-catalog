@@ -1,0 +1,4 @@
+testType: eval
+image: gcr.io/kpt-fn/preview-hierarchy:unstable
+args:
+  renderer: 'text'
