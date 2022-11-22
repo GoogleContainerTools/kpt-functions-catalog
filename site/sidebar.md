@@ -5,5 +5,7 @@
 - [Functions Catalog](/)
   - [Curated](/)
   - [Contrib](/contrib/)
+- [GitOps](https://kpt.dev/gitops/ ':crossorgin :target=_self')
+- [Guides](https://kpt.dev/guides/ ':crossorgin :target=_self')
 - [FAQ](https://kpt.dev/faq/ ':crossorgin :target=_self')
 - [Contact](https://kpt.dev/contact/ ':crossorgin :target=_self')
