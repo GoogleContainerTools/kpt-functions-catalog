@@ -41,4 +41,4 @@ replacements:
 ```
 <!--mdtogo-->
 
-[kustomize replacements]: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/replacements/
+[kustomize replacements]: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/replacements/ ':target=_blank'
