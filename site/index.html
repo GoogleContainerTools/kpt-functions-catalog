@@ -39,6 +39,7 @@
           placeholder: "Search",
         },
         crossOriginLinks: ["https://kpt.dev/?id=overview"],
+        externalLinkTarget: '_blank',
         alias: {
           "/.*/sidebar.md": "/sidebar.md",
         },
@@ -98,6 +99,21 @@
               html += wrapper.outerHTML;
               next(html);
             });
+
+            // Adds the external link target (_blank) to all external links
+            function defaultLinkTargets() {
+              const externalPageLinks = Array.from(
+                document.getElementsByTagName("a")
+              ).filter(
+                (a) =>
+                  window.Docsify.util.isExternal(a.href) &&
+                  !window.$docsify.crossOriginLinks.includes(a.href)
+              );
+              externalPageLinks.forEach(
+                (a) => (a.target = window.$docsify.externalLinkTarget)
+              );
+            }
+            hook.doneEach(defaultLinkTargets);
 
             hook.doneEach(function () {
               let isContribFn = false;
