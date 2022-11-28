@@ -1,17 +1,12 @@
 # GCP project to use for development
 GOBIN := $(shell go env GOPATH)/bin
 
-export GCP_PROJECT_ID ?= \
-	$(if $(shell which gcloud),$(shell gcloud config get-value project), \
-	gcr.io/kpt-fn)
+export GCP_PROJECT_ID ?= $(shell gcloud config get-value project)
 export IMAGE_REPO ?= gcr.io/$(GCP_PROJECT_ID)
 export IMAGE_TAG ?= latest
 
-build: install-ko
-	KO_DOCKER_REPO=ko.local $(GOBIN)/ko build -B --tags=${IMAGE_TAG} .
+build:
+	KO_DOCKER_REPO=ko.local go run github.com/google/ko@v0.12.0 build -B --tags=${IMAGE_TAG} .
 
-push: install-ko
-	KO_DOCKER_REPO=${IMAGE_REPO} $(GOBIN)/ko build -B --tags=${IMAGE_TAG} .
-
-install-ko:
-	(which ko || GOBIN=$(GOBIN) go install github.com/google/ko@latest)
+push:
+	KO_DOCKER_REPO=${IMAGE_REPO} go run github.com/google/ko@v0.12.0 build -B --tags=${IMAGE_TAG} .
