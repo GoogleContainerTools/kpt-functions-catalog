@@ -3,7 +3,8 @@ module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go
 go 1.18
 
 require (
-	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221007213718-5fa523b306fe
+	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221104163847-f50fe3a2977e
+	github.com/google/go-cmp v0.5.9
 	k8s.io/apimachinery v0.25.2
 )
 
