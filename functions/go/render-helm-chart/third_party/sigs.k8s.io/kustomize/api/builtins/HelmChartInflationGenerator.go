@@ -290,14 +290,15 @@ func (p *HelmChartInflationGeneratorPlugin) Generate() (objects fn.KubeObjects, 
 		return nil, err
 	}
 
-	s := strings.Split(string(stdout), "---")
+	s := strings.Split(string(stdout), "\n---\n")
 	for i := range s {
 		if len(s[i]) == 0 {
 			continue
 		}
 		o, err := fn.ParseKubeObject([]byte(s[i]))
 		if err != nil {
-			if strings.Contains(err.Error(), "expected exactly one object, got 0") {
+			if strings.Contains(err.Error(), "expected exactly one object, got 0") ||
+				strings.Contains(err.Error(), "failed to extract objects: unhandled node kind") {
 				// sometimes helm produces some messages in between resources, we can safely
 				// ignore these
 				continue
