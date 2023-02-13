@@ -17,7 +17,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/gatekeeper/generated"
@@ -82,7 +81,7 @@ func (gkp *GatekeeperProcessor) Process(resourceList *framework.ResourceList) er
 }
 
 func (gkp *GatekeeperProcessor) ProcessInput() error {
-	content, err := ioutil.ReadFile(gkp.input)
+	content, err := os.ReadFile(gkp.input)
 	if err != nil {
 		return fmt.Errorf("unable to process input: %w", err)
 	}
@@ -116,7 +115,7 @@ func (gkp *GatekeeperProcessor) ProcessOutput() error {
 		}
 	}
 
-	err = ioutil.WriteFile(gkp.output, content, 0644)
+	err = os.WriteFile(gkp.output, content, 0644)
 	if err != nil {
 		return fmt.Errorf("unable to process output: %w", err)
 	}

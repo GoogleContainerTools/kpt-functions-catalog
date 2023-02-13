@@ -10,7 +10,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 )
 
-//nolint
+// nolint
 func main() {
 	lsp := ListSettersProcessor{}
 	cmd := command.Build(&lsp, command.StandaloneEnabled, false)

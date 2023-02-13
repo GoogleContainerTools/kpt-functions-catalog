@@ -11,7 +11,7 @@ import (
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-//nolint
+// nolint
 func main() {
 	srp := SearchReplaceProcessor{}
 	cmd := command.Build(&srp, command.StandaloneEnabled, false)

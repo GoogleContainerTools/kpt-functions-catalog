@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/generate-kpt-pkg-docs/docs"
@@ -16,7 +15,7 @@ import (
 const defaultReadmePath = "/tmp/README.md"
 const defaultRepoPath = "https://github.com/GoogleCloudPlatform/blueprints.git/catalog/"
 
-//nolint
+// nolint
 func main() {
 	rp := ReadmeProcessor{}
 	cmd := command.Build(&rp, command.StandaloneEnabled, false)
@@ -34,7 +33,7 @@ type ReadmeProcessor struct{}
 func (rp *ReadmeProcessor) Process(resourceList *framework.ResourceList) error {
 	readmePath, repoPath, pkgName := parseFnCfg(resourceList.FunctionConfig)
 
-	currentDoc, err := ioutil.ReadFile(readmePath)
+	currentDoc, err := os.ReadFile(readmePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			resourceList.Results = getResults(fmt.Sprintf("Skipping readme generation: %s", err), framework.Warning)
@@ -60,7 +59,7 @@ func generateReadme(repoPath, readmePath, pkgName, currentDoc string, resourceLi
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(readmePath, []byte(readme), os.ModePerm)
+	err = os.WriteFile(readmePath, []byte(readme), os.ModePerm)
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/kio/filters"
 )
 
-//nolint
+// nolint
 func main() {
 	asp := FormatProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)

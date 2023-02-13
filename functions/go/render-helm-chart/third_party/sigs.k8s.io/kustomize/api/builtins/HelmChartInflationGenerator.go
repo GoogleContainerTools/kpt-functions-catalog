@@ -9,7 +9,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -50,7 +50,7 @@ var legalMergeOptions = []string{
 	valuesMergeOptionReplace,
 }
 
-//noinspection GoUnusedGlobalVariable
+// noinspection GoUnusedGlobalVariable
 var KustomizeHelmChartInflationGeneratorPlugin HelmChartInflationGeneratorPlugin
 
 func (p *HelmChartInflationGeneratorPlugin) establishTmpDir() (err error) {
@@ -58,7 +58,7 @@ func (p *HelmChartInflationGeneratorPlugin) establishTmpDir() (err error) {
 		// already done.
 		return nil
 	}
-	p.tmpDir, err = ioutil.TempDir("", "kustomize-helm-")
+	p.tmpDir, err = os.MkdirTemp("", "kustomize-helm-")
 	return err
 }
 
@@ -170,7 +170,7 @@ func (p *HelmChartInflationGeneratorPlugin) runHelmCommand(
 // createNewMergedValuesFiles replaces/merges original values file with ValuesInline.
 func (p *HelmChartInflationGeneratorPlugin) createNewMergedValuesFiles(path string) (
 	string, error) {
-	pValues, err := ioutil.ReadFile(path)
+	pValues, err := os.ReadFile(path)
 	if err != nil {
 		if u, urlErr := url.Parse(path); urlErr == nil {
 			if u.Scheme == "http" || u.Scheme == "https" {
@@ -179,7 +179,7 @@ func (p *HelmChartInflationGeneratorPlugin) createNewMergedValuesFiles(path stri
 					return "", err
 				}
 				defer resp.Body.Close()
-				pValues, err = ioutil.ReadAll(resp.Body)
+				pValues, err = io.ReadAll(resp.Body)
 				if err != nil {
 					return "", err
 				}
@@ -241,7 +241,7 @@ func (p *HelmChartInflationGeneratorPlugin) writeValuesBytes(
 	// use a hash of the provided path to generate a unique, valid filename
 	hash := md5.Sum([]byte(path))
 	newPath := filepath.Join(p.tmpDir, p.Name+"-kustomize-values-"+hex.EncodeToString(hash[:])+".yaml")
-	return newPath, ioutil.WriteFile(newPath, b, 0644)
+	return newPath, os.WriteFile(newPath, b, 0644)
 }
 
 func (p *HelmChartInflationGeneratorPlugin) cleanup() {

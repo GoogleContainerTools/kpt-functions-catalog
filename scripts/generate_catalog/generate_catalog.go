@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+//	https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -312,7 +311,7 @@ func getFunctions(branches []string, source string, dest string) []function {
 
 func copyExamples(b string, exampleSources []string, versionDest, minorVersion string) error {
 	// Copy examples for the function's version to a temporary directory.
-	tempDir, err := ioutil.TempDir("", "examples")
+	tempDir, err := os.MkdirTemp("", "examples")
 	if err != nil {
 		return err
 	}
@@ -357,7 +356,7 @@ func copyExamples(b string, exampleSources []string, versionDest, minorVersion s
 
 func copyReadme(b string, funcName string, relativeFuncPath string, versionDest string) error {
 	// Copy README for the function's version to the function's directory.
-	tempDir, err := ioutil.TempDir("", "functions")
+	tempDir, err := os.MkdirTemp("", "functions")
 	if err != nil {
 		return err
 	}
@@ -564,11 +563,11 @@ func writeFunctionIndex(functions []function, source string, dest string) ([]fun
 	}
 
 	o := strings.Join(out, "\n")
-	if err := ioutil.WriteFile(filepath.Join(dest, "README.md"), []byte(o), 0744); err != nil {
+	if err := os.WriteFile(filepath.Join(dest, "README.md"), []byte(o), 0744); err != nil {
 		return nil, nil, err
 	}
 	co := strings.Join(contribOut, "\n")
-	if err := ioutil.WriteFile(filepath.Join(dest, "contrib", "README.md"), []byte(co), 0744); err != nil {
+	if err := os.WriteFile(filepath.Join(dest, "contrib", "README.md"), []byte(co), 0744); err != nil {
 		return nil, nil, err
 	}
 	return append(genericFunctions, gcp...), contribFunctions, nil
@@ -605,7 +604,7 @@ func writeExampleIndex(functions []function, source string, dest string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(dest, "catalog.json"), funcJson, 0600)
+	err = os.WriteFile(filepath.Join(dest, "catalog.json"), funcJson, 0600)
 	return err
 }
 
@@ -647,6 +646,6 @@ func writeExampleIndexV2(functions []function, source string, dest string) error
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(dest, "catalog-v2.json"), funcJson, 0600)
+	err = os.WriteFile(filepath.Join(dest, "catalog-v2.json"), funcJson, 0600)
 	return err
 }

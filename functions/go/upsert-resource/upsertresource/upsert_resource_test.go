@@ -2,7 +2,6 @@ package upsertresource
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -537,13 +536,13 @@ spec:
 	for i := range tests {
 		test := tests[i]
 		t.Run(test.name, func(t *testing.T) {
-			baseDir, err := ioutil.TempDir("", "")
+			baseDir, err := os.MkdirTemp("", "")
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
 			defer os.RemoveAll(baseDir)
 
-			err = ioutil.WriteFile(filepath.Join(baseDir, "f1.yaml"), []byte(test.input), 0700)
+			err = os.WriteFile(filepath.Join(baseDir, "f1.yaml"), []byte(test.input), 0700)
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
