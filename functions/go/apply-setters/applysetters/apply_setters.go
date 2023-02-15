@@ -6,50 +6,14 @@ import (
 	"strings"
 
 	"sigs.k8s.io/kustomize/kyaml/errors"
-	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 const SetterCommentIdentifier = "# kpt-set: "
 
-var _ kio.Filter = &ApplySetters{}
-
-// ApplySetters applies the setter values to the resource fields which are tagged
-// by the setter reference comments
-type ApplySetters struct {
-	// Setters holds the user provided values for all the setters
-	Setters []Setter
-
-	// Results are the results of applying setter values
-	Results []*Result
-
-	// filePath file path of resource
-	filePath string
-}
-
-type Setter struct {
-	// Name is the name of the setter
-	Name string
-
-	// Value is the input value for setter
-	Value string
-}
-
-// Result holds result of search and replace operation
-type Result struct {
-	// FilePath is the file path of the matching field
-	FilePath string
-
-	// FieldPath is field path of the matching field
-	FieldPath string
-
-	// Value of the matching field
-	Value string
-}
-
 // Filter implements Set as a yaml.Filter
-func (as *ApplySetters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
+func (as *Setters) Filter(nodes []*yaml.RNode) ([]*yaml.RNode, error) {
 	for i := range nodes {
 		filePath, _, err := kioutil.GetFileAnnotations(nodes[i])
 		if err != nil {
@@ -77,14 +41,13 @@ environments: # kpt-set: ${env}
 - dev
 - stage
 
-For input ApplySetters [name: env, value: "[stage, prod]"], qthe yaml node is transformed to
+For input Setters [name: env, value: "[stage, prod]"], qthe yaml node is transformed to
 
 environments: # kpt-set: ${env}
 - stage
 - prod
-
 */
-func (as *ApplySetters) visitMapping(object *yaml.RNode, path string) error {
+func (as *Setters) visitMapping(object *yaml.RNode, path string) error {
 	return object.VisitFields(func(node *yaml.MapNode) error {
 		if node == nil || node.Key.IsNil() || node.Value.IsNil() {
 			// don't do IsNilOrEmpty check as empty sequences are allowed
@@ -180,17 +143,18 @@ e.g.for input of scalar node 'nginx:1.7.1 # kpt-set: ${image}:${tag}' in the yam
 
 apiVersion: v1
 ...
-  image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 
-and for input ApplySetters [[name: image, value: ubuntu], [name: tag, value: 1.8.0]]
+	image: nginx:1.7.1 # kpt-set: ${image}:${tag}
+
+and for input Setters [[name: image, value: ubuntu], [name: tag, value: 1.8.0]]
 The yaml node is transformed to
 
 apiVersion: v1
 ...
-  image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
 
+	image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
 */
-func (as *ApplySetters) visitScalar(object *yaml.RNode, path string) error {
+func (as *Setters) visitScalar(object *yaml.RNode, path string) error {
 	if object.IsNil() {
 		return nil
 	}
@@ -358,7 +322,7 @@ func clean(input string) string {
 }
 
 // Decode decodes the input yaml node into Set struct
-func Decode(rn *yaml.RNode, fcd *ApplySetters) {
+func Decode(rn *yaml.RNode, fcd *Setters) {
 	for k, v := range rn.GetDataMap() {
 		fcd.Setters = append(fcd.Setters, Setter{Name: k, Value: v})
 	}
