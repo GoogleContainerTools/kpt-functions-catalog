@@ -17,7 +17,6 @@
 package main
 
 import (
-	"fmt"
 	"syscall/js"
 
 	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-namespace/transformer"
@@ -25,8 +24,13 @@ import (
 )
 
 func run() error {
+	resourceList := []byte("")
+
 	// Register js function processResourceList to the globals.
-	js.Global().Set("processResourceList", resourceListProcessorWrapper())
+	js.Global().Set("processResourceList", resourceListProcessorWrapper(&resourceList))
+	// Provide a second function that serves purely to also return the resourceList,
+	// in case of the above function failing.
+	js.Global().Set("processResourceListErrors", resourceListProcessorErrors(&resourceList))
 	// We need to ensure that the Go program is running when JavaScript calls it.
 	// Otherwise, it will complain the Go program has already exited.
 	<-make(chan bool)
@@ -37,19 +41,40 @@ func transformNamespace(input []byte) ([]byte, error) {
 	return fn.Run(fn.ResourceListProcessorFunc(transformer.Run), []byte(input))
 }
 
-func resourceListProcessorWrapper() js.Func {
-	// TODO: figure out a better way to surface a golang error to JS environment.
-	// Currently error is surfaced as a string.
-	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+func resourceListProcessorWrapper(resourceList *[]byte) js.Func {
+	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) any {
 		if len(args) != 1 {
 			return "Invalid number of arguments passed"
 		}
 		input := args[0].String()
-		transformed, err := transformNamespace([]byte(input))
+		applied, err := transformNamespace([]byte(input))
 		if err != nil {
-			return fmt.Errorf("unable to process resource list:", err.Error())
+			*resourceList = applied
+			return "unable to process resource list: " + err.Error()
 		}
-		return string(transformed)
+		*resourceList = applied
+		return string(applied)
+	})
+
+	return jsonFunc
+}
+
+func resourceListProcessorErrors(resourceList *[]byte) js.Func {
+	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) any {
+		rl, err := fn.ParseResourceList(*resourceList)
+		if err != nil {
+			return ""
+		}
+		if len(rl.Results) == 0 {
+			return ""
+		}
+		errorMessages := ""
+		for _, r := range(rl.Results) {
+			if (r.Severity == "error") {
+				errorMessages += r.Message
+			}
+		}
+		return errorMessages
 	})
 	return jsonFunc
 }

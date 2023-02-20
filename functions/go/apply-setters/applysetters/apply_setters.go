@@ -82,7 +82,6 @@ For input ApplySetters [name: env, value: "[stage, prod]"], qthe yaml node is tr
 environments: # kpt-set: ${env}
 - stage
 - prod
-
 */
 func (as *ApplySetters) visitMapping(object *yaml.RNode, path string) error {
 	return object.VisitFields(func(node *yaml.MapNode) error {
@@ -180,15 +179,16 @@ e.g.for input of scalar node 'nginx:1.7.1 # kpt-set: ${image}:${tag}' in the yam
 
 apiVersion: v1
 ...
-  image: nginx:1.7.1 # kpt-set: ${image}:${tag}
+
+	image: nginx:1.7.1 # kpt-set: ${image}:${tag}
 
 and for input ApplySetters [[name: image, value: ubuntu], [name: tag, value: 1.8.0]]
 The yaml node is transformed to
 
 apiVersion: v1
 ...
-  image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
 
+	image: ubuntu:1.8.0 # kpt-set: ${image}:${tag}
 */
 func (as *ApplySetters) visitScalar(object *yaml.RNode, path string) error {
 	if object.IsNil() {
