@@ -41,6 +41,8 @@ func transformLabels(input []byte) ([]byte, error) {
 	return fn.Run(runner, []byte(input))
 }
 
+// This funcion will return ALL Results with Severity error,
+// meaning unrelated errors may also be included.
 func resourceListProcessorWrapper(resourceList *[]byte) js.Func {
 	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) any {
 		if len(args) != 1 {
