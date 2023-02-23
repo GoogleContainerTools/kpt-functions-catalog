@@ -434,6 +434,40 @@ roles: # kpt-set: ${roles}
   - prod
 `,
 		},
+		{
+			// TODO(annasong): Handle inline yaml and fix test
+			// so that `path: new-placeholder` replaces 
+			// `path: placeholder # kpt-set: ${some-json-pointer}`
+			name: "inline yaml",
+			config: `
+data:
+  some-json-pointer: new-placeholder
+`,
+			input: `apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: test
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: placeholder # kpt-set: ${some-json-pointer}
+        value: known
+`,
+			expectedResources: `apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: test
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: placeholder # kpt-set: ${some-json-pointer}
+        value: known
+`,			
+		},
 	}
 	for i := range tests {
 		test := tests[i]
