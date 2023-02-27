@@ -2,6 +2,8 @@ apiVersion: kpt.dev/v1alpha1
 kind: Kptfile
 metadata:
   name: nginx
+  annotations:
+    config.kubernetes.io/local-config: "true"
 packageMetadata:
   shortDescription: describe this package
 upstream:

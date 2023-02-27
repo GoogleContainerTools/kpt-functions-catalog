@@ -2,6 +2,8 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
   name: set-namespace-to-prod
+  annotations:
+    config.kubernetes.io/local-config: "true"
 source: |
   load('encoding/json.star', 'json')
 
