@@ -1,5 +1,5 @@
 diff --git a/fn-config.yaml b/fn-config.yaml
-index 12939e5..0ee2f64 100644
+index d0a96a3..c191e3d 100644
 --- a/fn-config.yaml
 +++ b/fn-config.yaml
 @@ -1,7 +1,7 @@
@@ -8,9 +8,9 @@ index 12939e5..0ee2f64 100644
  metadata:
 -  name: my-config
 +  name: prod-my-config
+   annotations:
+     config.kubernetes.io/local-config: "true"
  additionalNameFields:
-   - kind: MyResource
-     group: dev.example.com
 diff --git a/resources.yaml b/resources.yaml
 index 8e037c3..ffd583b 100644
 --- a/resources.yaml
