@@ -1,9 +1,13 @@
 diff --git a/Kptfile b/Kptfile
-index bfbf712..6dd3f52 100644
+index d8e547b..dadae4c 100644
 --- a/Kptfile
 +++ b/Kptfile
-@@ -4,4 +4,4 @@ metadata:
+@@ -3,7 +3,7 @@ kind: Kptfile
+ metadata:
    name: example
+   annotations:
+-    config.kubernetes.io/local-config: "true"
++    config.kubernetes.io/local-config: 'true'
  pipeline:
    mutators:
 -    - image: gcr.io/kpt-fn/generate-folders:unstable

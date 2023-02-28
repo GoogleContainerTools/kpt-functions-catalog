@@ -2,6 +2,8 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
   name: pdb-for-depl
+  annotations:
+    config.kubernetes.io/local-config: "true"
 params:
   pdb:
     apiVersion: policy/v1beta1
