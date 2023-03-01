@@ -22,6 +22,7 @@ import (
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 	"github.com/imdario/mergo"
 	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/yaml"
 )
 
@@ -290,19 +291,21 @@ func (p *HelmChartInflationGeneratorPlugin) Generate() (objects fn.KubeObjects, 
 		return nil, err
 	}
 
-	s := strings.Split(string(stdout), "---")
-	for i := range s {
-		if len(s[i]) == 0 {
-			continue
-		}
-		o, err := fn.ParseKubeObject([]byte(s[i]))
+	r := &kio.ByteReader{Reader: bytes.NewBufferString(string(stdout)), OmitReaderAnnotations: true}
+	nodes, err := r.Read()
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range nodes {
+		o, err := fn.ParseKubeObject([]byte(nodes[i].MustString()))
 		if err != nil {
 			if strings.Contains(err.Error(), "expected exactly one object, got 0") {
 				// sometimes helm produces some messages in between resources, we can safely
 				// ignore these
 				continue
 			}
-			return nil, fmt.Errorf("failed to parse %s: %s", s[i], err.Error())
+			return nil, fmt.Errorf("failed to parse %s: %s", nodes[i].MustString(), err.Error())
 		}
 		objects = append(objects, o)
 	}
