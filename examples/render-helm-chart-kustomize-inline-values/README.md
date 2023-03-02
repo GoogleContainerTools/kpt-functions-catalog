@@ -23,7 +23,7 @@ generators:
       config.kubernetes.io/function: |
         container:
           network: true
-          image: gcr.io/kpt-fn/render-helm-chart:v0.2.1
+          image: gcr.io/kpt-fn/render-helm-chart:v0.2.2
   helmCharts:
   - name: ocp-pipeline
     namespace: mynamespace
