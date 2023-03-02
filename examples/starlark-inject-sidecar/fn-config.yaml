@@ -2,6 +2,8 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
   name: inject-sidecar-to-depl
+  annotations:
+    config.kubernetes.io/local-config: "true"
 source: |
   def ensure_inject_sidecar_to_depl(r):
     if r["apiVersion"] == "apps/v1" and r["kind"] == "Deployment":

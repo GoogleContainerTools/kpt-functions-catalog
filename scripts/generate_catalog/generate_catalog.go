@@ -56,6 +56,7 @@ var keywordsPool = []string{
 
 var (
 	branchesToSkip = []string{
+		"set-name-prefix/v0.0",
 		"sops/v0.2",
 	}
 )

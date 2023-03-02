@@ -2,6 +2,8 @@ apiVersion: fn.kpt.dev/v1alpha1
 kind: StarlarkRun
 metadata:
   name: set-namespace-to-prod
+  annotations:
+    config.kubernetes.io/local-config: "true"
 source: |
   # set the namespace on all resources except Kptfile and StarlarkRun kind.
   for resource in ctx.resource_list["items"]:

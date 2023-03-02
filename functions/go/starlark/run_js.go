@@ -19,7 +19,7 @@ package main
 import (
 	"syscall/js"
 
-	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-namespace/transformer"
+	"github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/starlark/starlark"
 	"github.com/GoogleContainerTools/kpt-functions-sdk/go/fn"
 )
 
@@ -31,25 +31,25 @@ func run() error {
 	// Provide a second function that serves purely to also return the resourceList,
 	// in case of the above function failing.
 	js.Global().Set("processResourceListErrors", resourceListProcessorErrors(&resourceList))
+
+
 	// We need to ensure that the Go program is running when JavaScript calls it.
 	// Otherwise, it will complain the Go program has already exited.
 	<-make(chan bool)
 	return nil
 }
 
-func transformNamespace(input []byte) ([]byte, error) {
-	return fn.Run(fn.ResourceListProcessorFunc(transformer.Run), []byte(input))
+func executeStarlark(input []byte) ([]byte, error) {
+	return fn.Run(fn.ResourceListProcessorFunc(starlark.Process), []byte(input))
 }
 
-// This funcion will return ALL Results with Severity error,
-// meaning unrelated errors may also be included.
 func resourceListProcessorWrapper(resourceList *[]byte) js.Func {
 	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) any {
 		if len(args) != 1 {
 			return "Invalid number of arguments passed"
 		}
 		input := args[0].String()
-		applied, err := transformNamespace([]byte(input))
+		applied, err := executeStarlark([]byte(input))
 		if err != nil {
 			*resourceList = applied
 			return "unable to process resource list: " + err.Error()
@@ -61,6 +61,8 @@ func resourceListProcessorWrapper(resourceList *[]byte) js.Func {
 	return jsonFunc
 }
 
+// This funcion will return ALL Results with Severity error,
+// meaning unrelated errors may also be included.
 func resourceListProcessorErrors(resourceList *[]byte) js.Func {
 	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) any {
 		rl, err := fn.ParseResourceList(*resourceList)

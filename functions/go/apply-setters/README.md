@@ -106,7 +106,7 @@ $ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable --fn-config ./apply-s
 Alternatively, setter values can be passed as key-value pairs in the CLI
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- image=ubuntu replicas=3
+$ kpt fn eval --image gcr.io/kpt-fn/apply-setters:unstable -- tag=1.16.2 nginx-replicas=3
 ```
 
 Modified resource looks like the following:
