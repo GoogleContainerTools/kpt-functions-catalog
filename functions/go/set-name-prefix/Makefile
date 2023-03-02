@@ -10,3 +10,4 @@ build:
 
 push:
 	KO_DOCKER_REPO=${IMAGE_REPO} go run github.com/google/ko@v0.12.0 build -B --tags=${IMAGE_TAG} .
+	
