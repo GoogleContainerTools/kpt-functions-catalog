@@ -13,12 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
       - uses: actions/setup-node@v3
         with:
           node-version: 16
       - name: Merge gob branch
         run: git worktree add ./gob gob && cp -r gob/* .
-          node-version: 16
       - name: Generate Site
         run: make site-generate
       - uses: FirebaseExtended/action-hosting-deploy@4d0d0023f1d92b9b7d16dda64b3d7abd2c98974b
