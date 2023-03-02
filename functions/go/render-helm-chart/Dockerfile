@@ -14,7 +14,7 @@ ARG TARGETOS TARGETARCH
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/function ./
 
 RUN apk update && apk add --no-cache curl
-ARG HELM_VERSION="v3.8.0"
+ARG HELM_VERSION="v3.11.1"
 RUN curl -fsSL -o /helm-${HELM_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz https://get.helm.sh/helm-${HELM_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz && \
      tar -zxvf /helm-${HELM_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz && \
      mv ./${TARGETOS}-${TARGETARCH}/helm /usr/local/bin/helm
