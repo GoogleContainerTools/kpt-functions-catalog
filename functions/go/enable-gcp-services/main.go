@@ -11,7 +11,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 )
 
-//nolint
+// nolint
 func main() {
 	psf := ProjectServiceSetFunction{}
 	cmd := command.Build(&psf, command.StandaloneEnabled, false)

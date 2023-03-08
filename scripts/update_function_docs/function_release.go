@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://www.apache.org/licenses/LICENSE-2.0
+//	https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -157,7 +156,7 @@ func (fr *functionRelease) parseMetadata(examplesPath string) error {
 
 	metadataPath := filepath.Join(fr.FunctionPath, "metadata.yaml")
 	var md metadata
-	yamlFile, err := ioutil.ReadFile(metadataPath)
+	yamlFile, err := os.ReadFile(metadataPath)
 	if err != nil {
 		return err
 	}
@@ -224,7 +223,7 @@ func (fr *functionRelease) updateExampleDocs() error {
 
 // Perform in place search/replace operations on a documentation file
 func (fr *functionRelease) updateDoc(filePath string) error {
-	contents, err := ioutil.ReadFile(filePath)
+	contents, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}

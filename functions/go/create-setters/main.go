@@ -11,7 +11,7 @@ import (
 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-//nolint
+// nolint
 func main() {
 	csp := CreateSettersProcessor{}
 	cmd := command.Build(&csp, command.StandaloneEnabled, false)

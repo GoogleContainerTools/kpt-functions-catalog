@@ -48,7 +48,7 @@ $ kpt fn render apply-replacements-simple
 
 ### Expected result
 
-`job.yaml` should now have the following conents: 
+`job.yaml` should now have the following contents: 
 
 ```yaml
 apiVersion: batch/v1

@@ -149,7 +149,7 @@ func newResMapFactory() *resmap.Factory {
 	return resmap.NewFactory(resourceFactory)
 }
 
-//nolint
+// nolint
 func main() {
 	asp := SetAnnotationsProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)

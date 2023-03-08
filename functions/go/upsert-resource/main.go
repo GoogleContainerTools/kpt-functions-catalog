@@ -10,7 +10,7 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/fn/framework/command"
 )
 
-//nolint
+// nolint
 func main() {
 	asp := UpsertResourceProcessor{}
 	cmd := command.Build(&asp, command.StandaloneEnabled, false)
