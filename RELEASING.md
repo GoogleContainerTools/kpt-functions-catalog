@@ -7,8 +7,8 @@ kpt-functions-catalog repo.
    failing on the master, we need to fix it before doing a release.
 1. Go to the [releases pages] in your browser.
 1. Click `Draft a new release` to create a new release for a function. The tag
-   version format should be `{language}/{function-name}/{semver}`. e.g.
-   `go/set-namespace/v1.2.3` and `ts/kubeval/v2.3.4`. The release name should be
+   version format should be `functions/{language}/{function-name}/{semver}`. e.g.
+   `functions/go/set-namespace/v1.2.3` and `functions/ts/kubeval/v2.3.4`. The release name should be
    `{funtion-name} {semver}`. The release notes for this function should be in
    the body. 
 1. Click `Publish release` button.
