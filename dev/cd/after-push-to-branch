@@ -20,6 +20,9 @@ echo "BRANCH is ${BRANCH}"
 REF=$(git rev-parse --short HEAD)
 echo "REF is ${REF}"
 
+IMAGE_REPO=$(echo $IMAGE_REPO | tr '[:upper:]' '[:lower:]')
+echo "IMAGE_REPO is ${IMAGE_REPO}"
+
 # We push two tags, <branchname>-latest and <branchname>-git-$GITSHA
 # The idea is that if you want the latest version from that branch,
 # you'll use the first form, if you want a particular version
