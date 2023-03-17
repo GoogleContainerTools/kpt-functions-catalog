@@ -21,7 +21,7 @@ const (
 
 	sourceKey = "source"
 
-	defaultProgramName = "stalark-function-run"
+	defaultProgramName = "starlark-function-run"
 )
 
 type StarlarkRun struct {
