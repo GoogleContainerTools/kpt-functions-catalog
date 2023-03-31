@@ -2,7 +2,6 @@ package gcpservices
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -709,14 +708,14 @@ metadata:
 func setupInputs(t *testing.T, resourceMap map[string]string) string {
 	t.Helper()
 	require := require.New(t)
-	baseDir, err := ioutil.TempDir("", "")
+	baseDir, err := os.MkdirTemp("", "")
 	require.NoError(err)
 
 	for rpath, data := range resourceMap {
 		filePath := path.Join(baseDir, rpath)
 		err = os.MkdirAll(path.Dir(filePath), os.ModePerm)
 		require.NoError(err)
-		err = ioutil.WriteFile(path.Join(baseDir, rpath), []byte(data), 0644)
+		err = os.WriteFile(path.Join(baseDir, rpath), []byte(data), 0644)
 		require.NoError(err)
 	}
 	return baseDir
