@@ -1,6 +1,6 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/fix
 
-go 1.18
+go 1.19
 
 require (
 	github.com/stretchr/testify v1.7.0

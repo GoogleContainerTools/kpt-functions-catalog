@@ -1,12 +1,8 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221013190212-691c71e8ceee h1:4lvMQqHIcZFCLO0JS0YkHligjZca5Wi0CZ7QLCvMjZY=
-github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221013190212-691c71e8ceee/go.mod h1:prNhhUAODrB2VqHVead9tB8nLU9ffY4e4jjBwLMNO1M=
 github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221014182208-8e78fe927b37 h1:XBW54uFJhiVz3fvypNtWhfkthKI4PpFnLNTBXfi7DHE=
 github.com/GoogleContainerTools/kpt-functions-sdk/go/api v0.0.0-20221014182208-8e78fe927b37/go.mod h1:prNhhUAODrB2VqHVead9tB8nLU9ffY4e4jjBwLMNO1M=
-github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221013190212-691c71e8ceee h1:AdsG3SitnwYJrCWPVa6X/whonvmbKa5+uOI3tUm3sJU=
-github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221013190212-691c71e8ceee/go.mod h1:mqc5jH6i0Ll6T4wCmTXsVNVxhwBGlVtrtmoF/g3E9lE=
 github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221014182208-8e78fe927b37 h1:3IBAC+PIdiUyLSuUBCdfWgNUdki0aUcEyvjljfygMpo=
 github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221014182208-8e78fe927b37/go.mod h1:mqc5jH6i0Ll6T4wCmTXsVNVxhwBGlVtrtmoF/g3E9lE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
