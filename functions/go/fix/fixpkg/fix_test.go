@@ -1,7 +1,6 @@
 package fixpkg
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -12,7 +11,7 @@ import (
 )
 
 func TestFixV1alpha1ToV1(t *testing.T) {
-	dir, err := ioutil.TempDir("", "")
+	dir, err := os.MkdirTemp("", "")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 	err = copyutil.CopyDir("../../../../testdata/fix/nginx-v1alpha1", dir)
@@ -57,7 +56,7 @@ func TestFixV1alpha1ToV1(t *testing.T) {
 }
 
 func TestFixV1alpha2ToV1(t *testing.T) {
-	dir, err := ioutil.TempDir("", "")
+	dir, err := os.MkdirTemp("", "")
 	assert.NoError(t, err)
 	defer os.RemoveAll(dir)
 	err = copyutil.CopyDir("../../../../testdata/fix/nginx-v1alpha2", dir)

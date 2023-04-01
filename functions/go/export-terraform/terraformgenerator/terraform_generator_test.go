@@ -16,7 +16,6 @@ package terraformgenerator
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -95,7 +94,7 @@ func TestTerraformGeneration(t *testing.T) {
 				require.NoError(err)
 
 				// round-trip to disk to make sure all annotations are consistent
-				tmpDir, err := ioutil.TempDir("", "export-terraform-test-*")
+				tmpDir, err := os.MkdirTemp("", "export-terraform-test-*")
 				defer os.RemoveAll(tmpDir)
 				require.NoError(err)
 				err = testutil.ResourceListToDirectory(tempRL, tmpDir)
@@ -142,7 +141,7 @@ func TestTerraformGeneration(t *testing.T) {
 			// diff command) to do it. This will be addressed in the next iteration.
 			// The workaround is that we read the resource files as a ResourceList and
 			// then compare this ResourceList with the expected ResourceList.
-			tmpDir, err := ioutil.TempDir("", "export-terraform-test-*")
+			tmpDir, err := os.MkdirTemp("", "export-terraform-test-*")
 			defer os.RemoveAll(tmpDir)
 			require.NoError(err)
 			err = testutil.ResourceListToDirectory(actualRL, tmpDir)

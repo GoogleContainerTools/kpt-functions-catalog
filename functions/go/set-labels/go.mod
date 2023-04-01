@@ -1,6 +1,6 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-labels
 
-go 1.18
+go 1.19
 
 require github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20221014182208-8e78fe927b37
 

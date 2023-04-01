@@ -7,8 +7,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/qri-io/starlib/util"
 	"go.starlark.net/resolve"
@@ -60,7 +60,7 @@ func (sf *Filter) setup() error {
 
 	// read the program from a file
 	if sf.Path != "" {
-		b, err := ioutil.ReadFile(sf.Path)
+		b, err := os.ReadFile(sf.Path)
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func (sf *Filter) setup() error {
 				return err
 			}
 			defer resp.Body.Close()
-			b, err := ioutil.ReadAll(resp.Body)
+			b, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return err
 			}
