@@ -1,6 +1,6 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/source-gcloud-generator
 
-go 1.18
+go 1.19
 
 require (
 	gopkg.in/ini.v1 v1.66.4

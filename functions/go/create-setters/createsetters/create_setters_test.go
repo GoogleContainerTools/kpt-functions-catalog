@@ -2,7 +2,6 @@ package createsetters
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -525,18 +524,18 @@ spec:
 	for i := range tests {
 		test := tests[i]
 		t.Run(test.name, func(t *testing.T) {
-			baseDir, err := ioutil.TempDir("", "")
+			baseDir, err := os.MkdirTemp("", "")
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
 			defer os.RemoveAll(baseDir)
 
-			r, err := ioutil.TempFile(baseDir, "k8s-cli-*.yaml")
+			r, err := os.CreateTemp(baseDir, "k8s-cli-*.yaml")
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
 			defer os.Remove(r.Name())
-			err = ioutil.WriteFile(r.Name(), []byte(test.input), 0600)
+			err = os.WriteFile(r.Name(), []byte(test.input), 0600)
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
@@ -584,7 +583,7 @@ spec:
 				t.FailNow()
 			}
 
-			actualResources, err := ioutil.ReadFile(r.Name())
+			actualResources, err := os.ReadFile(r.Name())
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
