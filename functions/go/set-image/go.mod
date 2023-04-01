@@ -1,10 +1,9 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/set-image
 
-go 1.18
+go 1.19
 
 require (
 	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220812180116-970f3e4cbc5a
-	github.com/stretchr/testify v1.8.0
 	sigs.k8s.io/kustomize/api v0.11.0
 	sigs.k8s.io/kustomize/kyaml v0.13.9
 )
@@ -24,7 +23,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

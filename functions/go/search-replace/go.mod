@@ -1,6 +1,6 @@
 module github.com/GoogleContainerTools/kpt-functions-catalog/functions/go/search-replace
 
-go 1.18
+go 1.19
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.0.2
