@@ -135,7 +135,7 @@ helmCharts:
 To render a remote minecraft chart, you can run the following command: 
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.2.2 --network -- \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.2.3 --network -- \
 name=minecraft \
 repo=https://itzg.github.io/minecraft-server-charts \
 releaseName=test

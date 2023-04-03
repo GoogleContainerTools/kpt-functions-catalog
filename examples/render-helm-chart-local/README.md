@@ -21,7 +21,7 @@ Run the following commands to render the helm chart in your local
 filesystem.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.2.2 \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.2.3 \
 --mount type=bind,src=$(pwd),dst=/tmp/charts \
 -- name=helloworld-chart \
 releaseName=test
@@ -30,7 +30,7 @@ releaseName=test
 You can optionally provide your own values files using `valuesFile`.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.2.2 \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.2.3 \
 --mount type=bind,src=$(pwd),dst=/tmp/charts -- \
 name=helloworld-chart \
 releaseName=test \
@@ -40,7 +40,7 @@ valuesFile=/tmp/charts/helloworld-values/values.yaml
 You can optionally skip tests in the templated output with `skipTests`.
 
 ```shell
-$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.2.2 \
+$ kpt fn eval --image gcr.io/kpt-fn/render-helm-chart:v0.2.3 \
 --mount type=bind,src=$(pwd),dst=/tmp/charts -- \
 name=helloworld-chart \
 releaseName=test \
