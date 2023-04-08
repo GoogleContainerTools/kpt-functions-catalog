@@ -12,7 +12,11 @@ kpt-functions-catalog repo.
    `{funtion-name} {semver}`. The release notes for this function should be in
    the body. 
 1. Click `Publish release` button.
+1. Verify the new functions is released in gcr.io/kpt-fn/{funtion-name}/{semver}
 1. Send an announcement email in the [kpt users google group].
+
+Note: For most functions, you can ignore the GitHub action "Run the CD script after tags that look like versions". It is only for functions that have 
+KO build and release setup. Currently only three functions uses ko to release: `bind`, `ensure-name-substring`, `set-gcp-resource-ids`.  
 
 ## Updating function docs
 
