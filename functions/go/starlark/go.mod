@@ -6,7 +6,7 @@ require (
 	github.com/GoogleContainerTools/kpt-functions-sdk/go/fn v0.0.0-20220506190241-f85503febd54
 	github.com/qri-io/starlib v0.5.0
 	github.com/stretchr/testify v1.7.1
-	go.starlark.net v0.0.0-20230302034142-4b1e35fe2254
+	go.starlark.net v0.0.0-20230829175125-68633c9954b0
 	k8s.io/api v0.23.4
 	k8s.io/apimachinery v0.23.4
 	sigs.k8s.io/kustomize/kyaml v0.13.7-0.20220418212550-9d5491c2e20c

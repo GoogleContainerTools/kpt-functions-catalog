@@ -60,7 +60,7 @@ jobs:
       GO111MODULE: on
     steps:
       - name: Set up Go 1.19
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: 1.19
         id: go
@@ -93,7 +93,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Set up Go 1.19
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: 1.19
       - name: Install kpt
