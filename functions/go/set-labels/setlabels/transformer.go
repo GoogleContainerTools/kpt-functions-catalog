@@ -21,7 +21,10 @@ var _ fn.Runner = &SetLabels{}
 type SetLabels struct {
 	// labels is the desired labels
 	Labels  map[string]string `json:"labels,omitempty"`
+
+	// options is the configurable and optional options
 	Options map[string]bool   `json:"options,omitempty"`
+
 	count   int
 }
 
@@ -162,6 +165,7 @@ func hasSpecSelector(o *fn.KubeObject) bool {
 
 // setLabelsInSelector set labels for all selectors, including spec selector map, spec selector LabelSelector, LabelSelector in JobTemplate, and podSelector in NetworkPolicy, and
 func (p *SetLabels) setLabelsInSelector(o *fn.KubeObject) error {
+	// setSelectorLabels is true by default
 	if !p.Options["setSelectorLabels"] {
 		return nil
 	}
