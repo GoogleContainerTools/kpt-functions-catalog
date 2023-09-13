@@ -1,5 +1,5 @@
 diff --git a/deployment.yaml b/deployment.yaml
-index e284621a..2e32cb8c 100644
+index e284621..2e32cb8 100644
 --- a/deployment.yaml
 +++ b/deployment.yaml
 @@ -4,6 +4,8 @@ metadata:
