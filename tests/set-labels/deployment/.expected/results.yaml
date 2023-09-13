@@ -9,3 +9,13 @@ items:
     results:
       - message: set 4 labels in total
         severity: info
+  - image: gcr.io/kpt-fn/set-labels:unstable
+    exitCode: 0
+    results:
+      - message: set 6 labels in total
+        severity: info
+  - image: gcr.io/kpt-fn/set-labels:unstable
+    exitCode: 0
+    results:
+      - message: set 6 labels in total
+        severity: info
