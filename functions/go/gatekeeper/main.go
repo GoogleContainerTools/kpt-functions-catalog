@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2021-2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,9 +42,6 @@ type GatekeeperProcessor struct {
 }
 
 func (gkp *GatekeeperProcessor) Process(resourceList *framework.ResourceList) error {
-	resourceList.Result = &framework.Result{
-		Name: "gatekeeper",
-	}
 	var objects []*unstructured.Unstructured
 	for _, item := range resourceList.Items {
 		s, err := item.String()
@@ -61,21 +58,19 @@ func (gkp *GatekeeperProcessor) Process(resourceList *framework.ResourceList) er
 		objects = append(objects, un)
 	}
 
-	result, err := Validate(objects)
+	results, err := Validate(objects)
 	// When err is not nil, result should be nil.
 	if err != nil {
-		result = &framework.Result{
-			Items: []framework.ResultItem{
-				{
-					Message:  err.Error(),
-					Severity: framework.Error,
-				},
+		results = &framework.Results{
+			&framework.Result{
+				Message:  err.Error(),
+				Severity: framework.Error,
 			},
 		}
 	}
-	resourceList.Result = result
-	if resultContainsError(result) {
-		return result
+	resourceList.Results = *results
+	if resultContainsError(results) {
+		return results
 	}
 	return nil
 }
@@ -186,12 +181,12 @@ func main() {
 	}
 }
 
-func resultContainsError(result *framework.Result) bool {
-	if result == nil {
+func resultContainsError(results *framework.Results) bool {
+	if results == nil {
 		return false
 	}
-	for _, item := range result.Items {
-		if item.Severity == framework.Error {
+	for _, result := range *results {
+		if result.Severity == framework.Error {
 			return true
 		}
 	}

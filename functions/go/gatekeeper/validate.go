@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019-2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@ import (
 	"sort"
 	"strconv"
 
-	opatypes "github.com/open-policy-agent/frameworks/constraint/pkg/types"
 	// The gatekeeper/pkg/gator/test package is the underlying libraries for
 	// the `gator test` subcommand, not a library for testing golang code.
-	gatortest "github.com/open-policy-agent/gatekeeper/pkg/gator/test"
-	opautil "github.com/open-policy-agent/gatekeeper/pkg/util"
+	gatortest "github.com/open-policy-agent/gatekeeper/v3/pkg/gator/test"
+	gkutil "github.com/open-policy-agent/gatekeeper/v3/pkg/util"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/kustomize/kyaml/fn/framework"
 	"sigs.k8s.io/kustomize/kyaml/kio/kioutil"
@@ -31,9 +30,9 @@ import (
 )
 
 // Validate makes sure the configs passed to it comply with any Constraints and
-// Constraint Templates present in the list of configs
-func Validate(objects []*unstructured.Unstructured) (*framework.Result, error) {
-	resps, err := gatortest.Test(objects)
+// Constraint Templates present in the list of configs.
+func Validate(objects []*unstructured.Unstructured) (*framework.Results, error) {
+	resps, err := gatortest.Test(objects, gatortest.Opts{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,18 +44,15 @@ func Validate(objects []*unstructured.Unstructured) (*framework.Result, error) {
 	return nil, nil
 }
 
-func parseResults(results []*opatypes.Result) (*framework.Result, error) {
-	var items []framework.ResultItem
+func parseResults(results []*gatortest.GatorResult) (*framework.Results, error) {
+	var items framework.Results
 
 	for _, r := range results {
-		u, ok := r.Resource.(*unstructured.Unstructured)
-		if !ok {
-			return nil, fmt.Errorf("could not cast to unstructured: %+v", r.Resource)
-		}
+		u := r.ViolatingObject
 
-		item := framework.ResultItem{
+		item := framework.Result{
 			Message: fmt.Sprintf("%s\nviolatedConstraint: %s", r.Msg, r.Constraint.GetName()),
-			ResourceRef: yaml.ResourceIdentifier{
+			ResourceRef: &yaml.ResourceIdentifier{
 				TypeMeta: yaml.TypeMeta{
 					APIVersion: u.GetAPIVersion(),
 					Kind:       u.GetKind(),
@@ -69,9 +65,9 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 		}
 
 		switch r.EnforcementAction {
-		case string(opautil.Dryrun):
+		case string(gkutil.Dryrun):
 			item.Severity = framework.Info
-		case string(opautil.Warn):
+		case string(gkutil.Warn):
 			item.Severity = framework.Warning
 		default:
 			item.Severity = framework.Error
@@ -80,7 +76,7 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 		path, foundPath := u.GetAnnotations()[kioutil.PathAnnotation]
 		index, foundIndex := u.GetAnnotations()[kioutil.IndexAnnotation]
 		if foundPath {
-			item.File = framework.File{
+			item.File = &framework.File{
 				Path: path,
 			}
 			if foundIndex {
@@ -90,19 +86,19 @@ func parseResults(results []*opatypes.Result) (*framework.Result, error) {
 				}
 				item.File.Index = idx
 			}
+		} else {
+			item.File = &framework.File{}
 		}
 
-		items = append(items, item)
+		items = append(items, &item)
 	}
 	sortResultItems(items)
 
-	return &framework.Result{
-		Items: items,
-	}, nil
+	return &items, nil
 }
 
-// TODO(mengqiy): upstream this to the SDK
-func sortResultItems(items []framework.ResultItem) {
+// TODO(mengqiy): upstream this to the SDK.
+func sortResultItems(items framework.Results) {
 	sort.SliceStable(items, func(i, j int) bool {
 		if fileLess(items, i, j) != 0 {
 			return fileLess(items, i, j) < 0
@@ -110,11 +106,11 @@ func sortResultItems(items []framework.ResultItem) {
 		if severityLess(items, i, j) != 0 {
 			return severityLess(items, i, j) < 0
 		}
-		return resultItemToString(items[i]) < resultItemToString(items[j])
+		return resultItemToString(*items[i]) < resultItemToString(*items[j])
 	})
 }
 
-func severityLess(items []framework.ResultItem, i, j int) int {
+func severityLess(items framework.Results, i, j int) int {
 	severityToNumber := map[framework.Severity]int{
 		framework.Error:   0,
 		framework.Warning: 1,
@@ -132,7 +128,7 @@ func severityLess(items []framework.ResultItem, i, j int) int {
 	return severityLevelI - severityLevelJ
 }
 
-func fileLess(items []framework.ResultItem, i, j int) int {
+func fileLess(items framework.Results, i, j int) int {
 	if items[i].File.Path != items[j].File.Path {
 		if items[i].File.Path < items[j].File.Path {
 			return -1
@@ -143,7 +139,7 @@ func fileLess(items []framework.ResultItem, i, j int) int {
 	return items[i].File.Index - items[j].File.Index
 }
 
-func resultItemToString(item framework.ResultItem) string {
+func resultItemToString(item framework.Result) string {
 	return fmt.Sprintf("resource-ref:%s,field:%s,message:%s",
 		item.ResourceRef, item.Field, item.Message)
 }

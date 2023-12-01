@@ -11,111 +11,115 @@ import (
 func TestSortResultItems(t *testing.T) {
 	testcases := []struct {
 		name   string
-		input  []framework.ResultItem
-		output []framework.ResultItem
+		input  framework.Results
+		output framework.Results
 	}{
 		{
 			name: "sort based on severity",
-			input: []framework.ResultItem{
-				{
+			input: framework.Results{
+				&framework.Result{
 					Message:  "Error message 1",
 					Severity: framework.Info,
+					File:     &framework.File{},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message 2",
 					Severity: framework.Error,
+					File:     &framework.File{},
 				},
 			},
-			output: []framework.ResultItem{
-				{
+			output: framework.Results{
+				&framework.Result{
 					Message:  "Error message 2",
 					Severity: framework.Error,
+					File:     &framework.File{},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message 1",
 					Severity: framework.Info,
+					File:     &framework.File{},
 				},
 			},
 		},
 		{
 			name: "sort based on file",
-			input: []framework.ResultItem{
-				{
+			input: framework.Results{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Error,
-					File: framework.File{
+					File: &framework.File{
 						Path:  "resource.yaml",
 						Index: 1,
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Info,
-					File: framework.File{
+					File: &framework.File{
 						Path:  "resource.yaml",
 						Index: 0,
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Info,
-					File: framework.File{
+					File: &framework.File{
 						Path:  "other-resource.yaml",
 						Index: 0,
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Warning,
-					File: framework.File{
+					File: &framework.File{
 						Path:  "resource.yaml",
 						Index: 2,
 					},
 				},
 			},
-			output: []framework.ResultItem{
-				{
+			output: framework.Results{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Info,
-					File: framework.File{
+					File: &framework.File{
 						Path:  "other-resource.yaml",
 						Index: 0,
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Info,
-					File: framework.File{
+					File: &framework.File{
 						Path:  "resource.yaml",
 						Index: 0,
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Error,
-					File: framework.File{
+					File: &framework.File{
 						Path:  "resource.yaml",
 						Index: 1,
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Warning,
-					File: framework.File{
+					File: &framework.File{
 						Path:  "resource.yaml",
 						Index: 2,
 					},
 				},
 			},
 		},
-
 		{
 			name: "sort based on other fields",
-			input: []framework.ResultItem{
-				{
+			input: framework.Results{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceIdentifier{
+					File:     &framework.File{},
+					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
@@ -125,14 +129,15 @@ func TestSortResultItems(t *testing.T) {
 							Name:      "bar",
 						},
 					},
-					Field: framework.Field{
+					Field: &framework.Field{
 						Path: "spec",
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceIdentifier{
+					File:     &framework.File{},
+					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
@@ -142,14 +147,15 @@ func TestSortResultItems(t *testing.T) {
 							Name:      "bar",
 						},
 					},
-					Field: framework.Field{
+					Field: &framework.Field{
 						Path: "metadata.name",
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Another error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceIdentifier{
+					File:     &framework.File{},
+					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
@@ -159,14 +165,15 @@ func TestSortResultItems(t *testing.T) {
 							Name:      "bar",
 						},
 					},
-					Field: framework.Field{
+					Field: &framework.Field{
 						Path: "metadata.name",
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Another error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceIdentifier{
+					File:     &framework.File{},
+					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "ConfigMap",
@@ -176,16 +183,17 @@ func TestSortResultItems(t *testing.T) {
 							Name:      "bar",
 						},
 					},
-					Field: framework.Field{
+					Field: &framework.Field{
 						Path: "metadata.name",
 					},
 				},
 			},
-			output: []framework.ResultItem{
-				{
+			output: framework.Results{
+				&framework.Result{
 					Message:  "Another error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceIdentifier{
+					File:     &framework.File{},
+					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "ConfigMap",
@@ -195,14 +203,15 @@ func TestSortResultItems(t *testing.T) {
 							Name:      "bar",
 						},
 					},
-					Field: framework.Field{
+					Field: &framework.Field{
 						Path: "metadata.name",
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Another error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceIdentifier{
+					File:     &framework.File{},
+					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
@@ -212,14 +221,15 @@ func TestSortResultItems(t *testing.T) {
 							Name:      "bar",
 						},
 					},
-					Field: framework.Field{
+					Field: &framework.Field{
 						Path: "metadata.name",
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceIdentifier{
+					File:     &framework.File{},
+					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
@@ -229,14 +239,15 @@ func TestSortResultItems(t *testing.T) {
 							Name:      "bar",
 						},
 					},
-					Field: framework.Field{
+					Field: &framework.Field{
 						Path: "metadata.name",
 					},
 				},
-				{
+				&framework.Result{
 					Message:  "Error message",
 					Severity: framework.Error,
-					ResourceRef: yaml.ResourceIdentifier{
+					File:     &framework.File{},
+					ResourceRef: &yaml.ResourceIdentifier{
 						TypeMeta: yaml.TypeMeta{
 							APIVersion: "v1",
 							Kind:       "Pod",
@@ -246,7 +257,7 @@ func TestSortResultItems(t *testing.T) {
 							Name:      "bar",
 						},
 					},
-					Field: framework.Field{
+					Field: &framework.Field{
 						Path: "spec",
 					},
 				},
