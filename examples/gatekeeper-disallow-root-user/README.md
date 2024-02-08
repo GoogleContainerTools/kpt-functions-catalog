@@ -83,7 +83,7 @@ exitCode: 1
 items:
   - image: gcr.io/kpt-fn/gatekeeper:unstable
     stderr: |-
-      [error] apps/v1/Deployment/nginx-deploy : Containers must not run as root
+      [error] apps/v1/Deployment/nginx-deploy: Containers must not run as root
       violatedConstraint: disallowroot
     exitCode: 1
     results:
