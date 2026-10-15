@@ -154,7 +154,7 @@ while IFS= read -r -d '' f; do
   else
     # Match any patch of the same series we are moving to is not assumed;
     # replace whatever single go directive exists.
-    pattern='^go [0-9]\+\.[0-9]\+\.[0-9]\+$'
+    pattern='^go [0-9]+\.[0-9]+\.[0-9]+$'
     replacement="go ${NEW}"
   fi
 
